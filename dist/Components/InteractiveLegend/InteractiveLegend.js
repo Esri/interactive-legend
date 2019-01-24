@@ -78,6 +78,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             _this.mutedShade = null;
             // mutedOpacity
             _this.mutedOpacity = null;
+            // searchExpressions
             _this.searchExpressions = null;
             // layerListViewModel
             _this.layerListViewModel = null;
@@ -130,7 +131,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                     style.activeLayerInfos = activeLayerInfos;
                     return _this._refreshActiveLayerInfos(activeLayerInfos);
                 }),
-                watchUtils.init(this, ["view", "filterMode", "layerListViewModel"], function () {
+                watchUtils.init(this, ["view", "filterMode", "mutedOpacity", "layerListViewModel"], function () {
                     style.view = view;
                     style.filterMode = filterMode;
                     style.mutedOpacity = mutedOpacity;

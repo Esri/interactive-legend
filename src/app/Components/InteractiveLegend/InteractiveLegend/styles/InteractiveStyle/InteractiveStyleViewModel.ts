@@ -187,7 +187,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   //
   //----------------------------------
 
-  // filterFeatures
+  // applyFeatureFilter
   applyFeatureFilter(
     elementInfo: any,
     field: string,
@@ -217,7 +217,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     });
   }
 
-  // muteFeatures
+  // applyFeatureMute
   applyFeatureMute(
     elementInfo: any,
     field: string,
@@ -256,7 +256,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     this._setSearchExpression(filterExpression, featureLayerViewIndex);
   }
 
-  // highlightFeatures
+  // applyFeatureHighlight
   applyFeatureHighlight(
     elementInfo: any,
     field: string,
@@ -496,6 +496,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       );
       return expression;
     }
+
     if (legendElement.type === "symbol-table") {
       if (label.includes(">")) {
         return Array.isArray(elementInfoHasValue)
@@ -512,19 +513,22 @@ class InteractiveStyleViewModel extends declared(Accessor) {
             : `${field} > ${elementInfoHasValue[0]} AND ${field} <= ${
                 elementInfoHasValue[1]
               }`
+          : isNaN(parseFloat(elementInfoHasValue))
+          ? `${field} = '${elementInfoHasValue}'`
           : `${field} = ${elementInfoHasValue} OR ${field} = '${elementInfoHasValue}'`;
         return expression;
       }
     }
   }
 
+  // LOGIC MAY CHANGE FOR SIZE RAMP FILTER
   // _handleSizeRampFeatureFilter
   private _handleSizeRampFeatureFilter(
     legendInfoIndex: number,
     field: string,
     legendElementInfos: any[],
     elementInfo: any
-  ) {
+  ): string {
     // FIRST LEGEND INFO
     if (legendInfoIndex === 0) {
       return `${field} >= ${elementInfo.value}`;
@@ -661,6 +665,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     highlightedFeatureData[legendInfoIndex] = [highlight];
   }
 
+  // LOGIC MAY CHANGE FOR SIZE RAMP FILTER
   // _highlightSizeRamp
   private _highlightSizeRamp(
     legendInfoIndex: number,

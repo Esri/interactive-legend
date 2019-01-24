@@ -129,7 +129,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         //  Public methods
         //
         //----------------------------------
-        // filterFeatures
+        // applyFeatureFilter
         InteractiveStyleViewModel.prototype.applyFeatureFilter = function (elementInfo, field, featureLayerViewIndex, legendElement, legendInfoIndex, legendElementInfos) {
             this._generateQueryExpressions(elementInfo, field, featureLayerViewIndex, legendElement, legendInfoIndex, legendElementInfos);
             var queryExpressions = this.interactiveStyleData.queryExpressions[featureLayerViewIndex];
@@ -140,7 +140,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 where: filterExpression
             });
         };
-        // muteFeatures
+        // applyFeatureMute
         InteractiveStyleViewModel.prototype.applyFeatureMute = function (elementInfo, field, legendInfoIndex, featureLayerViewIndex, legendElement, legendElementInfos) {
             var originalRenderer = this.interactiveStyleData.originalRenderers[featureLayerViewIndex];
             if (!originalRenderer) {
@@ -158,7 +158,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             var filterExpression = queryExpressions.join(" OR ");
             this._setSearchExpression(filterExpression, featureLayerViewIndex);
         };
-        // highlightFeatures
+        // applyFeatureHighlight
         InteractiveStyleViewModel.prototype.applyFeatureHighlight = function (elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, legendElementInfos) {
             if (isSizeRamp) {
                 this._highlightSizeRamp(legendInfoIndex, field, legendElementInfos, elementInfo, featureLayerViewIndex);
@@ -310,11 +310,14 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                         ? legendElementInfos.length - 1 === legendInfoIndex
                             ? field + " >= " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfoHasValue[1]
                             : field + " > " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfoHasValue[1]
-                        : field + " = " + elementInfoHasValue + " OR " + field + " = '" + elementInfoHasValue + "'";
+                        : isNaN(parseFloat(elementInfoHasValue))
+                            ? field + " = '" + elementInfoHasValue + "'"
+                            : field + " = " + elementInfoHasValue + " OR " + field + " = '" + elementInfoHasValue + "'";
                     return expression;
                 }
             }
         };
+        // LOGIC MAY CHANGE FOR SIZE RAMP FILTER
         // _handleSizeRampFeatureFilter
         InteractiveStyleViewModel.prototype._handleSizeRampFeatureFilter = function (legendInfoIndex, field, legendElementInfos, elementInfo) {
             // FIRST LEGEND INFO
@@ -418,6 +421,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 .highlight(highlightedFeatures.slice());
             highlightedFeatureData[legendInfoIndex] = [highlight];
         };
+        // LOGIC MAY CHANGE FOR SIZE RAMP FILTER
         // _highlightSizeRamp
         InteractiveStyleViewModel.prototype._highlightSizeRamp = function (legendInfoIndex, field, legendElementInfos, elementInfo, featureLayerViewIndex) {
             var features = [];

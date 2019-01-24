@@ -132,6 +132,7 @@ class InteractiveLegend extends declared(Widget) {
   @property()
   mutedOpacity: number = null;
 
+  // searchExpressions
   @aliasOf("style.searchExpressions")
   @property()
   searchExpressions: Collection<string> = null;
@@ -216,7 +217,7 @@ class InteractiveLegend extends declared(Widget) {
       }),
       watchUtils.init(
         this,
-        ["view", "filterMode", "layerListViewModel"],
+        ["view", "filterMode", "mutedOpacity", "layerListViewModel"],
         () => {
           style.view = view;
           style.filterMode = filterMode;
