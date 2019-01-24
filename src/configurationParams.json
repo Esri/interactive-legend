@@ -2,8 +2,12 @@
   "configurationSettings": [{
       "category": "General",
       "fields": [{
-          "type": "webmap",
-          "conditions": "featureLayer"
+          "type": "itembrowser",
+          "fieldName": "webmap",
+          "label": "Select",
+          "itemTypes": ["Web Map"],
+          "defaultContent": true,
+          "showOnLoad": true
         },
         {
           "type": "options",
