@@ -1,0 +1,36 @@
+{
+  "name": "@esri/telemetry",
+  "version": "1.4.0",
+  "description": "A JavaScript Implementation of the ArcGIS Telemetry Specification",
+  "main": "dist/telemetry.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArcGIS/telemetry.js.git"
+  },
+  "keywords": [
+    "arcgis",
+    "telemetry",
+    "analytics",
+    "tracking",
+    "google",
+    "amazon"
+  ],
+  "author": "Daniel Fenton <dfenton@esri.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/ArcGIS/telemetry,js/issues"
+  },
+  "homepage": "https://github.com/ArcGIS/telemetry.js#readme",
+  "dependencies": {},
+  "standard": {
+    "globals": [
+      "window",
+      "document",
+      "XMLHttpRequest"
+    ],
+    "ignore": [
+      "dist/*.js",
+      "test.html"
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "name": "interactive-legend",
+  "version": "0.0.1",
+  "description": "Web Application which includes an Interactive Legend to filter features on a web map.",
+  "author": "Ryan Libed <rlibed@esri.com>",
+  "license": "SEE LICENSE IN license.txt",
+  "main": "dist/index.html",
+  "keywords": [
+    "Esri",
+    "esrijs",
+    "ArcGIS",
+    "gis",
+    "JavaScript",
+    "TypeScript"
+  ],
+  "devDependencies": {
+    "@esri/application-base-js": "0.0.2",
+    "@types/arcgis-js-api": "^4.10.0",
+    "autoprefixer": "^6.3.6",
+    "dojo-typings": "^1.11.9",
+    "grunt": "^1.0.2",
+    "grunt-contrib-jshint": "^1.1.0",
+    "grunt-contrib-watch": "^1.0.1",
+    "grunt-postcss": "^0.8.0",
+    "grunt-sass": "^2.1.0",
+    "grunt-tslint": "^5.0.2",
+    "npm-run-all": "^4.1.2",
+    "postcss-normalize-charset": "^1.1.0",
+    "tslint": "^5.11.0",
+    "typescript": "^2.9.2"
+  },
+  "scripts": {
+    "start": "npm-run-all --parallel watch:grunt watch:ts",
+    "watch:grunt": "grunt watch",
+    "watch:ts": "tsc --watch",
+    "lint": "grunt lint"
+  }
+}
