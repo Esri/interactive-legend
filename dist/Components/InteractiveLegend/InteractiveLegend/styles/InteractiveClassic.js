@@ -134,8 +134,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                             var requiredFields = renderer ? renderer.requiredFields : null;
                             _this._selectedStyleData.add({
                                 layerItemId: featureLayer.id,
-                                selectedInfoIndex: [],
-                                requiredFields: requiredFields
+                                requiredFields: requiredFields,
+                                selectedInfoIndex: []
                             });
                         }
                     });

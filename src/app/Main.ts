@@ -20,6 +20,7 @@
   limitations under the License.​
 */
 
+// dojo.i18n
 import * as i18nInteractiveLegend from "dojo/i18n!./nls/resources";
 
 // ApplicationBase.ApplicationBase

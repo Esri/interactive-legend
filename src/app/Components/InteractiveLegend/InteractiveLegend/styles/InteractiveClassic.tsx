@@ -233,8 +233,8 @@ class InteractiveClassic extends declared(Widget) {
               const requiredFields = renderer ? renderer.requiredFields : null;
               this._selectedStyleData.add({
                 layerItemId: featureLayer.id,
-                selectedInfoIndex: [],
-                requiredFields
+                requiredFields,
+                selectedInfoIndex: []
               });
             }
           }
