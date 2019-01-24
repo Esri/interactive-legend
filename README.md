@@ -12,7 +12,7 @@ Select from three different filter modes:
 2. Highlight: Features that fall within the criteria of the selected legend elements will be highlighted on the feature layer view.
 3. Mute: A muted shade and/or muted opacity will be applied to features that do not fall within the criteria of the selected legend items.
    
-       a. Both the muted shade and muted opacity will be configurable.
+       a. Both the muted shade and muted opacity are configurable.
 4. Select from a set of map tools which include: Home, Search, Basemap Toggle, Layer List, and Screenshot
 
 ## Instructions
