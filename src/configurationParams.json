@@ -1,0 +1,167 @@
+{
+  "configurationSettings": [{
+      "category": "General",
+      "fields": [{
+          "type": "webmap",
+          "conditions": "featureLayer"
+        },
+        {
+          "type": "options",
+          "fieldName": "filterMode",
+          "tooltip": "Select a filter mode",
+          "label": "Filter Mode",
+          "options": [{
+              "label": "Feature Filter",
+              "value": "featureFilter"
+            },
+            {
+              "label": "Highlight",
+              "value": "highlight"
+            },
+            {
+              "label": "Mute",
+              "value": "mute"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "Widgets",
+      "fields": [{
+          "type": "paragraph",
+          "value": "Select the widgets you would like to include in your app:"
+        },
+        {
+          "type": "boolean",
+          "fieldName": "homeEnabled",
+          "label": "Home"
+        },
+        {
+          "type": "boolean",
+          "fieldName": "searchEnabled",
+          "label": "Search"
+        },
+        {
+          "type": "boolean",
+          "fieldName": "layerListEnabled",
+          "label": "Layer List"
+        },
+        {
+          "type": "conditional",
+          "fieldName": "screenshotEnabled",
+          "label": "Screenshot",
+          "condition": false,
+          "items": [{
+            "type": "boolean",
+            "fieldName": "legendIncludedInScreenshot",
+            "label": "Include legend in screenshot"
+          }, {
+            "type": "boolean",
+            "fieldName": "popupIncludedInScreenshot",
+            "label": "Include pop up in screenshot"
+          }]
+        },
+        {
+          "type": "conditional",
+          "fieldName": "basemapToggleEnabled",
+          "label": "Basemap Toggle",
+          "condition": false,
+          "items": [{
+            "type": "options",
+            "fieldName": "nextBasemap",
+            "tooltip": "Select a basemap to toggle",
+            "label": "Select a basemap to toggle",
+            "options": [{
+                "label": "Topo",
+                "value": "topo"
+              },
+              {
+                "label": "Streets",
+                "value": "streets"
+              },
+              {
+                "label": "Satellite",
+                "value": "satellite"
+              },
+              {
+                "label": "Hybrid",
+                "value": "hybrid"
+              },
+              {
+                "label": "Dark Gray",
+                "value": "dark-gray"
+              },
+              {
+                "label": "Gray",
+                "value": "gray"
+              },
+              {
+                "label": "National Geographic",
+                "value": "national-geographic"
+              },
+              {
+                "label": "Oceans",
+                "value": "oceans"
+              },
+              {
+                "label": "OSM",
+                "value": "osm"
+              },
+              {
+                "label": "Terrain",
+                "value": "terrain"
+              }
+            ]
+          }]
+        }
+      ]
+    },
+    {
+      "category": "Filter Settings",
+      "fields": [{
+          "type": "paragraph",
+          "value": "Filter Mode: Highlight Configuration"
+        },
+        {
+          "type": "color",
+          "label": "Choose a highlight color",
+          "fieldName": "highlightShade"
+        },
+        {
+          "type": "paragraph",
+          "value": "Filter Mode: Mute Configuration"
+        },
+        {
+          "type": "color",
+          "label": "Choose a muted shade",
+          "fieldName": "mutedShade"
+        },
+        {
+          "type": "number",
+          "label": "Set a muted opacity by entering a number between 0 and 1",
+          "fieldName": "mutedOpacity",
+          "constraints": {
+            "min": 0,
+            "max": 1,
+            "places": 0
+          }
+        }
+      ]
+    }
+  ],
+  "values": {
+    "filterMode": "featureFilter",
+    "homeEnabled": true,
+    "searchEnabled": false,
+    "layerListEnabled": false,
+    "basemapToggleEnabled": false,
+    "screenshotEnabled": false,
+    "legendIncludedInScreenshot": false,
+    "popupIncludedInScreenshot": false,
+    "highlightShade": "#000000",
+    "mutedShade": "#a9a9a9",
+    "mutedOpacity": 0.5,
+    "nextBasemap": "topo"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "module": "amd",
+    "noImplicitAny": false,
+    "sourceMap": true,
+    "jsx": "react",
+    "jsxFactory": "tsx",
+    "target": "es5",
+    "lib": ["es5", "es6", "dom"],
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "preserveConstEnums": true,
+    "declaration": false,
+    "suppressImplicitAnyIndexErrors": true,
+    "outDir": "./dist"
+  },
+  "include": [
+    "./**/*",
+    "./src/app/Components/InteractiveLegend",
+    "./src/app/Components/Screenshot"
+  ],
+  "exclude": [
+    "./node_modules",
+    "./tsrules"
+  ],
+  "files": [
+    "./node_modules/@esri/application-base-js/index.d.ts",
+    "./node_modules/@types/arcgis-js-api/index.d.ts",
+    "./src/app/Components/Screenshot/Screenshot/interfaces/interfaces.d.ts",
+    "./src/app/telemetry/index.d.ts",
+    "./src/app/interfaces/interfaces.d.ts",
+    "./node_modules/dojo-typings/dojo/1.11/loader.d.ts",
+    "./node_modules/dojo-typings/dojo/1.11/index.d.ts",
+    "./node_modules/dojo-typings/dojo/1.11/modules.d.ts",
+    "./node_modules/dojo-typings/dijit/1.11/index.d.ts",
+    "./node_modules/dojo-typings/dijit/1.11/modules.d.ts",
+    "./node_modules/dojo-typings/dojox/1.11/index.d.ts",
+    "./node_modules/dojo-typings/dojox/1.11/modules.d.ts"
+
+  ]
+}
