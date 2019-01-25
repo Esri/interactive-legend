@@ -300,7 +300,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 return expression;
             }
             if (legendElement.type === "symbol-table") {
-                if (label.includes(">")) {
+                if (label.indexOf(">") !== -1) {
                     return Array.isArray(elementInfoHasValue)
                         ? field + " > " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfo.value[1]
                         : field + " = " + elementInfoHasValue + " OR " + field + " = '" + elementInfoHasValue + "'";

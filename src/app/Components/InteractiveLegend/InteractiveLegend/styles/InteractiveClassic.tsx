@@ -303,7 +303,8 @@ class InteractiveClassic extends declared(Widget) {
     const { title } = activeLayerInfo;
     const titleIsString =
       typeof title === "string"
-        ? title.includes("Description") || title.includes("Map Notes")
+        ? title.indexOf("Description") !== -1 ||
+          title.indexOf("Map Notes") !== -1
         : null;
     if (!activeLayerInfo.ready || titleIsString) {
       return null;
@@ -418,22 +419,41 @@ class InteractiveClassic extends declared(Widget) {
           legendTitle && legendTitle.hasOwnProperty("field")
             ? legendTitle.field
             : null;
+        const requiredFields = this._selectedStyleData.getItemAt(
+          featureLayerViewIndex
+        ).requiredFields;
+        const requiredFieldsCollection = new Collection();
+        requiredFields.forEach(requiredField => {
+          requiredFieldsCollection.add(requiredField);
+        });
         if (requiredFields && fieldVal) {
-          field = this._selectedStyleData
-            .getItemAt(featureLayerViewIndex)
-            .requiredFields.find(requiredField => requiredField === fieldVal);
+          field = requiredFieldsCollection.find(
+            requiredField => requiredField === fieldVal
+          );
         }
       } else {
         if (requiredFields && activeLayerInfo.layer.renderer.field) {
-          field = this._selectedStyleData
-            .getItemAt(featureLayerViewIndex)
-            .requiredFields.find(
-              requiredField =>
-                requiredField ===
-                activeLayerInfo.layer.renderer.requiredFields.find(
-                  requiredField2 => requiredField === requiredField2
-                )
-            );
+          const requiredFields = this._selectedStyleData.getItemAt(
+            featureLayerViewIndex
+          ).requiredFields;
+          const activeLayerRequiredFields =
+            activeLayerInfo.layer.renderer.requiredFields;
+          const requiredFieldsCollection = new Collection();
+          const activeLayerFieldsCollection = new Collection();
+          requiredFields.forEach(requiredField => {
+            requiredFieldsCollection.add(requiredField);
+          });
+          activeLayerRequiredFields.forEach(activeLayerField => {
+            activeLayerFieldsCollection.add(activeLayerField);
+          });
+
+          field = requiredFieldsCollection.find(
+            requiredField =>
+              requiredField ===
+              activeLayerFieldsCollection.find(
+                requiredField2 => requiredField === requiredField2
+              )
+          );
         }
       }
     }

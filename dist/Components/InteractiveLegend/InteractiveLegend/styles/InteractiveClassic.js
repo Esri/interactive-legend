@@ -182,7 +182,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var _a;
             var title = activeLayerInfo.title;
             var titleIsString = typeof title === "string"
-                ? title.includes("Description") || title.includes("Map Notes")
+                ? title.indexOf("Description") !== -1 ||
+                    title.indexOf("Map Notes") !== -1
                 : null;
             if (!activeLayerInfo.ready || titleIsString) {
                 return null;
@@ -243,19 +244,30 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     var fieldVal_1 = legendTitle && legendTitle.hasOwnProperty("field")
                         ? legendTitle.field
                         : null;
-                    if (requiredFields && fieldVal_1) {
-                        field = this._selectedStyleData
-                            .getItemAt(featureLayerViewIndex)
-                            .requiredFields.find(function (requiredField) { return requiredField === fieldVal_1; });
+                    var requiredFields_1 = this._selectedStyleData.getItemAt(featureLayerViewIndex).requiredFields;
+                    var requiredFieldsCollection_1 = new Collection();
+                    requiredFields_1.forEach(function (requiredField) {
+                        requiredFieldsCollection_1.add(requiredField);
+                    });
+                    if (requiredFields_1 && fieldVal_1) {
+                        field = requiredFieldsCollection_1.find(function (requiredField) { return requiredField === fieldVal_1; });
                     }
                 }
                 else {
                     if (requiredFields && activeLayerInfo.layer.renderer.field) {
-                        field = this._selectedStyleData
-                            .getItemAt(featureLayerViewIndex)
-                            .requiredFields.find(function (requiredField) {
+                        var requiredFields_2 = this._selectedStyleData.getItemAt(featureLayerViewIndex).requiredFields;
+                        var activeLayerRequiredFields = activeLayerInfo.layer.renderer.requiredFields;
+                        var requiredFieldsCollection_2 = new Collection();
+                        var activeLayerFieldsCollection_1 = new Collection();
+                        requiredFields_2.forEach(function (requiredField) {
+                            requiredFieldsCollection_2.add(requiredField);
+                        });
+                        activeLayerRequiredFields.forEach(function (activeLayerField) {
+                            activeLayerFieldsCollection_1.add(activeLayerField);
+                        });
+                        field = requiredFieldsCollection_2.find(function (requiredField) {
                             return requiredField ===
-                                activeLayerInfo.layer.renderer.requiredFields.find(function (requiredField2) { return requiredField === requiredField2; });
+                                activeLayerFieldsCollection_1.find(function (requiredField2) { return requiredField === requiredField2; });
                         });
                     }
                 }
