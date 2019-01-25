@@ -40,7 +40,6 @@
 
 .menu-button:hover {
   cursor: pointer;
-  transition: 0.3s;
   color: #2a2a2a
 }
 
@@ -49,19 +48,22 @@
 
 .esri-interactive-legend--layer-row.esri-interactive-legend__filter-layer-row {
   display: block;
-  transition: 0.2s;
   width: 100%;
   padding: 1% 2%;
+  margin: 3px 0;
 }
 
 .esri-interactive-legend--selected-row {
-  background-color: #f1f1f1;
+  background-color: #d2d2d2;
+  text-shadow: 0.75px 0.75px #fff;
 }
 
 .esri-interactive-legend--layer-row:hover {
   cursor: pointer;
-  opacity: 0.8;
-  background-color: #f3f3f3;
+  opacity: 0.9;
+  background-color: #d2d2d2;
+  text-shadow: 0.75px 0.75px #fff;
+  backface-visibility: visible;
 }
 
 .esri-interactive-legend__loader-container {
@@ -70,28 +72,6 @@
   top: 1vh;
 }
 
-.esri-interactive-legend__svg-rect-element {
-  transition: opacity 0.2s;
-}
-
-.esri-interactive-legend__svg-rect-element:hover {
-  opacity: 0.5;
-  cursor: pointer;
-}
-
-.esri-interactive-legend--simple-fill-row {
-  transition: opacity 0.2s
-}
-
-.esri-interactive-legend--simple-fill-row:hover {
-  opacity: 0.5;
-  cursor: pointer;
-}
-
-.esri-interactive-legend--selected-cell {
-  stroke: rgb(0, 0, 0);
-  stroke-width: 1.2;
-}
 
 .esri-interactive-legend__loader {
   margin: 0 auto;
@@ -103,17 +83,6 @@
   background-image: url(../../../assets/loader-ie9.gif);
 
 }
-
-.esri-interactive-legend__card-loader {
-  position: relative;
-  top: 24.5%;
-}
-
-.esri-interactive-legend__card-container {
-  margin: 0 auto;
-}
-
-
 
 .esri-legend__service-label {
   white-space: pre-wrap;
@@ -135,7 +104,6 @@
 .dijitTooltip {
   z-index: 1000;
 }
-
 
 .esri-interactive-legend--error {
   margin: 5px 0;
