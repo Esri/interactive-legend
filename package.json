@@ -34,5 +34,8 @@
     "watch:grunt": "grunt watch",
     "watch:ts": "tsc --watch",
     "lint": "grunt lint"
+  },
+  "dependencies": {
+    "html2canvas-render-offscreen": "0.0.3"
   }
 }

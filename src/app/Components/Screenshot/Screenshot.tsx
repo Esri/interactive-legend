@@ -154,13 +154,8 @@ class Screenshot extends declared(Widget) {
     if (this.viewModel.screenshotModeIsActive) {
       return;
     }
-    if (this._popupIsIncluded) {
-      if (!this.view.popup.visible) {
-        return;
-      }
-    }
     this.mapComponentSelectors.forEach((mapComponents: string) => {
-      if (mapComponents.includes("popup")) {
+      if (mapComponents.indexOf("popup") !== -1) {
         this.view.popup.dockEnabled = true;
       }
     });
@@ -199,23 +194,12 @@ class Screenshot extends declared(Widget) {
       [CSS.disabledCursor]: screenshotModeIsActive,
       [CSS.pointerCursor]: !screenshotModeIsActive
     };
-    const screenshotStyles = this._popupIsIncluded
-      ? this.view.popup.visible
-        ? this.classes(CSS.screenshotBtn, cursorStyles)
-        : this.classes(
-            CSS.screenshotBtn,
-            cursorStyles,
-            CSS.tooltip,
-            CSS.tooltipRight,
-            CSS.modifierClass,
-            CSS.disabledCursor
-          )
-      : this.classes(CSS.screenshotBtn, cursorStyles);
+
     return (
       <button
         bind={this}
         tabIndex={!screenshotModeIsActive ? 0 : -1}
-        class={screenshotStyles}
+        class={this.classes(CSS.screenshotBtn, cursorStyles)}
         aria-label={i18n.popUpIsIncluded}
         onclick={this.activateScreenshot}
         title={i18n.widgetLabel}
@@ -315,7 +299,7 @@ class Screenshot extends declared(Widget) {
         return;
       }
       this.mapComponentSelectors.forEach((componentSelector: string) => {
-        if (componentSelector.includes("popup")) {
+        if (componentSelector.indexOf("popup") !== -1) {
           this._popupIsIncluded = true;
           this.scheduleRender();
         }
