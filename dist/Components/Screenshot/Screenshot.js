@@ -110,13 +110,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             if (this.viewModel.screenshotModeIsActive) {
                 return;
             }
-            if (this._popupIsIncluded) {
-                if (!this.view.popup.visible) {
-                    return;
-                }
-            }
             this.mapComponentSelectors.forEach(function (mapComponents) {
-                if (mapComponents.includes("popup")) {
+                if (mapComponents.indexOf("popup") !== -1) {
                     _this.view.popup.dockEnabled = true;
                 }
             });
@@ -143,12 +138,19 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 _a[CSS.disabledCursor] = screenshotModeIsActive,
                 _a[CSS.pointerCursor] = !screenshotModeIsActive,
                 _a);
-            var screenshotStyles = this._popupIsIncluded
-                ? this.view.popup.visible
-                    ? this.classes(CSS.screenshotBtn, cursorStyles)
-                    : this.classes(CSS.screenshotBtn, cursorStyles, CSS.tooltip, CSS.tooltipRight, CSS.modifierClass, CSS.disabledCursor)
-                : this.classes(CSS.screenshotBtn, cursorStyles);
-            return (widget_1.tsx("button", { bind: this, tabIndex: !screenshotModeIsActive ? 0 : -1, class: screenshotStyles, "aria-label": i18n.popUpIsIncluded, onclick: this.activateScreenshot, title: i18n.widgetLabel },
+            // const screenshotStyles = this._popupIsIncluded
+            //   ? this.view.popup.visible
+            //     ? this.classes(CSS.screenshotBtn, cursorStyles)
+            //     : this.classes(
+            //         CSS.screenshotBtn,
+            //         cursorStyles,
+            //         CSS.tooltip,
+            //         CSS.tooltipRight,
+            //         CSS.modifierClass,
+            //         CSS.disabledCursor
+            //       )
+            //   : this.classes(CSS.screenshotBtn, cursorStyles);
+            return (widget_1.tsx("button", { bind: this, tabIndex: !screenshotModeIsActive ? 0 : -1, class: this.classes(CSS.screenshotBtn, cursorStyles), "aria-label": i18n.popUpIsIncluded, onclick: this.activateScreenshot, title: i18n.widgetLabel },
                 widget_1.tsx("span", { class: CSS.mediaIcon })));
         };
         // _renderScreenshotPreviewBtns
@@ -199,7 +201,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     return;
                 }
                 _this.mapComponentSelectors.forEach(function (componentSelector) {
-                    if (componentSelector.includes("popup")) {
+                    if (componentSelector.indexOf("popup") !== -1) {
                         _this._popupIsIncluded = true;
                         _this.scheduleRender();
                     }
