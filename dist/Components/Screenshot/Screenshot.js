@@ -138,18 +138,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 _a[CSS.disabledCursor] = screenshotModeIsActive,
                 _a[CSS.pointerCursor] = !screenshotModeIsActive,
                 _a);
-            // const screenshotStyles = this._popupIsIncluded
-            //   ? this.view.popup.visible
-            //     ? this.classes(CSS.screenshotBtn, cursorStyles)
-            //     : this.classes(
-            //         CSS.screenshotBtn,
-            //         cursorStyles,
-            //         CSS.tooltip,
-            //         CSS.tooltipRight,
-            //         CSS.modifierClass,
-            //         CSS.disabledCursor
-            //       )
-            //   : this.classes(CSS.screenshotBtn, cursorStyles);
             return (widget_1.tsx("button", { bind: this, tabIndex: !screenshotModeIsActive ? 0 : -1, class: this.classes(CSS.screenshotBtn, cursorStyles), "aria-label": i18n.popUpIsIncluded, onclick: this.activateScreenshot, title: i18n.widgetLabel },
                 widget_1.tsx("span", { class: CSS.mediaIcon })));
         };

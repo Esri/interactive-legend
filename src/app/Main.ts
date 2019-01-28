@@ -158,7 +158,8 @@ class InteractiveLegendApp {
       searchEnabled,
       basemapToggleEnabled,
       homeEnabled,
-      nextBasemap
+      nextBasemap,
+      searchConfig
     } = config;
 
     const { webMapItems } = results;
@@ -265,7 +266,12 @@ class InteractiveLegendApp {
               layerListViewModel
             });
 
-            this._handleSearchWidget(searchEnabled, interactiveLegend, view);
+            this._handleSearchWidget(
+              searchEnabled,
+              interactiveLegend,
+              view,
+              searchConfig
+            );
 
             this.interactiveLegendExpand = new Expand({
               content: interactiveLegend,
@@ -399,71 +405,84 @@ class InteractiveLegendApp {
   private _handleSearchWidget(
     searchEnabled: boolean,
     interactiveLegend: InteractiveLegend,
-    view: MapView
+    view: MapView,
+    searchConfig: any
   ): void {
+    // Get any configured search settings
     if (searchEnabled) {
-      const search = new Search({
+      const searchProperties: any = {
         view,
-        maxResults: 6,
-        maxSuggestions: 6,
-        suggestionsEnabled: true,
-        includeDefaultSources: false
-      });
+        container: document.createElement("div")
+      };
 
+      if (searchConfig) {
+        if (searchConfig.sources) {
+          const sources = searchConfig.sources;
+
+          searchProperties.sources = sources.filter(source => {
+            if (source.flayerId && source.url) {
+              const layer = view.map.findLayerById(source.flayerId);
+              source.layer = layer ? layer : new FeatureLayer(source.url);
+            }
+            if (source.hasOwnProperty("enableSuggestions")) {
+              source.suggestionsEnabled = source.enableSuggestions;
+            }
+            if (source.hasOwnProperty("searchWithinMap")) {
+              source.withinViewEnabled = source.searchWithinMap;
+            }
+
+            return source;
+          });
+        }
+        if (
+          searchProperties.sources &&
+          searchProperties.sources.length &&
+          searchProperties.sources.length > 0
+        ) {
+          searchProperties.includeDefaultSources = false;
+        }
+        searchProperties.searchAllEnabled = searchConfig.enableSearchingAll
+          ? true
+          : false;
+        if (
+          searchConfig.activeSourceIndex &&
+          searchProperties.sources &&
+          searchProperties.sources.length >= searchConfig.activeSourceIndex
+        ) {
+          searchProperties.activeSourceIndex = searchConfig.activeSourceIndex;
+        }
+
+        watchUtils.on(interactiveLegend, "searchExpressions", "change", () => {
+          this.layerList.operationalItems.forEach(
+            (operationalItems, operationalItemIndex) => {
+              search.sources.forEach(searchSource => {
+                if (!searchSource.hasOwnProperty("layer")) {
+                  return;
+                }
+                const layerSearchSource = searchSource as LayerSearchSource;
+                const featureLayer = operationalItems.layer as FeatureLayer;
+                if (featureLayer.id === layerSearchSource.layer.id) {
+                  const searchExpression = interactiveLegend.searchExpressions.getItemAt(
+                    operationalItemIndex
+                  );
+                  if (searchExpression) {
+                    searchSource.filter = {
+                      where: searchExpression
+                    };
+                  } else {
+                    searchSource.filter = null;
+                  }
+                }
+              });
+            }
+          );
+        });
+      }
+
+      const search = new Search(searchProperties);
       this.searchExpand = new Expand({
         content: search,
         expanded: true
-      });
-
-      watchUtils.on(interactiveLegend, "activeLayerInfos", "change", () => {
-        search.sources.removeAll();
-        interactiveLegend.activeLayerInfos.forEach(activeLayerInfo => {
-          if (activeLayerInfo.layer.type === "map-notes") {
-            this.search.sources.add(null);
-            return;
-          }
-          const featureLayer = activeLayerInfo.layer as FeatureLayer;
-          watchUtils.init(featureLayer, "fields", () => {
-            if (featureLayer.fields) {
-              const fields = [];
-              featureLayer.fields.forEach((field: __esri.Field) => {
-                if (field.name !== "OBJECTID" && field.name !== "GlobalID") {
-                  fields.push(field.name);
-                }
-              });
-              const featureLayerSearchSource = new LayerSearchSource({
-                layer: featureLayer,
-                searchFields: fields,
-                exactMatch: false,
-                name: featureLayer.title,
-                placeholder: featureLayer.title,
-                suggestionsEnabled: true
-              });
-              search.sources.add(featureLayerSearchSource);
-            }
-          });
-        });
-      });
-
-      watchUtils.on(interactiveLegend, "searchExpressions", "change", () => {
-        this.layerList.operationalItems.forEach(
-          (operationalItems, operationalItemIndex) => {
-            search.sources.forEach(searchSource => {
-              const layerSearchSource = searchSource as LayerSearchSource;
-              if (!searchSource) {
-                return;
-              }
-              const featureLayer = operationalItems.layer as FeatureLayer;
-              if (featureLayer.id === layerSearchSource.layer.id) {
-                searchSource.filter = {
-                  where: interactiveLegend.searchExpressions.getItemAt(
-                    operationalItemIndex
-                  )
-                };
-              }
-            });
-          }
-        );
       });
       view.ui.add(this.searchExpand, "top-right");
     }

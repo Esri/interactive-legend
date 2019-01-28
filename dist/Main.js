@@ -27,7 +27,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     }
     return t;
 };
-define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/support/itemUtils", "ApplicationBase/support/domHelper", "esri/widgets/Home", "esri/widgets/LayerList", "esri/widgets/Search", "esri/widgets/Search/LayerSearchSource", "esri/widgets/BasemapToggle", "esri/widgets/Expand", "esri/core/watchUtils", "esri/Color", "./Components/Screenshot/Screenshot", "telemetry/telemetry.dojo", "./Components/InteractiveLegend/InteractiveLegend"], function (require, exports, i18nInteractiveLegend, itemUtils_1, domHelper_1, Home, LayerList, Search, LayerSearchSource, BasemapToggle, Expand, watchUtils, Color, Screenshot, Telemetry, InteractiveLegend) {
+define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/support/itemUtils", "ApplicationBase/support/domHelper", "esri/widgets/Home", "esri/widgets/LayerList", "esri/widgets/Search", "esri/layers/FeatureLayer", "esri/widgets/BasemapToggle", "esri/widgets/Expand", "esri/core/watchUtils", "esri/Color", "./Components/Screenshot/Screenshot", "telemetry/telemetry.dojo", "./Components/InteractiveLegend/InteractiveLegend"], function (require, exports, i18nInteractiveLegend, itemUtils_1, domHelper_1, Home, LayerList, Search, FeatureLayer, BasemapToggle, Expand, watchUtils, Color, Screenshot, Telemetry, InteractiveLegend) {
     "use strict";
     // CSS
     var CSS = {
@@ -86,7 +86,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 });
                 this.telemetry.logPageView();
             }
-            var drawerEnabled = config.drawerEnabled, expandEnabled = config.expandEnabled, highlightShade = config.highlightShade, mutedShade = config.mutedShade, style = config.style, mutedOpacity = config.mutedOpacity, filterMode = config.filterMode, screenshotEnabled = config.screenshotEnabled, legendIncludedInScreenshot = config.legendIncludedInScreenshot, popupIncludedInScreenshot = config.popupIncludedInScreenshot, featureCountEnabled = config.featureCountEnabled, layerListEnabled = config.layerListEnabled, searchEnabled = config.searchEnabled, basemapToggleEnabled = config.basemapToggleEnabled, homeEnabled = config.homeEnabled, nextBasemap = config.nextBasemap;
+            var drawerEnabled = config.drawerEnabled, expandEnabled = config.expandEnabled, highlightShade = config.highlightShade, mutedShade = config.mutedShade, style = config.style, mutedOpacity = config.mutedOpacity, filterMode = config.filterMode, screenshotEnabled = config.screenshotEnabled, legendIncludedInScreenshot = config.legendIncludedInScreenshot, popupIncludedInScreenshot = config.popupIncludedInScreenshot, featureCountEnabled = config.featureCountEnabled, layerListEnabled = config.layerListEnabled, searchEnabled = config.searchEnabled, basemapToggleEnabled = config.basemapToggleEnabled, homeEnabled = config.homeEnabled, nextBasemap = config.nextBasemap, searchConfig = config.searchConfig;
             var webMapItems = results.webMapItems;
             var validWebMapItems = webMapItems.map(function (response) {
                 return response.value;
@@ -161,7 +161,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 featureCountEnabled: featureCountEnabled,
                                 layerListViewModel: layerListViewModel
                             });
-                            _this._handleSearchWidget(searchEnabled, interactiveLegend, view);
+                            _this._handleSearchWidget(searchEnabled, interactiveLegend, view, searchConfig);
                             _this.interactiveLegendExpand = new Expand({
                                 content: interactiveLegend,
                                 expanded: expandEnabled,
@@ -264,64 +264,71 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
             }
         };
         // _handleSearchWidget
-        InteractiveLegendApp.prototype._handleSearchWidget = function (searchEnabled, interactiveLegend, view) {
+        InteractiveLegendApp.prototype._handleSearchWidget = function (searchEnabled, interactiveLegend, view, searchConfig) {
             var _this = this;
+            // Get any configured search settings
             if (searchEnabled) {
-                var search_1 = new Search({
+                var searchProperties = {
                     view: view,
-                    maxResults: 6,
-                    maxSuggestions: 6,
-                    suggestionsEnabled: true,
-                    includeDefaultSources: false
-                });
+                    container: document.createElement("div")
+                };
+                if (searchConfig) {
+                    if (searchConfig.sources) {
+                        var sources = searchConfig.sources;
+                        searchProperties.sources = sources.filter(function (source) {
+                            if (source.flayerId && source.url) {
+                                var layer = view.map.findLayerById(source.flayerId);
+                                source.layer = layer ? layer : new FeatureLayer(source.url);
+                            }
+                            if (source.hasOwnProperty("enableSuggestions")) {
+                                source.suggestionsEnabled = source.enableSuggestions;
+                            }
+                            if (source.hasOwnProperty("searchWithinMap")) {
+                                source.withinViewEnabled = source.searchWithinMap;
+                            }
+                            return source;
+                        });
+                    }
+                    if (searchProperties.sources &&
+                        searchProperties.sources.length &&
+                        searchProperties.sources.length > 0) {
+                        searchProperties.includeDefaultSources = false;
+                    }
+                    searchProperties.searchAllEnabled = searchConfig.enableSearchingAll
+                        ? true
+                        : false;
+                    if (searchConfig.activeSourceIndex &&
+                        searchProperties.sources &&
+                        searchProperties.sources.length >= searchConfig.activeSourceIndex) {
+                        searchProperties.activeSourceIndex = searchConfig.activeSourceIndex;
+                    }
+                    watchUtils.on(interactiveLegend, "searchExpressions", "change", function () {
+                        _this.layerList.operationalItems.forEach(function (operationalItems, operationalItemIndex) {
+                            search_1.sources.forEach(function (searchSource) {
+                                if (!searchSource.hasOwnProperty("layer")) {
+                                    return;
+                                }
+                                var layerSearchSource = searchSource;
+                                var featureLayer = operationalItems.layer;
+                                if (featureLayer.id === layerSearchSource.layer.id) {
+                                    var searchExpression = interactiveLegend.searchExpressions.getItemAt(operationalItemIndex);
+                                    if (searchExpression) {
+                                        searchSource.filter = {
+                                            where: searchExpression
+                                        };
+                                    }
+                                    else {
+                                        searchSource.filter = null;
+                                    }
+                                }
+                            });
+                        });
+                    });
+                }
+                var search_1 = new Search(searchProperties);
                 this.searchExpand = new Expand({
                     content: search_1,
                     expanded: true
-                });
-                watchUtils.on(interactiveLegend, "activeLayerInfos", "change", function () {
-                    search_1.sources.removeAll();
-                    interactiveLegend.activeLayerInfos.forEach(function (activeLayerInfo) {
-                        if (activeLayerInfo.layer.type === "map-notes") {
-                            _this.search.sources.add(null);
-                            return;
-                        }
-                        var featureLayer = activeLayerInfo.layer;
-                        watchUtils.init(featureLayer, "fields", function () {
-                            if (featureLayer.fields) {
-                                var fields_1 = [];
-                                featureLayer.fields.forEach(function (field) {
-                                    if (field.name !== "OBJECTID" && field.name !== "GlobalID") {
-                                        fields_1.push(field.name);
-                                    }
-                                });
-                                var featureLayerSearchSource = new LayerSearchSource({
-                                    layer: featureLayer,
-                                    searchFields: fields_1,
-                                    exactMatch: false,
-                                    name: featureLayer.title,
-                                    placeholder: featureLayer.title,
-                                    suggestionsEnabled: true
-                                });
-                                search_1.sources.add(featureLayerSearchSource);
-                            }
-                        });
-                    });
-                });
-                watchUtils.on(interactiveLegend, "searchExpressions", "change", function () {
-                    _this.layerList.operationalItems.forEach(function (operationalItems, operationalItemIndex) {
-                        search_1.sources.forEach(function (searchSource) {
-                            var layerSearchSource = searchSource;
-                            if (!searchSource) {
-                                return;
-                            }
-                            var featureLayer = operationalItems.layer;
-                            if (featureLayer.id === layerSearchSource.layer.id) {
-                                searchSource.filter = {
-                                    where: interactiveLegend.searchExpressions.getItemAt(operationalItemIndex)
-                                };
-                            }
-                        });
-                    });
                 });
                 view.ui.add(this.searchExpand, "top-right");
             }
