@@ -73,7 +73,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         preventScroll: "esri-interactive-legend__prevent-scroll",
         screenshot: "esri-interactive-legend__screenshot",
         hoverStyles: "esri-interactive-legend--layer-row",
-        error: "esri-interactive-legend--error"
+        error: "esri-interactive-legend--error",
+        legendElements: "esri-interactive-legend__legend-elements"
     };
     var KEY = "esri-legend__", GRADIENT_WIDTH = 24;
     var InteractiveClassic = /** @class */ (function (_super) {
@@ -158,7 +159,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     legendElements.push(legendElement);
                 });
             });
-            return (widget_1.tsx("div", { class: this.classes(baseClasses, CSS.preventScroll) }, filteredLayers && filteredLayers.length ? (widget_1.tsx("div", null, state === "loading" || state === "querying" ? (widget_1.tsx("div", { class: CSS.loader })) : (widget_1.tsx("div", null,
+            return (widget_1.tsx("div", { class: this.classes(baseClasses, CSS.preventScroll) }, filteredLayers && filteredLayers.length ? (widget_1.tsx("div", { class: CSS.legendElements }, state === "loading" || state === "querying" ? (widget_1.tsx("div", { class: CSS.loader })) : (widget_1.tsx("div", null,
                 " ",
                 filteredLayers)))) : (widget_1.tsx("div", { class: CSS.message }, i18n.noLegend))));
         };

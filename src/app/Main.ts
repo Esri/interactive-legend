@@ -85,8 +85,8 @@ import InteractiveLegend = require("./Components/InteractiveLegend/InteractiveLe
 // CSS
 const CSS = {
   loading: "configurable-application--loading",
-  legend: ".esri-legend__service",
-  popup: ".esri-popup__main-container"
+  legend: "esri-interactive-legend__legend-elements",
+  popup: "esri-popup__main-container"
 };
 
 class InteractiveLegendApp {
@@ -319,11 +319,11 @@ class InteractiveLegendApp {
     if (screenshotEnabled) {
       const mapComponentSelectors =
         legendIncludedInScreenshot && popupIncludedInScreenshot
-          ? [CSS.legend, CSS.popup]
+          ? [`.${CSS.legend}`, `.${CSS.popup}`]
           : legendIncludedInScreenshot && !popupIncludedInScreenshot
-          ? [CSS.legend]
+          ? [`.${CSS.legend}`]
           : !legendIncludedInScreenshot && popupIncludedInScreenshot
-          ? [CSS.popup]
+          ? [`.${CSS.popup}`]
           : null;
       this.screenshot = new Screenshot({
         view,

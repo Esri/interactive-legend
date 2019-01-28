@@ -136,7 +136,8 @@ const CSS = {
   preventScroll: "esri-interactive-legend__prevent-scroll",
   screenshot: "esri-interactive-legend__screenshot",
   hoverStyles: "esri-interactive-legend--layer-row",
-  error: "esri-interactive-legend--error"
+  error: "esri-interactive-legend--error",
+  legendElements: "esri-interactive-legend__legend-elements"
 };
 
 const KEY = "esri-legend__",
@@ -264,7 +265,7 @@ class InteractiveClassic extends declared(Widget) {
     return (
       <div class={this.classes(baseClasses, CSS.preventScroll)}>
         {filteredLayers && filteredLayers.length ? (
-          <div>
+          <div class={CSS.legendElements}>
             {state === "loading" || state === "querying" ? (
               <div class={CSS.loader} />
             ) : (

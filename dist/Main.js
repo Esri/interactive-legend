@@ -32,8 +32,8 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
     // CSS
     var CSS = {
         loading: "configurable-application--loading",
-        legend: ".esri-legend__service",
-        popup: ".esri-popup__main-container"
+        legend: "esri-interactive-legend__legend-elements",
+        popup: "esri-popup__main-container"
     };
     var InteractiveLegendApp = /** @class */ (function () {
         function InteractiveLegendApp() {
@@ -198,11 +198,11 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
             var _this = this;
             if (screenshotEnabled) {
                 var mapComponentSelectors = legendIncludedInScreenshot && popupIncludedInScreenshot
-                    ? [CSS.legend, CSS.popup]
+                    ? ["." + CSS.legend, "." + CSS.popup]
                     : legendIncludedInScreenshot && !popupIncludedInScreenshot
-                        ? [CSS.legend]
+                        ? ["." + CSS.legend]
                         : !legendIncludedInScreenshot && popupIncludedInScreenshot
-                            ? [CSS.popup]
+                            ? ["." + CSS.popup]
                             : null;
                 this.screenshot = new Screenshot({
                     view: view,
