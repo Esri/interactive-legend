@@ -16,6 +16,7 @@
   "mutedShade": null,
   "nextBasemap": "topo",
   "featureCountEnabled": false,
+  "searchConfig": null,
   "style": "classic",
   "filterMode": "featureFilter",
   "webmap": "default",
