@@ -409,73 +409,75 @@ class InteractiveLegendApp {
     searchConfig: any
   ): void {
     // Get any configured search settings
-    if (searchEnabled && searchConfig) {
+    if (searchEnabled) {
       const searchProperties: any = {
         view,
         container: document.createElement("div")
       };
 
-      if (searchConfig.sources) {
-        const sources = searchConfig.sources;
+      if (searchConfig) {
+        if (searchConfig.sources) {
+          const sources = searchConfig.sources;
 
-        searchProperties.sources = sources.filter(source => {
-          if (source.flayerId && source.url) {
-            const layer = view.map.findLayerById(source.flayerId);
-            source.layer = layer ? layer : new FeatureLayer(source.url);
-          }
-          if (source.hasOwnProperty("enableSuggestions")) {
-            source.suggestionsEnabled = source.enableSuggestions;
-          }
-          if (source.hasOwnProperty("searchWithinMap")) {
-            source.withinViewEnabled = source.searchWithinMap;
-          }
+          searchProperties.sources = sources.filter(source => {
+            if (source.flayerId && source.url) {
+              const layer = view.map.findLayerById(source.flayerId);
+              source.layer = layer ? layer : new FeatureLayer(source.url);
+            }
+            if (source.hasOwnProperty("enableSuggestions")) {
+              source.suggestionsEnabled = source.enableSuggestions;
+            }
+            if (source.hasOwnProperty("searchWithinMap")) {
+              source.withinViewEnabled = source.searchWithinMap;
+            }
 
-          return source;
+            return source;
+          });
+        }
+        if (
+          searchProperties.sources &&
+          searchProperties.sources.length &&
+          searchProperties.sources.length > 0
+        ) {
+          searchProperties.includeDefaultSources = false;
+        }
+        searchProperties.searchAllEnabled = searchConfig.enableSearchingAll
+          ? true
+          : false;
+        if (
+          searchConfig.activeSourceIndex &&
+          searchProperties.sources &&
+          searchProperties.sources.length >= searchConfig.activeSourceIndex
+        ) {
+          searchProperties.activeSourceIndex = searchConfig.activeSourceIndex;
+        }
+
+        watchUtils.on(interactiveLegend, "searchExpressions", "change", () => {
+          this.layerList.operationalItems.forEach(
+            (operationalItems, operationalItemIndex) => {
+              search.sources.forEach(searchSource => {
+                if (!searchSource.hasOwnProperty("layer")) {
+                  return;
+                }
+                const layerSearchSource = searchSource as LayerSearchSource;
+                const featureLayer = operationalItems.layer as FeatureLayer;
+                if (featureLayer.id === layerSearchSource.layer.id) {
+                  const searchExpression = interactiveLegend.searchExpressions.getItemAt(
+                    operationalItemIndex
+                  );
+                  if (searchExpression) {
+                    searchSource.filter = {
+                      where: searchExpression
+                    };
+                  } else {
+                    searchSource.filter = null;
+                  }
+                }
+              });
+            }
+          );
         });
       }
-      if (
-        searchProperties.sources &&
-        searchProperties.sources.length &&
-        searchProperties.sources.length > 0
-      ) {
-        searchProperties.includeDefaultSources = false;
-      }
-      searchProperties.searchAllEnabled = searchConfig.enableSearchingAll
-        ? true
-        : false;
-      if (
-        searchConfig.activeSourceIndex &&
-        searchProperties.sources &&
-        searchProperties.sources.length >= searchConfig.activeSourceIndex
-      ) {
-        searchProperties.activeSourceIndex = searchConfig.activeSourceIndex;
-      }
-
-      watchUtils.on(interactiveLegend, "searchExpressions", "change", () => {
-        this.layerList.operationalItems.forEach(
-          (operationalItems, operationalItemIndex) => {
-            search.sources.forEach(searchSource => {
-              if (!searchSource.hasOwnProperty("layer")) {
-                return;
-              }
-              const layerSearchSource = searchSource as LayerSearchSource;
-              const featureLayer = operationalItems.layer as FeatureLayer;
-              if (featureLayer.id === layerSearchSource.layer.id) {
-                const searchExpression = interactiveLegend.searchExpressions.getItemAt(
-                  operationalItemIndex
-                );
-                if (searchExpression) {
-                  searchSource.filter = {
-                    where: searchExpression
-                  };
-                } else {
-                  searchSource.filter = null;
-                }
-              }
-            });
-          }
-        );
-      });
 
       const search = new Search(searchProperties);
       this.searchExpand = new Expand({

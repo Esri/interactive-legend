@@ -267,62 +267,64 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
         InteractiveLegendApp.prototype._handleSearchWidget = function (searchEnabled, interactiveLegend, view, searchConfig) {
             var _this = this;
             // Get any configured search settings
-            if (searchEnabled && searchConfig) {
+            if (searchEnabled) {
                 var searchProperties = {
                     view: view,
                     container: document.createElement("div")
                 };
-                if (searchConfig.sources) {
-                    var sources = searchConfig.sources;
-                    searchProperties.sources = sources.filter(function (source) {
-                        if (source.flayerId && source.url) {
-                            var layer = view.map.findLayerById(source.flayerId);
-                            source.layer = layer ? layer : new FeatureLayer(source.url);
-                        }
-                        if (source.hasOwnProperty("enableSuggestions")) {
-                            source.suggestionsEnabled = source.enableSuggestions;
-                        }
-                        if (source.hasOwnProperty("searchWithinMap")) {
-                            source.withinViewEnabled = source.searchWithinMap;
-                        }
-                        return source;
-                    });
-                }
-                if (searchProperties.sources &&
-                    searchProperties.sources.length &&
-                    searchProperties.sources.length > 0) {
-                    searchProperties.includeDefaultSources = false;
-                }
-                searchProperties.searchAllEnabled = searchConfig.enableSearchingAll
-                    ? true
-                    : false;
-                if (searchConfig.activeSourceIndex &&
-                    searchProperties.sources &&
-                    searchProperties.sources.length >= searchConfig.activeSourceIndex) {
-                    searchProperties.activeSourceIndex = searchConfig.activeSourceIndex;
-                }
-                watchUtils.on(interactiveLegend, "searchExpressions", "change", function () {
-                    _this.layerList.operationalItems.forEach(function (operationalItems, operationalItemIndex) {
-                        search_1.sources.forEach(function (searchSource) {
-                            if (!searchSource.hasOwnProperty("layer")) {
-                                return;
+                if (searchConfig) {
+                    if (searchConfig.sources) {
+                        var sources = searchConfig.sources;
+                        searchProperties.sources = sources.filter(function (source) {
+                            if (source.flayerId && source.url) {
+                                var layer = view.map.findLayerById(source.flayerId);
+                                source.layer = layer ? layer : new FeatureLayer(source.url);
                             }
-                            var layerSearchSource = searchSource;
-                            var featureLayer = operationalItems.layer;
-                            if (featureLayer.id === layerSearchSource.layer.id) {
-                                var searchExpression = interactiveLegend.searchExpressions.getItemAt(operationalItemIndex);
-                                if (searchExpression) {
-                                    searchSource.filter = {
-                                        where: searchExpression
-                                    };
-                                }
-                                else {
-                                    searchSource.filter = null;
-                                }
+                            if (source.hasOwnProperty("enableSuggestions")) {
+                                source.suggestionsEnabled = source.enableSuggestions;
                             }
+                            if (source.hasOwnProperty("searchWithinMap")) {
+                                source.withinViewEnabled = source.searchWithinMap;
+                            }
+                            return source;
+                        });
+                    }
+                    if (searchProperties.sources &&
+                        searchProperties.sources.length &&
+                        searchProperties.sources.length > 0) {
+                        searchProperties.includeDefaultSources = false;
+                    }
+                    searchProperties.searchAllEnabled = searchConfig.enableSearchingAll
+                        ? true
+                        : false;
+                    if (searchConfig.activeSourceIndex &&
+                        searchProperties.sources &&
+                        searchProperties.sources.length >= searchConfig.activeSourceIndex) {
+                        searchProperties.activeSourceIndex = searchConfig.activeSourceIndex;
+                    }
+                    watchUtils.on(interactiveLegend, "searchExpressions", "change", function () {
+                        _this.layerList.operationalItems.forEach(function (operationalItems, operationalItemIndex) {
+                            search_1.sources.forEach(function (searchSource) {
+                                if (!searchSource.hasOwnProperty("layer")) {
+                                    return;
+                                }
+                                var layerSearchSource = searchSource;
+                                var featureLayer = operationalItems.layer;
+                                if (featureLayer.id === layerSearchSource.layer.id) {
+                                    var searchExpression = interactiveLegend.searchExpressions.getItemAt(operationalItemIndex);
+                                    if (searchExpression) {
+                                        searchSource.filter = {
+                                            where: searchExpression
+                                        };
+                                    }
+                                    else {
+                                        searchSource.filter = null;
+                                    }
+                                }
+                            });
                         });
                     });
-                });
+                }
                 var search_1 = new Search(searchProperties);
                 this.searchExpand = new Expand({
                     content: search_1,
