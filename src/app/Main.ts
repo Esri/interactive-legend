@@ -219,7 +219,8 @@ class InteractiveLegendApp {
             const defaultMode = filterMode
               ? filterMode
               : "definitionExpression";
-            const defaultOpacity = mutedOpacity ? mutedOpacity : 0.5;
+            const defaultOpacity =
+              mutedOpacity || mutedOpacity === 0 ? mutedOpacity : 0.5;
             const mode = drawerEnabled ? "drawer" : "auto";
             const defaultExpandMode = mode ? mode : null;
             if (highlightShade) {
