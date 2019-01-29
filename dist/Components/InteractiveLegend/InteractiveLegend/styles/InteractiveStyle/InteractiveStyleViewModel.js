@@ -522,7 +522,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 var symbol = uniqueInfo.symbol;
                 if (colorIndexes.indexOf(uniqueInfoIndex) === -1) {
                     symbol.color = new Color(_this.mutedShade);
-                    if (_this.mutedOpacity) {
+                    if (_this.mutedOpacity || _this.mutedOpacity === 0) {
                         symbol.color.a = _this.mutedOpacity;
                     }
                 }
@@ -596,7 +596,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 }
                 else {
                     symbol.color = mutedShade;
-                    if (_this.mutedOpacity) {
+                    if (_this.mutedOpacity || _this.mutedOpacity === 0) {
                         symbol.color.a = mutedOpacity;
                     }
                 }

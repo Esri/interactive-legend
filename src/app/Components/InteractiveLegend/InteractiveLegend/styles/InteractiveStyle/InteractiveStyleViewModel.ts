@@ -804,7 +804,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         if (colorIndexes.indexOf(uniqueInfoIndex) === -1) {
           symbol.color = new Color(this.mutedShade);
 
-          if (this.mutedOpacity) {
+          if (this.mutedOpacity || this.mutedOpacity === 0) {
             symbol.color.a = this.mutedOpacity;
           }
         }
@@ -909,7 +909,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         });
       } else {
         symbol.color = mutedShade;
-        if (this.mutedOpacity) {
+        if (this.mutedOpacity || this.mutedOpacity === 0) {
           symbol.color.a = mutedOpacity;
         }
       }

@@ -128,7 +128,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                             var defaultMode = filterMode
                                 ? filterMode
                                 : "definitionExpression";
-                            var defaultOpacity = mutedOpacity ? mutedOpacity : 0.5;
+                            var defaultOpacity = mutedOpacity || mutedOpacity === 0 ? mutedOpacity : 0.5;
                             var mode = drawerEnabled ? "drawer" : "auto";
                             var defaultExpandMode = mode ? mode : null;
                             if (highlightShade) {
