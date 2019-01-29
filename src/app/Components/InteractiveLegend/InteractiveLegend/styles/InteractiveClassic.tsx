@@ -541,6 +541,7 @@ class InteractiveClassic extends declared(Widget) {
         !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
         !isColorRamp &&
         !isOpacityRamp &&
+        activeLayerInfo.layer.renderer.authoringInfo &&
         activeLayerInfo.layer.renderer.authoringInfo.type !== "predominance" &&
         !isHeatRamp ? (
           <div class={CSS.error}>
@@ -803,6 +804,7 @@ class InteractiveClassic extends declared(Widget) {
     );
     const isRelationship = legendElement.type === "relationship-ramp";
     const isPredominance =
+      activeLayerInfo.layer.renderer.authoringInfo &&
       activeLayerInfo.layer.renderer.authoringInfo.type === "predominance";
     const isSizeRampAndMute = isSizeRamp && this.filterMode === "mute";
     const selectedStyleData = this._selectedStyleData.getItemAt(

@@ -329,7 +329,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                         ? legendElementInfos.length - 1 === legendInfoIndex
                             ? field + " >= " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfoHasValue[1]
                             : field + " > " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfoHasValue[1]
-                        : isNaN(parseFloat(elementInfoHasValue))
+                        : isNaN(elementInfoHasValue)
                             ? field + " = '" + elementInfoHasValue + "'"
                             : field + " = " + elementInfoHasValue + " OR " + field + " = '" + elementInfoHasValue + "'";
                     return expression;

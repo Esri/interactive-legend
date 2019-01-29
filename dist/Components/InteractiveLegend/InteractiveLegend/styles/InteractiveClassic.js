@@ -327,6 +327,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
                     !isColorRamp &&
                     !isOpacityRamp &&
+                    activeLayerInfo.layer.renderer.authoringInfo &&
                     activeLayerInfo.layer.renderer.authoringInfo.type !== "predominance" &&
                     !isHeatRamp ? (widget_1.tsx("div", { class: CSS.error },
                     widget_1.tsx("span", { class: CSS.calciteStyles.error }),
@@ -474,7 +475,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             }
             var hasPictureMarkersAndIsMute = this._checkForPictureMarkersAndIsMute(activeLayerInfo);
             var isRelationship = legendElement.type === "relationship-ramp";
-            var isPredominance = activeLayerInfo.layer.renderer.authoringInfo.type === "predominance";
+            var isPredominance = activeLayerInfo.layer.renderer.authoringInfo &&
+                activeLayerInfo.layer.renderer.authoringInfo.type === "predominance";
             var isSizeRampAndMute = isSizeRamp && this.filterMode === "mute";
             var selectedStyleData = this._selectedStyleData.getItemAt(featureLayerViewIndex);
             var requiredFields = selectedStyleData
