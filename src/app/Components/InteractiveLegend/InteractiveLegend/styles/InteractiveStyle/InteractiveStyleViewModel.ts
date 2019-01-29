@@ -513,7 +513,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
             : `${field} > ${elementInfoHasValue[0]} AND ${field} <= ${
                 elementInfoHasValue[1]
               }`
-          : isNaN(parseFloat(elementInfoHasValue))
+          : isNaN(elementInfoHasValue)
           ? `${field} = '${elementInfoHasValue}'`
           : `${field} = ${elementInfoHasValue} OR ${field} = '${elementInfoHasValue}'`;
         return expression;
