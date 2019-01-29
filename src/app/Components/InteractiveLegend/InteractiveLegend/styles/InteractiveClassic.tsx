@@ -541,6 +541,7 @@ class InteractiveClassic extends declared(Widget) {
         !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
         !isColorRamp &&
         !isOpacityRamp &&
+        activeLayerInfo.layer.renderer.authoringInfo.type !== "predominance" &&
         !isHeatRamp ? (
           <div class={CSS.error}>
             <span class={CSS.calciteStyles.error} />
@@ -560,13 +561,13 @@ class InteractiveClassic extends declared(Widget) {
             {i18nInteractiveLegend.elementInfoNoValue}
           </div>
         ) : null}
-
+        {/* 
         {legendElement.title === "Predominant category" ? (
           <div class={CSS.error}>
             <span class={CSS.calciteStyles.error} />
             {i18nInteractiveLegend.predominantNotSupported}
           </div>
-        ) : null}
+        ) : null} */}
 
         {isSizeRamp && this.filterMode === "mute" ? (
           <div class={CSS.error}>
@@ -801,6 +802,8 @@ class InteractiveClassic extends declared(Widget) {
       activeLayerInfo
     );
     const isRelationship = legendElement.type === "relationship-ramp";
+    const isPredominance =
+      activeLayerInfo.layer.renderer.authoringInfo.type === "predominance";
     const isSizeRampAndMute = isSizeRamp && this.filterMode === "mute";
     const selectedStyleData = this._selectedStyleData.getItemAt(
       featureLayerViewIndex
@@ -822,13 +825,12 @@ class InteractiveClassic extends declared(Widget) {
       ((isRelationship ||
         hasPictureMarkersAndIsMute ||
         isSizeRampAndMute ||
-        hasPictureFillAndIsMute ||
-        legendTitle === "Predominant") &&
+        hasPictureFillAndIsMute) &&
         legendElement.infos.length > 1 &&
         !activeLayerInfo.layer.hasOwnProperty("sublayers")) ||
-      !requiredFields
+      (!requiredFields && !isPredominance)
         ? null
-        : field && elementInfo.hasOwnProperty("value")
+        : (field && elementInfo.hasOwnProperty("value")) || isPredominance
         ? selectedRow
         : null;
     const hasMoreThanOneInfo = legendElement.infos.length > 1;
@@ -854,17 +856,17 @@ class InteractiveClassic extends declared(Widget) {
         data-layer-id={`${activeLayerInfo.layer.id}`}
         onclick={(event: Event) => {
           if (
-            !isRelationship &&
-            !hasPictureMarkersAndIsMute &&
-            !isSizeRampAndMute &&
-            !hasPictureFillAndIsMute &&
-            elementInfo.hasOwnProperty("value") &&
-            legendElement.title !== "Predominant category" &&
-            hasMoreThanOneInfo &&
-            !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
-            requiredFields &&
-            field &&
-            featureLayerData
+            (!isRelationship &&
+              !hasPictureMarkersAndIsMute &&
+              !isSizeRampAndMute &&
+              !hasPictureFillAndIsMute &&
+              elementInfo.hasOwnProperty("value") &&
+              hasMoreThanOneInfo &&
+              !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
+              requiredFields &&
+              field &&
+              featureLayerData) ||
+            isPredominance
           ) {
             this._handleFilterOption(
               event,
@@ -874,23 +876,24 @@ class InteractiveClassic extends declared(Widget) {
               featureLayerViewIndex,
               isSizeRamp,
               legendElement,
+              isPredominance,
               legendElementInfos
             );
           }
         }}
         onkeydown={(event: Event) => {
           if (
-            !isRelationship &&
-            !hasPictureMarkersAndIsMute &&
-            !isSizeRampAndMute &&
-            !hasPictureFillAndIsMute &&
-            elementInfo.hasOwnProperty("value") &&
-            legendElement.title !== "Predominant category" &&
-            hasMoreThanOneInfo &&
-            !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
-            requiredFields &&
-            field &&
-            featureLayerData
+            (!isRelationship &&
+              !hasPictureMarkersAndIsMute &&
+              !isSizeRampAndMute &&
+              !hasPictureFillAndIsMute &&
+              elementInfo.hasOwnProperty("value") &&
+              hasMoreThanOneInfo &&
+              !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
+              requiredFields &&
+              field &&
+              featureLayerData) ||
+            isPredominance
           ) {
             this._handleFilterOption(
               event,
@@ -900,6 +903,7 @@ class InteractiveClassic extends declared(Widget) {
               featureLayerViewIndex,
               isSizeRamp,
               legendElement,
+              isPredominance,
               legendElementInfos
             );
           }
@@ -960,6 +964,7 @@ class InteractiveClassic extends declared(Widget) {
     featureLayerViewIndex: number,
     isSizeRamp: boolean,
     legendElement: LegendElement,
+    isPredominance: boolean,
     legendElementInfos?: any[]
   ): void {
     this.filterMode === "highlight"
@@ -980,6 +985,7 @@ class InteractiveClassic extends declared(Widget) {
           featureLayerViewIndex,
           legendInfoIndex,
           legendElement,
+          isPredominance,
           legendElementInfos
         )
       : this.filterMode === "mute"
@@ -1002,6 +1008,7 @@ class InteractiveClassic extends declared(Widget) {
     featureLayerViewIndex: number,
     legendInfoIndex: number,
     legendElement: LegendElement,
+    isPredominance: boolean,
     legendElementInfos?: any[]
   ): void {
     this._handleSelectedStyles(event);
@@ -1011,6 +1018,7 @@ class InteractiveClassic extends declared(Widget) {
       featureLayerViewIndex,
       legendElement,
       legendInfoIndex,
+      isPredominance,
       legendElementInfos
     );
   }

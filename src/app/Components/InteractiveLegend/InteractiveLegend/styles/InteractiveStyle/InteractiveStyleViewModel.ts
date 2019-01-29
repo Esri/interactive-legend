@@ -194,27 +194,54 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     featureLayerViewIndex: number,
     legendElement: LegendElement,
     legendInfoIndex: number,
+    isPredominance: boolean,
     legendElementInfos?: any[]
   ): void {
-    this._generateQueryExpressions(
-      elementInfo,
-      field,
-      featureLayerViewIndex,
-      legendElement,
-      legendInfoIndex,
-      legendElementInfos
-    );
-    const queryExpressions = this.interactiveStyleData.queryExpressions[
-      featureLayerViewIndex
-    ];
-    const featureLayerView = this.featureLayerViews.getItemAt(
-      featureLayerViewIndex
-    );
-    const filterExpression = queryExpressions.join(" OR ");
-    this._setSearchExpression(filterExpression, featureLayerViewIndex);
-    featureLayerView.filter = new FeatureFilter({
-      where: filterExpression
-    });
+    if (isPredominance) {
+      const queryExpression = this._handlePredominanceFeatureFilter(
+        elementInfo,
+        featureLayerViewIndex
+      ).join(" AND ");
+
+      const queryExpressions = this.interactiveStyleData.queryExpressions[
+        featureLayerViewIndex
+      ];
+      const expressionIndex = queryExpressions.indexOf(queryExpression);
+      if (queryExpressions.length === 0 || expressionIndex === -1) {
+        queryExpressions.push(queryExpression);
+      } else {
+        queryExpressions.splice(expressionIndex, 1);
+      }
+
+      const featureLayerView = this.featureLayerViews.getItemAt(
+        featureLayerViewIndex
+      );
+      const filterExpression = queryExpressions.join(" OR ");
+      this._setSearchExpression(filterExpression, featureLayerViewIndex);
+      featureLayerView.filter = new FeatureFilter({
+        where: filterExpression
+      });
+    } else {
+      this._generateQueryExpressions(
+        elementInfo,
+        field,
+        featureLayerViewIndex,
+        legendElement,
+        legendInfoIndex,
+        legendElementInfos
+      );
+      const queryExpressions = this.interactiveStyleData.queryExpressions[
+        featureLayerViewIndex
+      ];
+      const featureLayerView = this.featureLayerViews.getItemAt(
+        featureLayerViewIndex
+      );
+      const filterExpression = queryExpressions.join(" OR ");
+      this._setSearchExpression(filterExpression, featureLayerViewIndex);
+      featureLayerView.filter = new FeatureFilter({
+        where: filterExpression
+      });
+    }
   }
 
   // applyFeatureMute
@@ -569,6 +596,27 @@ class InteractiveStyleViewModel extends declared(Accessor) {
           2;
       return `${field} < ${midPoint1} AND ${field} > ${midPoint2}`;
     }
+  }
+
+  // _handlePredominanceFeatureFilter
+  private _handlePredominanceFeatureFilter(
+    elementInfo: any,
+    featureLayerViewIndex: number
+  ): string[] {
+    const featureLayerView = this.featureLayerViews.getItemAt(
+      featureLayerViewIndex
+    );
+    const authoringInfo = featureLayerView.layer.renderer.authoringInfo as any;
+    const fields = authoringInfo.fields;
+    const expressionArr = [];
+    fields.forEach(field => {
+      if (elementInfo.value === field) {
+        return;
+      }
+      expressionArr.push(`${elementInfo.value} > ${field}`);
+    });
+
+    return expressionArr;
   }
 
   //----------------------------------

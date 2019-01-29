@@ -130,15 +130,34 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         //
         //----------------------------------
         // applyFeatureFilter
-        InteractiveStyleViewModel.prototype.applyFeatureFilter = function (elementInfo, field, featureLayerViewIndex, legendElement, legendInfoIndex, legendElementInfos) {
-            this._generateQueryExpressions(elementInfo, field, featureLayerViewIndex, legendElement, legendInfoIndex, legendElementInfos);
-            var queryExpressions = this.interactiveStyleData.queryExpressions[featureLayerViewIndex];
-            var featureLayerView = this.featureLayerViews.getItemAt(featureLayerViewIndex);
-            var filterExpression = queryExpressions.join(" OR ");
-            this._setSearchExpression(filterExpression, featureLayerViewIndex);
-            featureLayerView.filter = new FeatureFilter({
-                where: filterExpression
-            });
+        InteractiveStyleViewModel.prototype.applyFeatureFilter = function (elementInfo, field, featureLayerViewIndex, legendElement, legendInfoIndex, isPredominance, legendElementInfos) {
+            if (isPredominance) {
+                var queryExpression = this._handlePredominanceFeatureFilter(elementInfo, featureLayerViewIndex).join(" AND ");
+                var queryExpressions = this.interactiveStyleData.queryExpressions[featureLayerViewIndex];
+                var expressionIndex = queryExpressions.indexOf(queryExpression);
+                if (queryExpressions.length === 0 || expressionIndex === -1) {
+                    queryExpressions.push(queryExpression);
+                }
+                else {
+                    queryExpressions.splice(expressionIndex, 1);
+                }
+                var featureLayerView = this.featureLayerViews.getItemAt(featureLayerViewIndex);
+                var filterExpression = queryExpressions.join(" OR ");
+                this._setSearchExpression(filterExpression, featureLayerViewIndex);
+                featureLayerView.filter = new FeatureFilter({
+                    where: filterExpression
+                });
+            }
+            else {
+                this._generateQueryExpressions(elementInfo, field, featureLayerViewIndex, legendElement, legendInfoIndex, legendElementInfos);
+                var queryExpressions = this.interactiveStyleData.queryExpressions[featureLayerViewIndex];
+                var featureLayerView = this.featureLayerViews.getItemAt(featureLayerViewIndex);
+                var filterExpression = queryExpressions.join(" OR ");
+                this._setSearchExpression(filterExpression, featureLayerViewIndex);
+                featureLayerView.filter = new FeatureFilter({
+                    where: filterExpression
+                });
+            }
         };
         // applyFeatureMute
         InteractiveStyleViewModel.prototype.applyFeatureMute = function (elementInfo, field, legendInfoIndex, featureLayerViewIndex, legendElement, legendElementInfos) {
@@ -353,6 +372,20 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                         2;
                 return field + " < " + midPoint1 + " AND " + field + " > " + midPoint2;
             }
+        };
+        // _handlePredominanceFeatureFilter
+        InteractiveStyleViewModel.prototype._handlePredominanceFeatureFilter = function (elementInfo, featureLayerViewIndex) {
+            var featureLayerView = this.featureLayerViews.getItemAt(featureLayerViewIndex);
+            var authoringInfo = featureLayerView.layer.renderer.authoringInfo;
+            var fields = authoringInfo.fields;
+            var expressionArr = [];
+            fields.forEach(function (field) {
+                if (elementInfo.value === field) {
+                    return;
+                }
+                expressionArr.push(elementInfo.value + " > " + field);
+            });
+            return expressionArr;
         };
         //----------------------------------
         //
