@@ -415,7 +415,6 @@ class InteractiveLegendApp {
         view,
         container: document.createElement("div")
       };
-
       if (searchConfig) {
         if (searchConfig.sources) {
           const sources = searchConfig.sources;
@@ -452,32 +451,6 @@ class InteractiveLegendApp {
         ) {
           searchProperties.activeSourceIndex = searchConfig.activeSourceIndex;
         }
-
-        watchUtils.on(interactiveLegend, "searchExpressions", "change", () => {
-          this.layerList.operationalItems.forEach(
-            (operationalItems, operationalItemIndex) => {
-              search.sources.forEach(searchSource => {
-                if (!searchSource.hasOwnProperty("layer")) {
-                  return;
-                }
-                const layerSearchSource = searchSource as LayerSearchSource;
-                const featureLayer = operationalItems.layer as FeatureLayer;
-                if (featureLayer.id === layerSearchSource.layer.id) {
-                  const searchExpression = interactiveLegend.searchExpressions.getItemAt(
-                    operationalItemIndex
-                  );
-                  if (searchExpression) {
-                    searchSource.filter = {
-                      where: searchExpression
-                    };
-                  } else {
-                    searchSource.filter = null;
-                  }
-                }
-              });
-            }
-          );
-        });
       }
 
       const search = new Search(searchProperties);
@@ -485,6 +458,8 @@ class InteractiveLegendApp {
         content: search,
         expanded: true
       });
+      interactiveLegend.searchViewModel = search.viewModel;
+
       view.ui.add(this.searchExpand, "top-right");
     }
   }

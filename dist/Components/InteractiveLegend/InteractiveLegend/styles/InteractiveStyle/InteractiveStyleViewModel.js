@@ -63,6 +63,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             _this.layerListViewModel = new LayerListViewModel();
             // searchExpressions
             _this.searchExpressions = new Collection();
+            _this.searchViewModel = null;
             return _this;
         }
         Object.defineProperty(InteractiveStyleViewModel.prototype, "state", {
@@ -130,50 +131,50 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         //
         //----------------------------------
         // applyFeatureFilter
-        InteractiveStyleViewModel.prototype.applyFeatureFilter = function (elementInfo, field, featureLayerViewIndex, legendElement, legendInfoIndex, legendElementInfos) {
-            this._generateQueryExpressions(elementInfo, field, featureLayerViewIndex, legendElement, legendInfoIndex, legendElementInfos);
-            var queryExpressions = this.interactiveStyleData.queryExpressions[featureLayerViewIndex];
-            var featureLayerView = this.featureLayerViews.getItemAt(featureLayerViewIndex);
+        InteractiveStyleViewModel.prototype.applyFeatureFilter = function (elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, legendElementInfos) {
+            this._generateQueryExpressions(elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, legendElementInfos);
+            var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
+            var featureLayerView = this.featureLayerViews.getItemAt(operationalItemIndex);
             var filterExpression = queryExpressions.join(" OR ");
-            this._setSearchExpression(filterExpression, featureLayerViewIndex);
+            this._setSearchExpression(filterExpression, operationalItemIndex);
             featureLayerView.filter = new FeatureFilter({
                 where: filterExpression
             });
         };
         // applyFeatureMute
-        InteractiveStyleViewModel.prototype.applyFeatureMute = function (elementInfo, field, legendInfoIndex, featureLayerViewIndex, legendElement, legendElementInfos) {
-            var originalRenderer = this.interactiveStyleData.originalRenderers[featureLayerViewIndex];
+        InteractiveStyleViewModel.prototype.applyFeatureMute = function (elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos) {
+            var originalRenderer = this.interactiveStyleData.originalRenderers[operationalItemIndex];
             if (!originalRenderer) {
                 return;
             }
             if (originalRenderer.hasOwnProperty("uniqueValueInfos")) {
-                this._muteUniqueValues(legendInfoIndex, field, featureLayerViewIndex);
+                this._muteUniqueValues(legendInfoIndex, field, operationalItemIndex);
             }
             else if (Array.isArray(elementInfo.value) &&
                 elementInfo.value.length === 2) {
-                this._muteRangeValues(legendInfoIndex, field, featureLayerViewIndex);
+                this._muteRangeValues(legendInfoIndex, field, operationalItemIndex);
             }
-            this._generateQueryExpressions(elementInfo, field, featureLayerViewIndex, legendElement, null, legendElementInfos);
-            var queryExpressions = this.interactiveStyleData.queryExpressions[featureLayerViewIndex];
+            this._generateQueryExpressions(elementInfo, field, operationalItemIndex, legendElement, null, legendElementInfos);
+            var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
             var filterExpression = queryExpressions.join(" OR ");
-            this._setSearchExpression(filterExpression, featureLayerViewIndex);
+            this._setSearchExpression(filterExpression, operationalItemIndex);
         };
         // applyFeatureHighlight
-        InteractiveStyleViewModel.prototype.applyFeatureHighlight = function (elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, legendElementInfos) {
+        InteractiveStyleViewModel.prototype.applyFeatureHighlight = function (elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, legendElementInfos) {
             if (isSizeRamp) {
-                this._highlightSizeRamp(legendInfoIndex, field, legendElementInfos, elementInfo, featureLayerViewIndex);
+                this._highlightSizeRamp(legendInfoIndex, field, legendElementInfos, elementInfo, operationalItemIndex);
             }
             else if (Array.isArray(elementInfo.value) &&
                 elementInfo.value.length === 2) {
-                this._highlightRangeValues(legendInfoIndex, elementInfo, field, featureLayerViewIndex, legendElementInfos);
+                this._highlightRangeValues(legendInfoIndex, elementInfo, field, operationalItemIndex, legendElementInfos);
             }
             else {
-                this._highlightUniqueValues(legendInfoIndex, elementInfo, field, featureLayerViewIndex);
+                this._highlightUniqueValues(legendInfoIndex, elementInfo, field, operationalItemIndex);
             }
-            this._generateQueryExpressions(elementInfo, field, featureLayerViewIndex, legendElement, null, legendElementInfos);
-            var queryExpressions = this.interactiveStyleData.queryExpressions[featureLayerViewIndex];
+            this._generateQueryExpressions(elementInfo, field, operationalItemIndex, legendElement, null, legendElementInfos);
+            var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
             var filterExpression = queryExpressions.join(" OR ");
-            this._setSearchExpression(filterExpression, featureLayerViewIndex);
+            this._setSearchExpression(filterExpression, operationalItemIndex);
         };
         //----------------------------------
         //
@@ -248,16 +249,16 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         InteractiveStyleViewModel.prototype._storeOriginalRenderersAndColors = function () {
             var _this = this;
             this.interactiveStyleData.originalRenderers = [];
-            this.layerListViewModel.operationalItems.forEach(function (operationalItem, featureLayerViewIndex) {
+            this.layerListViewModel.operationalItems.forEach(function (operationalItem, operationalItemIndex) {
                 if (operationalItem.layer.hasOwnProperty("renderer")) {
-                    _this._useLayerFromOperationalItem(operationalItem, featureLayerViewIndex);
+                    _this._useLayerFromOperationalItem(operationalItem, operationalItemIndex);
                 }
             });
         };
         // _useLayerFromOperationalItem
-        InteractiveStyleViewModel.prototype._useLayerFromOperationalItem = function (operationalItem, featureLayerViewIndex) {
+        InteractiveStyleViewModel.prototype._useLayerFromOperationalItem = function (operationalItem, operationalItemIndex) {
             var clonedRenderer = operationalItem.layer.renderer.clone();
-            var originalColors = this.interactiveStyleData.originalColors[featureLayerViewIndex];
+            var originalColors = this.interactiveStyleData.originalColors[operationalItemIndex];
             var infos = clonedRenderer.hasOwnProperty("uniqueValueInfos")
                 ? clonedRenderer.uniqueValueInfos
                 : clonedRenderer.classBreakInfos;
@@ -268,7 +269,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 if (!operationalItem.layer.hasOwnProperty("renderer")) {
                     return;
                 }
-                this.interactiveStyleData.originalRenderers[featureLayerViewIndex] = clonedRenderer;
+                this.interactiveStyleData.originalRenderers[operationalItemIndex] = clonedRenderer;
             }
         };
         //----------------------------------
@@ -277,9 +278,9 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         //
         //----------------------------------
         // _generateQueryExpressions
-        InteractiveStyleViewModel.prototype._generateQueryExpressions = function (elementInfo, field, featureLayerViewIndex, legendElement, legendInfoIndex, legendElementInfos) {
+        InteractiveStyleViewModel.prototype._generateQueryExpressions = function (elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, legendElementInfos) {
             var queryExpression = this._generateQueryExpression(elementInfo, field, legendInfoIndex, legendElement, legendElementInfos);
-            var queryExpressions = this.interactiveStyleData.queryExpressions[featureLayerViewIndex];
+            var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
             var expressionIndex = queryExpressions.indexOf(queryExpression);
             if (queryExpressions.length === 0 || expressionIndex === -1) {
                 queryExpressions.push(queryExpression);
@@ -360,15 +361,15 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         //
         //----------------------------------
         // _highlightRangeValues
-        InteractiveStyleViewModel.prototype._highlightRangeValues = function (legendInfoIndex, elementInfo, field, featureLayerViewIndex, legendElementInfos) {
+        InteractiveStyleViewModel.prototype._highlightRangeValues = function (legendInfoIndex, elementInfo, field, operationalItemIndex, legendElementInfos) {
             var features = [];
-            var highlightedFeatures = this.interactiveStyleData.highlightedFeatures[featureLayerViewIndex];
+            var highlightedFeatures = this.interactiveStyleData.highlightedFeatures[operationalItemIndex];
             var elementInfoValue = elementInfo.value;
             if (highlightedFeatures[legendInfoIndex]) {
-                this._removeHighlight(featureLayerViewIndex, legendInfoIndex);
+                this._removeHighlight(operationalItemIndex, legendInfoIndex);
                 return;
             }
-            this.layerGraphics.getItemAt(featureLayerViewIndex).forEach(function (feature) {
+            this.layerGraphics.getItemAt(operationalItemIndex).forEach(function (feature) {
                 var fieldValue = feature.attributes[field];
                 if (legendElementInfos.length - 1 === legendInfoIndex) {
                     if (fieldValue >= elementInfoValue[0] &&
@@ -387,22 +388,22 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 return;
             }
             var highlight = this.featureLayerViews
-                .getItemAt(featureLayerViewIndex)
+                .getItemAt(operationalItemIndex)
                 .highlight(features.slice());
             highlightedFeatures[legendInfoIndex] = [highlight];
         };
         // _highlightUniqueValue
-        InteractiveStyleViewModel.prototype._highlightUniqueValues = function (legendInfoIndex, elementInfo, field, featureLayerViewIndex) {
+        InteractiveStyleViewModel.prototype._highlightUniqueValues = function (legendInfoIndex, elementInfo, field, operationalItemIndex) {
             var features = [];
             var highlightedFeatures = [];
             var highlightedFeatureData = this.interactiveStyleData
-                .highlightedFeatures[featureLayerViewIndex];
+                .highlightedFeatures[operationalItemIndex];
             if (highlightedFeatureData[legendInfoIndex]) {
                 highlightedFeatureData[legendInfoIndex][0].remove();
                 highlightedFeatureData[legendInfoIndex] = null;
                 return;
             }
-            this.layerGraphics.getItemAt(featureLayerViewIndex).map(function (feature) {
+            this.layerGraphics.getItemAt(operationalItemIndex).map(function (feature) {
                 var attributes = feature.attributes;
                 if (elementInfo.value == attributes[field] ||
                     elementInfo.value == attributes[field.toLowerCase()] ||
@@ -417,21 +418,21 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 return;
             }
             var highlight = this.featureLayerViews
-                .getItemAt(featureLayerViewIndex)
+                .getItemAt(operationalItemIndex)
                 .highlight(highlightedFeatures.slice());
             highlightedFeatureData[legendInfoIndex] = [highlight];
         };
         // LOGIC MAY CHANGE FOR SIZE RAMP FILTER
         // _highlightSizeRamp
-        InteractiveStyleViewModel.prototype._highlightSizeRamp = function (legendInfoIndex, field, legendElementInfos, elementInfo, featureLayerViewIndex) {
+        InteractiveStyleViewModel.prototype._highlightSizeRamp = function (legendInfoIndex, field, legendElementInfos, elementInfo, operationalItemIndex) {
             var features = [];
             var highlightedFeatureData = this.interactiveStyleData
-                .highlightedFeatures[featureLayerViewIndex];
+                .highlightedFeatures[operationalItemIndex];
             if (highlightedFeatureData[legendInfoIndex]) {
-                this._removeHighlight(featureLayerViewIndex, legendInfoIndex);
+                this._removeHighlight(operationalItemIndex, legendInfoIndex);
                 return;
             }
-            this.layerGraphics.getItemAt(featureLayerViewIndex).forEach(function (feature) {
+            this.layerGraphics.getItemAt(operationalItemIndex).forEach(function (feature) {
                 // FIRST LEGEND INFO
                 if (legendInfoIndex === 0) {
                     if (feature.attributes[field] >= elementInfo.value) {
@@ -484,13 +485,13 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 return;
             }
             var highlight = this.featureLayerViews
-                .getItemAt(featureLayerViewIndex)
+                .getItemAt(operationalItemIndex)
                 .highlight(features.slice());
             highlightedFeatureData[legendInfoIndex] = [highlight];
         };
         // _removeHighlight
-        InteractiveStyleViewModel.prototype._removeHighlight = function (featureLayerViewIndex, legendInfoIndex) {
-            var highlightedFeatures = this.interactiveStyleData.highlightedFeatures[featureLayerViewIndex];
+        InteractiveStyleViewModel.prototype._removeHighlight = function (operationalItemIndex, legendInfoIndex) {
+            var highlightedFeatures = this.interactiveStyleData.highlightedFeatures[operationalItemIndex];
             highlightedFeatures[legendInfoIndex].forEach(function (feature) {
                 feature.remove();
             });
@@ -501,20 +502,20 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         //  Mute Methods
         //
         //----------------------------------
-        InteractiveStyleViewModel.prototype._muteUniqueValues = function (legendInfoIndex, field, featureLayerViewIndex) {
+        InteractiveStyleViewModel.prototype._muteUniqueValues = function (legendInfoIndex, field, operationalItemIndex) {
             var _this = this;
-            var featureLayer = this.layerListViewModel.operationalItems.getItemAt(featureLayerViewIndex).layer;
-            var colorIndexes = this.interactiveStyleData.colorIndexes[featureLayerViewIndex];
+            var featureLayer = this.layerListViewModel.operationalItems.getItemAt(operationalItemIndex).layer;
+            var colorIndexes = this.interactiveStyleData.colorIndexes[operationalItemIndex];
             if (colorIndexes.indexOf(legendInfoIndex) === -1) {
                 colorIndexes.push(legendInfoIndex);
             }
             else {
                 colorIndexes.splice(colorIndexes.indexOf(legendInfoIndex), 1);
             }
-            this._resetMutedUniqueValues(featureLayerViewIndex);
+            this._resetMutedUniqueValues(operationalItemIndex);
             if (colorIndexes.length === 0) {
-                this._resetMutedUniqueValues(featureLayerViewIndex);
-                this._generateRenderer(featureLayerViewIndex, "unique-value", field);
+                this._resetMutedUniqueValues(operationalItemIndex);
+                this._generateRenderer(operationalItemIndex, "unique-value", field);
                 return;
             }
             var renderer = featureLayer.renderer;
@@ -527,12 +528,12 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                     }
                 }
             });
-            this._generateRenderer(featureLayerViewIndex, "unique-value", field);
+            this._generateRenderer(operationalItemIndex, "unique-value", field);
         };
         // _resetMutedUniqueValues
-        InteractiveStyleViewModel.prototype._resetMutedUniqueValues = function (featureLayerViewIndex) {
-            var featureLayer = this.layerListViewModel.operationalItems.getItemAt(featureLayerViewIndex).layer;
-            var originalColors = this.interactiveStyleData.originalColors[featureLayerViewIndex];
+        InteractiveStyleViewModel.prototype._resetMutedUniqueValues = function (operationalItemIndex) {
+            var featureLayer = this.layerListViewModel.operationalItems.getItemAt(operationalItemIndex).layer;
+            var originalColors = this.interactiveStyleData.originalColors[operationalItemIndex];
             originalColors.forEach(function (original, originalIndex) {
                 var uvr = featureLayer.renderer;
                 uvr.uniqueValueInfos.forEach(function (newItem, newIndex) {
@@ -543,29 +544,29 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             });
         };
         // _muteRangeValues
-        InteractiveStyleViewModel.prototype._muteRangeValues = function (legendInfoIndex, field, featureLayerViewIndex) {
-            var featureLayer = this.layerListViewModel.operationalItems.getItemAt(featureLayerViewIndex).layer;
+        InteractiveStyleViewModel.prototype._muteRangeValues = function (legendInfoIndex, field, operationalItemIndex) {
+            var featureLayer = this.layerListViewModel.operationalItems.getItemAt(operationalItemIndex).layer;
             var classBreakInfos = featureLayer.renderer.classBreakInfos;
-            var originalColors = this.interactiveStyleData.originalColors[featureLayerViewIndex];
+            var originalColors = this.interactiveStyleData.originalColors[operationalItemIndex];
             var reversedClassBreakInfos = [];
             var reversedColors = [];
             for (var i = classBreakInfos.length - 1; i >= 0; i--) {
                 reversedClassBreakInfos.push(classBreakInfos[i]);
                 reversedColors.push(originalColors[i]);
             }
-            var classBreakInfosIndex = this.interactiveStyleData.classBreakInfosIndex[featureLayerViewIndex];
+            var classBreakInfosIndex = this.interactiveStyleData.classBreakInfosIndex[operationalItemIndex];
             if (classBreakInfosIndex.indexOf(legendInfoIndex) === -1) {
                 classBreakInfosIndex.push(legendInfoIndex);
             }
             else {
                 classBreakInfosIndex.splice(classBreakInfosIndex.indexOf(legendInfoIndex), 1);
             }
-            this._applyColors(featureLayerViewIndex, reversedColors, reversedClassBreakInfos, field);
+            this._applyColors(operationalItemIndex, reversedColors, reversedClassBreakInfos, field);
         };
         // _applyColors
-        InteractiveStyleViewModel.prototype._applyColors = function (featureLayerViewIndex, reversedColors, reversedClassBreakInfos, field) {
+        InteractiveStyleViewModel.prototype._applyColors = function (operationalItemIndex, reversedColors, reversedClassBreakInfos, field) {
             var _this = this;
-            var classBreakInfosIndex = this.interactiveStyleData.classBreakInfosIndex[featureLayerViewIndex];
+            var classBreakInfosIndex = this.interactiveStyleData.classBreakInfosIndex[operationalItemIndex];
             if (classBreakInfosIndex.length === 0) {
                 reversedClassBreakInfos.forEach(function (classBreakInfo, classBreakInfoIndex) {
                     var symbol = classBreakInfo.symbol;
@@ -578,7 +579,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                         }
                     });
                 });
-                this._generateRenderer(featureLayerViewIndex, "class-breaks", field);
+                this._generateRenderer(operationalItemIndex, "class-breaks", field);
                 return;
             }
             reversedClassBreakInfos.forEach(function (classBreakInfo, classBreakInfoIndex) {
@@ -601,11 +602,11 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                     }
                 }
             });
-            this._generateRenderer(featureLayerViewIndex, "class-breaks", field);
+            this._generateRenderer(operationalItemIndex, "class-breaks", field);
         };
         // _generateRenderer
-        InteractiveStyleViewModel.prototype._generateRenderer = function (featureLayerViewIndex, type, field) {
-            var featureLayer = this.layerListViewModel.operationalItems.getItemAt(featureLayerViewIndex).layer;
+        InteractiveStyleViewModel.prototype._generateRenderer = function (operationalItemIndex, type, field) {
+            var featureLayer = this.layerListViewModel.operationalItems.getItemAt(operationalItemIndex).layer;
             var _a = featureLayer.renderer, defaultLabel = _a.defaultLabel, defaultSymbol = _a.defaultSymbol;
             var visualVariables = featureLayer.renderer.hasOwnProperty("visualVariables") &&
                 featureLayer.renderer.visualVariables
@@ -630,13 +631,21 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         };
         // End of filter methods
         // _setSearchExpression
-        InteractiveStyleViewModel.prototype._setSearchExpression = function (filterExpression, featureLayerViewIndex) {
-            var searchExpressions = this.searchExpressions;
-            if (searchExpressions.getItemAt(featureLayerViewIndex)) {
-                searchExpressions.removeAt(featureLayerViewIndex);
+        InteractiveStyleViewModel.prototype._setSearchExpression = function (filterExpression, operationalItemIndex) {
+            var _this = this;
+            var searchSource = this.searchViewModel.sources.find(function (searchSource) {
+                return searchSource.flayerId ===
+                    _this.layerListViewModel.operationalItems.getItemAt(operationalItemIndex)
+                        .layer.id;
+            });
+            if (filterExpression) {
+                searchSource.filter = {
+                    where: filterExpression
+                };
             }
-            searchExpressions.add(filterExpression, featureLayerViewIndex);
-            searchExpressions.removeAt(featureLayerViewIndex + 1);
+            else {
+                searchSource.filter = null;
+            }
         };
         __decorate([
             decorators_1.property()
@@ -674,6 +683,9 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         __decorate([
             decorators_1.property()
         ], InteractiveStyleViewModel.prototype, "searchExpressions", void 0);
+        __decorate([
+            decorators_1.property()
+        ], InteractiveStyleViewModel.prototype, "searchViewModel", void 0);
         InteractiveStyleViewModel = __decorate([
             decorators_1.subclass("InteractiveStyleViewModel")
         ], InteractiveStyleViewModel);

@@ -265,7 +265,6 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
         };
         // _handleSearchWidget
         InteractiveLegendApp.prototype._handleSearchWidget = function (searchEnabled, interactiveLegend, view, searchConfig) {
-            var _this = this;
             // Get any configured search settings
             if (searchEnabled) {
                 var searchProperties = {
@@ -302,34 +301,13 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                         searchProperties.sources.length >= searchConfig.activeSourceIndex) {
                         searchProperties.activeSourceIndex = searchConfig.activeSourceIndex;
                     }
-                    watchUtils.on(interactiveLegend, "searchExpressions", "change", function () {
-                        _this.layerList.operationalItems.forEach(function (operationalItems, operationalItemIndex) {
-                            search_1.sources.forEach(function (searchSource) {
-                                if (!searchSource.hasOwnProperty("layer")) {
-                                    return;
-                                }
-                                var layerSearchSource = searchSource;
-                                var featureLayer = operationalItems.layer;
-                                if (featureLayer.id === layerSearchSource.layer.id) {
-                                    var searchExpression = interactiveLegend.searchExpressions.getItemAt(operationalItemIndex);
-                                    if (searchExpression) {
-                                        searchSource.filter = {
-                                            where: searchExpression
-                                        };
-                                    }
-                                    else {
-                                        searchSource.filter = null;
-                                    }
-                                }
-                            });
-                        });
-                    });
                 }
-                var search_1 = new Search(searchProperties);
+                var search = new Search(searchProperties);
                 this.searchExpand = new Expand({
-                    content: search_1,
+                    content: search,
                     expanded: true
                 });
+                interactiveLegend.searchViewModel = search.viewModel;
                 view.ui.add(this.searchExpand, "top-right");
             }
         };

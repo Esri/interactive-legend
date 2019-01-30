@@ -134,6 +134,9 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   @property()
   searchExpressions: Collection<string> = new Collection();
 
+  @property()
+  searchViewModel = null;
+
   //----------------------------------
   //
   //  Lifecycle methods
@@ -191,7 +194,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   applyFeatureFilter(
     elementInfo: any,
     field: string,
-    featureLayerViewIndex: number,
+    operationalItemIndex: number,
     legendElement: LegendElement,
     legendInfoIndex: number,
     legendElementInfos?: any[]
@@ -199,19 +202,19 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     this._generateQueryExpressions(
       elementInfo,
       field,
-      featureLayerViewIndex,
+      operationalItemIndex,
       legendElement,
       legendInfoIndex,
       legendElementInfos
     );
     const queryExpressions = this.interactiveStyleData.queryExpressions[
-      featureLayerViewIndex
+      operationalItemIndex
     ];
     const featureLayerView = this.featureLayerViews.getItemAt(
-      featureLayerViewIndex
+      operationalItemIndex
     );
     const filterExpression = queryExpressions.join(" OR ");
-    this._setSearchExpression(filterExpression, featureLayerViewIndex);
+    this._setSearchExpression(filterExpression, operationalItemIndex);
     featureLayerView.filter = new FeatureFilter({
       where: filterExpression
     });
@@ -222,38 +225,38 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     elementInfo: any,
     field: string,
     legendInfoIndex: number,
-    featureLayerViewIndex: number,
+    operationalItemIndex: number,
     legendElement: LegendElement,
     legendElementInfos: any[]
   ): void {
     const originalRenderer = this.interactiveStyleData.originalRenderers[
-      featureLayerViewIndex
+      operationalItemIndex
     ];
     if (!originalRenderer) {
       return;
     }
     if (originalRenderer.hasOwnProperty("uniqueValueInfos")) {
-      this._muteUniqueValues(legendInfoIndex, field, featureLayerViewIndex);
+      this._muteUniqueValues(legendInfoIndex, field, operationalItemIndex);
     } else if (
       Array.isArray(elementInfo.value) &&
       elementInfo.value.length === 2
     ) {
-      this._muteRangeValues(legendInfoIndex, field, featureLayerViewIndex);
+      this._muteRangeValues(legendInfoIndex, field, operationalItemIndex);
     }
 
     this._generateQueryExpressions(
       elementInfo,
       field,
-      featureLayerViewIndex,
+      operationalItemIndex,
       legendElement,
       null,
       legendElementInfos
     );
     const queryExpressions = this.interactiveStyleData.queryExpressions[
-      featureLayerViewIndex
+      operationalItemIndex
     ];
     const filterExpression = queryExpressions.join(" OR ");
-    this._setSearchExpression(filterExpression, featureLayerViewIndex);
+    this._setSearchExpression(filterExpression, operationalItemIndex);
   }
 
   // applyFeatureHighlight
@@ -261,7 +264,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     elementInfo: any,
     field: string,
     legendInfoIndex: number,
-    featureLayerViewIndex: number,
+    operationalItemIndex: number,
     isSizeRamp: boolean,
     legendElement: LegendElement,
     legendElementInfos: any[]
@@ -272,7 +275,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         field,
         legendElementInfos,
         elementInfo,
-        featureLayerViewIndex
+        operationalItemIndex
       );
     } else if (
       Array.isArray(elementInfo.value) &&
@@ -282,7 +285,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         legendInfoIndex,
         elementInfo,
         field,
-        featureLayerViewIndex,
+        operationalItemIndex,
         legendElementInfos
       );
     } else {
@@ -290,23 +293,23 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         legendInfoIndex,
         elementInfo,
         field,
-        featureLayerViewIndex
+        operationalItemIndex
       );
     }
 
     this._generateQueryExpressions(
       elementInfo,
       field,
-      featureLayerViewIndex,
+      operationalItemIndex,
       legendElement,
       null,
       legendElementInfos
     );
     const queryExpressions = this.interactiveStyleData.queryExpressions[
-      featureLayerViewIndex
+      operationalItemIndex
     ];
     const filterExpression = queryExpressions.join(" OR ");
-    this._setSearchExpression(filterExpression, featureLayerViewIndex);
+    this._setSearchExpression(filterExpression, operationalItemIndex);
   }
 
   //----------------------------------
@@ -403,11 +406,11 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   private _storeOriginalRenderersAndColors(): void {
     this.interactiveStyleData.originalRenderers = [];
     this.layerListViewModel.operationalItems.forEach(
-      (operationalItem, featureLayerViewIndex) => {
+      (operationalItem, operationalItemIndex) => {
         if (operationalItem.layer.hasOwnProperty("renderer")) {
           this._useLayerFromOperationalItem(
             operationalItem,
-            featureLayerViewIndex
+            operationalItemIndex
           );
         }
       }
@@ -417,11 +420,11 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   // _useLayerFromOperationalItem
   private _useLayerFromOperationalItem(
     operationalItem: ActiveLayerInfo,
-    featureLayerViewIndex: number
+    operationalItemIndex: number
   ): void {
     const clonedRenderer = operationalItem.layer.renderer.clone();
     const originalColors = this.interactiveStyleData.originalColors[
-      featureLayerViewIndex
+      operationalItemIndex
     ];
     const infos = clonedRenderer.hasOwnProperty("uniqueValueInfos")
       ? clonedRenderer.uniqueValueInfos
@@ -434,7 +437,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         return;
       }
       this.interactiveStyleData.originalRenderers[
-        featureLayerViewIndex
+        operationalItemIndex
       ] = clonedRenderer;
     }
   }
@@ -449,7 +452,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   private _generateQueryExpressions(
     elementInfo: any,
     field: string,
-    featureLayerViewIndex: number,
+    operationalItemIndex: number,
     legendElement: LegendElement,
     legendInfoIndex?: number,
     legendElementInfos?: any[]
@@ -462,7 +465,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       legendElementInfos
     );
     const queryExpressions = this.interactiveStyleData.queryExpressions[
-      featureLayerViewIndex
+      operationalItemIndex
     ];
     const expressionIndex = queryExpressions.indexOf(queryExpression);
     if (queryExpressions.length === 0 || expressionIndex === -1) {
@@ -582,20 +585,20 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     legendInfoIndex: number,
     elementInfo: any,
     field: string,
-    featureLayerViewIndex: number,
+    operationalItemIndex: number,
     legendElementInfos: any[]
   ): void {
     const features = [];
     const highlightedFeatures = this.interactiveStyleData.highlightedFeatures[
-      featureLayerViewIndex
+      operationalItemIndex
     ];
 
     const elementInfoValue = elementInfo.value;
     if (highlightedFeatures[legendInfoIndex]) {
-      this._removeHighlight(featureLayerViewIndex, legendInfoIndex);
+      this._removeHighlight(operationalItemIndex, legendInfoIndex);
       return;
     }
-    this.layerGraphics.getItemAt(featureLayerViewIndex).forEach(feature => {
+    this.layerGraphics.getItemAt(operationalItemIndex).forEach(feature => {
       const fieldValue = feature.attributes[field];
       if (legendElementInfos.length - 1 === legendInfoIndex) {
         if (
@@ -618,7 +621,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       return;
     }
     const highlight = this.featureLayerViews
-      .getItemAt(featureLayerViewIndex)
+      .getItemAt(operationalItemIndex)
       .highlight([...features]);
     highlightedFeatures[legendInfoIndex] = [highlight];
   }
@@ -628,19 +631,19 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     legendInfoIndex: number,
     elementInfo: any,
     field: string,
-    featureLayerViewIndex: number
+    operationalItemIndex: number
   ): void {
     const features = [];
     const highlightedFeatures = [];
     const highlightedFeatureData = this.interactiveStyleData
-      .highlightedFeatures[featureLayerViewIndex];
+      .highlightedFeatures[operationalItemIndex];
 
     if (highlightedFeatureData[legendInfoIndex]) {
       highlightedFeatureData[legendInfoIndex][0].remove();
       highlightedFeatureData[legendInfoIndex] = null;
       return;
     }
-    this.layerGraphics.getItemAt(featureLayerViewIndex).map(feature => {
+    this.layerGraphics.getItemAt(operationalItemIndex).map(feature => {
       const attributes = feature.attributes;
 
       if (
@@ -660,7 +663,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       return;
     }
     const highlight = this.featureLayerViews
-      .getItemAt(featureLayerViewIndex)
+      .getItemAt(operationalItemIndex)
       .highlight([...highlightedFeatures]);
     highlightedFeatureData[legendInfoIndex] = [highlight];
   }
@@ -672,18 +675,18 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     field: string,
     legendElementInfos: any[],
     elementInfo: any,
-    featureLayerViewIndex: number
+    operationalItemIndex: number
   ): void {
     const features = [];
     const highlightedFeatureData = this.interactiveStyleData
-      .highlightedFeatures[featureLayerViewIndex];
+      .highlightedFeatures[operationalItemIndex];
 
     if (highlightedFeatureData[legendInfoIndex]) {
-      this._removeHighlight(featureLayerViewIndex, legendInfoIndex);
+      this._removeHighlight(operationalItemIndex, legendInfoIndex);
       return;
     }
 
-    this.layerGraphics.getItemAt(featureLayerViewIndex).forEach(feature => {
+    this.layerGraphics.getItemAt(operationalItemIndex).forEach(feature => {
       // FIRST LEGEND INFO
       if (legendInfoIndex === 0) {
         if (feature.attributes[field] >= elementInfo.value) {
@@ -748,18 +751,18 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       return;
     }
     const highlight = this.featureLayerViews
-      .getItemAt(featureLayerViewIndex)
+      .getItemAt(operationalItemIndex)
       .highlight([...features]);
     highlightedFeatureData[legendInfoIndex] = [highlight];
   }
 
   // _removeHighlight
   private _removeHighlight(
-    featureLayerViewIndex: number,
+    operationalItemIndex: number,
     legendInfoIndex: number
   ): void {
     const highlightedFeatures = this.interactiveStyleData.highlightedFeatures[
-      featureLayerViewIndex
+      operationalItemIndex
     ];
     highlightedFeatures[legendInfoIndex].forEach(feature => {
       feature.remove();
@@ -776,13 +779,13 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   private _muteUniqueValues(
     legendInfoIndex: number,
     field: string,
-    featureLayerViewIndex: number
+    operationalItemIndex: number
   ): void {
     const featureLayer = this.layerListViewModel.operationalItems.getItemAt(
-      featureLayerViewIndex
+      operationalItemIndex
     ).layer as FeatureLayer;
     const colorIndexes = this.interactiveStyleData.colorIndexes[
-      featureLayerViewIndex
+      operationalItemIndex
     ];
 
     if (colorIndexes.indexOf(legendInfoIndex) === -1) {
@@ -791,10 +794,10 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       colorIndexes.splice(colorIndexes.indexOf(legendInfoIndex), 1);
     }
 
-    this._resetMutedUniqueValues(featureLayerViewIndex);
+    this._resetMutedUniqueValues(operationalItemIndex);
     if (colorIndexes.length === 0) {
-      this._resetMutedUniqueValues(featureLayerViewIndex);
-      this._generateRenderer(featureLayerViewIndex, "unique-value", field);
+      this._resetMutedUniqueValues(operationalItemIndex);
+      this._generateRenderer(operationalItemIndex, "unique-value", field);
       return;
     }
     const renderer = featureLayer.renderer as any;
@@ -810,16 +813,16 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         }
       }
     );
-    this._generateRenderer(featureLayerViewIndex, "unique-value", field);
+    this._generateRenderer(operationalItemIndex, "unique-value", field);
   }
 
   // _resetMutedUniqueValues
-  private _resetMutedUniqueValues(featureLayerViewIndex: number): void {
+  private _resetMutedUniqueValues(operationalItemIndex: number): void {
     const featureLayer = this.layerListViewModel.operationalItems.getItemAt(
-      featureLayerViewIndex
+      operationalItemIndex
     ).layer as FeatureLayer;
     const originalColors = this.interactiveStyleData.originalColors[
-      featureLayerViewIndex
+      operationalItemIndex
     ];
     originalColors.forEach((original, originalIndex) => {
       const uvr = featureLayer.renderer as __esri.UniqueValueRenderer;
@@ -835,14 +838,14 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   private _muteRangeValues(
     legendInfoIndex: number,
     field: string,
-    featureLayerViewIndex: number
+    operationalItemIndex: number
   ): void {
     const featureLayer = this.layerListViewModel.operationalItems.getItemAt(
-      featureLayerViewIndex
+      operationalItemIndex
     ).layer as any;
     const classBreakInfos = featureLayer.renderer.classBreakInfos;
     const originalColors = this.interactiveStyleData.originalColors[
-      featureLayerViewIndex
+      operationalItemIndex
     ];
     const reversedClassBreakInfos = [];
     const reversedColors = [];
@@ -851,7 +854,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       reversedColors.push(originalColors[i]);
     }
     const classBreakInfosIndex = this.interactiveStyleData.classBreakInfosIndex[
-      featureLayerViewIndex
+      operationalItemIndex
     ];
     if (classBreakInfosIndex.indexOf(legendInfoIndex) === -1) {
       classBreakInfosIndex.push(legendInfoIndex);
@@ -863,7 +866,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     }
 
     this._applyColors(
-      featureLayerViewIndex,
+      operationalItemIndex,
       reversedColors,
       reversedClassBreakInfos,
       field
@@ -872,13 +875,13 @@ class InteractiveStyleViewModel extends declared(Accessor) {
 
   // _applyColors
   private _applyColors(
-    featureLayerViewIndex: number,
+    operationalItemIndex: number,
     reversedColors: Color[],
     reversedClassBreakInfos: any[],
     field: string
   ): void {
     const classBreakInfosIndex = this.interactiveStyleData.classBreakInfosIndex[
-      featureLayerViewIndex
+      operationalItemIndex
     ];
     if (classBreakInfosIndex.length === 0) {
       reversedClassBreakInfos.forEach((classBreakInfo, classBreakInfoIndex) => {
@@ -892,7 +895,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
           }
         });
       });
-      this._generateRenderer(featureLayerViewIndex, "class-breaks", field);
+      this._generateRenderer(operationalItemIndex, "class-breaks", field);
       return;
     }
     reversedClassBreakInfos.forEach((classBreakInfo, classBreakInfoIndex) => {
@@ -914,17 +917,17 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         }
       }
     });
-    this._generateRenderer(featureLayerViewIndex, "class-breaks", field);
+    this._generateRenderer(operationalItemIndex, "class-breaks", field);
   }
 
   // _generateRenderer
   private _generateRenderer(
-    featureLayerViewIndex: number,
+    operationalItemIndex: number,
     type: string,
     field: string
   ): void {
     const featureLayer = this.layerListViewModel.operationalItems.getItemAt(
-      featureLayerViewIndex
+      operationalItemIndex
     ).layer as any;
     const { defaultLabel, defaultSymbol } = featureLayer.renderer;
     const visualVariables =
@@ -958,14 +961,21 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   // _setSearchExpression
   private _setSearchExpression(
     filterExpression: string,
-    featureLayerViewIndex: number
+    operationalItemIndex: number
   ): void {
-    const { searchExpressions } = this;
-    if (searchExpressions.getItemAt(featureLayerViewIndex)) {
-      searchExpressions.removeAt(featureLayerViewIndex);
+    const searchSource = this.searchViewModel.sources.find(
+      searchSource =>
+        searchSource.flayerId ===
+        this.layerListViewModel.operationalItems.getItemAt(operationalItemIndex)
+          .layer.id
+    );
+    if (filterExpression) {
+      searchSource.filter = {
+        where: filterExpression
+      };
+    } else {
+      searchSource.filter = null;
     }
-    searchExpressions.add(filterExpression, featureLayerViewIndex);
-    searchExpressions.removeAt(featureLayerViewIndex + 1);
   }
 }
 
