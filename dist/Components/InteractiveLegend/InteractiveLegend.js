@@ -80,6 +80,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             _this.mutedOpacity = null;
             // searchExpressions
             _this.searchExpressions = null;
+            _this.searchViewModel = null;
             // layerListViewModel
             _this.layerListViewModel = null;
             // style
@@ -89,7 +90,8 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 filterMode: _this.filterMode,
                 mutedShade: _this.mutedShade,
                 mutedOpacity: _this.mutedOpacity,
-                layerListViewModel: _this.layerListViewModel
+                layerListViewModel: _this.layerListViewModel,
+                searchViewModel: _this.searchViewModel
             });
             return _this;
         }
@@ -105,7 +107,8 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                     filterMode: this.filterMode,
                     mutedShade: this.mutedShade,
                     mutedOpacity: this.mutedOpacity,
-                    layerListViewModel: this.layerListViewModel
+                    layerListViewModel: this.layerListViewModel,
+                    searchViewModel: this.searchViewModel
                 });
             }
             if (value && typeof value.type === "string") {
@@ -120,7 +123,8 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 filterMode: this.filterMode,
                 mutedShade: this.mutedShade,
                 mutedOpacity: this.mutedOpacity,
-                layerListViewModel: this.layerListViewModel
+                layerListViewModel: this.layerListViewModel,
+                searchViewModel: this.searchViewModel
             });
         };
         InteractiveLegend.prototype.postInitialize = function () {
@@ -228,6 +232,10 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             decorators_1.aliasOf("style.searchExpressions"),
             decorators_1.property()
         ], InteractiveLegend.prototype, "searchExpressions", void 0);
+        __decorate([
+            decorators_1.aliasOf("style.searchViewModel"),
+            decorators_1.property()
+        ], InteractiveLegend.prototype, "searchViewModel", void 0);
         __decorate([
             decorators_1.property()
         ], InteractiveLegend.prototype, "layerListViewModel", void 0);

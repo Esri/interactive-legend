@@ -114,6 +114,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this.layerListViewModel = null;
             // searchExpressions
             _this.searchExpressions = null;
+            _this.searchViewModel = null;
             // viewModel
             _this.viewModel = new InteractiveStyleViewModel();
             // type
@@ -207,10 +208,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 if (legendElements_1 && !legendElements_1.length) {
                     return null;
                 }
-                var featureLayerViewIndex_1 = this._getFeatureLayerViewIndex(activeLayerInfo);
+                var operationalItemIndex_1 = this._getOperationalItemIndex(activeLayerInfo);
                 var filteredElements = legendElements_1
                     .map(function (legendElement, legendElementIndex) {
-                    return _this._renderLegendForElement(legendElement, activeLayerInfo.layer, legendElementIndex, activeLayerInfo, activeLayerInfoIndex, featureLayerViewIndex_1, legendElement.infos, legendElements_1.length);
+                    return _this._renderLegendForElement(legendElement, activeLayerInfo.layer, legendElementIndex, activeLayerInfo, activeLayerInfoIndex, operationalItemIndex_1, legendElement.infos, legendElements_1.length);
                 })
                     .filter(function (element) { return !!element; });
                 if (!filteredElements.length) {
@@ -228,7 +229,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             }
         };
         // _renderLegendForElement
-        InteractiveClassic.prototype._renderLegendForElement = function (legendElement, layer, legendElementIndex, activeLayerInfo, activeLayerInfoIndex, featureLayerViewIndex, legendElementInfos, legendElementsLength, isChild) {
+        InteractiveClassic.prototype._renderLegendForElement = function (legendElement, layer, legendElementIndex, activeLayerInfo, activeLayerInfoIndex, operationalItemIndex, legendElementInfos, legendElementsLength, isChild) {
             var _this = this;
             var _a;
             var type = legendElement.type;
@@ -238,14 +239,14 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 ? legendElement.title
                 : null;
             var field = null;
-            var selectedStyleData = this._selectedStyleData.getItemAt(featureLayerViewIndex);
+            var selectedStyleData = this._selectedStyleData.getItemAt(operationalItemIndex);
             if (selectedStyleData) {
                 var requiredFields = selectedStyleData.requiredFields;
                 if (legendElementsLength > 1) {
                     var fieldVal_1 = legendTitle && legendTitle.hasOwnProperty("field")
                         ? legendTitle.field
                         : null;
-                    var requiredFields_1 = this._selectedStyleData.getItemAt(featureLayerViewIndex).requiredFields;
+                    var requiredFields_1 = this._selectedStyleData.getItemAt(operationalItemIndex).requiredFields;
                     var requiredFieldsCollection_1 = new Collection();
                     requiredFields_1.forEach(function (requiredField) {
                         requiredFieldsCollection_1.add(requiredField);
@@ -256,7 +257,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 }
                 else {
                     if (requiredFields && activeLayerInfo.layer.renderer.field) {
-                        var requiredFields_2 = this._selectedStyleData.getItemAt(featureLayerViewIndex).requiredFields;
+                        var requiredFields_2 = this._selectedStyleData.getItemAt(operationalItemIndex).requiredFields;
                         var activeLayerRequiredFields = activeLayerInfo.layer.renderer.requiredFields;
                         var requiredFieldsCollection_2 = new Collection();
                         var activeLayerFieldsCollection_1 = new Collection();
@@ -277,7 +278,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             if (legendElement.type === "symbol-table" || isSizeRamp) {
                 var rows = legendElement.infos
                     .map(function (info, legendInfoIndex) {
-                    return _this._renderLegendForElementInfo(info, layer, isSizeRamp, legendElement.legendType, legendInfoIndex, field, legendElementIndex, legendTitle, legendElement, activeLayerInfo, activeLayerInfoIndex, featureLayerViewIndex, legendElementInfos);
+                    return _this._renderLegendForElementInfo(info, layer, isSizeRamp, legendElement.legendType, legendInfoIndex, field, legendElementIndex, legendTitle, legendElement, activeLayerInfo, activeLayerInfoIndex, operationalItemIndex, legendElementInfos);
                 })
                     .filter(function (row) { return !!row; });
                 if (rows.length) {
@@ -425,12 +426,12 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     widget_1.tsx("div", { class: CSS.rampLabelsContainer, styles: rampLabelsContainerStyles }, labelsContent))));
         };
         // _renderLegendForElementInfo
-        InteractiveClassic.prototype._renderLegendForElementInfo = function (elementInfo, layer, isSizeRamp, legendType, legendInfoIndex, field, legendElementIndex, legendTitle, legendElement, activeLayerInfo, activeLayerInfoIndex, featureLayerViewIndex, legendElementInfos) {
+        InteractiveClassic.prototype._renderLegendForElementInfo = function (elementInfo, layer, isSizeRamp, legendType, legendInfoIndex, field, legendElementIndex, legendTitle, legendElement, activeLayerInfo, activeLayerInfoIndex, operationalItemIndex, legendElementInfos) {
             var _this = this;
             var _a, _b;
             // nested
             if (elementInfo.type) {
-                return this._renderLegendForElement(elementInfo, layer, legendElementIndex, activeLayerInfo, activeLayerInfoIndex, featureLayerViewIndex, legendElementInfos, null, true);
+                return this._renderLegendForElement(elementInfo, layer, legendElementIndex, activeLayerInfo, activeLayerInfoIndex, operationalItemIndex, legendElementInfos, null, true);
             }
             var content = null;
             var isStretched = styleUtils_1.isImageryStretchedLegend(layer, legendType);
@@ -477,11 +478,11 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var hasPictureMarkersAndIsMute = this._checkForPictureMarkersAndIsMute(activeLayerInfo);
             var isRelationship = legendElement.type === "relationship-ramp";
             var isSizeRampAndMute = isSizeRamp && this.filterMode === "mute";
-            var selectedStyleData = this._selectedStyleData.getItemAt(featureLayerViewIndex);
+            var selectedStyleData = this._selectedStyleData.getItemAt(operationalItemIndex);
             var requiredFields = selectedStyleData
                 ? selectedStyleData &&
                     selectedStyleData.requiredFields &&
-                    this._selectedStyleData.getItemAt(featureLayerViewIndex).requiredFields
+                    this._selectedStyleData.getItemAt(operationalItemIndex).requiredFields
                         .length > 0
                     ? true
                     : false
@@ -519,7 +520,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         requiredFields &&
                         field &&
                         featureLayerData) {
-                        _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, legendElementInfos);
+                        _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, legendElementInfos);
                     }
                 }, onkeydown: function (event) {
                     if (!isRelationship &&
@@ -533,7 +534,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         requiredFields &&
                         field &&
                         featureLayerData) {
-                        _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, legendElementInfos);
+                        _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, legendElementInfos);
                     }
                 } },
                 widget_1.tsx("div", { class: this.classes(CSS.symbolContainer, symbolClasses) }, content),
@@ -557,37 +558,37 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         //  Filter methods
         //
         //-------------------------------------------------------------------
-        InteractiveClassic.prototype._handleFilterOption = function (event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, legendElementInfos) {
+        InteractiveClassic.prototype._handleFilterOption = function (event, elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, legendElementInfos) {
             this.filterMode === "highlight"
-                ? this._featureHighlight(event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, legendElementInfos)
+                ? this._featureHighlight(event, elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, legendElementInfos)
                 : this.filterMode === "featureFilter"
-                    ? this._featureFilter(elementInfo, field, featureLayerViewIndex, legendInfoIndex, legendElement, legendElementInfos)
+                    ? this._featureFilter(elementInfo, field, operationalItemIndex, legendInfoIndex, legendElement, legendElementInfos)
                     : this.filterMode === "mute"
-                        ? this._featureMute(event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, legendElement, legendElementInfos)
+                        ? this._featureMute(event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos)
                         : null;
         };
         //_filterFeatures
-        InteractiveClassic.prototype._featureFilter = function (elementInfo, field, featureLayerViewIndex, legendInfoIndex, legendElement, legendElementInfos) {
+        InteractiveClassic.prototype._featureFilter = function (elementInfo, field, operationalItemIndex, legendInfoIndex, legendElement, legendElementInfos) {
             this._handleSelectedStyles(event);
-            this.viewModel.applyFeatureFilter(elementInfo, field, featureLayerViewIndex, legendElement, legendInfoIndex, legendElementInfos);
+            this.viewModel.applyFeatureFilter(elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, legendElementInfos);
         };
         // _highlightFeatures
-        InteractiveClassic.prototype._featureHighlight = function (event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, legendElementInfos) {
+        InteractiveClassic.prototype._featureHighlight = function (event, elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, legendElementInfos) {
             var state = this.viewModel.state;
             if (state === "querying") {
                 return;
             }
-            this.viewModel.applyFeatureHighlight(elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, legendElementInfos);
-            this._handleSelectedStyles(event, featureLayerViewIndex, legendInfoIndex);
+            this.viewModel.applyFeatureHighlight(elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, legendElementInfos);
+            this._handleSelectedStyles(event, operationalItemIndex, legendInfoIndex);
         };
         // _muteFeatures
-        InteractiveClassic.prototype._featureMute = function (event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, legendElement, legendElementInfos) {
+        InteractiveClassic.prototype._featureMute = function (event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos) {
             this._handleSelectedStyles(event);
-            this.viewModel.applyFeatureMute(elementInfo, field, legendInfoIndex, featureLayerViewIndex, legendElement, legendElementInfos);
+            this.viewModel.applyFeatureMute(elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos);
         };
         // End of filter methods
         // _handleSelectedStyles
-        InteractiveClassic.prototype._handleSelectedStyles = function (event, featureLayerViewIndex, legendInfoIndex) {
+        InteractiveClassic.prototype._handleSelectedStyles = function (event, operationalItemIndex, legendInfoIndex) {
             var node = event.currentTarget;
             var legendElementInfoIndex = parseInt(node.getAttribute("data-child-index"));
             var legendElementIndex = parseInt(node.getAttribute("data-legend-index"));
@@ -601,7 +602,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var legendElementChildArr = featureLayerData.selectedInfoIndex[legendElementIndex];
             if (this.filterMode === "highlight") {
                 var highlightedFeatures = this.viewModel.interactiveStyleData
-                    .highlightedFeatures[featureLayerViewIndex];
+                    .highlightedFeatures[operationalItemIndex];
                 if (!highlightedFeatures[legendInfoIndex] &&
                     !featureLayerData.selectedInfoIndex[legendElementIndex] &&
                     featureLayerData.selectedInfoIndex.indexOf(legendInfoIndex) === -1) {
@@ -627,14 +628,14 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 }
             }
         };
-        // _getFeatureLayerViewIndex
-        InteractiveClassic.prototype._getFeatureLayerViewIndex = function (activeLayerInfo) {
+        // _getOperationalItemIndex
+        InteractiveClassic.prototype._getOperationalItemIndex = function (activeLayerInfo) {
             var itemIndex = null;
-            this.viewModel.featureLayerViews.forEach(function (featureLayerView, featureLayerViewIndex) {
-                if (featureLayerView) {
-                    var featureLayerViewSourceLayer = featureLayerView.layer;
-                    if (featureLayerViewSourceLayer.uid === activeLayerInfo.layer.uid) {
-                        itemIndex = featureLayerViewIndex;
+            this.layerListViewModel.operationalItems.forEach(function (operationalItem, operationalItemIndex) {
+                if (operationalItem) {
+                    var operationalItemLayer = operationalItem.layer;
+                    if (operationalItemLayer.id === activeLayerInfo.layer.id) {
+                        itemIndex = operationalItemIndex;
                     }
                 }
             });
@@ -722,6 +723,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             decorators_1.aliasOf("viewModel.searchExpressions"),
             decorators_1.property()
         ], InteractiveClassic.prototype, "searchExpressions", void 0);
+        __decorate([
+            decorators_1.aliasOf("viewModel.searchViewModel"),
+            decorators_1.property()
+        ], InteractiveClassic.prototype, "searchViewModel", void 0);
         __decorate([
             widget_1.renderable(["viewModel.state"]),
             decorators_1.property({

@@ -199,6 +199,10 @@ class InteractiveClassic extends declared(Widget) {
   @property()
   searchExpressions: Collection<string> = null;
 
+  @aliasOf("viewModel.searchViewModel")
+  @property()
+  searchViewModel = null;
+
   // viewModel
   @renderable(["viewModel.state"])
   @property({
@@ -344,7 +348,7 @@ class InteractiveClassic extends declared(Widget) {
       if (legendElements && !legendElements.length) {
         return null;
       }
-      const featureLayerViewIndex = this._getFeatureLayerViewIndex(
+      const operationalItemIndex = this._getOperationalItemIndex(
         activeLayerInfo
       );
       const filteredElements = legendElements
@@ -355,7 +359,7 @@ class InteractiveClassic extends declared(Widget) {
             legendElementIndex,
             activeLayerInfo,
             activeLayerInfoIndex,
-            featureLayerViewIndex,
+            operationalItemIndex,
             legendElement.infos,
             legendElements.length
           );
@@ -392,7 +396,7 @@ class InteractiveClassic extends declared(Widget) {
     legendElementIndex: number,
     activeLayerInfo: ActiveLayerInfo,
     activeLayerInfoIndex: number,
-    featureLayerViewIndex: number,
+    operationalItemIndex: number,
     legendElementInfos: any[],
     legendElementsLength: number,
     isChild?: boolean
@@ -410,7 +414,7 @@ class InteractiveClassic extends declared(Widget) {
       : null;
     let field = null;
     const selectedStyleData = this._selectedStyleData.getItemAt(
-      featureLayerViewIndex
+      operationalItemIndex
     );
     if (selectedStyleData) {
       const { requiredFields } = selectedStyleData;
@@ -421,7 +425,7 @@ class InteractiveClassic extends declared(Widget) {
             ? legendTitle.field
             : null;
         const requiredFields = this._selectedStyleData.getItemAt(
-          featureLayerViewIndex
+          operationalItemIndex
         ).requiredFields;
         const requiredFieldsCollection = new Collection();
         requiredFields.forEach(requiredField => {
@@ -435,7 +439,7 @@ class InteractiveClassic extends declared(Widget) {
       } else {
         if (requiredFields && activeLayerInfo.layer.renderer.field) {
           const requiredFields = this._selectedStyleData.getItemAt(
-            featureLayerViewIndex
+            operationalItemIndex
           ).requiredFields;
           const activeLayerRequiredFields =
             activeLayerInfo.layer.renderer.requiredFields;
@@ -474,7 +478,7 @@ class InteractiveClassic extends declared(Widget) {
             legendElement,
             activeLayerInfo,
             activeLayerInfoIndex,
-            featureLayerViewIndex,
+            operationalItemIndex,
             legendElementInfos
           )
         )
@@ -714,7 +718,7 @@ class InteractiveClassic extends declared(Widget) {
     legendElement: LegendElement,
     activeLayerInfo: ActiveLayerInfo,
     activeLayerInfoIndex: number,
-    featureLayerViewIndex: number,
+    operationalItemIndex: number,
     legendElementInfos: any[]
   ): VNode {
     // nested
@@ -725,7 +729,7 @@ class InteractiveClassic extends declared(Widget) {
         legendElementIndex,
         activeLayerInfo,
         activeLayerInfoIndex,
-        featureLayerViewIndex,
+        operationalItemIndex,
         legendElementInfos,
         null,
         true
@@ -803,12 +807,12 @@ class InteractiveClassic extends declared(Widget) {
     const isRelationship = legendElement.type === "relationship-ramp";
     const isSizeRampAndMute = isSizeRamp && this.filterMode === "mute";
     const selectedStyleData = this._selectedStyleData.getItemAt(
-      featureLayerViewIndex
+      operationalItemIndex
     );
     const requiredFields = selectedStyleData
       ? selectedStyleData &&
         selectedStyleData.requiredFields &&
-        this._selectedStyleData.getItemAt(featureLayerViewIndex).requiredFields
+        this._selectedStyleData.getItemAt(operationalItemIndex).requiredFields
           .length > 0
         ? true
         : false
@@ -871,7 +875,7 @@ class InteractiveClassic extends declared(Widget) {
               elementInfo,
               field,
               legendInfoIndex,
-              featureLayerViewIndex,
+              operationalItemIndex,
               isSizeRamp,
               legendElement,
               legendElementInfos
@@ -897,7 +901,7 @@ class InteractiveClassic extends declared(Widget) {
               elementInfo,
               field,
               legendInfoIndex,
-              featureLayerViewIndex,
+              operationalItemIndex,
               isSizeRamp,
               legendElement,
               legendElementInfos
@@ -957,7 +961,7 @@ class InteractiveClassic extends declared(Widget) {
     elementInfo: any,
     field: string,
     legendInfoIndex: number,
-    featureLayerViewIndex: number,
+    operationalItemIndex: number,
     isSizeRamp: boolean,
     legendElement: LegendElement,
     legendElementInfos?: any[]
@@ -968,7 +972,7 @@ class InteractiveClassic extends declared(Widget) {
           elementInfo,
           field,
           legendInfoIndex,
-          featureLayerViewIndex,
+          operationalItemIndex,
           isSizeRamp,
           legendElement,
           legendElementInfos
@@ -977,7 +981,7 @@ class InteractiveClassic extends declared(Widget) {
       ? this._featureFilter(
           elementInfo,
           field,
-          featureLayerViewIndex,
+          operationalItemIndex,
           legendInfoIndex,
           legendElement,
           legendElementInfos
@@ -988,7 +992,7 @@ class InteractiveClassic extends declared(Widget) {
           elementInfo,
           field,
           legendInfoIndex,
-          featureLayerViewIndex,
+          operationalItemIndex,
           legendElement,
           legendElementInfos
         )
@@ -999,7 +1003,7 @@ class InteractiveClassic extends declared(Widget) {
   private _featureFilter(
     elementInfo: any,
     field: string,
-    featureLayerViewIndex: number,
+    operationalItemIndex: number,
     legendInfoIndex: number,
     legendElement: LegendElement,
     legendElementInfos?: any[]
@@ -1008,7 +1012,7 @@ class InteractiveClassic extends declared(Widget) {
     this.viewModel.applyFeatureFilter(
       elementInfo,
       field,
-      featureLayerViewIndex,
+      operationalItemIndex,
       legendElement,
       legendInfoIndex,
       legendElementInfos
@@ -1021,7 +1025,7 @@ class InteractiveClassic extends declared(Widget) {
     elementInfo: any,
     field: string,
     legendInfoIndex: number,
-    featureLayerViewIndex: number,
+    operationalItemIndex: number,
     isSizeRamp: boolean,
     legendElement: LegendElement,
     legendElementInfos: any[]
@@ -1035,12 +1039,12 @@ class InteractiveClassic extends declared(Widget) {
       elementInfo,
       field,
       legendInfoIndex,
-      featureLayerViewIndex,
+      operationalItemIndex,
       isSizeRamp,
       legendElement,
       legendElementInfos
     );
-    this._handleSelectedStyles(event, featureLayerViewIndex, legendInfoIndex);
+    this._handleSelectedStyles(event, operationalItemIndex, legendInfoIndex);
   }
 
   // _muteFeatures
@@ -1049,7 +1053,7 @@ class InteractiveClassic extends declared(Widget) {
     elementInfo: any,
     field: string,
     legendInfoIndex: number,
-    featureLayerViewIndex: number,
+    operationalItemIndex: number,
     legendElement: LegendElement,
     legendElementInfos: any[]
   ): void {
@@ -1058,7 +1062,7 @@ class InteractiveClassic extends declared(Widget) {
       elementInfo,
       field,
       legendInfoIndex,
-      featureLayerViewIndex,
+      operationalItemIndex,
       legendElement,
       legendElementInfos
     );
@@ -1068,7 +1072,7 @@ class InteractiveClassic extends declared(Widget) {
   // _handleSelectedStyles
   private _handleSelectedStyles(
     event: Event,
-    featureLayerViewIndex?: number,
+    operationalItemIndex?: number,
     legendInfoIndex?: number
   ): void {
     const node = event.currentTarget as HTMLElement;
@@ -1093,7 +1097,7 @@ class InteractiveClassic extends declared(Widget) {
 
     if (this.filterMode === "highlight") {
       const highlightedFeatures = this.viewModel.interactiveStyleData
-        .highlightedFeatures[featureLayerViewIndex];
+        .highlightedFeatures[operationalItemIndex];
       if (
         !highlightedFeatures[legendInfoIndex] &&
         !featureLayerData.selectedInfoIndex[legendElementIndex] &&
@@ -1126,15 +1130,15 @@ class InteractiveClassic extends declared(Widget) {
     }
   }
 
-  // _getFeatureLayerViewIndex
-  private _getFeatureLayerViewIndex(activeLayerInfo: ActiveLayerInfo): number {
+  // _getOperationalItemIndex
+  private _getOperationalItemIndex(activeLayerInfo: ActiveLayerInfo): number {
     let itemIndex = null;
-    this.viewModel.featureLayerViews.forEach(
-      (featureLayerView, featureLayerViewIndex) => {
-        if (featureLayerView) {
-          const featureLayerViewSourceLayer = featureLayerView.layer as any;
-          if (featureLayerViewSourceLayer.uid === activeLayerInfo.layer.uid) {
-            itemIndex = featureLayerViewIndex;
+    this.layerListViewModel.operationalItems.forEach(
+      (operationalItem, operationalItemIndex) => {
+        if (operationalItem) {
+          const operationalItemLayer = operationalItem.layer as any;
+          if (operationalItemLayer.id === activeLayerInfo.layer.id) {
+            itemIndex = operationalItemIndex;
           }
         }
       }

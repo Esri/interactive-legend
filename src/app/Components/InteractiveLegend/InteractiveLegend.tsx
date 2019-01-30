@@ -137,6 +137,10 @@ class InteractiveLegend extends declared(Widget) {
   @property()
   searchExpressions: Collection<string> = null;
 
+  @aliasOf("style.searchViewModel")
+  @property()
+  searchViewModel = null;
+
   // layerListViewModel
   @property()
   layerListViewModel: LayerListViewModel = null;
@@ -150,7 +154,8 @@ class InteractiveLegend extends declared(Widget) {
     filterMode: this.filterMode,
     mutedShade: this.mutedShade,
     mutedOpacity: this.mutedOpacity,
-    layerListViewModel: this.layerListViewModel
+    layerListViewModel: this.layerListViewModel,
+    searchViewModel: this.searchViewModel
   });
 
   // castStyle
@@ -169,7 +174,8 @@ class InteractiveLegend extends declared(Widget) {
         filterMode: this.filterMode,
         mutedShade: this.mutedShade,
         mutedOpacity: this.mutedOpacity,
-        layerListViewModel: this.layerListViewModel
+        layerListViewModel: this.layerListViewModel,
+        searchViewModel: this.searchViewModel
       });
     }
 
@@ -188,7 +194,8 @@ class InteractiveLegend extends declared(Widget) {
       filterMode: this.filterMode,
       mutedShade: this.mutedShade,
       mutedOpacity: this.mutedOpacity,
-      layerListViewModel: this.layerListViewModel
+      layerListViewModel: this.layerListViewModel,
+      searchViewModel: this.searchViewModel
     });
   }
 

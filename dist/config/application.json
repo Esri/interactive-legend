@@ -2,7 +2,7 @@
   "appid": "",
   "group": "",
   "title": "",
-  "homeEnabled": false,
+  "homeEnabled": true,
   "searchEnabled": false,
   "basemapToggleEnabled": false,
   "layerListEnabled": false,
