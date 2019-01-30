@@ -2,10 +2,10 @@
   "appid": "",
   "group": "",
   "title": "",
-  "homeEnabled": false,
-  "searchEnabled": true,
+  "homeEnabled": true,
+  "searchEnabled": false,
   "basemapToggleEnabled": false,
-  "layerListEnabled": true,
+  "layerListEnabled": false,
   "screenshotEnabled": false,
   "legendIncludedInScreenshot": false,
   "popupIncludedInScreenshot": false,
@@ -16,18 +16,7 @@
   "mutedShade": null,
   "nextBasemap": "topo",
   "featureCountEnabled": false,
-  "searchConfig": {
-    "sources": [{
-      "name": "Detroit Demographics",
-      "flayerId": "Detroit Demographics_RL_3644",
-      "placeholder": "Search a county...",
-      "filter": null,
-      "url": "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Detroit%20Demographics_RL/FeatureServer",
-      "outFields": ["COUNTY"],
-      "searchFields": ["COUNTY"],
-      "displayField": "STATE"
-    }]
-  },
+  "searchConfig": null,
   "style": "classic",
   "filterMode": "featureFilter",
   "webmap": "default",

@@ -963,6 +963,9 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     filterExpression: string,
     operationalItemIndex: number
   ): void {
+    if (!this.searchViewModel) {
+      return;
+    }
     const searchSource = this.searchViewModel.sources.find(
       searchSource =>
         searchSource.flayerId ===

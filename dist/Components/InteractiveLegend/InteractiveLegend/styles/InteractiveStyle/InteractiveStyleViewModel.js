@@ -633,6 +633,9 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         // _setSearchExpression
         InteractiveStyleViewModel.prototype._setSearchExpression = function (filterExpression, operationalItemIndex) {
             var _this = this;
+            if (!this.searchViewModel) {
+                return;
+            }
             var searchSource = this.searchViewModel.sources.find(function (searchSource) {
                 return searchSource.flayerId ===
                     _this.layerListViewModel.operationalItems.getItemAt(operationalItemIndex)
