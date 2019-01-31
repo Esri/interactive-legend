@@ -97,7 +97,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             //  Properties
             //
             //--------------------------------------------------------------------------
-            _this.legendElementsNode = null;
             // activeLayerInfos
             _this.activeLayerInfos = null;
             // view
@@ -162,7 +161,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     legendElements.push(legendElement);
                 });
             });
-            return (widget_1.tsx("div", { class: this.classes(baseClasses, CSS.preventScroll) }, filteredLayers && filteredLayers.length ? (widget_1.tsx("div", { bind: this, afterCreate: widget_1.storeNode, "data-node-ref": "legendElementsNode", class: CSS.legendElements }, state === "loading" || state === "querying" ? (widget_1.tsx("div", { class: CSS.loader })) : (widget_1.tsx("div", null,
+            return (widget_1.tsx("div", { class: this.classes(baseClasses, CSS.preventScroll) }, filteredLayers && filteredLayers.length ? (widget_1.tsx("div", { class: CSS.legendElements }, state === "loading" || state === "querying" ? (widget_1.tsx("div", { class: CSS.loader })) : (widget_1.tsx("div", null,
                 " ",
                 filteredLayers)))) : (widget_1.tsx("div", { class: CSS.message }, i18n.noLegend))));
         };
@@ -693,9 +692,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     }))) &&
                 this.filterMode === "mute");
         };
-        __decorate([
-            decorators_1.property()
-        ], InteractiveClassic.prototype, "legendElementsNode", void 0);
         __decorate([
             decorators_1.aliasOf("viewModel.activeLayerInfos"),
             decorators_1.property()

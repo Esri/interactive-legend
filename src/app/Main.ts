@@ -269,7 +269,7 @@ class InteractiveLegendApp {
               layerListViewModel
             });
 
-            const interactiveLegend2 = new InteractiveLegend({
+            const offScreenInteractiveLegend = new InteractiveLegend({
               view,
               container: document.querySelector(
                 ".offscreen-interactive-legend-container"
@@ -282,7 +282,7 @@ class InteractiveLegendApp {
               layerListViewModel
             });
 
-            interactiveLegend2.style.selectedStyleData =
+            offScreenInteractiveLegend.style.selectedStyleData =
               interactiveLegend.style.selectedStyleData;
 
             this._handleSearchWidget(

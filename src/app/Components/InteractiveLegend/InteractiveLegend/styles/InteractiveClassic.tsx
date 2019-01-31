@@ -160,9 +160,6 @@ class InteractiveClassic extends declared(Widget) {
   //
   //--------------------------------------------------------------------------
 
-  @property()
-  legendElementsNode: HTMLElement = null;
-
   // activeLayerInfos
   @aliasOf("viewModel.activeLayerInfos")
   @property()
@@ -277,12 +274,7 @@ class InteractiveClassic extends declared(Widget) {
     return (
       <div class={this.classes(baseClasses, CSS.preventScroll)}>
         {filteredLayers && filteredLayers.length ? (
-          <div
-            bind={this}
-            afterCreate={storeNode}
-            data-node-ref="legendElementsNode"
-            class={CSS.legendElements}
-          >
+          <div class={CSS.legendElements}>
             {state === "loading" || state === "querying" ? (
               <div class={CSS.loader} />
             ) : (

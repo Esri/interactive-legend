@@ -161,7 +161,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 featureCountEnabled: featureCountEnabled,
                                 layerListViewModel: layerListViewModel
                             });
-                            var interactiveLegend2 = new InteractiveLegend({
+                            var offScreenInteractiveLegend = new InteractiveLegend({
                                 view: view,
                                 container: document.querySelector(".offscreen-interactive-legend-container"),
                                 mutedShade: defaultShade,
@@ -171,7 +171,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 featureCountEnabled: featureCountEnabled,
                                 layerListViewModel: layerListViewModel
                             });
-                            interactiveLegend2.style.selectedStyleData =
+                            offScreenInteractiveLegend.style.selectedStyleData =
                                 interactiveLegend.style.selectedStyleData;
                             _this._handleSearchWidget(searchEnabled, interactiveLegend, view, searchConfig);
                             _this.interactiveLegendExpand = new Expand({
