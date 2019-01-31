@@ -23,7 +23,8 @@ import {
 import {
   renderable,
   tsx,
-  accessibleHandler
+  accessibleHandler,
+  storeNode
 } from "esri/widgets/support/widget";
 
 // esri.views.MapView
@@ -150,7 +151,7 @@ class InteractiveClassic extends declared(Widget) {
   //  Variables
   //
   //----------------------------------
-  private _selectedStyleData: Collection<SelectedStyleData> = new Collection();
+
   private _handles = new Handles();
 
   //--------------------------------------------------------------------------
@@ -158,6 +159,9 @@ class InteractiveClassic extends declared(Widget) {
   //  Properties
   //
   //--------------------------------------------------------------------------
+
+  @property()
+  legendElementsNode: HTMLElement = null;
 
   // activeLayerInfos
   @aliasOf("viewModel.activeLayerInfos")
@@ -203,6 +207,10 @@ class InteractiveClassic extends declared(Widget) {
   @property()
   searchViewModel = null;
 
+  // selectedStyleData
+  @property()
+  selectedStyleData: Collection<SelectedStyleData> = new Collection();
+
   // viewModel
   @renderable(["viewModel.state"])
   @property({
@@ -227,16 +235,16 @@ class InteractiveClassic extends declared(Widget) {
   postInitialize() {
     this.own([
       watchUtils.on(this, "viewModel.featureLayerViews", "change", () => {
-        this._selectedStyleData.removeAll();
+        this.selectedStyleData.removeAll();
         this.viewModel.featureLayerViews.forEach(
           (featureLayerView: __esri.FeatureLayerView) => {
             if (!featureLayerView) {
-              this._selectedStyleData.add(null);
+              this.selectedStyleData.add(null);
             } else {
               const featureLayer = featureLayerView.layer as FeatureLayer;
               const renderer = featureLayer.renderer as any;
               const requiredFields = renderer ? renderer.requiredFields : null;
-              this._selectedStyleData.add({
+              this.selectedStyleData.add({
                 layerItemId: featureLayer.id,
                 requiredFields,
                 selectedInfoIndex: []
@@ -269,7 +277,12 @@ class InteractiveClassic extends declared(Widget) {
     return (
       <div class={this.classes(baseClasses, CSS.preventScroll)}>
         {filteredLayers && filteredLayers.length ? (
-          <div class={CSS.legendElements}>
+          <div
+            bind={this}
+            afterCreate={storeNode}
+            data-node-ref="legendElementsNode"
+            class={CSS.legendElements}
+          >
             {state === "loading" || state === "querying" ? (
               <div class={CSS.loader} />
             ) : (
@@ -413,7 +426,7 @@ class InteractiveClassic extends declared(Widget) {
       ? (legendElement.title as any)
       : null;
     let field = null;
-    const selectedStyleData = this._selectedStyleData.getItemAt(
+    const selectedStyleData = this.selectedStyleData.getItemAt(
       operationalItemIndex
     );
     if (selectedStyleData) {
@@ -424,7 +437,7 @@ class InteractiveClassic extends declared(Widget) {
           legendTitle && legendTitle.hasOwnProperty("field")
             ? legendTitle.field
             : null;
-        const requiredFields = this._selectedStyleData.getItemAt(
+        const requiredFields = this.selectedStyleData.getItemAt(
           operationalItemIndex
         ).requiredFields;
         const requiredFieldsCollection = new Collection();
@@ -438,7 +451,7 @@ class InteractiveClassic extends declared(Widget) {
         }
       } else {
         if (requiredFields && activeLayerInfo.layer.renderer.field) {
-          const requiredFields = this._selectedStyleData.getItemAt(
+          const requiredFields = this.selectedStyleData.getItemAt(
             operationalItemIndex
           ).requiredFields;
           const activeLayerRequiredFields =
@@ -768,8 +781,8 @@ class InteractiveClassic extends declared(Widget) {
     };
 
     let selectedRow = null;
-    if (this._selectedStyleData.length > 0) {
-      const featureLayerData = this._selectedStyleData.find(data =>
+    if (this.selectedStyleData.length > 0) {
+      const featureLayerData = this.selectedStyleData.find(data =>
         data ? activeLayerInfo.layer.id === data.layerItemId : null
       );
       if (featureLayerData) {
@@ -806,13 +819,13 @@ class InteractiveClassic extends declared(Widget) {
     );
     const isRelationship = legendElement.type === "relationship-ramp";
     const isSizeRampAndMute = isSizeRamp && this.filterMode === "mute";
-    const selectedStyleData = this._selectedStyleData.getItemAt(
+    const selectedStyleData = this.selectedStyleData.getItemAt(
       operationalItemIndex
     );
     const requiredFields = selectedStyleData
       ? selectedStyleData &&
         selectedStyleData.requiredFields &&
-        this._selectedStyleData.getItemAt(operationalItemIndex).requiredFields
+        this.selectedStyleData.getItemAt(operationalItemIndex).requiredFields
           .length > 0
         ? true
         : false
@@ -838,8 +851,8 @@ class InteractiveClassic extends declared(Widget) {
     const hasMoreThanOneInfo = legendElement.infos.length > 1;
 
     const featureLayerData =
-      this._selectedStyleData.length > 0
-        ? this._selectedStyleData.find(data =>
+      this.selectedStyleData.length > 0
+        ? this.selectedStyleData.find(data =>
             data ? activeLayerInfo.layer.id === data.layerItemId : null
           )
         : null;
@@ -1081,7 +1094,7 @@ class InteractiveClassic extends declared(Widget) {
     );
     const legendElementIndex = parseInt(node.getAttribute("data-legend-index"));
     const activeLayerInfoId = node.getAttribute("data-layer-id");
-    const featureLayerData = this._selectedStyleData.find(
+    const featureLayerData = this.selectedStyleData.find(
       layerData => layerData.layerItemId === activeLayerInfoId
     );
     const { selectedInfoIndex } = featureLayerData;

@@ -130,7 +130,19 @@ class Screenshot extends declared(Widget) {
     const maskNode = this._renderMaskNode(screenshotModeIsActive);
     return (
       <div class={CSS.base}>
-        {screenshotBtn}
+        {screenshotModeIsActive ? (
+          <button
+            bind={this}
+            class="esri-screenshot__btn esri-screenshot--pointer"
+            onclick={this._deactivateScreenshot}
+            onkeydown={this._deactivateScreenshot}
+            title="Deactivate Screenshot Mode"
+          >
+            <span class="icon-ui-close" />
+          </button>
+        ) : (
+          screenshotBtn
+        )}
         {screenshotPreviewOverlay}
         {maskNode}
       </div>
@@ -320,6 +332,14 @@ class Screenshot extends declared(Widget) {
         this.scheduleRender();
       }
     });
+  }
+
+  // _deactivateScreenshot
+  private _deactivateScreenshot(): void {
+    this.viewModel.screenshotModeIsActive = false;
+    this.view.container.classList.remove(CSS.screenshotCursor);
+    this._dragHandler.remove();
+    this.scheduleRender();
   }
 }
 

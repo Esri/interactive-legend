@@ -79,14 +79,17 @@ import Screenshot = require("./Components/Screenshot/Screenshot");
 // Telemetry
 import Telemetry = require("telemetry/telemetry.dojo");
 
+import FeatureWidget = require("esri/widgets/Feature");
+
 // InteractiveLegend
 import InteractiveLegend = require("./Components/InteractiveLegend/InteractiveLegend");
+import { clone } from "dojox/gfx/matrix";
 
 // CSS
 const CSS = {
   loading: "configurable-application--loading",
-  legend: "esri-interactive-legend__legend-elements",
-  popup: "esri-popup__main-container"
+  legend: "offscreen-interactive-legend-container",
+  popup: "offscreen-pop-up-container"
 };
 
 class InteractiveLegendApp {
@@ -104,6 +107,8 @@ class InteractiveLegendApp {
   screenshot: Screenshot = null;
   interactiveLegendExpand: Expand = null;
   searchExpand: Expand = null;
+  featureWidget: FeatureWidget = null;
+  highlightedFeature: any = null;
 
   //--------------------------------------------------------------------------
   //
@@ -212,8 +217,6 @@ class InteractiveLegendApp {
           map
         }).then((view: MapView) =>
           findQuery(find, view).then(() => {
-            const interactiveLegendMapContainer = document.createElement("div");
-
             const defaultShade = mutedShade ? mutedShade : new Color("#a9a9a9");
             const defaultStyle = style ? style : "classic";
             const defaultMode = filterMode
@@ -258,7 +261,6 @@ class InteractiveLegendApp {
 
             const interactiveLegend = new InteractiveLegend({
               view,
-              container: interactiveLegendMapContainer,
               mutedShade: defaultShade,
               style: defaultStyle,
               filterMode: defaultMode,
@@ -266,6 +268,22 @@ class InteractiveLegendApp {
               featureCountEnabled,
               layerListViewModel
             });
+
+            const interactiveLegend2 = new InteractiveLegend({
+              view,
+              container: document.querySelector(
+                ".offscreen-interactive-legend-container"
+              ),
+              mutedShade: defaultShade,
+              style: defaultStyle,
+              filterMode: defaultMode,
+              mutedOpacity: defaultOpacity,
+              featureCountEnabled,
+              layerListViewModel
+            });
+
+            interactiveLegend2.style.selectedStyleData =
+              interactiveLegend.style.selectedStyleData;
 
             this._handleSearchWidget(
               searchEnabled,
@@ -279,6 +297,7 @@ class InteractiveLegendApp {
               expanded: expandEnabled,
               mode: defaultExpandMode
             });
+
             view.ui.add(this.interactiveLegendExpand, "bottom-left");
 
             goToMarker(marker, view);
@@ -330,18 +349,38 @@ class InteractiveLegendApp {
         view,
         mapComponentSelectors
       });
+      watchUtils.watch(view, "popup.visible", () => {
+        if (view.popup.visible) {
+          if (!this.featureWidget) {
+            this.featureWidget = new FeatureWidget({
+              view,
+              graphic: view.popup.selectedFeature,
+              container: document.querySelector(
+                ".offscreen-pop-up-container"
+              ) as HTMLElement
+            });
+          } else {
+            this.featureWidget.graphic = view.popup.selectedFeature;
+          }
+        }
+      });
 
       watchUtils.watch(
         this.screenshot.viewModel,
         "screenshotModeIsActive",
         () => {
           if (this.screenshot.viewModel.screenshotModeIsActive) {
-            if (!legendIncludedInScreenshot) {
-              this.interactiveLegendExpand.expanded = false;
-            }
-            if (!popupIncludedInScreenshot && view.popup.visible) {
-              view.popup.dockEnabled = true;
-            }
+            // if (!legendIncludedInScreenshot) {
+            //   this.interactiveLegendExpand.expanded = false;
+            // }
+            this.interactiveLegendExpand.expanded = false;
+            view.popup.visible = false;
+            // if (!popupIncludedInScreenshot && view.popup.visible) {
+            //   view.popup.dockEnabled = true;
+            // }
+            // if (popupIncludedInScreenshot && view.popup.visible) {
+            //   view.popup.visible = false;
+            // }
             if (this.layerListExpand) {
               this.layerListExpand.expanded = false;
             }
@@ -359,6 +398,38 @@ class InteractiveLegendApp {
             }
             if (this.searchExpand) {
               this.searchExpand.expanded = true;
+            }
+          }
+        }
+      );
+      watchUtils.watch(view, "popup.visible", () => {
+        if (
+          !view.popup.visible &&
+          this.screenshot.viewModel.screenshotModeIsActive &&
+          popupIncludedInScreenshot &&
+          view.popup.selectedFeature
+        ) {
+          const layerView = view.layerViews.find(
+            layerView =>
+              layerView.layer.id === view.popup.selectedFeature.layer.id
+          ) as __esri.FeatureLayerView;
+          this.highlightedFeature = layerView.highlight(
+            view.popup.selectedFeature
+          );
+        }
+      });
+
+      watchUtils.watch(
+        this.screenshot,
+        "viewModel.screenshotModeIsActive",
+        () => {
+          if (!this.screenshot.viewModel.screenshotModeIsActive) {
+            if (this.featureWidget) {
+              this.featureWidget.graphic = null;
+            }
+            if (this.highlightedFeature) {
+              this.highlightedFeature.remove();
+              this.highlightedFeature = null;
             }
           }
         }

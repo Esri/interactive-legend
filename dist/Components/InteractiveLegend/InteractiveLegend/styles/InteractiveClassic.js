@@ -91,13 +91,13 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             //  Variables
             //
             //----------------------------------
-            _this._selectedStyleData = new Collection();
             _this._handles = new Handles();
             //--------------------------------------------------------------------------
             //
             //  Properties
             //
             //--------------------------------------------------------------------------
+            _this.legendElementsNode = null;
             // activeLayerInfos
             _this.activeLayerInfos = null;
             // view
@@ -115,6 +115,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             // searchExpressions
             _this.searchExpressions = null;
             _this.searchViewModel = null;
+            // selectedStyleData
+            _this.selectedStyleData = new Collection();
             // viewModel
             _this.viewModel = new InteractiveStyleViewModel();
             // type
@@ -125,16 +127,16 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var _this = this;
             this.own([
                 watchUtils.on(this, "viewModel.featureLayerViews", "change", function () {
-                    _this._selectedStyleData.removeAll();
+                    _this.selectedStyleData.removeAll();
                     _this.viewModel.featureLayerViews.forEach(function (featureLayerView) {
                         if (!featureLayerView) {
-                            _this._selectedStyleData.add(null);
+                            _this.selectedStyleData.add(null);
                         }
                         else {
                             var featureLayer = featureLayerView.layer;
                             var renderer = featureLayer.renderer;
                             var requiredFields = renderer ? renderer.requiredFields : null;
-                            _this._selectedStyleData.add({
+                            _this.selectedStyleData.add({
                                 layerItemId: featureLayer.id,
                                 requiredFields: requiredFields,
                                 selectedInfoIndex: []
@@ -160,7 +162,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     legendElements.push(legendElement);
                 });
             });
-            return (widget_1.tsx("div", { class: this.classes(baseClasses, CSS.preventScroll) }, filteredLayers && filteredLayers.length ? (widget_1.tsx("div", { class: CSS.legendElements }, state === "loading" || state === "querying" ? (widget_1.tsx("div", { class: CSS.loader })) : (widget_1.tsx("div", null,
+            return (widget_1.tsx("div", { class: this.classes(baseClasses, CSS.preventScroll) }, filteredLayers && filteredLayers.length ? (widget_1.tsx("div", { bind: this, afterCreate: widget_1.storeNode, "data-node-ref": "legendElementsNode", class: CSS.legendElements }, state === "loading" || state === "querying" ? (widget_1.tsx("div", { class: CSS.loader })) : (widget_1.tsx("div", null,
                 " ",
                 filteredLayers)))) : (widget_1.tsx("div", { class: CSS.message }, i18n.noLegend))));
         };
@@ -239,14 +241,14 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 ? legendElement.title
                 : null;
             var field = null;
-            var selectedStyleData = this._selectedStyleData.getItemAt(operationalItemIndex);
+            var selectedStyleData = this.selectedStyleData.getItemAt(operationalItemIndex);
             if (selectedStyleData) {
                 var requiredFields = selectedStyleData.requiredFields;
                 if (legendElementsLength > 1) {
                     var fieldVal_1 = legendTitle && legendTitle.hasOwnProperty("field")
                         ? legendTitle.field
                         : null;
-                    var requiredFields_1 = this._selectedStyleData.getItemAt(operationalItemIndex).requiredFields;
+                    var requiredFields_1 = this.selectedStyleData.getItemAt(operationalItemIndex).requiredFields;
                     var requiredFieldsCollection_1 = new Collection();
                     requiredFields_1.forEach(function (requiredField) {
                         requiredFieldsCollection_1.add(requiredField);
@@ -257,7 +259,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 }
                 else {
                     if (requiredFields && activeLayerInfo.layer.renderer.field) {
-                        var requiredFields_2 = this._selectedStyleData.getItemAt(operationalItemIndex).requiredFields;
+                        var requiredFields_2 = this.selectedStyleData.getItemAt(operationalItemIndex).requiredFields;
                         var activeLayerRequiredFields = activeLayerInfo.layer.renderer.requiredFields;
                         var requiredFieldsCollection_2 = new Collection();
                         var activeLayerFieldsCollection_1 = new Collection();
@@ -452,8 +454,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 _b[CSS.sizeRamp] = !isStretched && isSizeRamp,
                 _b);
             var selectedRow = null;
-            if (this._selectedStyleData.length > 0) {
-                var featureLayerData_1 = this._selectedStyleData.find(function (data) {
+            if (this.selectedStyleData.length > 0) {
+                var featureLayerData_1 = this.selectedStyleData.find(function (data) {
                     return data ? activeLayerInfo.layer.id === data.layerItemId : null;
                 });
                 if (featureLayerData_1) {
@@ -478,11 +480,11 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var hasPictureMarkersAndIsMute = this._checkForPictureMarkersAndIsMute(activeLayerInfo);
             var isRelationship = legendElement.type === "relationship-ramp";
             var isSizeRampAndMute = isSizeRamp && this.filterMode === "mute";
-            var selectedStyleData = this._selectedStyleData.getItemAt(operationalItemIndex);
+            var selectedStyleData = this.selectedStyleData.getItemAt(operationalItemIndex);
             var requiredFields = selectedStyleData
                 ? selectedStyleData &&
                     selectedStyleData.requiredFields &&
-                    this._selectedStyleData.getItemAt(operationalItemIndex).requiredFields
+                    this.selectedStyleData.getItemAt(operationalItemIndex).requiredFields
                         .length > 0
                     ? true
                     : false
@@ -501,8 +503,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     ? selectedRow
                     : null;
             var hasMoreThanOneInfo = legendElement.infos.length > 1;
-            var featureLayerData = this._selectedStyleData.length > 0
-                ? this._selectedStyleData.find(function (data) {
+            var featureLayerData = this.selectedStyleData.length > 0
+                ? this.selectedStyleData.find(function (data) {
                     return data ? activeLayerInfo.layer.id === data.layerItemId : null;
                 })
                 : null;
@@ -593,7 +595,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var legendElementInfoIndex = parseInt(node.getAttribute("data-child-index"));
             var legendElementIndex = parseInt(node.getAttribute("data-legend-index"));
             var activeLayerInfoId = node.getAttribute("data-layer-id");
-            var featureLayerData = this._selectedStyleData.find(function (layerData) { return layerData.layerItemId === activeLayerInfoId; });
+            var featureLayerData = this.selectedStyleData.find(function (layerData) { return layerData.layerItemId === activeLayerInfoId; });
             var selectedInfoIndex = featureLayerData.selectedInfoIndex;
             var legendElementInfoIndexFromData = selectedInfoIndex.indexOf(legendElementInfoIndex);
             var activeLayerInfo = this.activeLayerInfos.find(function (activeLayerInfo) {
@@ -692,6 +694,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 this.filterMode === "mute");
         };
         __decorate([
+            decorators_1.property()
+        ], InteractiveClassic.prototype, "legendElementsNode", void 0);
+        __decorate([
             decorators_1.aliasOf("viewModel.activeLayerInfos"),
             decorators_1.property()
         ], InteractiveClassic.prototype, "activeLayerInfos", void 0);
@@ -727,6 +732,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             decorators_1.aliasOf("viewModel.searchViewModel"),
             decorators_1.property()
         ], InteractiveClassic.prototype, "searchViewModel", void 0);
+        __decorate([
+            decorators_1.property()
+        ], InteractiveClassic.prototype, "selectedStyleData", void 0);
         __decorate([
             widget_1.renderable(["viewModel.state"]),
             decorators_1.property({

@@ -202,7 +202,20 @@ class ScreenshotViewModel extends declared(Accessor) {
     const combinedCanvas = document.createElement(
       "canvas"
     ) as HTMLCanvasElement;
-    html2canvas(document.querySelector(this.mapComponentSelectors[0]))
+
+    const firstComponent = document.querySelector(
+      this.mapComponentSelectors[0]
+    ) as HTMLElement;
+    const secondMapComponent = document.querySelector(
+      this.mapComponentSelectors[1]
+    ) as HTMLElement;
+
+    const mapComponent =
+      firstComponent.offsetWidth && firstComponent.offsetHeight
+        ? firstComponent
+        : secondMapComponent;
+
+    html2canvas(mapComponent)
       .catch((err: Error) => {
         console.error("ERROR: ", err);
       })
@@ -230,8 +243,7 @@ class ScreenshotViewModel extends declared(Accessor) {
     viewCanvas: HTMLCanvasElement,
     img: HTMLImageElement,
     screenshotImageElement: HTMLImageElement,
-    maskDiv: HTMLElement,
-    popupKey: string
+    maskDiv: HTMLElement
   ): void {
     const screenshotKey = "screenshot-key";
     const viewCanvasContext = viewCanvas.getContext(
@@ -249,11 +261,10 @@ class ScreenshotViewModel extends declared(Accessor) {
       .then((firstMapComponent: HTMLCanvasElement) => {
         this.firstMapComponent = firstMapComponent;
         this.notifyChange("state");
-        const popupContainer = this.view.popup.container as HTMLDivElement;
-        const popUpElement = popupContainer.children[0] as HTMLElement;
-
-        html2canvas(popUpElement, {
-          height: popUpElement.offsetHeight,
+        html2canvas(document.querySelector(this.mapComponentSelectors[1]), {
+          height: (document.querySelector(
+            this.mapComponentSelectors[1]
+          ) as HTMLElement).offsetHeight,
           removeContainer: true
         })
           .catch((err: Error) => {
@@ -261,7 +272,6 @@ class ScreenshotViewModel extends declared(Accessor) {
           })
           .then((secondMapComponent: HTMLCanvasElement) => {
             this.secondMapComponent = secondMapComponent;
-            this._handles.remove(popupKey);
             this.notifyChange("state");
           });
       });
@@ -407,13 +417,7 @@ class ScreenshotViewModel extends declared(Accessor) {
     screenshotImageElement.width = canvasElement.width;
     screenshotImageElement.src = canvasElement.toDataURL();
     this.view.container.classList.remove("esri-screenshot__cursor");
-    if (this.mapComponentSelectors.length > 0) {
-      this.mapComponentSelectors.forEach((mapComponentSelector: string) => {
-        if (mapComponentSelector.indexOf("popup") !== -1) {
-          this.view.popup.dockEnabled = false;
-        }
-      });
-    }
+
     this._area = null;
     this._setMaskPosition(maskDiv, null);
     this.previewIsVisible = true;
@@ -490,6 +494,12 @@ class ScreenshotViewModel extends declared(Accessor) {
   ): void {
     const viewCanvas = document.createElement("canvas") as HTMLCanvasElement;
     const img = document.createElement("img") as HTMLImageElement;
+    const firstComponent = document.querySelector(
+      this.mapComponentSelectors[0]
+    ) as HTMLElement;
+    const secondMapComponent = document.querySelector(
+      this.mapComponentSelectors[1]
+    ) as HTMLElement;
     if (
       this.mapComponentSelectors.length > 2 ||
       this.mapComponentSelectors.length === 0
@@ -503,15 +513,7 @@ class ScreenshotViewModel extends declared(Accessor) {
       );
     } else {
       if (this.mapComponentSelectors.length === 1) {
-        this._includeOneMapComponent(
-          viewScreenshot,
-          viewCanvas,
-          img,
-          screenshotImageElement,
-          maskDiv
-        );
-      } else if (this.mapComponentSelectors.length === 2) {
-        if (!this.view.popup.visible) {
+        if (firstComponent.offsetWidth && firstComponent.offsetHeight) {
           this._includeOneMapComponent(
             viewScreenshot,
             viewCanvas,
@@ -520,27 +522,47 @@ class ScreenshotViewModel extends declared(Accessor) {
             maskDiv
           );
         } else {
-          const popupKey = "pop-up";
-          this._handles.add(
-            watchUtils.init(this, "this.view.popup", () => {
-              const popupContainer = this.view.popup
-                .container as HTMLDivElement;
-              const popUpElement = popupContainer.children[0] as HTMLElement;
-              if (
-                this.view.popup.dockEnabled &&
-                popUpElement.offsetHeight > 0
-              ) {
-                this._includeTwoMapComponents(
-                  viewScreenshot,
-                  viewCanvas,
-                  img,
-                  screenshotImageElement,
-                  maskDiv,
-                  popupKey
-                );
-              }
-            }),
-            popupKey
+          this._onlyTakeScreenshotOfView(
+            viewScreenshot,
+            viewCanvas,
+            img,
+            screenshotImageElement,
+            maskDiv
+          );
+        }
+      } else if (this.mapComponentSelectors.length === 2) {
+        if (
+          firstComponent.offsetWidth &&
+          firstComponent.offsetHeight &&
+          secondMapComponent.offsetWidth &&
+          secondMapComponent.offsetHeight
+        ) {
+          this._includeTwoMapComponents(
+            viewScreenshot,
+            viewCanvas,
+            img,
+            screenshotImageElement,
+            maskDiv
+          );
+        } else if (
+          !firstComponent.offsetWidth ||
+          !firstComponent.offsetHeight ||
+          (!secondMapComponent.offsetWidth || !secondMapComponent.offsetHeight)
+        ) {
+          this._includeOneMapComponent(
+            viewScreenshot,
+            viewCanvas,
+            img,
+            screenshotImageElement,
+            maskDiv
+          );
+        } else {
+          this._onlyTakeScreenshotOfView(
+            viewScreenshot,
+            viewCanvas,
+            img,
+            screenshotImageElement,
+            maskDiv
           );
         }
       }

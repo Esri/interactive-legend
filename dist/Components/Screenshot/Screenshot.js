@@ -91,7 +91,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var screenshotPreviewOverlay = this._renderScreenshotPreviewOverlay();
             var maskNode = this._renderMaskNode(screenshotModeIsActive);
             return (widget_1.tsx("div", { class: CSS.base },
-                screenshotBtn,
+                screenshotModeIsActive ? (widget_1.tsx("button", { bind: this, class: "esri-screenshot__btn esri-screenshot--pointer", onclick: this._deactivateScreenshot, onkeydown: this._deactivateScreenshot, title: "Deactivate Screenshot Mode" },
+                    widget_1.tsx("span", { class: "icon-ui-close" }))) : (screenshotBtn),
                 screenshotPreviewOverlay,
                 maskNode));
         };
@@ -208,6 +209,13 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     _this.scheduleRender();
                 }
             });
+        };
+        // _deactivateScreenshot
+        Screenshot.prototype._deactivateScreenshot = function () {
+            this.viewModel.screenshotModeIsActive = false;
+            this.view.container.classList.remove(CSS.screenshotCursor);
+            this._dragHandler.remove();
+            this.scheduleRender();
         };
         __decorate([
             decorators_1.aliasOf("viewModel.view"),
