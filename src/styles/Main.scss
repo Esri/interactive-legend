@@ -72,3 +72,8 @@ body {
   align-items: center;
   font-size: 1.5rem;
 }
+
+.offscreen-pop-up-container,
+.offscreen-interactive-legend-container {
+  max-width: 500px;
+}

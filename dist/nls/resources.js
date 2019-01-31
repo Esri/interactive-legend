@@ -12,7 +12,9 @@ define({
     elementInfoNoValue: "Element info data must contain values to apply filter.",
     sublayerFiltering: "Applying filter to sublayers is not supported.",
     muteAndPictureFillError: "Mute filter cannot be applied to picture fill symbols.",
-    error: "Could not load an item to display"
+    error: "Could not load an item to display",
+    sizeRampFilterNotSupported: "Filtering for size ramp legend type is currently not supported."
+
   }),
   "ar": 1,
   "bs": 1,

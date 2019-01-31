@@ -39,7 +39,7 @@ import watchUtils = require("esri/core/watchUtils");
 import InteractiveClassic = require("./InteractiveLegend/styles/InteractiveClassic");
 
 // interfaces
-import { LayerInfo, FilterMode } from "../../interfaces/interfaces";
+import { LayerInfo, FilterMode, LayerUID } from "../../interfaces/interfaces";
 
 // InteractiveLegendViewModel
 import InteractiveLegendViewModel = require("./InteractiveLegend/InteractiveLegendViewModel");
@@ -127,15 +127,14 @@ class InteractiveLegend extends declared(Widget) {
   @renderable()
   mutedShade: number[] = null;
 
-  // mutedOpacity
-  @aliasOf("style.mutedOpacity")
-  @property()
-  mutedOpacity: number = null;
-
   // searchExpressions
   @aliasOf("style.searchExpressions")
   @property()
   searchExpressions: Collection<string> = null;
+
+  @aliasOf("style.searchViewModel")
+  @property()
+  searchViewModel = null;
 
   // layerListViewModel
   @property()
@@ -149,8 +148,8 @@ class InteractiveLegend extends declared(Widget) {
     activeLayerInfos: this.activeLayerInfos,
     filterMode: this.filterMode,
     mutedShade: this.mutedShade,
-    mutedOpacity: this.mutedOpacity,
-    layerListViewModel: this.layerListViewModel
+    layerListViewModel: this.layerListViewModel,
+    searchViewModel: this.searchViewModel
   });
 
   // castStyle
@@ -168,8 +167,8 @@ class InteractiveLegend extends declared(Widget) {
         activeLayerInfos: this.activeLayerInfos,
         filterMode: this.filterMode,
         mutedShade: this.mutedShade,
-        mutedOpacity: this.mutedOpacity,
-        layerListViewModel: this.layerListViewModel
+        layerListViewModel: this.layerListViewModel,
+        searchViewModel: this.searchViewModel
       });
     }
 
@@ -187,8 +186,8 @@ class InteractiveLegend extends declared(Widget) {
       activeLayerInfos: this.activeLayerInfos,
       filterMode: this.filterMode,
       mutedShade: this.mutedShade,
-      mutedOpacity: this.mutedOpacity,
-      layerListViewModel: this.layerListViewModel
+      layerListViewModel: this.layerListViewModel,
+      searchViewModel: this.searchViewModel
     });
   }
 
@@ -206,7 +205,6 @@ class InteractiveLegend extends declared(Widget) {
       style,
       activeLayerInfos,
       filterMode,
-      mutedOpacity,
       view,
       layerListViewModel
     } = this;
@@ -217,11 +215,10 @@ class InteractiveLegend extends declared(Widget) {
       }),
       watchUtils.init(
         this,
-        ["view", "filterMode", "mutedOpacity", "layerListViewModel"],
+        ["view", "filterMode", "layerListViewModel"],
         () => {
           style.view = view;
           style.filterMode = filterMode;
-          style.mutedOpacity = mutedOpacity;
           style.layerListViewModel = layerListViewModel;
         }
       ),
@@ -276,7 +273,7 @@ class InteractiveLegend extends declared(Widget) {
     );
     this._handles.add(
       infoVersionHandle,
-      `version_${activeLayerInfo.layer.uid}`
+      `version_${(activeLayerInfo.layer as LayerUID).uid}`
     );
 
     activeLayerInfo.children.forEach(childActiveLayerInfo =>

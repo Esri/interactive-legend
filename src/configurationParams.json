@@ -43,11 +43,6 @@
         },
         {
           "type": "boolean",
-          "fieldName": "searchEnabled",
-          "label": "Search"
-        },
-        {
-          "type": "boolean",
           "fieldName": "layerListEnabled",
           "label": "Layer List"
         },
@@ -139,17 +134,8 @@
         {
           "type": "color",
           "label": "Choose a muted shade",
-          "fieldName": "mutedShade"
-        },
-        {
-          "type": "number",
-          "label": "Set a muted opacity by entering a number between 0 and 1",
-          "fieldName": "mutedOpacity",
-          "constraints": {
-            "min": 0,
-            "max": 1,
-            "places": 0
-          }
+          "fieldName": "mutedShade",
+          "transparent": true
         }
       ]
     },
@@ -157,7 +143,7 @@
       "category": "Search",
       "fields": [{
         "type": "conditional",
-        "fieldName": "search",
+        "fieldName": "searchEnabled",
         "label": "Search",
         "condition": false,
         "items": [{
@@ -209,8 +195,12 @@
     "legendIncludedInScreenshot": false,
     "popupIncludedInScreenshot": false,
     "highlightShade": "#000000",
-    "mutedShade": "#a9a9a9",
-    "mutedOpacity": 0.5,
+    "mutedShade": {
+      "r": 169,
+      "g": 169,
+      "b": 169,
+      "a": 0.5
+    },
     "nextBasemap": "topo"
   }
 }

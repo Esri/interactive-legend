@@ -4,7 +4,7 @@ define({
     downloadImage: "Download Image",
     backButton: "Back to map",
     widgetLabel: "Screenshot",
-    popUpIsIncluded: "Select a feature to enable screenshot tool"
+    deactivateScreenshot: "Deactivate screenshot mode"
   }),
   "ar": 1,
   "bs": 1,

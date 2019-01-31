@@ -139,7 +139,15 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var _this = this;
             var context = viewCanvas.getContext("2d");
             var combinedCanvas = document.createElement("canvas");
-            html2canvas(document.querySelector(this.mapComponentSelectors[0]))
+            var firstComponent = document.querySelector(this.mapComponentSelectors[0]);
+            var secondMapComponent = document.querySelector(this.mapComponentSelectors[1]);
+            var mapComponent = firstComponent.offsetWidth && firstComponent.offsetHeight
+                ? firstComponent
+                : secondMapComponent;
+            html2canvas(mapComponent, {
+                removeContainer: true,
+                logging: false
+            })
                 .catch(function (err) {
                 console.error("ERROR: ", err);
             })
@@ -156,13 +164,14 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             });
         };
         // _includeTwoMapComponents
-        ScreenshotViewModel.prototype._includeTwoMapComponents = function (viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv, popupKey) {
+        ScreenshotViewModel.prototype._includeTwoMapComponents = function (viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv) {
             var _this = this;
             var screenshotKey = "screenshot-key";
             var viewCanvasContext = viewCanvas.getContext("2d");
             var combinedCanvasElements = document.createElement("canvas");
             html2canvas(document.querySelector(this.mapComponentSelectors[0]), {
-                removeContainer: true
+                removeContainer: true,
+                logging: false
             })
                 .catch(function (err) {
                 console.error("ERROR: ", err);
@@ -170,18 +179,16 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 .then(function (firstMapComponent) {
                 _this.firstMapComponent = firstMapComponent;
                 _this.notifyChange("state");
-                var popupContainer = _this.view.popup.container;
-                var popUpElement = popupContainer.children[0];
-                html2canvas(popUpElement, {
-                    height: popUpElement.offsetHeight,
-                    removeContainer: true
+                html2canvas(document.querySelector(_this.mapComponentSelectors[1]), {
+                    height: document.querySelector(_this.mapComponentSelectors[1]).offsetHeight,
+                    removeContainer: true,
+                    logging: false
                 })
                     .catch(function (err) {
                     console.error("ERROR: ", err);
                 })
                     .then(function (secondMapComponent) {
                     _this.secondMapComponent = secondMapComponent;
-                    _this._handles.remove(popupKey);
                     _this.notifyChange("state");
                 });
             });
@@ -251,19 +258,11 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         };
         // _showPreview
         ScreenshotViewModel.prototype._showPreview = function (canvasElement, screenshotImageElement, maskDiv) {
-            var _this = this;
             var activeElement = document.activeElement;
             activeElement.blur();
             screenshotImageElement.width = canvasElement.width;
             screenshotImageElement.src = canvasElement.toDataURL();
             this.view.container.classList.remove("esri-screenshot__cursor");
-            if (this.mapComponentSelectors.length > 0) {
-                this.mapComponentSelectors.forEach(function (mapComponentSelector) {
-                    if (mapComponentSelector.indexOf("popup") !== -1) {
-                        _this.view.popup.dockEnabled = false;
-                    }
-                });
-            }
             this._area = null;
             this._setMaskPosition(maskDiv, null);
             this.previewIsVisible = true;
@@ -315,32 +314,37 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         };
         // _processScreenshot
         ScreenshotViewModel.prototype._processScreenshot = function (viewScreenshot, screenshotImageElement, maskDiv) {
-            var _this = this;
             var viewCanvas = document.createElement("canvas");
             var img = document.createElement("img");
+            var firstComponent = document.querySelector(this.mapComponentSelectors[0]);
+            var secondMapComponent = document.querySelector(this.mapComponentSelectors[1]);
             if (this.mapComponentSelectors.length > 2 ||
                 this.mapComponentSelectors.length === 0) {
                 this._onlyTakeScreenshotOfView(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv);
             }
             else {
                 if (this.mapComponentSelectors.length === 1) {
-                    this._includeOneMapComponent(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv);
-                }
-                else if (this.mapComponentSelectors.length === 2) {
-                    if (!this.view.popup.visible) {
+                    if (firstComponent.offsetWidth && firstComponent.offsetHeight) {
                         this._includeOneMapComponent(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv);
                     }
                     else {
-                        var popupKey_1 = "pop-up";
-                        this._handles.add(watchUtils.init(this, "this.view.popup", function () {
-                            var popupContainer = _this.view.popup
-                                .container;
-                            var popUpElement = popupContainer.children[0];
-                            if (_this.view.popup.dockEnabled &&
-                                popUpElement.offsetHeight > 0) {
-                                _this._includeTwoMapComponents(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv, popupKey_1);
-                            }
-                        }), popupKey_1);
+                        this._onlyTakeScreenshotOfView(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv);
+                    }
+                }
+                else if (this.mapComponentSelectors.length === 2) {
+                    if (firstComponent.offsetWidth &&
+                        firstComponent.offsetHeight &&
+                        secondMapComponent.offsetWidth &&
+                        secondMapComponent.offsetHeight) {
+                        this._includeTwoMapComponents(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv);
+                    }
+                    else if (!firstComponent.offsetWidth ||
+                        !firstComponent.offsetHeight ||
+                        (!secondMapComponent.offsetWidth || !secondMapComponent.offsetHeight)) {
+                        this._includeOneMapComponent(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv);
+                    }
+                    else {
+                        this._onlyTakeScreenshotOfView(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv);
                     }
                 }
             }

@@ -23,7 +23,8 @@ import {
 import {
   renderable,
   tsx,
-  accessibleHandler
+  accessibleHandler,
+  storeNode
 } from "esri/widgets/support/widget";
 
 // esri.views.MapView
@@ -77,9 +78,15 @@ import {
   SymbolTableElement,
   FilterMode,
   VNode,
-  SelectedStyleData
+  SelectedStyleData,
+  LayerUID
 } from "../../../../interfaces/interfaces";
 import { renderRelationshipRamp } from "../relationshipRamp/utils";
+import {
+  UniqueValueRenderer,
+  ClassBreaksRenderer,
+  SimpleRenderer
+} from "esri/renderers";
 
 //----------------------------------
 //
@@ -150,7 +157,7 @@ class InteractiveClassic extends declared(Widget) {
   //  Variables
   //
   //----------------------------------
-  private _selectedStyleData: Collection<SelectedStyleData> = new Collection();
+
   private _handles = new Handles();
 
   //--------------------------------------------------------------------------
@@ -179,11 +186,6 @@ class InteractiveClassic extends declared(Widget) {
   @property()
   mutedShade: number[] = null;
 
-  // mutedOpacity
-  @aliasOf("viewModel.mutedOpacity")
-  @property()
-  mutedOpacity: number = null;
-
   // layerGraphics
   @aliasOf("viewModel.layerGraphics")
   @property()
@@ -198,6 +200,14 @@ class InteractiveClassic extends declared(Widget) {
   @aliasOf("viewModel.searchExpressions")
   @property()
   searchExpressions: Collection<string> = null;
+
+  @aliasOf("viewModel.searchViewModel")
+  @property()
+  searchViewModel = null;
+
+  // selectedStyleData
+  @property()
+  selectedStyleData: Collection<SelectedStyleData> = new Collection();
 
   // viewModel
   @renderable(["viewModel.state"])
@@ -223,16 +233,16 @@ class InteractiveClassic extends declared(Widget) {
   postInitialize() {
     this.own([
       watchUtils.on(this, "viewModel.featureLayerViews", "change", () => {
-        this._selectedStyleData.removeAll();
+        this.selectedStyleData.removeAll();
         this.viewModel.featureLayerViews.forEach(
           (featureLayerView: __esri.FeatureLayerView) => {
             if (!featureLayerView) {
-              this._selectedStyleData.add(null);
+              this.selectedStyleData.add(null);
             } else {
               const featureLayer = featureLayerView.layer as FeatureLayer;
               const renderer = featureLayer.renderer as any;
               const requiredFields = renderer ? renderer.requiredFields : null;
-              this._selectedStyleData.add({
+              this.selectedStyleData.add({
                 layerItemId: featureLayer.id,
                 requiredFields,
                 selectedInfoIndex: []
@@ -312,7 +322,7 @@ class InteractiveClassic extends declared(Widget) {
     }
 
     const hasChildren = !!activeLayerInfo.children.length;
-    const key = `${KEY}${activeLayerInfo.layer.uid}-version-${
+    const key = `${KEY}${(activeLayerInfo.layer as LayerUID).uid}-version-${
       activeLayerInfo.version
     }`;
 
@@ -344,18 +354,18 @@ class InteractiveClassic extends declared(Widget) {
       if (legendElements && !legendElements.length) {
         return null;
       }
-      const featureLayerViewIndex = this._getFeatureLayerViewIndex(
+      const operationalItemIndex = this._getOperationalItemIndex(
         activeLayerInfo
       );
       const filteredElements = legendElements
         .map((legendElement, legendElementIndex) => {
           return this._renderLegendForElement(
-            legendElement,
+            legendElement as SymbolTableElement,
             activeLayerInfo.layer,
             legendElementIndex,
             activeLayerInfo,
             activeLayerInfoIndex,
-            featureLayerViewIndex,
+            operationalItemIndex,
             legendElement.infos,
             legendElements.length
           );
@@ -392,7 +402,7 @@ class InteractiveClassic extends declared(Widget) {
     legendElementIndex: number,
     activeLayerInfo: ActiveLayerInfo,
     activeLayerInfoIndex: number,
-    featureLayerViewIndex: number,
+    operationalItemIndex: number,
     legendElementInfos: any[],
     legendElementsLength: number,
     isChild?: boolean
@@ -409,36 +419,43 @@ class InteractiveClassic extends declared(Widget) {
       ? (legendElement.title as any)
       : null;
     let field = null;
-    const selectedStyleData = this._selectedStyleData.getItemAt(
-      featureLayerViewIndex
+    const selectedStyleData = this.selectedStyleData.getItemAt(
+      operationalItemIndex
     );
     if (selectedStyleData) {
       const { requiredFields } = selectedStyleData;
-
       if (legendElementsLength > 1) {
         const fieldVal =
           legendTitle && legendTitle.hasOwnProperty("field")
             ? legendTitle.field
             : null;
-        const requiredFields = this._selectedStyleData.getItemAt(
-          featureLayerViewIndex
+        const requiredFields = this.selectedStyleData.getItemAt(
+          operationalItemIndex
         ).requiredFields;
-        const requiredFieldsCollection = new Collection();
-        requiredFields.forEach(requiredField => {
-          requiredFieldsCollection.add(requiredField);
-        });
-        if (requiredFields && fieldVal) {
-          field = requiredFieldsCollection.find(
-            requiredField => requiredField === fieldVal
-          );
+        if (requiredFields) {
+          const requiredFieldsCollection = new Collection();
+          requiredFields.forEach(requiredField => {
+            requiredFieldsCollection.add(requiredField);
+          });
+          if (fieldVal) {
+            field = requiredFieldsCollection.find(
+              requiredField => requiredField === fieldVal
+            );
+          }
         }
       } else {
-        if (requiredFields && activeLayerInfo.layer.renderer.field) {
-          const requiredFields = this._selectedStyleData.getItemAt(
-            featureLayerViewIndex
+        const featureLayer = activeLayerInfo.layer as FeatureLayer;
+        const renderer = featureLayer.hasOwnProperty("uniqueValueInfos")
+          ? (featureLayer.renderer as UniqueValueRenderer)
+          : featureLayer.hasOwnProperty("classBreakInfos")
+          ? (featureLayer.renderer as ClassBreaksRenderer)
+          : (featureLayer.renderer as any);
+
+        if (requiredFields && renderer.field) {
+          const requiredFields = this.selectedStyleData.getItemAt(
+            operationalItemIndex
           ).requiredFields;
-          const activeLayerRequiredFields =
-            activeLayerInfo.layer.renderer.requiredFields;
+          const activeLayerRequiredFields = renderer.requiredFields;
           const requiredFieldsCollection = new Collection();
           const activeLayerFieldsCollection = new Collection();
           requiredFields.forEach(requiredField => {
@@ -474,7 +491,7 @@ class InteractiveClassic extends declared(Widget) {
             legendElement,
             activeLayerInfo,
             activeLayerInfoIndex,
-            featureLayerViewIndex,
+            operationalItemIndex,
             legendElementInfos
           )
         )
@@ -569,6 +586,13 @@ class InteractiveClassic extends declared(Widget) {
             {i18nInteractiveLegend.predominantNotSupported}
           </div>
         ) : null} */}
+
+        {isSizeRamp ? (
+          <div class={CSS.error}>
+            <span class={CSS.calciteStyles.error} />
+            {i18nInteractiveLegend.sizeRampFilterNotSupported}
+          </div>
+        ) : null}
 
         {isSizeRamp && this.filterMode === "mute" ? (
           <div class={CSS.error}>
@@ -716,7 +740,7 @@ class InteractiveClassic extends declared(Widget) {
     legendElement: LegendElement,
     activeLayerInfo: ActiveLayerInfo,
     activeLayerInfoIndex: number,
-    featureLayerViewIndex: number,
+    operationalItemIndex: number,
     legendElementInfos: any[]
   ): VNode {
     // nested
@@ -727,7 +751,7 @@ class InteractiveClassic extends declared(Widget) {
         legendElementIndex,
         activeLayerInfo,
         activeLayerInfoIndex,
-        featureLayerViewIndex,
+        operationalItemIndex,
         legendElementInfos,
         null,
         true
@@ -766,8 +790,8 @@ class InteractiveClassic extends declared(Widget) {
     };
 
     let selectedRow = null;
-    if (this._selectedStyleData.length > 0) {
-      const featureLayerData = this._selectedStyleData.find(data =>
+    if (this.selectedStyleData.length > 0) {
+      const featureLayerData = this.selectedStyleData.find(data =>
         data ? activeLayerInfo.layer.id === data.layerItemId : null
       );
       if (featureLayerData) {
@@ -807,13 +831,13 @@ class InteractiveClassic extends declared(Widget) {
       activeLayerInfo.layer.renderer.authoringInfo &&
       activeLayerInfo.layer.renderer.authoringInfo.type === "predominance";
     const isSizeRampAndMute = isSizeRamp && this.filterMode === "mute";
-    const selectedStyleData = this._selectedStyleData.getItemAt(
-      featureLayerViewIndex
+    const selectedStyleData = this.selectedStyleData.getItemAt(
+      operationalItemIndex
     );
     const requiredFields = selectedStyleData
       ? selectedStyleData &&
         selectedStyleData.requiredFields &&
-        this._selectedStyleData.getItemAt(featureLayerViewIndex).requiredFields
+        this.selectedStyleData.getItemAt(operationalItemIndex).requiredFields
           .length > 0
         ? true
         : false
@@ -827,7 +851,8 @@ class InteractiveClassic extends declared(Widget) {
       ((isRelationship ||
         hasPictureMarkersAndIsMute ||
         isSizeRampAndMute ||
-        hasPictureFillAndIsMute) &&
+        hasPictureFillAndIsMute ||
+        isSizeRamp) &&
         legendElement.infos.length > 1 &&
         !activeLayerInfo.layer.hasOwnProperty("sublayers")) ||
       (!requiredFields && !isPredominance)
@@ -838,8 +863,8 @@ class InteractiveClassic extends declared(Widget) {
     const hasMoreThanOneInfo = legendElement.infos.length > 1;
 
     const featureLayerData =
-      this._selectedStyleData.length > 0
-        ? this._selectedStyleData.find(data =>
+      this.selectedStyleData.length > 0
+        ? this.selectedStyleData.find(data =>
             data ? activeLayerInfo.layer.id === data.layerItemId : null
           )
         : null;
@@ -867,7 +892,7 @@ class InteractiveClassic extends declared(Widget) {
               !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
               requiredFields &&
               field &&
-              featureLayerData) ||
+              featureLayerData && !isSizeRamp) ||
             isPredominance
           ) {
             this._handleFilterOption(
@@ -875,7 +900,7 @@ class InteractiveClassic extends declared(Widget) {
               elementInfo,
               field,
               legendInfoIndex,
-              featureLayerViewIndex,
+              operationalItemIndex,
               isSizeRamp,
               legendElement,
               isPredominance,
@@ -894,7 +919,7 @@ class InteractiveClassic extends declared(Widget) {
               !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
               requiredFields &&
               field &&
-              featureLayerData) ||
+              featureLayerData && !isSizeRamp) ||
             isPredominance
           ) {
             this._handleFilterOption(
@@ -902,7 +927,7 @@ class InteractiveClassic extends declared(Widget) {
               elementInfo,
               field,
               legendInfoIndex,
-              featureLayerViewIndex,
+              operationalItemIndex,
               isSizeRamp,
               legendElement,
               isPredominance,
@@ -963,7 +988,7 @@ class InteractiveClassic extends declared(Widget) {
     elementInfo: any,
     field: string,
     legendInfoIndex: number,
-    featureLayerViewIndex: number,
+    operationalItemIndex: number,
     isSizeRamp: boolean,
     legendElement: LegendElement,
     isPredominance: boolean,
@@ -972,9 +997,10 @@ class InteractiveClassic extends declared(Widget) {
     this.filterMode === "featureFilter"
       ? this._featureFilter(
           elementInfo,
-          field,
-          featureLayerViewIndex,
+          field
           legendInfoIndex,
+          operationalItemIndex,
+          isSizeRamp,
           legendElement,
           isPredominance,
           legendElementInfos
@@ -984,6 +1010,7 @@ class InteractiveClassic extends declared(Widget) {
           event,
           elementInfo,
           field,
+          operationalItemIndex,
           legendInfoIndex,
           featureLayerViewIndex,
           isSizeRamp,
@@ -997,7 +1024,7 @@ class InteractiveClassic extends declared(Widget) {
           elementInfo,
           field,
           legendInfoIndex,
-          featureLayerViewIndex,
+          operationalItemIndex,
           legendElement,
           isPredominance,
           legendElementInfos
@@ -1009,7 +1036,7 @@ class InteractiveClassic extends declared(Widget) {
   private _featureFilter(
     elementInfo: any,
     field: string,
-    featureLayerViewIndex: number,
+    operationalItemIndex: number,
     legendInfoIndex: number,
     legendElement: LegendElement,
     isPredominance: boolean,
@@ -1019,7 +1046,7 @@ class InteractiveClassic extends declared(Widget) {
     this.viewModel.applyFeatureFilter(
       elementInfo,
       field,
-      featureLayerViewIndex,
+      operationalItemIndex,
       legendElement,
       legendInfoIndex,
       isPredominance,
@@ -1033,7 +1060,7 @@ class InteractiveClassic extends declared(Widget) {
     elementInfo: any,
     field: string,
     legendInfoIndex: number,
-    featureLayerViewIndex: number,
+    operationalItemIndex: number,
     isSizeRamp: boolean,
     legendElement: LegendElement,
     isPredominance: boolean,
@@ -1048,13 +1075,13 @@ class InteractiveClassic extends declared(Widget) {
       elementInfo,
       field,
       legendInfoIndex,
-      featureLayerViewIndex,
+      operationalItemIndex,
       isSizeRamp,
       legendElement,
       isPredominance,
       legendElementInfos
     );
-    this._handleSelectedStyles(event, featureLayerViewIndex, legendInfoIndex);
+    this._handleSelectedStyles(event, operationalItemIndex, legendInfoIndex);
   }
 
   // _muteFeatures
@@ -1063,7 +1090,7 @@ class InteractiveClassic extends declared(Widget) {
     elementInfo: any,
     field: string,
     legendInfoIndex: number,
-    featureLayerViewIndex: number,
+    operationalItemIndex: number,
     legendElement: LegendElement,
     isPredominance: boolean,
     legendElementInfos: any[]
@@ -1073,7 +1100,7 @@ class InteractiveClassic extends declared(Widget) {
       elementInfo,
       field,
       legendInfoIndex,
-      featureLayerViewIndex,
+      operationalItemIndex,
       legendElement,
       isPredominance,
       legendElementInfos
@@ -1084,7 +1111,7 @@ class InteractiveClassic extends declared(Widget) {
   // _handleSelectedStyles
   private _handleSelectedStyles(
     event: Event,
-    featureLayerViewIndex?: number,
+    operationalItemIndex?: number,
     legendInfoIndex?: number
   ): void {
     const node = event.currentTarget as HTMLElement;
@@ -1093,7 +1120,7 @@ class InteractiveClassic extends declared(Widget) {
     );
     const legendElementIndex = parseInt(node.getAttribute("data-legend-index"));
     const activeLayerInfoId = node.getAttribute("data-layer-id");
-    const featureLayerData = this._selectedStyleData.find(
+    const featureLayerData = this.selectedStyleData.find(
       layerData => layerData.layerItemId === activeLayerInfoId
     );
     const { selectedInfoIndex } = featureLayerData;
@@ -1109,7 +1136,7 @@ class InteractiveClassic extends declared(Widget) {
 
     if (this.filterMode === "highlight") {
       const highlightedFeatures = this.viewModel.interactiveStyleData
-        .highlightedFeatures[featureLayerViewIndex];
+        .highlightedFeatures[operationalItemIndex];
       if (
         !highlightedFeatures[legendInfoIndex] &&
         !featureLayerData.selectedInfoIndex[legendElementIndex] &&
@@ -1142,15 +1169,15 @@ class InteractiveClassic extends declared(Widget) {
     }
   }
 
-  // _getFeatureLayerViewIndex
-  private _getFeatureLayerViewIndex(activeLayerInfo: ActiveLayerInfo): number {
+  // _getOperationalItemIndex
+  private _getOperationalItemIndex(activeLayerInfo: ActiveLayerInfo): number {
     let itemIndex = null;
-    this.viewModel.featureLayerViews.forEach(
-      (featureLayerView, featureLayerViewIndex) => {
-        if (featureLayerView) {
-          const featureLayerViewSourceLayer = featureLayerView.layer as any;
-          if (featureLayerViewSourceLayer.uid === activeLayerInfo.layer.uid) {
-            itemIndex = featureLayerViewIndex;
+    this.layerListViewModel.operationalItems.forEach(
+      (operationalItem, operationalItemIndex) => {
+        if (operationalItem) {
+          const operationalItemLayer = operationalItem.layer as any;
+          if (operationalItemLayer.id === activeLayerInfo.layer.id) {
+            itemIndex = operationalItemIndex;
           }
         }
       }
@@ -1167,23 +1194,23 @@ class InteractiveClassic extends declared(Widget) {
     if (!hasRenderer) {
       return false;
     }
-    const { renderer } = layer;
+    const { renderer } = layer as FeatureLayer;
     const hasSymbol = renderer.hasOwnProperty("symbol");
     const hasUniqueValueInfos = renderer.hasOwnProperty("uniqueValueInfos");
     const hasClassBreakInfos = renderer.hasOwnProperty("classBreakInfos");
     return (
       ((hasRenderer &&
         hasSymbol &&
-        renderer.symbol.type === "picture-marker") ||
+        (renderer as SimpleRenderer).symbol.type === "picture-marker") ||
         (hasRenderer &&
           hasUniqueValueInfos &&
-          renderer.uniqueValueInfos.every(
+          (renderer as UniqueValueRenderer).uniqueValueInfos.every(
             (uvInfo: __esri.UniqueValueInfo) =>
               uvInfo.symbol.type === "picture-marker"
           )) ||
         (hasRenderer &&
           hasClassBreakInfos &&
-          renderer.classBreakInfos.every(
+          (renderer as ClassBreaksRenderer).classBreakInfos.every(
             (cbInfo: __esri.ClassBreaksRendererClassBreakInfos) =>
               cbInfo.symbol.type === "picture-marker"
           ))) &&
@@ -1200,21 +1227,23 @@ class InteractiveClassic extends declared(Widget) {
     if (!hasRenderer) {
       return false;
     }
-    const { renderer } = layer;
+    const { renderer } = layer as FeatureLayer;
     const hasSymbol = renderer.hasOwnProperty("symbol");
     const hasUniqueValueInfos = renderer.hasOwnProperty("uniqueValueInfos");
     const hasClassBreakInfos = renderer.hasOwnProperty("classBreakInfos");
     return (
-      ((hasRenderer && hasSymbol && renderer.symbol.type === "picture-fill") ||
+      ((hasRenderer &&
+        hasSymbol &&
+        (renderer as SimpleRenderer).symbol.type === "picture-fill") ||
         (hasRenderer &&
           hasUniqueValueInfos &&
-          renderer.uniqueValueInfos.every(
+          (renderer as UniqueValueRenderer).uniqueValueInfos.every(
             (uvInfo: __esri.UniqueValueInfo) =>
               uvInfo.symbol.type === "picture-fill"
           )) ||
         (hasRenderer &&
           hasClassBreakInfos &&
-          renderer.classBreakInfos.every(
+          (renderer as ClassBreaksRenderer).classBreakInfos.every(
             (cbInfo: __esri.ClassBreaksRendererClassBreakInfos) =>
               cbInfo.symbol.type === "picture-fill"
           ))) &&

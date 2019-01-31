@@ -27,13 +27,13 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     }
     return t;
 };
-define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/support/itemUtils", "ApplicationBase/support/domHelper", "esri/widgets/Home", "esri/widgets/LayerList", "esri/widgets/Search", "esri/layers/FeatureLayer", "esri/widgets/BasemapToggle", "esri/widgets/Expand", "esri/core/watchUtils", "esri/Color", "./Components/Screenshot/Screenshot", "telemetry/telemetry.dojo", "./Components/InteractiveLegend/InteractiveLegend"], function (require, exports, i18nInteractiveLegend, itemUtils_1, domHelper_1, Home, LayerList, Search, FeatureLayer, BasemapToggle, Expand, watchUtils, Color, Screenshot, Telemetry, InteractiveLegend) {
+define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/support/itemUtils", "ApplicationBase/support/domHelper", "esri/widgets/Home", "esri/widgets/LayerList", "esri/widgets/Search", "esri/layers/FeatureLayer", "esri/widgets/BasemapToggle", "esri/widgets/Expand", "esri/core/watchUtils", "esri/Color", "./Components/Screenshot/Screenshot", "telemetry/telemetry.dojo", "esri/widgets/Feature", "./Components/InteractiveLegend/InteractiveLegend"], function (require, exports, i18nInteractiveLegend, itemUtils_1, domHelper_1, Home, LayerList, Search, FeatureLayer, BasemapToggle, Expand, watchUtils, Color, Screenshot, Telemetry, FeatureWidget, InteractiveLegend) {
     "use strict";
     // CSS
     var CSS = {
         loading: "configurable-application--loading",
-        legend: "esri-interactive-legend__legend-elements",
-        popup: "esri-popup__main-container"
+        legend: "offscreen-interactive-legend-container",
+        popup: "offscreen-pop-up-container"
     };
     var InteractiveLegendApp = /** @class */ (function () {
         function InteractiveLegendApp() {
@@ -50,6 +50,8 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
             this.screenshot = null;
             this.interactiveLegendExpand = null;
             this.searchExpand = null;
+            this.featureWidget = null;
+            this.highlightedFeature = null;
         }
         //--------------------------------------------------------------------------
         //
@@ -86,7 +88,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 });
                 this.telemetry.logPageView();
             }
-            var drawerEnabled = config.drawerEnabled, expandEnabled = config.expandEnabled, highlightShade = config.highlightShade, mutedShade = config.mutedShade, style = config.style, mutedOpacity = config.mutedOpacity, filterMode = config.filterMode, screenshotEnabled = config.screenshotEnabled, legendIncludedInScreenshot = config.legendIncludedInScreenshot, popupIncludedInScreenshot = config.popupIncludedInScreenshot, featureCountEnabled = config.featureCountEnabled, layerListEnabled = config.layerListEnabled, searchEnabled = config.searchEnabled, basemapToggleEnabled = config.basemapToggleEnabled, homeEnabled = config.homeEnabled, nextBasemap = config.nextBasemap, searchConfig = config.searchConfig;
+            var drawerEnabled = config.drawerEnabled, expandEnabled = config.expandEnabled, highlightShade = config.highlightShade, mutedShade = config.mutedShade, style = config.style, filterMode = config.filterMode, screenshotEnabled = config.screenshotEnabled, legendIncludedInScreenshot = config.legendIncludedInScreenshot, popupIncludedInScreenshot = config.popupIncludedInScreenshot, featureCountEnabled = config.featureCountEnabled, layerListEnabled = config.layerListEnabled, searchEnabled = config.searchEnabled, basemapToggleEnabled = config.basemapToggleEnabled, homeEnabled = config.homeEnabled, nextBasemap = config.nextBasemap, searchConfig = config.searchConfig;
             var webMapItems = results.webMapItems;
             var validWebMapItems = webMapItems.map(function (response) {
                 return response.value;
@@ -122,13 +124,16 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 itemUtils_1.createMapFromItem({ item: item, appProxies: appProxies }).then(function (map) {
                     return itemUtils_1.createView(__assign({}, viewProperties, { map: map })).then(function (view) {
                         return itemUtils_1.findQuery(find, view).then(function () {
-                            var interactiveLegendMapContainer = document.createElement("div");
-                            var defaultShade = mutedShade ? mutedShade : new Color("#a9a9a9");
+                            var defaultShade = null;
+                            if (mutedShade) {
+                                var r = mutedShade.r, g = mutedShade.g, b = mutedShade.b, a = mutedShade.a;
+                                defaultShade = new Color("rgba(" + r + "," + g + "," + b + "," + a + ")");
+                            }
+                            else {
+                                defaultShade = new Color("rgba(169,169,169, 0.5)");
+                            }
                             var defaultStyle = style ? style : "classic";
-                            var defaultMode = filterMode
-                                ? filterMode
-                                : "definitionExpression";
-                            var defaultOpacity = mutedOpacity ? mutedOpacity : 0.5;
+                            var defaultMode = filterMode ? filterMode : "featureFilter";
                             var mode = drawerEnabled ? "drawer" : "auto";
                             var defaultExpandMode = mode ? mode : null;
                             if (highlightShade) {
@@ -153,14 +158,23 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 : null;
                             var interactiveLegend = new InteractiveLegend({
                                 view: view,
-                                container: interactiveLegendMapContainer,
                                 mutedShade: defaultShade,
                                 style: defaultStyle,
                                 filterMode: defaultMode,
-                                mutedOpacity: defaultOpacity,
                                 featureCountEnabled: featureCountEnabled,
                                 layerListViewModel: layerListViewModel
                             });
+                            var offScreenInteractiveLegend = new InteractiveLegend({
+                                view: view,
+                                container: document.querySelector(".offscreen-interactive-legend-container"),
+                                mutedShade: defaultShade,
+                                style: defaultStyle,
+                                filterMode: defaultMode,
+                                featureCountEnabled: featureCountEnabled,
+                                layerListViewModel: layerListViewModel
+                            });
+                            offScreenInteractiveLegend.style.selectedStyleData =
+                                interactiveLegend.style.selectedStyleData;
                             _this._handleSearchWidget(searchEnabled, interactiveLegend, view, searchConfig);
                             _this.interactiveLegendExpand = new Expand({
                                 content: interactiveLegend,
@@ -208,14 +222,24 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                     view: view,
                     mapComponentSelectors: mapComponentSelectors
                 });
+                watchUtils.watch(view, "popup.visible", function () {
+                    if (view.popup.visible) {
+                        if (!_this.featureWidget) {
+                            _this.featureWidget = new FeatureWidget({
+                                view: view,
+                                graphic: view.popup.selectedFeature,
+                                container: document.querySelector(".offscreen-pop-up-container")
+                            });
+                        }
+                        else {
+                            _this.featureWidget.graphic = view.popup.selectedFeature;
+                        }
+                    }
+                });
                 watchUtils.watch(this.screenshot.viewModel, "screenshotModeIsActive", function () {
                     if (_this.screenshot.viewModel.screenshotModeIsActive) {
-                        if (!legendIncludedInScreenshot) {
-                            _this.interactiveLegendExpand.expanded = false;
-                        }
-                        if (!popupIncludedInScreenshot && view.popup.visible) {
-                            view.popup.dockEnabled = true;
-                        }
+                        _this.interactiveLegendExpand.expanded = false;
+                        view.popup.visible = false;
                         if (_this.layerListExpand) {
                             _this.layerListExpand.expanded = false;
                         }
@@ -225,14 +249,33 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                     }
                     else {
                         _this.interactiveLegendExpand.expanded = true;
-                        if (view.popup.dockEnabled) {
-                            view.popup.dockEnabled = false;
-                        }
                         if (_this.layerListExpand) {
                             _this.layerListExpand.expanded = true;
                         }
                         if (_this.searchExpand) {
                             _this.searchExpand.expanded = true;
+                        }
+                    }
+                });
+                watchUtils.watch(view, "popup.visible", function () {
+                    if (!view.popup.visible &&
+                        _this.screenshot.viewModel.screenshotModeIsActive &&
+                        popupIncludedInScreenshot &&
+                        view.popup.selectedFeature) {
+                        var layerView = view.layerViews.find(function (layerView) {
+                            return layerView.layer.id === view.popup.selectedFeature.layer.id;
+                        });
+                        _this.highlightedFeature = layerView.highlight(view.popup.selectedFeature);
+                    }
+                });
+                watchUtils.watch(this.screenshot, "viewModel.screenshotModeIsActive", function () {
+                    if (!_this.screenshot.viewModel.screenshotModeIsActive) {
+                        if (_this.featureWidget) {
+                            _this.featureWidget.graphic = null;
+                        }
+                        if (_this.highlightedFeature) {
+                            _this.highlightedFeature.remove();
+                            _this.highlightedFeature = null;
                         }
                     }
                 });
@@ -265,7 +308,6 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
         };
         // _handleSearchWidget
         InteractiveLegendApp.prototype._handleSearchWidget = function (searchEnabled, interactiveLegend, view, searchConfig) {
-            var _this = this;
             // Get any configured search settings
             if (searchEnabled) {
                 var searchProperties = {
@@ -302,34 +344,13 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                         searchProperties.sources.length >= searchConfig.activeSourceIndex) {
                         searchProperties.activeSourceIndex = searchConfig.activeSourceIndex;
                     }
-                    watchUtils.on(interactiveLegend, "searchExpressions", "change", function () {
-                        _this.layerList.operationalItems.forEach(function (operationalItems, operationalItemIndex) {
-                            search_1.sources.forEach(function (searchSource) {
-                                if (!searchSource.hasOwnProperty("layer")) {
-                                    return;
-                                }
-                                var layerSearchSource = searchSource;
-                                var featureLayer = operationalItems.layer;
-                                if (featureLayer.id === layerSearchSource.layer.id) {
-                                    var searchExpression = interactiveLegend.searchExpressions.getItemAt(operationalItemIndex);
-                                    if (searchExpression) {
-                                        searchSource.filter = {
-                                            where: searchExpression
-                                        };
-                                    }
-                                    else {
-                                        searchSource.filter = null;
-                                    }
-                                }
-                            });
-                        });
-                    });
                 }
-                var search_1 = new Search(searchProperties);
+                var search = new Search(searchProperties);
                 this.searchExpand = new Expand({
-                    content: search_1,
+                    content: search,
                     expanded: true
                 });
+                interactiveLegend.searchViewModel = search.viewModel;
                 view.ui.add(this.searchExpand, "top-right");
             }
         };
