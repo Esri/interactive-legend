@@ -13,7 +13,9 @@ import Handles = require("esri/core/Handles");
 // interfaces
 import {
   CollectionChangeEvent,
-  LayerInfo
+  LayerInfo,
+  LayerUID,
+  ActiveLayerInfoProps
 } from "../../../interfaces/interfaces";
 
 // esri.core.watchUtils
@@ -294,8 +296,10 @@ class InteractiveLegendViewModel extends declared(Accessor) {
     );
 
     activeLayerInfos.sort((activeLayerInfo1, activeLayerInfo2) => {
-      const layerIndex1 = layersIndex[activeLayerInfo1.layer.uid] || 0,
-        layerIndex2 = layersIndex[activeLayerInfo2.layer.uid] || 0;
+      const layerIndex1 =
+          layersIndex[(activeLayerInfo1.layer as LayerUID).uid] || 0,
+        layerIndex2 =
+          layersIndex[(activeLayerInfo2.layer as LayerUID).uid] || 0;
 
       return layerIndex2 - layerIndex1;
     });
@@ -444,9 +448,10 @@ class InteractiveLegendViewModel extends declared(Accessor) {
 
       activeLayerInfo = new ActiveLayerInfo({
         layer,
-        title: hasTitle ? layerInfo.title : layer.title,
-        view: this.view
+        title: hasTitle ? layerInfo.title : layer.title
       });
+
+      (activeLayerInfo as ActiveLayerInfoProps).view = this.view;
 
       this._activeLayerInfosByLayerViewId[layerViewId] = activeLayerInfo;
     }
@@ -540,7 +545,10 @@ class InteractiveLegendViewModel extends declared(Accessor) {
     layerView: LayerView
   ): void {
     const view = this.view as MapView;
-    if (activeLayerInfo.scale !== view.scale && activeLayerInfo.isScaleDriven) {
+    if (
+      activeLayerInfo.scale !== view.scale &&
+      (activeLayerInfo as ActiveLayerInfoProps).isScaleDriven
+    ) {
       this._constructLegendElements(activeLayerInfo, layerView);
     }
   }

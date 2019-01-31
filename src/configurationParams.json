@@ -43,11 +43,6 @@
         },
         {
           "type": "boolean",
-          "fieldName": "searchEnabled",
-          "label": "Search"
-        },
-        {
-          "type": "boolean",
           "fieldName": "layerListEnabled",
           "label": "Layer List"
         },
@@ -139,58 +134,8 @@
         {
           "type": "color",
           "label": "Choose a muted shade",
-          "fieldName": "mutedShade"
-        },
-        {
-          "type": "options",
-          "fieldName": "mutedOpacity",
-          "label": "Set a muted opacity by selecting a value between 0 and 1",
-          "tooltip": "Set a muted opacity by selecting a value between 0 and 1",
-          "options": [{
-              "label": "0",
-              "value": 0
-            },
-            {
-              "label": "0.1",
-              "value": 0.1
-            },
-            {
-              "label": "0.2",
-              "value": 0.2
-            },
-            {
-              "label": "0.3",
-              "value": 0.3
-            },
-            {
-              "label": "0.4",
-              "value": 0.4
-            },
-            {
-              "label": "0.5",
-              "value": 0.5
-            },
-            {
-              "label": "0.6",
-              "value": 0.6
-            },
-            {
-              "label": "0.7",
-              "value": 0.7
-            },
-            {
-              "label": "0.8",
-              "value": 0.8
-            },
-            {
-              "label": "0.9",
-              "value": 0.9
-            },
-            {
-              "label": "1",
-              "value": 1
-            }
-          ]
+          "fieldName": "mutedShade",
+          "transparent": true
         }
       ]
     },
@@ -198,7 +143,7 @@
       "category": "Search",
       "fields": [{
         "type": "conditional",
-        "fieldName": "search",
+        "fieldName": "searchEnabled",
         "label": "Search",
         "condition": false,
         "items": [{
@@ -250,8 +195,12 @@
     "legendIncludedInScreenshot": false,
     "popupIncludedInScreenshot": false,
     "highlightShade": "#000000",
-    "mutedShade": "#a9a9a9",
-    "mutedOpacity": 0.5,
+    "mutedShade": {
+      "r": 169,
+      "g": 169,
+      "b": 169,
+      "a": 0.5
+    },
     "nextBasemap": "topo"
   }
 }

@@ -1,14 +1,17 @@
 // dojo
 import * as i18n from "dojo/i18n!../nls/Legend";
 
-// esri.core
-import { substitute } from "esri/core/lang";
+import Lang = require("esri/core/lang");
 
 // esri.layers
 import ImageryLayer = require("esri/layers/ImageryLayer");
 
 // esri.widgets
-import { RampTitle, RendererTitle } from "../../../../interfaces/interfaces";
+import {
+  RampTitle,
+  RendererTitle,
+  LangProps
+} from "../../../../interfaces/interfaces";
 
 function isRampTitle(titleInfo: any, isRamp: boolean): titleInfo is RampTitle {
   return isRamp;
@@ -54,7 +57,7 @@ export function getTitle(
   }
 
   return bundleKey
-    ? substitute(
+    ? (Lang as LangProps).substitute(
         { field: titleInfo.field, normField: titleInfo.normField },
         bundleKey === "showField" ? "{field}" : i18n[bundleKey]
       )

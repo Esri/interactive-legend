@@ -1,4 +1,4 @@
-define(["require", "exports", "dojo/i18n!../nls/Legend", "esri/core/lang"], function (require, exports, i18n, lang_1) {
+define(["require", "exports", "dojo/i18n!../nls/Legend", "esri/core/lang"], function (require, exports, i18n, Lang) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     function isRampTitle(titleInfo, isRamp) {
@@ -40,7 +40,7 @@ define(["require", "exports", "dojo/i18n!../nls/Legend", "esri/core/lang"], func
                         : null;
         }
         return bundleKey
-            ? lang_1.substitute({ field: titleInfo.field, normField: titleInfo.normField }, bundleKey === "showField" ? "{field}" : i18n[bundleKey])
+            ? Lang.substitute({ field: titleInfo.field, normField: titleInfo.normField }, bundleKey === "showField" ? "{field}" : i18n[bundleKey])
             : null;
     }
     exports.getTitle = getTitle;
