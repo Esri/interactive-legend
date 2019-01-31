@@ -196,27 +196,54 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     operationalItemIndex: number,
     legendElement: LegendElement,
     legendInfoIndex: number,
+    isPredominance: boolean,
     legendElementInfos?: any[]
   ): void {
-    this._generateQueryExpressions(
-      elementInfo,
-      field,
-      operationalItemIndex,
-      legendElement,
-      legendInfoIndex,
-      legendElementInfos
-    );
-    const queryExpressions = this.interactiveStyleData.queryExpressions[
-      operationalItemIndex
-    ];
-    const featureLayerView = this.featureLayerViews.getItemAt(
-      operationalItemIndex
-    );
-    const filterExpression = queryExpressions.join(" OR ");
-    this._setSearchExpression(filterExpression);
-    featureLayerView.filter = new FeatureFilter({
-      where: filterExpression
-    });
+    if (isPredominance) {
+      const queryExpression = this._handlePredominanceFeatureFilter(
+        elementInfo,
+        featureLayerViewIndex
+      ).join(" AND ");
+
+      const queryExpressions = this.interactiveStyleData.queryExpressions[
+        featureLayerViewIndex
+      ];
+      const expressionIndex = queryExpressions.indexOf(queryExpression);
+      if (queryExpressions.length === 0 || expressionIndex === -1) {
+        queryExpressions.push(queryExpression);
+      } else {
+        queryExpressions.splice(expressionIndex, 1);
+      }
+
+      const featureLayerView = this.featureLayerViews.getItemAt(
+        featureLayerViewIndex
+      );
+      const filterExpression = queryExpressions.join(" OR ");
+      this._setSearchExpression(filterExpression, featureLayerViewIndex);
+      featureLayerView.filter = new FeatureFilter({
+        where: filterExpression
+      });
+    } else {
+      this._generateQueryExpressions(
+        elementInfo,
+        field,
+        featureLayerViewIndex,
+        legendElement,
+        legendInfoIndex,
+        legendElementInfos
+      );
+      const queryExpressions = this.interactiveStyleData.queryExpressions[
+        featureLayerViewIndex
+      ];
+      const featureLayerView = this.featureLayerViews.getItemAt(
+        featureLayerViewIndex
+      );
+      const filterExpression = queryExpressions.join(" OR ");
+      this._setSearchExpression(filterExpression, featureLayerViewIndex);
+      featureLayerView.filter = new FeatureFilter({
+        where: filterExpression
+      });
+    }
   }
 
   // applyFeatureMute
@@ -226,6 +253,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     legendInfoIndex: number,
     operationalItemIndex: number,
     legendElement: LegendElement,
+    isPredominance: boolean,
     legendElementInfos: any[]
   ): void {
     const originalRenderer = this.interactiveStyleData.originalRenderers[
@@ -234,6 +262,9 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     if (!originalRenderer) {
       return;
     }
+    // if (isPredominance) {
+    //   this._mutePredominance(featureLayerViewIndex, legend);
+    // } else
     if (originalRenderer.hasOwnProperty("uniqueValueInfos")) {
       this._muteUniqueValues(legendInfoIndex, field, operationalItemIndex);
     } else if (
@@ -266,6 +297,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     operationalItemIndex: number,
     isSizeRamp: boolean,
     legendElement: LegendElement,
+    isPredominance: boolean,
     legendElementInfos: any[]
   ): void {
     if (isSizeRamp) {
@@ -275,6 +307,13 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         legendElementInfos,
         elementInfo,
         operationalItemIndex
+      );
+    } else if (isPredominance) {
+      this._handlePredominanceHighlight(
+        elementInfo,
+        legendElementInfos,
+        featureLayerViewIndex,
+        legendInfoIndex
       );
     } else if (
       Array.isArray(elementInfo.value) &&
@@ -583,6 +622,27 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     }
   }
 
+  // _handlePredominanceFeatureFilter
+  private _handlePredominanceFeatureFilter(
+    elementInfo: any,
+    featureLayerViewIndex: number
+  ): string[] {
+    const featureLayerView = this.featureLayerViews.getItemAt(
+      featureLayerViewIndex
+    );
+    const authoringInfo = featureLayerView.layer.renderer.authoringInfo as any;
+    const fields = authoringInfo.fields;
+    const expressionArr = [];
+    fields.forEach(field => {
+      if (elementInfo.value === field) {
+        return;
+      }
+      expressionArr.push(`${elementInfo.value} > ${field}`);
+    });
+
+    return expressionArr;
+  }
+
   //----------------------------------
   //
   //  Highlight Methods
@@ -765,6 +825,69 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     highlightedFeatureData[legendInfoIndex] = [highlight];
   }
 
+  // _handlePredominanceHighlight
+  private _handlePredominanceHighlight(
+    elementInfo: any,
+    legendElementInfos: any[],
+    featureLayerViewIndex: number,
+    legendInfoIndex: number
+  ): void {
+    const predominantFeatures = this.layerGraphics.getItemAt(
+      featureLayerViewIndex
+    );
+    const { objectIdField } = this.featureLayerViews.getItemAt(
+      featureLayerViewIndex
+    ).layer;
+    const featuresToHighlight = [];
+    predominantFeatures.forEach(predominantFeature => {
+      const itemsToCompare = [];
+      for (const attr in predominantFeature.attributes) {
+        if (
+          attr !== elementInfo.value &&
+          attr !== objectIdField &&
+          legendElementInfos.find(
+            elementInfo => elementInfo.value === elementInfo.value
+          )
+        ) {
+          const item = {};
+          item[attr] = predominantFeature.attributes[attr];
+          itemsToCompare.push(item);
+        }
+      }
+      let pass = true;
+      itemsToCompare.forEach(itemToCompare => {
+        for (const key in itemToCompare) {
+          if (
+            predominantFeature.attributes[elementInfo.value] <
+            itemToCompare[key]
+          ) {
+            pass = false;
+            break;
+          }
+        }
+      });
+      if (pass) {
+        featuresToHighlight.push(predominantFeature);
+      }
+    });
+    this.interactiveStyleData.highlightedFeatures;
+
+    const highlightedFeatures = this.interactiveStyleData.highlightedFeatures[
+      featureLayerViewIndex
+    ];
+    const highlightedFeatureData = this.interactiveStyleData
+      .highlightedFeatures[featureLayerViewIndex];
+    if (highlightedFeatureData[legendInfoIndex]) {
+      this._removeHighlight(featureLayerViewIndex, legendInfoIndex);
+      return;
+    }
+    const highlight = this.featureLayerViews
+      .getItemAt(featureLayerViewIndex)
+      .highlight([...featuresToHighlight]);
+
+    highlightedFeatures[legendInfoIndex] = [highlight];
+  }
+
   // _removeHighlight
   private _removeHighlight(
     operationalItemIndex: number,
@@ -819,6 +942,27 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       }
     );
     this._generateRenderer(operationalItemIndex, "unique-value", field);
+  }
+
+  // _mutePredominance
+  private _mutePredominance(
+    featureLayerViewIndex: number,
+    legendInfoIndex: number
+  ): void {
+    const featureLayer = this.layerListViewModel.operationalItems.getItemAt(
+      featureLayerViewIndex
+    ).layer as FeatureLayer;
+    const colorIndexes = this.interactiveStyleData.colorIndexes[
+      featureLayerViewIndex
+    ];
+
+    if (colorIndexes.indexOf(legendInfoIndex) === -1) {
+      colorIndexes.push(legendInfoIndex);
+    } else {
+      colorIndexes.splice(colorIndexes.indexOf(legendInfoIndex), 1);
+    }
+
+    this._resetMutedUniqueValues(featureLayerViewIndex);
   }
 
   // _resetMutedUniqueValues
@@ -937,9 +1081,27 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       featureLayer.renderer.visualVariables
         ? [...featureLayer.renderer.visualVariables]
         : null;
-
+    const {
+      authoringInfo,
+      valueExpression,
+      valueExpressionTitle
+    } = featureLayer.renderer;
     const renderer =
-      type === "unique-value"
+      type === "unique-value" &&
+      authoringInfo.hasOwnProperty("type") &&
+      authoringInfo.type === "predominance"
+        ? {
+            authoringInfo,
+            type,
+            field,
+            uniqueValueInfos: [...featureLayer.renderer.uniqueValueInfos],
+            defaultLabel,
+            defaultSymbol,
+            visualVariables,
+            valueExpression,
+            valueExpressionTitle
+          }
+        : type === "unique-value"
         ? {
             type,
             field,

@@ -335,6 +335,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
                     !isColorRamp &&
                     !isOpacityRamp &&
+                    activeLayerInfo.layer.renderer.authoringInfo &&
+                    activeLayerInfo.layer.renderer.authoringInfo.type !== "predominance" &&
                     !isHeatRamp ? (widget_1.tsx("div", { class: CSS.error },
                     widget_1.tsx("span", { class: CSS.calciteStyles.error }),
                     i18nInteractiveLegend.noFieldAttribute)) : null,
@@ -345,12 +347,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     !activeLayerInfo.layer.hasOwnProperty("sublayers") ? (widget_1.tsx("div", { class: CSS.error },
                     widget_1.tsx("span", { class: CSS.calciteStyles.error }),
                     i18nInteractiveLegend.elementInfoNoValue)) : null,
-                legendElement.title === "Predominant category" ? (widget_1.tsx("div", { class: CSS.error },
-                    widget_1.tsx("span", { class: CSS.calciteStyles.error }),
-                    i18nInteractiveLegend.predominantNotSupported)) : null,
-                isSizeRamp ? (widget_1.tsx("div", { class: CSS.error },
-                    widget_1.tsx("span", { class: CSS.calciteStyles.error }),
-                    i18nInteractiveLegend.sizeRampFilterNotSupported)) : null,
                 isSizeRamp && this.filterMode === "mute" ? (widget_1.tsx("div", { class: CSS.error },
                     widget_1.tsx("span", { class: CSS.calciteStyles.error }),
                     i18nInteractiveLegend.muteAndSizeRamp)) : null,
@@ -487,6 +483,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             }
             var hasPictureMarkersAndIsMute = this._checkForPictureMarkersAndIsMute(activeLayerInfo);
             var isRelationship = legendElement.type === "relationship-ramp";
+            var isPredominance = activeLayerInfo.layer.renderer.authoringInfo &&
+                activeLayerInfo.layer.renderer.authoringInfo.type === "predominance";
             var isSizeRampAndMute = isSizeRamp && this.filterMode === "mute";
             var selectedStyleData = this.selectedStyleData.getItemAt(operationalItemIndex);
             var requiredFields = selectedStyleData
@@ -501,14 +499,12 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var applySelect = ((isRelationship ||
                 hasPictureMarkersAndIsMute ||
                 isSizeRampAndMute ||
-                hasPictureFillAndIsMute ||
-                legendTitle === "Predominant" ||
-                isSizeRamp) &&
+                hasPictureFillAndIsMute) &&
                 legendElement.infos.length > 1 &&
                 !activeLayerInfo.layer.hasOwnProperty("sublayers")) ||
-                !requiredFields
+                (!requiredFields && !isPredominance)
                 ? null
-                : field && elementInfo.hasOwnProperty("value")
+                : (field && elementInfo.hasOwnProperty("value")) || isPredominance
                     ? selectedRow
                     : null;
             var hasMoreThanOneInfo = legendElement.infos.length > 1;
@@ -520,12 +516,11 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             return (widget_1.tsx("div", { bind: this, class: hasMoreThanOneInfo && requiredFields && featureLayerData
                     ? applySelect
                     : null, tabIndex: hasMoreThanOneInfo && applySelect ? 0 : null, "data-legend-index": "" + legendElementIndex, "data-child-index": "" + legendInfoIndex, "data-layer-id": "" + activeLayerInfo.layer.id, onclick: function (event) {
-                    if (!isRelationship &&
+                    if ((!isRelationship &&
                         !hasPictureMarkersAndIsMute &&
                         !isSizeRampAndMute &&
                         !hasPictureFillAndIsMute &&
                         elementInfo.hasOwnProperty("value") &&
-                        legendElement.title !== "Predominant category" &&
                         hasMoreThanOneInfo &&
                         !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
                         requiredFields &&
@@ -533,21 +528,21 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         featureLayerData &&
                         !isSizeRamp) {
                         _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, legendElementInfos);
+
                     }
                 }, onkeydown: function (event) {
-                    if (!isRelationship &&
+                    if ((!isRelationship &&
                         !hasPictureMarkersAndIsMute &&
                         !isSizeRampAndMute &&
                         !hasPictureFillAndIsMute &&
                         elementInfo.hasOwnProperty("value") &&
-                        legendElement.title !== "Predominant category" &&
                         hasMoreThanOneInfo &&
                         !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
                         requiredFields &&
                         field &&
-                        featureLayerData &&
-                        !isSizeRamp) {
-                        _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, legendElementInfos);
+                        featureLayerData) ||
+                        isPredominance) {
+                        _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos);
                     }
                 } },
                 widget_1.tsx("div", { class: this.classes(CSS.symbolContainer, symbolClasses) }, content),
@@ -571,33 +566,33 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         //  Filter methods
         //
         //-------------------------------------------------------------------
-        InteractiveClassic.prototype._handleFilterOption = function (event, elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, legendElementInfos) {
-            this.filterMode === "highlight"
-                ? this._featureHighlight(event, elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, legendElementInfos)
-                : this.filterMode === "featureFilter"
-                    ? this._featureFilter(elementInfo, field, operationalItemIndex, legendInfoIndex, legendElement, legendElementInfos)
+        InteractiveClassic.prototype._handleFilterOption = function (event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos) {
+            this.filterMode === "featureFilter"
+                ? this._featureFilter(elementInfo, field, featureLayerViewIndex, legendInfoIndex, legendElement, isPredominance, legendElementInfos)
+                : this.filterMode === "highlight"
+                    ? this._featureHighlight(event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos)
                     : this.filterMode === "mute"
-                        ? this._featureMute(event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos)
+                        ? this._featureMute(event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, legendElement, isPredominance, legendElementInfos)
                         : null;
         };
         //_filterFeatures
-        InteractiveClassic.prototype._featureFilter = function (elementInfo, field, operationalItemIndex, legendInfoIndex, legendElement, legendElementInfos) {
+        InteractiveClassic.prototype._featureFilter = function (elementInfo, field, featureLayerViewIndex, legendInfoIndex, legendElement, isPredominance, legendElementInfos) {
             this._handleSelectedStyles(event);
-            this.viewModel.applyFeatureFilter(elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, legendElementInfos);
+            this.viewModel.applyFeatureFilter(elementInfo, field, featureLayerViewIndex, legendElement, legendInfoIndex, isPredominance, legendElementInfos);
         };
         // _highlightFeatures
-        InteractiveClassic.prototype._featureHighlight = function (event, elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, legendElementInfos) {
+        InteractiveClassic.prototype._featureHighlight = function (event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos) {
             var state = this.viewModel.state;
             if (state === "querying") {
                 return;
             }
-            this.viewModel.applyFeatureHighlight(elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, legendElementInfos);
-            this._handleSelectedStyles(event, operationalItemIndex, legendInfoIndex);
+            this.viewModel.applyFeatureHighlight(elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos);
+            this._handleSelectedStyles(event, featureLayerViewIndex, legendInfoIndex);
         };
         // _muteFeatures
-        InteractiveClassic.prototype._featureMute = function (event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos) {
+        InteractiveClassic.prototype._featureMute = function (event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, legendElement, isPredominance, legendElementInfos) {
             this._handleSelectedStyles(event);
-            this.viewModel.applyFeatureMute(elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos);
+            this.viewModel.applyFeatureMute(elementInfo, field, legendInfoIndex, featureLayerViewIndex, legendElement, isPredominance, legendElementInfos);
         };
         // End of filter methods
         // _handleSelectedStyles

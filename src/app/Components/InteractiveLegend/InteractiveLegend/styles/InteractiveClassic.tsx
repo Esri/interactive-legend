@@ -558,6 +558,8 @@ class InteractiveClassic extends declared(Widget) {
         !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
         !isColorRamp &&
         !isOpacityRamp &&
+        activeLayerInfo.layer.renderer.authoringInfo &&
+        activeLayerInfo.layer.renderer.authoringInfo.type !== "predominance" &&
         !isHeatRamp ? (
           <div class={CSS.error}>
             <span class={CSS.calciteStyles.error} />
@@ -577,13 +579,13 @@ class InteractiveClassic extends declared(Widget) {
             {i18nInteractiveLegend.elementInfoNoValue}
           </div>
         ) : null}
-
+        {/* 
         {legendElement.title === "Predominant category" ? (
           <div class={CSS.error}>
             <span class={CSS.calciteStyles.error} />
             {i18nInteractiveLegend.predominantNotSupported}
           </div>
-        ) : null}
+        ) : null} */}
 
         {isSizeRamp ? (
           <div class={CSS.error}>
@@ -825,6 +827,9 @@ class InteractiveClassic extends declared(Widget) {
       activeLayerInfo
     );
     const isRelationship = legendElement.type === "relationship-ramp";
+    const isPredominance =
+      activeLayerInfo.layer.renderer.authoringInfo &&
+      activeLayerInfo.layer.renderer.authoringInfo.type === "predominance";
     const isSizeRampAndMute = isSizeRamp && this.filterMode === "mute";
     const selectedStyleData = this.selectedStyleData.getItemAt(
       operationalItemIndex
@@ -847,13 +852,12 @@ class InteractiveClassic extends declared(Widget) {
         hasPictureMarkersAndIsMute ||
         isSizeRampAndMute ||
         hasPictureFillAndIsMute ||
-        legendTitle === "Predominant" ||
         isSizeRamp) &&
         legendElement.infos.length > 1 &&
         !activeLayerInfo.layer.hasOwnProperty("sublayers")) ||
-      !requiredFields
+      (!requiredFields && !isPredominance)
         ? null
-        : field && elementInfo.hasOwnProperty("value")
+        : (field && elementInfo.hasOwnProperty("value")) || isPredominance
         ? selectedRow
         : null;
     const hasMoreThanOneInfo = legendElement.infos.length > 1;
@@ -879,18 +883,17 @@ class InteractiveClassic extends declared(Widget) {
         data-layer-id={`${activeLayerInfo.layer.id}`}
         onclick={(event: Event) => {
           if (
-            !isRelationship &&
-            !hasPictureMarkersAndIsMute &&
-            !isSizeRampAndMute &&
-            !hasPictureFillAndIsMute &&
-            elementInfo.hasOwnProperty("value") &&
-            legendElement.title !== "Predominant category" &&
-            hasMoreThanOneInfo &&
-            !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
-            requiredFields &&
-            field &&
-            featureLayerData &&
-            !isSizeRamp
+            (!isRelationship &&
+              !hasPictureMarkersAndIsMute &&
+              !isSizeRampAndMute &&
+              !hasPictureFillAndIsMute &&
+              elementInfo.hasOwnProperty("value") &&
+              hasMoreThanOneInfo &&
+              !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
+              requiredFields &&
+              field &&
+              featureLayerData && !isSizeRamp) ||
+            isPredominance
           ) {
             this._handleFilterOption(
               event,
@@ -900,24 +903,24 @@ class InteractiveClassic extends declared(Widget) {
               operationalItemIndex,
               isSizeRamp,
               legendElement,
+              isPredominance,
               legendElementInfos
             );
           }
         }}
         onkeydown={(event: Event) => {
           if (
-            !isRelationship &&
-            !hasPictureMarkersAndIsMute &&
-            !isSizeRampAndMute &&
-            !hasPictureFillAndIsMute &&
-            elementInfo.hasOwnProperty("value") &&
-            legendElement.title !== "Predominant category" &&
-            hasMoreThanOneInfo &&
-            !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
-            requiredFields &&
-            field &&
-            featureLayerData &&
-            !isSizeRamp
+            (!isRelationship &&
+              !hasPictureMarkersAndIsMute &&
+              !isSizeRampAndMute &&
+              !hasPictureFillAndIsMute &&
+              elementInfo.hasOwnProperty("value") &&
+              hasMoreThanOneInfo &&
+              !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
+              requiredFields &&
+              field &&
+              featureLayerData && !isSizeRamp) ||
+            isPredominance
           ) {
             this._handleFilterOption(
               event,
@@ -927,6 +930,7 @@ class InteractiveClassic extends declared(Widget) {
               operationalItemIndex,
               isSizeRamp,
               legendElement,
+              isPredominance,
               legendElementInfos
             );
           }
@@ -987,26 +991,31 @@ class InteractiveClassic extends declared(Widget) {
     operationalItemIndex: number,
     isSizeRamp: boolean,
     legendElement: LegendElement,
+    isPredominance: boolean,
     legendElementInfos?: any[]
   ): void {
-    this.filterMode === "highlight"
-      ? this._featureHighlight(
-          event,
+    this.filterMode === "featureFilter"
+      ? this._featureFilter(
           elementInfo,
-          field,
+          field
           legendInfoIndex,
           operationalItemIndex,
           isSizeRamp,
           legendElement,
+          isPredominance,
           legendElementInfos
         )
-      : this.filterMode === "featureFilter"
-      ? this._featureFilter(
+      : this.filterMode === "highlight"
+      ? this._featureHighlight(
+          event,
           elementInfo,
           field,
           operationalItemIndex,
           legendInfoIndex,
+          featureLayerViewIndex,
+          isSizeRamp,
           legendElement,
+          isPredominance,
           legendElementInfos
         )
       : this.filterMode === "mute"
@@ -1017,6 +1026,7 @@ class InteractiveClassic extends declared(Widget) {
           legendInfoIndex,
           operationalItemIndex,
           legendElement,
+          isPredominance,
           legendElementInfos
         )
       : null;
@@ -1029,6 +1039,7 @@ class InteractiveClassic extends declared(Widget) {
     operationalItemIndex: number,
     legendInfoIndex: number,
     legendElement: LegendElement,
+    isPredominance: boolean,
     legendElementInfos?: any[]
   ): void {
     this._handleSelectedStyles(event);
@@ -1038,6 +1049,7 @@ class InteractiveClassic extends declared(Widget) {
       operationalItemIndex,
       legendElement,
       legendInfoIndex,
+      isPredominance,
       legendElementInfos
     );
   }
@@ -1051,6 +1063,7 @@ class InteractiveClassic extends declared(Widget) {
     operationalItemIndex: number,
     isSizeRamp: boolean,
     legendElement: LegendElement,
+    isPredominance: boolean,
     legendElementInfos: any[]
   ): void {
     const { state } = this.viewModel;
@@ -1065,6 +1078,7 @@ class InteractiveClassic extends declared(Widget) {
       operationalItemIndex,
       isSizeRamp,
       legendElement,
+      isPredominance,
       legendElementInfos
     );
     this._handleSelectedStyles(event, operationalItemIndex, legendInfoIndex);
@@ -1078,6 +1092,7 @@ class InteractiveClassic extends declared(Widget) {
     legendInfoIndex: number,
     operationalItemIndex: number,
     legendElement: LegendElement,
+    isPredominance: boolean,
     legendElementInfos: any[]
   ): void {
     this._handleSelectedStyles(event);
@@ -1087,6 +1102,7 @@ class InteractiveClassic extends declared(Widget) {
       legendInfoIndex,
       operationalItemIndex,
       legendElement,
+      isPredominance,
       legendElementInfos
     );
   }

@@ -129,22 +129,44 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         //
         //----------------------------------
         // applyFeatureFilter
-        InteractiveStyleViewModel.prototype.applyFeatureFilter = function (elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, legendElementInfos) {
-            this._generateQueryExpressions(elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, legendElementInfos);
-            var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
-            var featureLayerView = this.featureLayerViews.getItemAt(operationalItemIndex);
-            var filterExpression = queryExpressions.join(" OR ");
-            this._setSearchExpression(filterExpression);
-            featureLayerView.filter = new FeatureFilter({
-                where: filterExpression
-            });
+        InteractiveStyleViewModel.prototype.applyFeatureFilter = function (elementInfo, field, featureLayerViewIndex, legendElement, legendInfoIndex, isPredominance, legendElementInfos) {
+            if (isPredominance) {
+                var queryExpression = this._handlePredominanceFeatureFilter(elementInfo, featureLayerViewIndex).join(" AND ");
+                var queryExpressions = this.interactiveStyleData.queryExpressions[featureLayerViewIndex];
+                var expressionIndex = queryExpressions.indexOf(queryExpression);
+                if (queryExpressions.length === 0 || expressionIndex === -1) {
+                    queryExpressions.push(queryExpression);
+                }
+                else {
+                    queryExpressions.splice(expressionIndex, 1);
+                }
+                var featureLayerView = this.featureLayerViews.getItemAt(featureLayerViewIndex);
+                var filterExpression = queryExpressions.join(" OR ");
+                this._setSearchExpression(filterExpression, featureLayerViewIndex);
+                featureLayerView.filter = new FeatureFilter({
+                    where: filterExpression
+                });
+            }
+            else {
+                this._generateQueryExpressions(elementInfo, field, featureLayerViewIndex, legendElement, legendInfoIndex, legendElementInfos);
+                var queryExpressions = this.interactiveStyleData.queryExpressions[featureLayerViewIndex];
+                var featureLayerView = this.featureLayerViews.getItemAt(featureLayerViewIndex);
+                var filterExpression = queryExpressions.join(" OR ");
+                this._setSearchExpression(filterExpression, featureLayerViewIndex);
+                featureLayerView.filter = new FeatureFilter({
+                    where: filterExpression
+                });
+            }
         };
         // applyFeatureMute
-        InteractiveStyleViewModel.prototype.applyFeatureMute = function (elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos) {
-            var originalRenderer = this.interactiveStyleData.originalRenderers[operationalItemIndex];
+        InteractiveStyleViewModel.prototype.applyFeatureMute = function (elementInfo, field, legendInfoIndex, featureLayerViewIndex, legendElement, isPredominance, legendElementInfos) {
+            var originalRenderer = this.interactiveStyleData.originalRenderers[featureLayerViewIndex];
             if (!originalRenderer) {
                 return;
             }
+            // if (isPredominance) {
+            //   this._mutePredominance(featureLayerViewIndex, legend);
+            // } else
             if (originalRenderer.hasOwnProperty("uniqueValueInfos")) {
                 this._muteUniqueValues(legendInfoIndex, field, operationalItemIndex);
             }
@@ -158,9 +180,13 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             this._setSearchExpression(filterExpression);
         };
         // applyFeatureHighlight
-        InteractiveStyleViewModel.prototype.applyFeatureHighlight = function (elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, legendElementInfos) {
+
+        InteractiveStyleViewModel.prototype.applyFeatureHighlight = function (elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos) {
             if (isSizeRamp) {
                 this._highlightSizeRamp(legendInfoIndex, field, legendElementInfos, elementInfo, operationalItemIndex);
+            }
+            else if (isPredominance) {
+                this._handlePredominanceHighlight(elementInfo, legendElementInfos, featureLayerViewIndex, legendInfoIndex);
             }
             else if (Array.isArray(elementInfo.value) &&
                 elementInfo.value.length === 2) {
@@ -361,6 +387,20 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 return field + " < " + midPoint1 + " AND " + field + " > " + midPoint2;
             }
         };
+        // _handlePredominanceFeatureFilter
+        InteractiveStyleViewModel.prototype._handlePredominanceFeatureFilter = function (elementInfo, featureLayerViewIndex) {
+            var featureLayerView = this.featureLayerViews.getItemAt(featureLayerViewIndex);
+            var authoringInfo = featureLayerView.layer.renderer.authoringInfo;
+            var fields = authoringInfo.fields;
+            var expressionArr = [];
+            fields.forEach(function (field) {
+                if (elementInfo.value === field) {
+                    return;
+                }
+                expressionArr.push(elementInfo.value + " > " + field);
+            });
+            return expressionArr;
+        };
         //----------------------------------
         //
         //  Highlight Methods
@@ -495,6 +535,49 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 .highlight(features.slice());
             highlightedFeatureData[legendInfoIndex] = [highlight];
         };
+        // _handlePredominanceHighlight
+        InteractiveStyleViewModel.prototype._handlePredominanceHighlight = function (elementInfo, legendElementInfos, featureLayerViewIndex, legendInfoIndex) {
+            var predominantFeatures = this.layerGraphics.getItemAt(featureLayerViewIndex);
+            var objectIdField = this.featureLayerViews.getItemAt(featureLayerViewIndex).layer.objectIdField;
+            var featuresToHighlight = [];
+            predominantFeatures.forEach(function (predominantFeature) {
+                var itemsToCompare = [];
+                for (var attr in predominantFeature.attributes) {
+                    if (attr !== elementInfo.value &&
+                        attr !== objectIdField &&
+                        legendElementInfos.find(function (elementInfo) { return elementInfo.value === elementInfo.value; })) {
+                        var item = {};
+                        item[attr] = predominantFeature.attributes[attr];
+                        itemsToCompare.push(item);
+                    }
+                }
+                var pass = true;
+                itemsToCompare.forEach(function (itemToCompare) {
+                    for (var key in itemToCompare) {
+                        if (predominantFeature.attributes[elementInfo.value] <
+                            itemToCompare[key]) {
+                            pass = false;
+                            break;
+                        }
+                    }
+                });
+                if (pass) {
+                    featuresToHighlight.push(predominantFeature);
+                }
+            });
+            this.interactiveStyleData.highlightedFeatures;
+            var highlightedFeatures = this.interactiveStyleData.highlightedFeatures[featureLayerViewIndex];
+            var highlightedFeatureData = this.interactiveStyleData
+                .highlightedFeatures[featureLayerViewIndex];
+            if (highlightedFeatureData[legendInfoIndex]) {
+                this._removeHighlight(featureLayerViewIndex, legendInfoIndex);
+                return;
+            }
+            var highlight = this.featureLayerViews
+                .getItemAt(featureLayerViewIndex)
+                .highlight(featuresToHighlight.slice());
+            highlightedFeatures[legendInfoIndex] = [highlight];
+        };
         // _removeHighlight
         InteractiveStyleViewModel.prototype._removeHighlight = function (operationalItemIndex, legendInfoIndex) {
             var highlightedFeatures = this.interactiveStyleData.highlightedFeatures[operationalItemIndex];
@@ -532,6 +615,18 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 }
             });
             this._generateRenderer(operationalItemIndex, "unique-value", field);
+        };
+        // _mutePredominance
+        InteractiveStyleViewModel.prototype._mutePredominance = function (featureLayerViewIndex, legendInfoIndex) {
+            var featureLayer = this.layerListViewModel.operationalItems.getItemAt(featureLayerViewIndex).layer;
+            var colorIndexes = this.interactiveStyleData.colorIndexes[featureLayerViewIndex];
+            if (colorIndexes.indexOf(legendInfoIndex) === -1) {
+                colorIndexes.push(legendInfoIndex);
+            }
+            else {
+                colorIndexes.splice(colorIndexes.indexOf(legendInfoIndex), 1);
+            }
+            this._resetMutedUniqueValues(featureLayerViewIndex);
         };
         // _resetMutedUniqueValues
         InteractiveStyleViewModel.prototype._resetMutedUniqueValues = function (operationalItemIndex) {
@@ -611,22 +706,37 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             var visualVariables = featureLayer.renderer.hasOwnProperty("visualVariables") &&
                 featureLayer.renderer.visualVariables
                 ? featureLayer.renderer.visualVariables.slice() : null;
-            var renderer = type === "unique-value"
+            var _b = featureLayer.renderer, authoringInfo = _b.authoringInfo, valueExpression = _b.valueExpression, valueExpressionTitle = _b.valueExpressionTitle;
+            var renderer = type === "unique-value" &&
+                authoringInfo.hasOwnProperty("type") &&
+                authoringInfo.type === "predominance"
                 ? {
+                    authoringInfo: authoringInfo,
                     type: type,
                     field: field,
                     uniqueValueInfos: featureLayer.renderer.uniqueValueInfos.slice(),
                     defaultLabel: defaultLabel,
                     defaultSymbol: defaultSymbol,
-                    visualVariables: visualVariables
+                    visualVariables: visualVariables,
+                    valueExpression: valueExpression,
+                    valueExpressionTitle: valueExpressionTitle
                 }
-                : {
-                    type: type,
-                    field: field,
-                    classBreakInfos: featureLayer.renderer.classBreakInfos.slice(),
-                    defaultLabel: defaultLabel,
-                    defaultSymbol: defaultSymbol
-                };
+                : type === "unique-value"
+                    ? {
+                        type: type,
+                        field: field,
+                        uniqueValueInfos: featureLayer.renderer.uniqueValueInfos.slice(),
+                        defaultLabel: defaultLabel,
+                        defaultSymbol: defaultSymbol,
+                        visualVariables: visualVariables
+                    }
+                    : {
+                        type: type,
+                        field: field,
+                        classBreakInfos: featureLayer.renderer.classBreakInfos.slice(),
+                        defaultLabel: defaultLabel,
+                        defaultSymbol: defaultSymbol
+                    };
             featureLayer.renderer = renderer;
         };
         // End of filter methods
