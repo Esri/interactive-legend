@@ -59,7 +59,8 @@ const CSS = {
   disabledCursor: "esri-screenshot--disabled",
   tooltip: "tooltip",
   tooltipRight: "tooltip-right",
-  modifierClass: "modifier-class"
+  modifierClass: "modifier-class",
+  closeIcon: "icon-ui-close"
 };
 
 @subclass("Screenshot")
@@ -133,12 +134,13 @@ class Screenshot extends declared(Widget) {
         {screenshotModeIsActive ? (
           <button
             bind={this}
-            class="esri-screenshot__btn esri-screenshot--pointer"
+            tabIndex={0}
+            class={this.classes(CSS.screenshotBtn, CSS.pointerCursor)}
             onclick={this._deactivateScreenshot}
             onkeydown={this._deactivateScreenshot}
-            title="Deactivate Screenshot Mode"
+            title={i18n.deactivateScreenshot}
           >
-            <span class="icon-ui-close" />
+            <span class={CSS.closeIcon} />
           </button>
         ) : (
           screenshotBtn
@@ -212,7 +214,6 @@ class Screenshot extends declared(Widget) {
         bind={this}
         tabIndex={!screenshotModeIsActive ? 0 : -1}
         class={this.classes(CSS.screenshotBtn, cursorStyles)}
-        aria-label={i18n.popUpIsIncluded}
         onclick={this.activateScreenshot}
         title={i18n.widgetLabel}
       >

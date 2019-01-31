@@ -13,6 +13,7 @@ define({
     sublayerFiltering: "Applying filter to sublayers is not supported.",
     muteAndPictureFillError: "Mute filter cannot be applied to picture fill symbols.",
     error: "Could not load an item to display"
+
   }),
   "ar": 1,
   "bs": 1,
