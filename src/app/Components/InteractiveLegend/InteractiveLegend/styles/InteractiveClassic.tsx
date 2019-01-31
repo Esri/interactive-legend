@@ -978,6 +978,7 @@ class InteractiveClassic extends declared(Widget) {
           featureLayerViewIndex,
           isSizeRamp,
           legendElement,
+          isPredominance,
           legendElementInfos
         )
       : this.filterMode === "featureFilter"
@@ -1034,6 +1035,7 @@ class InteractiveClassic extends declared(Widget) {
     featureLayerViewIndex: number,
     isSizeRamp: boolean,
     legendElement: LegendElement,
+    isPredominance: boolean,
     legendElementInfos: any[]
   ): void {
     const { state } = this.viewModel;
@@ -1048,6 +1050,7 @@ class InteractiveClassic extends declared(Widget) {
       featureLayerViewIndex,
       isSizeRamp,
       legendElement,
+      isPredominance,
       legendElementInfos
     );
     this._handleSelectedStyles(event, featureLayerViewIndex, legendInfoIndex);

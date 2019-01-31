@@ -291,6 +291,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     featureLayerViewIndex: number,
     isSizeRamp: boolean,
     legendElement: LegendElement,
+    isPredominance: boolean,
     legendElementInfos: any[]
   ): void {
     if (isSizeRamp) {
@@ -300,6 +301,13 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         legendElementInfos,
         elementInfo,
         featureLayerViewIndex
+      );
+    } else if (isPredominance) {
+      this._handlePredominanceHighlight(
+        elementInfo,
+        legendElementInfos,
+        featureLayerViewIndex,
+        legendInfoIndex
       );
     } else if (
       Array.isArray(elementInfo.value) &&
@@ -799,6 +807,69 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       .getItemAt(featureLayerViewIndex)
       .highlight([...features]);
     highlightedFeatureData[legendInfoIndex] = [highlight];
+  }
+
+  // _handlePredominanceHighlight
+  private _handlePredominanceHighlight(
+    elementInfo: any,
+    legendElementInfos: any[],
+    featureLayerViewIndex: number,
+    legendInfoIndex: number
+  ): void {
+    const predominantFeatures = this.layerGraphics.getItemAt(
+      featureLayerViewIndex
+    );
+    const { objectIdField } = this.featureLayerViews.getItemAt(
+      featureLayerViewIndex
+    ).layer;
+    const featuresToHighlight = [];
+    predominantFeatures.forEach(predominantFeature => {
+      const itemsToCompare = [];
+      for (const attr in predominantFeature.attributes) {
+        if (
+          attr !== elementInfo.value &&
+          attr !== objectIdField &&
+          legendElementInfos.find(
+            elementInfo => elementInfo.value === elementInfo.value
+          )
+        ) {
+          const item = {};
+          item[attr] = predominantFeature.attributes[attr];
+          itemsToCompare.push(item);
+        }
+      }
+      let pass = true;
+      itemsToCompare.forEach(itemToCompare => {
+        for (const key in itemToCompare) {
+          if (
+            predominantFeature.attributes[elementInfo.value] <
+            itemToCompare[key]
+          ) {
+            pass = false;
+            break;
+          }
+        }
+      });
+      if (pass) {
+        featuresToHighlight.push(predominantFeature);
+      }
+    });
+    this.interactiveStyleData.highlightedFeatures;
+
+    const highlightedFeatures = this.interactiveStyleData.highlightedFeatures[
+      featureLayerViewIndex
+    ];
+    const highlightedFeatureData = this.interactiveStyleData
+      .highlightedFeatures[featureLayerViewIndex];
+    if (highlightedFeatureData[legendInfoIndex]) {
+      this._removeHighlight(featureLayerViewIndex, legendInfoIndex);
+      return;
+    }
+    const highlight = this.featureLayerViews
+      .getItemAt(featureLayerViewIndex)
+      .highlight([...featuresToHighlight]);
+
+    highlightedFeatures[legendInfoIndex] = [highlight];
   }
 
   // _removeHighlight

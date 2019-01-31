@@ -559,7 +559,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         //-------------------------------------------------------------------
         InteractiveClassic.prototype._handleFilterOption = function (event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos) {
             this.filterMode === "highlight"
-                ? this._featureHighlight(event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, legendElementInfos)
+                ? this._featureHighlight(event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos)
                 : this.filterMode === "featureFilter"
                     ? this._featureFilter(elementInfo, field, featureLayerViewIndex, legendInfoIndex, legendElement, isPredominance, legendElementInfos)
                     : this.filterMode === "mute"
@@ -572,12 +572,12 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             this.viewModel.applyFeatureFilter(elementInfo, field, featureLayerViewIndex, legendElement, legendInfoIndex, isPredominance, legendElementInfos);
         };
         // _highlightFeatures
-        InteractiveClassic.prototype._featureHighlight = function (event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, legendElementInfos) {
+        InteractiveClassic.prototype._featureHighlight = function (event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos) {
             var state = this.viewModel.state;
             if (state === "querying") {
                 return;
             }
-            this.viewModel.applyFeatureHighlight(elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, legendElementInfos);
+            this.viewModel.applyFeatureHighlight(elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos);
             this._handleSelectedStyles(event, featureLayerViewIndex, legendInfoIndex);
         };
         // _muteFeatures

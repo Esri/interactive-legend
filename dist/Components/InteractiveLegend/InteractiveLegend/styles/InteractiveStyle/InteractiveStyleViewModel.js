@@ -178,9 +178,12 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             this._setSearchExpression(filterExpression, featureLayerViewIndex);
         };
         // applyFeatureHighlight
-        InteractiveStyleViewModel.prototype.applyFeatureHighlight = function (elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, legendElementInfos) {
+        InteractiveStyleViewModel.prototype.applyFeatureHighlight = function (elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos) {
             if (isSizeRamp) {
                 this._highlightSizeRamp(legendInfoIndex, field, legendElementInfos, elementInfo, featureLayerViewIndex);
+            }
+            else if (isPredominance) {
+                this._handlePredominanceHighlight(elementInfo, legendElementInfos, featureLayerViewIndex, legendInfoIndex);
             }
             else if (Array.isArray(elementInfo.value) &&
                 elementInfo.value.length === 2) {
@@ -329,7 +332,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                         ? legendElementInfos.length - 1 === legendInfoIndex
                             ? field + " >= " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfoHasValue[1]
                             : field + " > " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfoHasValue[1]
-                        : isNaN(elementInfoHasValue)
+                        : isNaN(parseFloat(elementInfoHasValue))
                             ? field + " = '" + elementInfoHasValue + "'"
                             : field + " = " + elementInfoHasValue + " OR " + field + " = '" + elementInfoHasValue + "'";
                     return expression;
@@ -520,6 +523,49 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 .getItemAt(featureLayerViewIndex)
                 .highlight(features.slice());
             highlightedFeatureData[legendInfoIndex] = [highlight];
+        };
+        // _handlePredominanceHighlight
+        InteractiveStyleViewModel.prototype._handlePredominanceHighlight = function (elementInfo, legendElementInfos, featureLayerViewIndex, legendInfoIndex) {
+            var predominantFeatures = this.layerGraphics.getItemAt(featureLayerViewIndex);
+            var objectIdField = this.featureLayerViews.getItemAt(featureLayerViewIndex).layer.objectIdField;
+            var featuresToHighlight = [];
+            predominantFeatures.forEach(function (predominantFeature) {
+                var itemsToCompare = [];
+                for (var attr in predominantFeature.attributes) {
+                    if (attr !== elementInfo.value &&
+                        attr !== objectIdField &&
+                        legendElementInfos.find(function (elementInfo) { return elementInfo.value === elementInfo.value; })) {
+                        var item = {};
+                        item[attr] = predominantFeature.attributes[attr];
+                        itemsToCompare.push(item);
+                    }
+                }
+                var pass = true;
+                itemsToCompare.forEach(function (itemToCompare) {
+                    for (var key in itemToCompare) {
+                        if (predominantFeature.attributes[elementInfo.value] <
+                            itemToCompare[key]) {
+                            pass = false;
+                            break;
+                        }
+                    }
+                });
+                if (pass) {
+                    featuresToHighlight.push(predominantFeature);
+                }
+            });
+            this.interactiveStyleData.highlightedFeatures;
+            var highlightedFeatures = this.interactiveStyleData.highlightedFeatures[featureLayerViewIndex];
+            var highlightedFeatureData = this.interactiveStyleData
+                .highlightedFeatures[featureLayerViewIndex];
+            if (highlightedFeatureData[legendInfoIndex]) {
+                this._removeHighlight(featureLayerViewIndex, legendInfoIndex);
+                return;
+            }
+            var highlight = this.featureLayerViews
+                .getItemAt(featureLayerViewIndex)
+                .highlight(featuresToHighlight.slice());
+            highlightedFeatures[legendInfoIndex] = [highlight];
         };
         // _removeHighlight
         InteractiveStyleViewModel.prototype._removeHighlight = function (featureLayerViewIndex, legendInfoIndex) {
