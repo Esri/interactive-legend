@@ -42,7 +42,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         disabledCursor: "esri-screenshot--disabled",
         tooltip: "tooltip",
         tooltipRight: "tooltip-right",
-        modifierClass: "modifier-class"
+        modifierClass: "modifier-class",
+        closeIcon: "icon-ui-close"
     };
     var Screenshot = /** @class */ (function (_super) {
         __extends(Screenshot, _super);
@@ -91,7 +92,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var screenshotPreviewOverlay = this._renderScreenshotPreviewOverlay();
             var maskNode = this._renderMaskNode(screenshotModeIsActive);
             return (widget_1.tsx("div", { class: CSS.base },
-                screenshotBtn,
+                screenshotModeIsActive ? (widget_1.tsx("button", { bind: this, tabIndex: 0, class: this.classes(CSS.screenshotBtn, CSS.pointerCursor), onclick: this._deactivateScreenshot, onkeydown: this._deactivateScreenshot, title: i18n.deactivateScreenshot },
+                    widget_1.tsx("span", { class: CSS.closeIcon }))) : (screenshotBtn),
                 screenshotPreviewOverlay,
                 maskNode));
         };
@@ -138,7 +140,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 _a[CSS.disabledCursor] = screenshotModeIsActive,
                 _a[CSS.pointerCursor] = !screenshotModeIsActive,
                 _a);
-            return (widget_1.tsx("button", { bind: this, tabIndex: !screenshotModeIsActive ? 0 : -1, class: this.classes(CSS.screenshotBtn, cursorStyles), "aria-label": i18n.popUpIsIncluded, onclick: this.activateScreenshot, title: i18n.widgetLabel },
+            return (widget_1.tsx("button", { bind: this, tabIndex: !screenshotModeIsActive ? 0 : -1, class: this.classes(CSS.screenshotBtn, cursorStyles), onclick: this.activateScreenshot, title: i18n.widgetLabel },
                 widget_1.tsx("span", { class: CSS.mediaIcon })));
         };
         // _renderScreenshotPreviewBtns
@@ -208,6 +210,13 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     _this.scheduleRender();
                 }
             });
+        };
+        // _deactivateScreenshot
+        Screenshot.prototype._deactivateScreenshot = function () {
+            this.viewModel.screenshotModeIsActive = false;
+            this.view.container.classList.remove(CSS.screenshotCursor);
+            this._dragHandler.remove();
+            this.scheduleRender();
         };
         __decorate([
             decorators_1.aliasOf("viewModel.view"),

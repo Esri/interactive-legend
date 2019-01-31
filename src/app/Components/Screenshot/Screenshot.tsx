@@ -59,7 +59,8 @@ const CSS = {
   disabledCursor: "esri-screenshot--disabled",
   tooltip: "tooltip",
   tooltipRight: "tooltip-right",
-  modifierClass: "modifier-class"
+  modifierClass: "modifier-class",
+  closeIcon: "icon-ui-close"
 };
 
 @subclass("Screenshot")
@@ -130,7 +131,20 @@ class Screenshot extends declared(Widget) {
     const maskNode = this._renderMaskNode(screenshotModeIsActive);
     return (
       <div class={CSS.base}>
-        {screenshotBtn}
+        {screenshotModeIsActive ? (
+          <button
+            bind={this}
+            tabIndex={0}
+            class={this.classes(CSS.screenshotBtn, CSS.pointerCursor)}
+            onclick={this._deactivateScreenshot}
+            onkeydown={this._deactivateScreenshot}
+            title={i18n.deactivateScreenshot}
+          >
+            <span class={CSS.closeIcon} />
+          </button>
+        ) : (
+          screenshotBtn
+        )}
         {screenshotPreviewOverlay}
         {maskNode}
       </div>
@@ -200,7 +214,6 @@ class Screenshot extends declared(Widget) {
         bind={this}
         tabIndex={!screenshotModeIsActive ? 0 : -1}
         class={this.classes(CSS.screenshotBtn, cursorStyles)}
-        aria-label={i18n.popUpIsIncluded}
         onclick={this.activateScreenshot}
         title={i18n.widgetLabel}
       >
@@ -320,6 +333,14 @@ class Screenshot extends declared(Widget) {
         this.scheduleRender();
       }
     });
+  }
+
+  // _deactivateScreenshot
+  private _deactivateScreenshot(): void {
+    this.viewModel.screenshotModeIsActive = false;
+    this.view.container.classList.remove(CSS.screenshotCursor);
+    this._dragHandler.remove();
+    this.scheduleRender();
   }
 }
 
