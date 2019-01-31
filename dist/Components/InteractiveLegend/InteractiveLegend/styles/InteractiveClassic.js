@@ -558,12 +558,12 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         //
         //-------------------------------------------------------------------
         InteractiveClassic.prototype._handleFilterOption = function (event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos) {
-            this.filterMode === "highlight"
-                ? this._featureHighlight(event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos)
-                : this.filterMode === "featureFilter"
-                    ? this._featureFilter(elementInfo, field, featureLayerViewIndex, legendInfoIndex, legendElement, isPredominance, legendElementInfos)
+            this.filterMode === "featureFilter"
+                ? this._featureFilter(elementInfo, field, featureLayerViewIndex, legendInfoIndex, legendElement, isPredominance, legendElementInfos)
+                : this.filterMode === "highlight"
+                    ? this._featureHighlight(event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos)
                     : this.filterMode === "mute"
-                        ? this._featureMute(event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, legendElement, legendElementInfos)
+                        ? this._featureMute(event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, legendElement, isPredominance, legendElementInfos)
                         : null;
         };
         //_filterFeatures
@@ -581,9 +581,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             this._handleSelectedStyles(event, featureLayerViewIndex, legendInfoIndex);
         };
         // _muteFeatures
-        InteractiveClassic.prototype._featureMute = function (event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, legendElement, legendElementInfos) {
+        InteractiveClassic.prototype._featureMute = function (event, elementInfo, field, legendInfoIndex, featureLayerViewIndex, legendElement, isPredominance, legendElementInfos) {
             this._handleSelectedStyles(event);
-            this.viewModel.applyFeatureMute(elementInfo, field, legendInfoIndex, featureLayerViewIndex, legendElement, legendElementInfos);
+            this.viewModel.applyFeatureMute(elementInfo, field, legendInfoIndex, featureLayerViewIndex, legendElement, isPredominance, legendElementInfos);
         };
         // End of filter methods
         // _handleSelectedStyles

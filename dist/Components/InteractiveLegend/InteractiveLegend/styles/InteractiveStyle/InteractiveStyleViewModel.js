@@ -160,11 +160,14 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             }
         };
         // applyFeatureMute
-        InteractiveStyleViewModel.prototype.applyFeatureMute = function (elementInfo, field, legendInfoIndex, featureLayerViewIndex, legendElement, legendElementInfos) {
+        InteractiveStyleViewModel.prototype.applyFeatureMute = function (elementInfo, field, legendInfoIndex, featureLayerViewIndex, legendElement, isPredominance, legendElementInfos) {
             var originalRenderer = this.interactiveStyleData.originalRenderers[featureLayerViewIndex];
             if (!originalRenderer) {
                 return;
             }
+            // if (isPredominance) {
+            //   this._mutePredominance(featureLayerViewIndex, legend);
+            // } else
             if (originalRenderer.hasOwnProperty("uniqueValueInfos")) {
                 this._muteUniqueValues(legendInfoIndex, field, featureLayerViewIndex);
             }
@@ -608,6 +611,18 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             });
             this._generateRenderer(featureLayerViewIndex, "unique-value", field);
         };
+        // _mutePredominance
+        InteractiveStyleViewModel.prototype._mutePredominance = function (featureLayerViewIndex, legendInfoIndex) {
+            var featureLayer = this.layerListViewModel.operationalItems.getItemAt(featureLayerViewIndex).layer;
+            var colorIndexes = this.interactiveStyleData.colorIndexes[featureLayerViewIndex];
+            if (colorIndexes.indexOf(legendInfoIndex) === -1) {
+                colorIndexes.push(legendInfoIndex);
+            }
+            else {
+                colorIndexes.splice(colorIndexes.indexOf(legendInfoIndex), 1);
+            }
+            this._resetMutedUniqueValues(featureLayerViewIndex);
+        };
         // _resetMutedUniqueValues
         InteractiveStyleViewModel.prototype._resetMutedUniqueValues = function (featureLayerViewIndex) {
             var featureLayer = this.layerListViewModel.operationalItems.getItemAt(featureLayerViewIndex).layer;
@@ -689,22 +704,37 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             var visualVariables = featureLayer.renderer.hasOwnProperty("visualVariables") &&
                 featureLayer.renderer.visualVariables
                 ? featureLayer.renderer.visualVariables.slice() : null;
-            var renderer = type === "unique-value"
+            var _b = featureLayer.renderer, authoringInfo = _b.authoringInfo, valueExpression = _b.valueExpression, valueExpressionTitle = _b.valueExpressionTitle;
+            var renderer = type === "unique-value" &&
+                authoringInfo.hasOwnProperty("type") &&
+                authoringInfo.type === "predominance"
                 ? {
+                    authoringInfo: authoringInfo,
                     type: type,
                     field: field,
                     uniqueValueInfos: featureLayer.renderer.uniqueValueInfos.slice(),
                     defaultLabel: defaultLabel,
                     defaultSymbol: defaultSymbol,
-                    visualVariables: visualVariables
+                    visualVariables: visualVariables,
+                    valueExpression: valueExpression,
+                    valueExpressionTitle: valueExpressionTitle
                 }
-                : {
-                    type: type,
-                    field: field,
-                    classBreakInfos: featureLayer.renderer.classBreakInfos.slice(),
-                    defaultLabel: defaultLabel,
-                    defaultSymbol: defaultSymbol
-                };
+                : type === "unique-value"
+                    ? {
+                        type: type,
+                        field: field,
+                        uniqueValueInfos: featureLayer.renderer.uniqueValueInfos.slice(),
+                        defaultLabel: defaultLabel,
+                        defaultSymbol: defaultSymbol,
+                        visualVariables: visualVariables
+                    }
+                    : {
+                        type: type,
+                        field: field,
+                        classBreakInfos: featureLayer.renderer.classBreakInfos.slice(),
+                        defaultLabel: defaultLabel,
+                        defaultSymbol: defaultSymbol
+                    };
             featureLayer.renderer = renderer;
         };
         // End of filter methods

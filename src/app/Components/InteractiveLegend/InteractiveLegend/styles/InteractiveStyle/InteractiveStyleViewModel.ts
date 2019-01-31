@@ -251,6 +251,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     legendInfoIndex: number,
     featureLayerViewIndex: number,
     legendElement: LegendElement,
+    isPredominance: boolean,
     legendElementInfos: any[]
   ): void {
     const originalRenderer = this.interactiveStyleData.originalRenderers[
@@ -259,6 +260,9 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     if (!originalRenderer) {
       return;
     }
+    // if (isPredominance) {
+    //   this._mutePredominance(featureLayerViewIndex, legend);
+    // } else
     if (originalRenderer.hasOwnProperty("uniqueValueInfos")) {
       this._muteUniqueValues(legendInfoIndex, field, featureLayerViewIndex);
     } else if (
@@ -932,6 +936,27 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     this._generateRenderer(featureLayerViewIndex, "unique-value", field);
   }
 
+  // _mutePredominance
+  private _mutePredominance(
+    featureLayerViewIndex: number,
+    legendInfoIndex: number
+  ): void {
+    const featureLayer = this.layerListViewModel.operationalItems.getItemAt(
+      featureLayerViewIndex
+    ).layer as FeatureLayer;
+    const colorIndexes = this.interactiveStyleData.colorIndexes[
+      featureLayerViewIndex
+    ];
+
+    if (colorIndexes.indexOf(legendInfoIndex) === -1) {
+      colorIndexes.push(legendInfoIndex);
+    } else {
+      colorIndexes.splice(colorIndexes.indexOf(legendInfoIndex), 1);
+    }
+
+    this._resetMutedUniqueValues(featureLayerViewIndex);
+  }
+
   // _resetMutedUniqueValues
   private _resetMutedUniqueValues(featureLayerViewIndex: number): void {
     const featureLayer = this.layerListViewModel.operationalItems.getItemAt(
@@ -1051,9 +1076,27 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       featureLayer.renderer.visualVariables
         ? [...featureLayer.renderer.visualVariables]
         : null;
-
+    const {
+      authoringInfo,
+      valueExpression,
+      valueExpressionTitle
+    } = featureLayer.renderer;
     const renderer =
-      type === "unique-value"
+      type === "unique-value" &&
+      authoringInfo.hasOwnProperty("type") &&
+      authoringInfo.type === "predominance"
+        ? {
+            authoringInfo,
+            type,
+            field,
+            uniqueValueInfos: [...featureLayer.renderer.uniqueValueInfos],
+            defaultLabel,
+            defaultSymbol,
+            visualVariables,
+            valueExpression,
+            valueExpressionTitle
+          }
+        : type === "unique-value"
         ? {
             type,
             field,

@@ -969,7 +969,17 @@ class InteractiveClassic extends declared(Widget) {
     isPredominance: boolean,
     legendElementInfos?: any[]
   ): void {
-    this.filterMode === "highlight"
+    this.filterMode === "featureFilter"
+      ? this._featureFilter(
+          elementInfo,
+          field,
+          featureLayerViewIndex,
+          legendInfoIndex,
+          legendElement,
+          isPredominance,
+          legendElementInfos
+        )
+      : this.filterMode === "highlight"
       ? this._featureHighlight(
           event,
           elementInfo,
@@ -977,16 +987,6 @@ class InteractiveClassic extends declared(Widget) {
           legendInfoIndex,
           featureLayerViewIndex,
           isSizeRamp,
-          legendElement,
-          isPredominance,
-          legendElementInfos
-        )
-      : this.filterMode === "featureFilter"
-      ? this._featureFilter(
-          elementInfo,
-          field,
-          featureLayerViewIndex,
-          legendInfoIndex,
           legendElement,
           isPredominance,
           legendElementInfos
@@ -999,6 +999,7 @@ class InteractiveClassic extends declared(Widget) {
           legendInfoIndex,
           featureLayerViewIndex,
           legendElement,
+          isPredominance,
           legendElementInfos
         )
       : null;
@@ -1064,6 +1065,7 @@ class InteractiveClassic extends declared(Widget) {
     legendInfoIndex: number,
     featureLayerViewIndex: number,
     legendElement: LegendElement,
+    isPredominance: boolean,
     legendElementInfos: any[]
   ): void {
     this._handleSelectedStyles(event);
@@ -1073,6 +1075,7 @@ class InteractiveClassic extends declared(Widget) {
       legendInfoIndex,
       featureLayerViewIndex,
       legendElement,
+      isPredominance,
       legendElementInfos
     );
   }
