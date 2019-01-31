@@ -19,6 +19,15 @@ import Loadable = require("esri/core/Loadable");
 // esri.Graphic
 import Graphic = require("esri/Graphic");
 
+// esri.widgets.Legend.support.ActiveLayerInfo
+import ActiveLayerInfo = require("esri/widgets/Legend/support/ActiveLayerInfo");
+
+// esri.views.View
+import View = require("esri/views/View");
+
+// esri.core.lang
+import Lang = require("esri/core/lang");
+
 export type LegendElement =
   | SymbolTableElement
   | ColorRampElement
@@ -52,6 +61,10 @@ interface ImageSymbolTableElementInfo {
   opacity: number;
   width?: number;
   height?: number;
+}
+
+interface LayerUID extends Layer {
+  uid: string;
 }
 
 export interface CollectionChangeEvent<T> {
@@ -224,6 +237,15 @@ interface InteractiveStyleData {
   classBreakInfosIndex: number[][];
 }
 
+interface ActiveLayerInfoProps extends ActiveLayerInfo {
+  isScaleDriven: boolean;
+  view: View;
+}
+
 export type VNode = {
   /* avoids exposing vdom implementation details */
 };
+
+interface LangProps extends Lang {
+  substitute: any;
+}

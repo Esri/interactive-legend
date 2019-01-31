@@ -144,7 +144,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var mapComponent = firstComponent.offsetWidth && firstComponent.offsetHeight
                 ? firstComponent
                 : secondMapComponent;
-            html2canvas(mapComponent)
+            html2canvas(mapComponent, {
+                removeContainer: true,
+                logging: false
+            })
                 .catch(function (err) {
                 console.error("ERROR: ", err);
             })
@@ -167,7 +170,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var viewCanvasContext = viewCanvas.getContext("2d");
             var combinedCanvasElements = document.createElement("canvas");
             html2canvas(document.querySelector(this.mapComponentSelectors[0]), {
-                removeContainer: true
+                removeContainer: true,
+                logging: false
             })
                 .catch(function (err) {
                 console.error("ERROR: ", err);
@@ -177,7 +181,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 _this.notifyChange("state");
                 html2canvas(document.querySelector(_this.mapComponentSelectors[1]), {
                     height: document.querySelector(_this.mapComponentSelectors[1]).offsetHeight,
-                    removeContainer: true
+                    removeContainer: true,
+                    logging: false
                 })
                     .catch(function (err) {
                     console.error("ERROR: ", err);

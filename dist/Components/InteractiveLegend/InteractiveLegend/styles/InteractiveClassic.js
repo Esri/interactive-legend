@@ -105,8 +105,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this.filterMode = null;
             // mutedShade
             _this.mutedShade = null;
-            // mutedOpacity
-            _this.mutedOpacity = null;
             // layerGraphics
             _this.layerGraphics = null;
             // layerListViewModel
@@ -248,18 +246,26 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         ? legendTitle.field
                         : null;
                     var requiredFields_1 = this.selectedStyleData.getItemAt(operationalItemIndex).requiredFields;
-                    var requiredFieldsCollection_1 = new Collection();
-                    requiredFields_1.forEach(function (requiredField) {
-                        requiredFieldsCollection_1.add(requiredField);
-                    });
-                    if (requiredFields_1 && fieldVal_1) {
-                        field = requiredFieldsCollection_1.find(function (requiredField) { return requiredField === fieldVal_1; });
+                    if (requiredFields_1) {
+                        var requiredFieldsCollection_1 = new Collection();
+                        requiredFields_1.forEach(function (requiredField) {
+                            requiredFieldsCollection_1.add(requiredField);
+                        });
+                        if (fieldVal_1) {
+                            field = requiredFieldsCollection_1.find(function (requiredField) { return requiredField === fieldVal_1; });
+                        }
                     }
                 }
                 else {
-                    if (requiredFields && activeLayerInfo.layer.renderer.field) {
+                    var featureLayer = activeLayerInfo.layer;
+                    var renderer = featureLayer.hasOwnProperty("uniqueValueInfos")
+                        ? featureLayer.renderer
+                        : featureLayer.hasOwnProperty("classBreakInfos")
+                            ? featureLayer.renderer
+                            : featureLayer.renderer;
+                    if (requiredFields && renderer.field) {
                         var requiredFields_2 = this.selectedStyleData.getItemAt(operationalItemIndex).requiredFields;
-                        var activeLayerRequiredFields = activeLayerInfo.layer.renderer.requiredFields;
+                        var activeLayerRequiredFields = renderer.requiredFields;
                         var requiredFieldsCollection_2 = new Collection();
                         var activeLayerFieldsCollection_1 = new Collection();
                         requiredFields_2.forEach(function (requiredField) {
@@ -342,6 +348,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 legendElement.title === "Predominant category" ? (widget_1.tsx("div", { class: CSS.error },
                     widget_1.tsx("span", { class: CSS.calciteStyles.error }),
                     i18nInteractiveLegend.predominantNotSupported)) : null,
+                isSizeRamp ? (widget_1.tsx("div", { class: CSS.error },
+                    widget_1.tsx("span", { class: CSS.calciteStyles.error }),
+                    i18nInteractiveLegend.sizeRampFilterNotSupported)) : null,
                 isSizeRamp && this.filterMode === "mute" ? (widget_1.tsx("div", { class: CSS.error },
                     widget_1.tsx("span", { class: CSS.calciteStyles.error }),
                     i18nInteractiveLegend.muteAndSizeRamp)) : null,
@@ -493,7 +502,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 hasPictureMarkersAndIsMute ||
                 isSizeRampAndMute ||
                 hasPictureFillAndIsMute ||
-                legendTitle === "Predominant") &&
+                legendTitle === "Predominant" ||
+                isSizeRamp) &&
                 legendElement.infos.length > 1 &&
                 !activeLayerInfo.layer.hasOwnProperty("sublayers")) ||
                 !requiredFields
@@ -520,7 +530,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
                         requiredFields &&
                         field &&
-                        featureLayerData) {
+                        featureLayerData &&
+                        !isSizeRamp) {
                         _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, legendElementInfos);
                     }
                 }, onkeydown: function (event) {
@@ -534,7 +545,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
                         requiredFields &&
                         field &&
-                        featureLayerData) {
+                        featureLayerData &&
+                        !isSizeRamp) {
                         _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, legendElementInfos);
                     }
                 } },
@@ -679,7 +691,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var hasSymbol = renderer.hasOwnProperty("symbol");
             var hasUniqueValueInfos = renderer.hasOwnProperty("uniqueValueInfos");
             var hasClassBreakInfos = renderer.hasOwnProperty("classBreakInfos");
-            return (((hasRenderer && hasSymbol && renderer.symbol.type === "picture-fill") ||
+            return (((hasRenderer &&
+                hasSymbol &&
+                renderer.symbol.type === "picture-fill") ||
                 (hasRenderer &&
                     hasUniqueValueInfos &&
                     renderer.uniqueValueInfos.every(function (uvInfo) {
@@ -708,10 +722,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             decorators_1.aliasOf("viewModel.mutedShade"),
             decorators_1.property()
         ], InteractiveClassic.prototype, "mutedShade", void 0);
-        __decorate([
-            decorators_1.aliasOf("viewModel.mutedOpacity"),
-            decorators_1.property()
-        ], InteractiveClassic.prototype, "mutedOpacity", void 0);
         __decorate([
             decorators_1.aliasOf("viewModel.layerGraphics"),
             decorators_1.property()

@@ -33,6 +33,8 @@ import Collection = require("esri/core/Collection");
 // esri.widgets.Legend.support.ActiveLayerInfo
 import ActiveLayerInfo = require("esri/widgets/Legend/support/ActiveLayerInfo");
 
+import ListItem = require("esri/widgets/LayerList/ListItem");
+
 // esri.Graphic
 import Graphic = require("esri/Graphic");
 
@@ -51,6 +53,7 @@ import {
   InteractiveStyleData,
   LegendElement
 } from "../../../../../interfaces/interfaces";
+import { UniqueValueRenderer, ClassBreaksRenderer } from "esri/renderers";
 
 // HighLightState
 type HighLightState = "ready" | "querying" | "loading";
@@ -116,11 +119,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
 
   // mutedShade
   @property()
-  mutedShade: Color[] = null;
-
-  // mutedOpacity
-  @property()
-  mutedOpacity: number = null;
+  mutedShade: Color = null;
 
   // filterMode
   @property()
@@ -214,7 +213,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       operationalItemIndex
     );
     const filterExpression = queryExpressions.join(" OR ");
-    this._setSearchExpression(filterExpression, operationalItemIndex);
+    this._setSearchExpression(filterExpression);
     featureLayerView.filter = new FeatureFilter({
       where: filterExpression
     });
@@ -256,7 +255,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       operationalItemIndex
     ];
     const filterExpression = queryExpressions.join(" OR ");
-    this._setSearchExpression(filterExpression, operationalItemIndex);
+    this._setSearchExpression(filterExpression);
   }
 
   // applyFeatureHighlight
@@ -309,7 +308,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       operationalItemIndex
     ];
     const filterExpression = queryExpressions.join(" OR ");
-    this._setSearchExpression(filterExpression, operationalItemIndex);
+    this._setSearchExpression(filterExpression);
   }
 
   //----------------------------------
@@ -419,18 +418,28 @@ class InteractiveStyleViewModel extends declared(Accessor) {
 
   // _useLayerFromOperationalItem
   private _useLayerFromOperationalItem(
-    operationalItem: ActiveLayerInfo,
+    operationalItem: ListItem,
     operationalItemIndex: number
   ): void {
-    const clonedRenderer = operationalItem.layer.renderer.clone();
+    const clonedItem = operationalItem.clone();
+    const featureLayer = clonedItem.layer as FeatureLayer;
+    const clonedRenderer = featureLayer.renderer;
     const originalColors = this.interactiveStyleData.originalColors[
       operationalItemIndex
     ];
-    const infos = clonedRenderer.hasOwnProperty("uniqueValueInfos")
-      ? clonedRenderer.uniqueValueInfos
-      : clonedRenderer.classBreakInfos;
-    if (infos) {
-      infos.forEach(info => {
+
+    if (clonedRenderer.hasOwnProperty("uniqueValueInfos")) {
+      (clonedRenderer as UniqueValueRenderer).uniqueValueInfos.forEach(info => {
+        originalColors.push(info.symbol.color);
+      });
+      if (!operationalItem.layer.hasOwnProperty("renderer")) {
+        return;
+      }
+      this.interactiveStyleData.originalRenderers[
+        operationalItemIndex
+      ] = clonedRenderer;
+    } else if (clonedRenderer.hasOwnProperty("classBreakInfos")) {
+      (clonedRenderer as ClassBreaksRenderer).classBreakInfos.forEach(info => {
         originalColors.push(info.symbol.color);
       });
       if (!operationalItem.layer.hasOwnProperty("renderer")) {
@@ -806,10 +815,6 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         const { symbol } = uniqueInfo;
         if (colorIndexes.indexOf(uniqueInfoIndex) === -1) {
           symbol.color = new Color(this.mutedShade);
-
-          if (this.mutedOpacity || this.mutedOpacity === 0) {
-            symbol.color.a = this.mutedOpacity;
-          }
         }
       }
     );
@@ -900,7 +905,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     }
     reversedClassBreakInfos.forEach((classBreakInfo, classBreakInfoIndex) => {
       const { symbol } = classBreakInfo;
-      const { mutedOpacity, mutedShade } = this;
+      const { mutedShade } = this;
       if (classBreakInfosIndex.indexOf(classBreakInfoIndex) !== -1) {
         reversedColors.forEach((color, colorIndex) => {
           if (classBreakInfoIndex === colorIndex) {
@@ -912,9 +917,6 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         });
       } else {
         symbol.color = mutedShade;
-        if (this.mutedOpacity || this.mutedOpacity === 0) {
-          symbol.color.a = mutedOpacity;
-        }
       }
     });
     this._generateRenderer(operationalItemIndex, "class-breaks", field);
@@ -959,26 +961,23 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   // End of filter methods
 
   // _setSearchExpression
-  private _setSearchExpression(
-    filterExpression: string,
-    operationalItemIndex: number
-  ): void {
+  private _setSearchExpression(filterExpression: string): void {
     if (!this.searchViewModel) {
       return;
     }
-    const searchSource = this.searchViewModel.sources.find(
-      searchSource =>
-        searchSource.flayerId ===
-        this.layerListViewModel.operationalItems.getItemAt(operationalItemIndex)
-          .layer.id
-    );
-    if (filterExpression) {
-      searchSource.filter = {
-        where: filterExpression
-      };
-    } else {
-      searchSource.filter = null;
-    }
+    this.searchViewModel.sources.forEach(searchSource => {
+      this.layerListViewModel.operationalItems.forEach(operationalItem => {
+        if (searchSource.flayerId === operationalItem.layer.id) {
+          if (filterExpression) {
+            searchSource.filter = {
+              where: filterExpression
+            };
+          } else {
+            searchSource.filter = null;
+          }
+        }
+      });
+    });
   }
 }
 

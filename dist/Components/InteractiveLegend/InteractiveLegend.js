@@ -76,8 +76,6 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             _this.layerInfos = null;
             // mutedShade
             _this.mutedShade = null;
-            // mutedOpacity
-            _this.mutedOpacity = null;
             // searchExpressions
             _this.searchExpressions = null;
             _this.searchViewModel = null;
@@ -89,7 +87,6 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 activeLayerInfos: _this.activeLayerInfos,
                 filterMode: _this.filterMode,
                 mutedShade: _this.mutedShade,
-                mutedOpacity: _this.mutedOpacity,
                 layerListViewModel: _this.layerListViewModel,
                 searchViewModel: _this.searchViewModel
             });
@@ -106,7 +103,6 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                     activeLayerInfos: this.activeLayerInfos,
                     filterMode: this.filterMode,
                     mutedShade: this.mutedShade,
-                    mutedOpacity: this.mutedOpacity,
                     layerListViewModel: this.layerListViewModel,
                     searchViewModel: this.searchViewModel
                 });
@@ -122,23 +118,21 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 activeLayerInfos: this.activeLayerInfos,
                 filterMode: this.filterMode,
                 mutedShade: this.mutedShade,
-                mutedOpacity: this.mutedOpacity,
                 layerListViewModel: this.layerListViewModel,
                 searchViewModel: this.searchViewModel
             });
         };
         InteractiveLegend.prototype.postInitialize = function () {
             var _this = this;
-            var _a = this, style = _a.style, activeLayerInfos = _a.activeLayerInfos, filterMode = _a.filterMode, mutedOpacity = _a.mutedOpacity, view = _a.view, layerListViewModel = _a.layerListViewModel;
+            var _a = this, style = _a.style, activeLayerInfos = _a.activeLayerInfos, filterMode = _a.filterMode, view = _a.view, layerListViewModel = _a.layerListViewModel;
             this.own([
                 watchUtils.on(this, "activeLayerInfos", "change", function () {
                     style.activeLayerInfos = activeLayerInfos;
                     return _this._refreshActiveLayerInfos(activeLayerInfos);
                 }),
-                watchUtils.init(this, ["view", "filterMode", "mutedOpacity", "layerListViewModel"], function () {
+                watchUtils.init(this, ["view", "filterMode", "layerListViewModel"], function () {
                     style.view = view;
                     style.filterMode = filterMode;
-                    style.mutedOpacity = mutedOpacity;
                     style.layerListViewModel = layerListViewModel;
                 }),
                 watchUtils.init(this, "style", function (value, oldValue) {
@@ -224,10 +218,6 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             decorators_1.aliasOf("style.mutedShade"),
             widget_1.renderable()
         ], InteractiveLegend.prototype, "mutedShade", void 0);
-        __decorate([
-            decorators_1.aliasOf("style.mutedOpacity"),
-            decorators_1.property()
-        ], InteractiveLegend.prototype, "mutedOpacity", void 0);
         __decorate([
             decorators_1.aliasOf("style.searchExpressions"),
             decorators_1.property()

@@ -55,8 +55,6 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             _this.layerGraphics = new Collection();
             // mutedShade
             _this.mutedShade = null;
-            // mutedOpacity
-            _this.mutedOpacity = null;
             // filterMode
             _this.filterMode = null;
             // layerListViewModel
@@ -136,7 +134,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
             var featureLayerView = this.featureLayerViews.getItemAt(operationalItemIndex);
             var filterExpression = queryExpressions.join(" OR ");
-            this._setSearchExpression(filterExpression, operationalItemIndex);
+            this._setSearchExpression(filterExpression);
             featureLayerView.filter = new FeatureFilter({
                 where: filterExpression
             });
@@ -157,7 +155,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             this._generateQueryExpressions(elementInfo, field, operationalItemIndex, legendElement, null, legendElementInfos);
             var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
             var filterExpression = queryExpressions.join(" OR ");
-            this._setSearchExpression(filterExpression, operationalItemIndex);
+            this._setSearchExpression(filterExpression);
         };
         // applyFeatureHighlight
         InteractiveStyleViewModel.prototype.applyFeatureHighlight = function (elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, legendElementInfos) {
@@ -174,7 +172,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             this._generateQueryExpressions(elementInfo, field, operationalItemIndex, legendElement, null, legendElementInfos);
             var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
             var filterExpression = queryExpressions.join(" OR ");
-            this._setSearchExpression(filterExpression, operationalItemIndex);
+            this._setSearchExpression(filterExpression);
         };
         //----------------------------------
         //
@@ -257,13 +255,21 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         };
         // _useLayerFromOperationalItem
         InteractiveStyleViewModel.prototype._useLayerFromOperationalItem = function (operationalItem, operationalItemIndex) {
-            var clonedRenderer = operationalItem.layer.renderer.clone();
+            var clonedItem = operationalItem.clone();
+            var featureLayer = clonedItem.layer;
+            var clonedRenderer = featureLayer.renderer;
             var originalColors = this.interactiveStyleData.originalColors[operationalItemIndex];
-            var infos = clonedRenderer.hasOwnProperty("uniqueValueInfos")
-                ? clonedRenderer.uniqueValueInfos
-                : clonedRenderer.classBreakInfos;
-            if (infos) {
-                infos.forEach(function (info) {
+            if (clonedRenderer.hasOwnProperty("uniqueValueInfos")) {
+                clonedRenderer.uniqueValueInfos.forEach(function (info) {
+                    originalColors.push(info.symbol.color);
+                });
+                if (!operationalItem.layer.hasOwnProperty("renderer")) {
+                    return;
+                }
+                this.interactiveStyleData.originalRenderers[operationalItemIndex] = clonedRenderer;
+            }
+            else if (clonedRenderer.hasOwnProperty("classBreakInfos")) {
+                clonedRenderer.classBreakInfos.forEach(function (info) {
                     originalColors.push(info.symbol.color);
                 });
                 if (!operationalItem.layer.hasOwnProperty("renderer")) {
@@ -523,9 +529,6 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 var symbol = uniqueInfo.symbol;
                 if (colorIndexes.indexOf(uniqueInfoIndex) === -1) {
                     symbol.color = new Color(_this.mutedShade);
-                    if (_this.mutedOpacity || _this.mutedOpacity === 0) {
-                        symbol.color.a = _this.mutedOpacity;
-                    }
                 }
             });
             this._generateRenderer(operationalItemIndex, "unique-value", field);
@@ -584,7 +587,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             }
             reversedClassBreakInfos.forEach(function (classBreakInfo, classBreakInfoIndex) {
                 var symbol = classBreakInfo.symbol;
-                var _a = _this, mutedOpacity = _a.mutedOpacity, mutedShade = _a.mutedShade;
+                var mutedShade = _this.mutedShade;
                 if (classBreakInfosIndex.indexOf(classBreakInfoIndex) !== -1) {
                     reversedColors.forEach(function (color, colorIndex) {
                         if (classBreakInfoIndex === colorIndex) {
@@ -597,9 +600,6 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 }
                 else {
                     symbol.color = mutedShade;
-                    if (_this.mutedOpacity || _this.mutedOpacity === 0) {
-                        symbol.color.a = mutedOpacity;
-                    }
                 }
             });
             this._generateRenderer(operationalItemIndex, "class-breaks", field);
@@ -631,24 +631,25 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         };
         // End of filter methods
         // _setSearchExpression
-        InteractiveStyleViewModel.prototype._setSearchExpression = function (filterExpression, operationalItemIndex) {
+        InteractiveStyleViewModel.prototype._setSearchExpression = function (filterExpression) {
             var _this = this;
             if (!this.searchViewModel) {
                 return;
             }
-            var searchSource = this.searchViewModel.sources.find(function (searchSource) {
-                return searchSource.flayerId ===
-                    _this.layerListViewModel.operationalItems.getItemAt(operationalItemIndex)
-                        .layer.id;
+            this.searchViewModel.sources.forEach(function (searchSource) {
+                _this.layerListViewModel.operationalItems.forEach(function (operationalItem) {
+                    if (searchSource.flayerId === operationalItem.layer.id) {
+                        if (filterExpression) {
+                            searchSource.filter = {
+                                where: filterExpression
+                            };
+                        }
+                        else {
+                            searchSource.filter = null;
+                        }
+                    }
+                });
             });
-            if (filterExpression) {
-                searchSource.filter = {
-                    where: filterExpression
-                };
-            }
-            else {
-                searchSource.filter = null;
-            }
         };
         __decorate([
             decorators_1.property()
@@ -674,9 +675,6 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         __decorate([
             decorators_1.property()
         ], InteractiveStyleViewModel.prototype, "mutedShade", void 0);
-        __decorate([
-            decorators_1.property()
-        ], InteractiveStyleViewModel.prototype, "mutedOpacity", void 0);
         __decorate([
             decorators_1.property()
         ], InteractiveStyleViewModel.prototype, "filterMode", void 0);

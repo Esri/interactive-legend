@@ -215,7 +215,10 @@ class ScreenshotViewModel extends declared(Accessor) {
         ? firstComponent
         : secondMapComponent;
 
-    html2canvas(mapComponent)
+    html2canvas(mapComponent, {
+      removeContainer: true,
+      logging: false
+    })
       .catch((err: Error) => {
         console.error("ERROR: ", err);
       })
@@ -253,7 +256,8 @@ class ScreenshotViewModel extends declared(Accessor) {
       "canvas"
     ) as HTMLCanvasElement;
     html2canvas(document.querySelector(this.mapComponentSelectors[0]), {
-      removeContainer: true
+      removeContainer: true,
+      logging: false
     })
       .catch((err: Error) => {
         console.error("ERROR: ", err);
@@ -265,7 +269,8 @@ class ScreenshotViewModel extends declared(Accessor) {
           height: (document.querySelector(
             this.mapComponentSelectors[1]
           ) as HTMLElement).offsetHeight,
-          removeContainer: true
+          removeContainer: true,
+          logging: false
         })
           .catch((err: Error) => {
             console.error("ERROR: ", err);

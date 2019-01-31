@@ -55,9 +55,6 @@ import LayerList = require("esri/widgets/LayerList");
 // esri.widgets.Search
 import Search = require("esri/widgets/Search");
 
-// esri.widgets.Search.LayerSearchSource
-import LayerSearchSource = require("esri/widgets/Search/LayerSearchSource");
-
 // esri.layers.FeatureLayer
 import FeatureLayer = require("esri/layers/FeatureLayer");
 
@@ -79,11 +76,11 @@ import Screenshot = require("./Components/Screenshot/Screenshot");
 // Telemetry
 import Telemetry = require("telemetry/telemetry.dojo");
 
+// FeatureWidget
 import FeatureWidget = require("esri/widgets/Feature");
 
 // InteractiveLegend
 import InteractiveLegend = require("./Components/InteractiveLegend/InteractiveLegend");
-import { clone } from "dojox/gfx/matrix";
 
 // CSS
 const CSS = {
@@ -153,7 +150,6 @@ class InteractiveLegendApp {
       highlightShade,
       mutedShade,
       style,
-      mutedOpacity,
       filterMode,
       screenshotEnabled,
       legendIncludedInScreenshot,
@@ -166,12 +162,10 @@ class InteractiveLegendApp {
       nextBasemap,
       searchConfig
     } = config;
-
     const { webMapItems } = results;
     const validWebMapItems = webMapItems.map(response => {
       return response.value;
     });
-
     const firstItem = validWebMapItems[0];
     if (!firstItem) {
       const error = i18nInteractiveLegend.error;
@@ -217,13 +211,16 @@ class InteractiveLegendApp {
           map
         }).then((view: MapView) =>
           findQuery(find, view).then(() => {
-            const defaultShade = mutedShade ? mutedShade : new Color("#a9a9a9");
+            let defaultShade = null;
+            if (mutedShade) {
+              const { r, g, b, a } = mutedShade;
+              defaultShade = new Color(`rgba(${r},${g},${b},${a})`);
+            } else {
+              defaultShade = new Color("rgba(169,169,169, 0.5)");
+            }
+
             const defaultStyle = style ? style : "classic";
-            const defaultMode = filterMode
-              ? filterMode
-              : "definitionExpression";
-            const defaultOpacity =
-              mutedOpacity || mutedOpacity === 0 ? mutedOpacity : 0.5;
+            const defaultMode = filterMode ? filterMode : "featureFilter";
             const mode = drawerEnabled ? "drawer" : "auto";
             const defaultExpandMode = mode ? mode : null;
             if (highlightShade) {
@@ -264,7 +261,6 @@ class InteractiveLegendApp {
               mutedShade: defaultShade,
               style: defaultStyle,
               filterMode: defaultMode,
-              mutedOpacity: defaultOpacity,
               featureCountEnabled,
               layerListViewModel
             });
@@ -277,7 +273,6 @@ class InteractiveLegendApp {
               mutedShade: defaultShade,
               style: defaultStyle,
               filterMode: defaultMode,
-              mutedOpacity: defaultOpacity,
               featureCountEnabled,
               layerListViewModel
             });

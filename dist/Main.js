@@ -88,7 +88,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 });
                 this.telemetry.logPageView();
             }
-            var drawerEnabled = config.drawerEnabled, expandEnabled = config.expandEnabled, highlightShade = config.highlightShade, mutedShade = config.mutedShade, style = config.style, mutedOpacity = config.mutedOpacity, filterMode = config.filterMode, screenshotEnabled = config.screenshotEnabled, legendIncludedInScreenshot = config.legendIncludedInScreenshot, popupIncludedInScreenshot = config.popupIncludedInScreenshot, featureCountEnabled = config.featureCountEnabled, layerListEnabled = config.layerListEnabled, searchEnabled = config.searchEnabled, basemapToggleEnabled = config.basemapToggleEnabled, homeEnabled = config.homeEnabled, nextBasemap = config.nextBasemap, searchConfig = config.searchConfig;
+            var drawerEnabled = config.drawerEnabled, expandEnabled = config.expandEnabled, highlightShade = config.highlightShade, mutedShade = config.mutedShade, style = config.style, filterMode = config.filterMode, screenshotEnabled = config.screenshotEnabled, legendIncludedInScreenshot = config.legendIncludedInScreenshot, popupIncludedInScreenshot = config.popupIncludedInScreenshot, featureCountEnabled = config.featureCountEnabled, layerListEnabled = config.layerListEnabled, searchEnabled = config.searchEnabled, basemapToggleEnabled = config.basemapToggleEnabled, homeEnabled = config.homeEnabled, nextBasemap = config.nextBasemap, searchConfig = config.searchConfig;
             var webMapItems = results.webMapItems;
             var validWebMapItems = webMapItems.map(function (response) {
                 return response.value;
@@ -124,12 +124,16 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 itemUtils_1.createMapFromItem({ item: item, appProxies: appProxies }).then(function (map) {
                     return itemUtils_1.createView(__assign({}, viewProperties, { map: map })).then(function (view) {
                         return itemUtils_1.findQuery(find, view).then(function () {
-                            var defaultShade = mutedShade ? mutedShade : new Color("#a9a9a9");
+                            var defaultShade = null;
+                            if (mutedShade) {
+                                var r = mutedShade.r, g = mutedShade.g, b = mutedShade.b, a = mutedShade.a;
+                                defaultShade = new Color("rgba(" + r + "," + g + "," + b + "," + a + ")");
+                            }
+                            else {
+                                defaultShade = new Color("rgba(169,169,169, 0.5)");
+                            }
                             var defaultStyle = style ? style : "classic";
-                            var defaultMode = filterMode
-                                ? filterMode
-                                : "definitionExpression";
-                            var defaultOpacity = mutedOpacity || mutedOpacity === 0 ? mutedOpacity : 0.5;
+                            var defaultMode = filterMode ? filterMode : "featureFilter";
                             var mode = drawerEnabled ? "drawer" : "auto";
                             var defaultExpandMode = mode ? mode : null;
                             if (highlightShade) {
@@ -157,7 +161,6 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 mutedShade: defaultShade,
                                 style: defaultStyle,
                                 filterMode: defaultMode,
-                                mutedOpacity: defaultOpacity,
                                 featureCountEnabled: featureCountEnabled,
                                 layerListViewModel: layerListViewModel
                             });
@@ -167,7 +170,6 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 mutedShade: defaultShade,
                                 style: defaultStyle,
                                 filterMode: defaultMode,
-                                mutedOpacity: defaultOpacity,
                                 featureCountEnabled: featureCountEnabled,
                                 layerListViewModel: layerListViewModel
                             });

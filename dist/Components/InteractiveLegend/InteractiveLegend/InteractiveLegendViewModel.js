@@ -303,9 +303,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 var hasTitle = layerInfo && layerInfo.title !== undefined;
                 activeLayerInfo = new ActiveLayerInfo({
                     layer: layer,
-                    title: hasTitle ? layerInfo.title : layer.title,
-                    view: this.view
+                    title: hasTitle ? layerInfo.title : layer.title
                 });
+                activeLayerInfo.view = this.view;
                 this._activeLayerInfosByLayerViewId[layerViewId] = activeLayerInfo;
             }
             if (!activeLayerInfo.parent) {
@@ -364,7 +364,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         // _scaleHandle
         InteractiveLegendViewModel.prototype._scaleHandle = function (activeLayerInfo, layerView) {
             var view = this.view;
-            if (activeLayerInfo.scale !== view.scale && activeLayerInfo.isScaleDriven) {
+            if (activeLayerInfo.scale !== view.scale &&
+                activeLayerInfo.isScaleDriven) {
                 this._constructLegendElements(activeLayerInfo, layerView);
             }
         };

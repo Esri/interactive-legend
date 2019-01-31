@@ -78,9 +78,15 @@ import {
   SymbolTableElement,
   FilterMode,
   VNode,
-  SelectedStyleData
+  SelectedStyleData,
+  LayerUID
 } from "../../../../interfaces/interfaces";
 import { renderRelationshipRamp } from "../relationshipRamp/utils";
+import {
+  UniqueValueRenderer,
+  ClassBreaksRenderer,
+  SimpleRenderer
+} from "esri/renderers";
 
 //----------------------------------
 //
@@ -179,11 +185,6 @@ class InteractiveClassic extends declared(Widget) {
   @aliasOf("viewModel.mutedShade")
   @property()
   mutedShade: number[] = null;
-
-  // mutedOpacity
-  @aliasOf("viewModel.mutedOpacity")
-  @property()
-  mutedOpacity: number = null;
 
   // layerGraphics
   @aliasOf("viewModel.layerGraphics")
@@ -321,7 +322,7 @@ class InteractiveClassic extends declared(Widget) {
     }
 
     const hasChildren = !!activeLayerInfo.children.length;
-    const key = `${KEY}${activeLayerInfo.layer.uid}-version-${
+    const key = `${KEY}${(activeLayerInfo.layer as LayerUID).uid}-version-${
       activeLayerInfo.version
     }`;
 
@@ -359,7 +360,7 @@ class InteractiveClassic extends declared(Widget) {
       const filteredElements = legendElements
         .map((legendElement, legendElementIndex) => {
           return this._renderLegendForElement(
-            legendElement,
+            legendElement as SymbolTableElement,
             activeLayerInfo.layer,
             legendElementIndex,
             activeLayerInfo,
@@ -423,7 +424,6 @@ class InteractiveClassic extends declared(Widget) {
     );
     if (selectedStyleData) {
       const { requiredFields } = selectedStyleData;
-
       if (legendElementsLength > 1) {
         const fieldVal =
           legendTitle && legendTitle.hasOwnProperty("field")
@@ -432,22 +432,30 @@ class InteractiveClassic extends declared(Widget) {
         const requiredFields = this.selectedStyleData.getItemAt(
           operationalItemIndex
         ).requiredFields;
-        const requiredFieldsCollection = new Collection();
-        requiredFields.forEach(requiredField => {
-          requiredFieldsCollection.add(requiredField);
-        });
-        if (requiredFields && fieldVal) {
-          field = requiredFieldsCollection.find(
-            requiredField => requiredField === fieldVal
-          );
+        if (requiredFields) {
+          const requiredFieldsCollection = new Collection();
+          requiredFields.forEach(requiredField => {
+            requiredFieldsCollection.add(requiredField);
+          });
+          if (fieldVal) {
+            field = requiredFieldsCollection.find(
+              requiredField => requiredField === fieldVal
+            );
+          }
         }
       } else {
-        if (requiredFields && activeLayerInfo.layer.renderer.field) {
+        const featureLayer = activeLayerInfo.layer as FeatureLayer;
+        const renderer = featureLayer.hasOwnProperty("uniqueValueInfos")
+          ? (featureLayer.renderer as UniqueValueRenderer)
+          : featureLayer.hasOwnProperty("classBreakInfos")
+          ? (featureLayer.renderer as ClassBreaksRenderer)
+          : (featureLayer.renderer as any);
+
+        if (requiredFields && renderer.field) {
           const requiredFields = this.selectedStyleData.getItemAt(
             operationalItemIndex
           ).requiredFields;
-          const activeLayerRequiredFields =
-            activeLayerInfo.layer.renderer.requiredFields;
+          const activeLayerRequiredFields = renderer.requiredFields;
           const requiredFieldsCollection = new Collection();
           const activeLayerFieldsCollection = new Collection();
           requiredFields.forEach(requiredField => {
@@ -574,6 +582,13 @@ class InteractiveClassic extends declared(Widget) {
           <div class={CSS.error}>
             <span class={CSS.calciteStyles.error} />
             {i18nInteractiveLegend.predominantNotSupported}
+          </div>
+        ) : null}
+
+        {isSizeRamp ? (
+          <div class={CSS.error}>
+            <span class={CSS.calciteStyles.error} />
+            {i18nInteractiveLegend.sizeRampFilterNotSupported}
           </div>
         ) : null}
 
@@ -832,7 +847,8 @@ class InteractiveClassic extends declared(Widget) {
         hasPictureMarkersAndIsMute ||
         isSizeRampAndMute ||
         hasPictureFillAndIsMute ||
-        legendTitle === "Predominant") &&
+        legendTitle === "Predominant" ||
+        isSizeRamp) &&
         legendElement.infos.length > 1 &&
         !activeLayerInfo.layer.hasOwnProperty("sublayers")) ||
       !requiredFields
@@ -873,7 +889,8 @@ class InteractiveClassic extends declared(Widget) {
             !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
             requiredFields &&
             field &&
-            featureLayerData
+            featureLayerData &&
+            !isSizeRamp
           ) {
             this._handleFilterOption(
               event,
@@ -899,7 +916,8 @@ class InteractiveClassic extends declared(Widget) {
             !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
             requiredFields &&
             field &&
-            featureLayerData
+            featureLayerData &&
+            !isSizeRamp
           ) {
             this._handleFilterOption(
               event,
@@ -1160,23 +1178,23 @@ class InteractiveClassic extends declared(Widget) {
     if (!hasRenderer) {
       return false;
     }
-    const { renderer } = layer;
+    const { renderer } = layer as FeatureLayer;
     const hasSymbol = renderer.hasOwnProperty("symbol");
     const hasUniqueValueInfos = renderer.hasOwnProperty("uniqueValueInfos");
     const hasClassBreakInfos = renderer.hasOwnProperty("classBreakInfos");
     return (
       ((hasRenderer &&
         hasSymbol &&
-        renderer.symbol.type === "picture-marker") ||
+        (renderer as SimpleRenderer).symbol.type === "picture-marker") ||
         (hasRenderer &&
           hasUniqueValueInfos &&
-          renderer.uniqueValueInfos.every(
+          (renderer as UniqueValueRenderer).uniqueValueInfos.every(
             (uvInfo: __esri.UniqueValueInfo) =>
               uvInfo.symbol.type === "picture-marker"
           )) ||
         (hasRenderer &&
           hasClassBreakInfos &&
-          renderer.classBreakInfos.every(
+          (renderer as ClassBreaksRenderer).classBreakInfos.every(
             (cbInfo: __esri.ClassBreaksRendererClassBreakInfos) =>
               cbInfo.symbol.type === "picture-marker"
           ))) &&
@@ -1193,21 +1211,23 @@ class InteractiveClassic extends declared(Widget) {
     if (!hasRenderer) {
       return false;
     }
-    const { renderer } = layer;
+    const { renderer } = layer as FeatureLayer;
     const hasSymbol = renderer.hasOwnProperty("symbol");
     const hasUniqueValueInfos = renderer.hasOwnProperty("uniqueValueInfos");
     const hasClassBreakInfos = renderer.hasOwnProperty("classBreakInfos");
     return (
-      ((hasRenderer && hasSymbol && renderer.symbol.type === "picture-fill") ||
+      ((hasRenderer &&
+        hasSymbol &&
+        (renderer as SimpleRenderer).symbol.type === "picture-fill") ||
         (hasRenderer &&
           hasUniqueValueInfos &&
-          renderer.uniqueValueInfos.every(
+          (renderer as UniqueValueRenderer).uniqueValueInfos.every(
             (uvInfo: __esri.UniqueValueInfo) =>
               uvInfo.symbol.type === "picture-fill"
           )) ||
         (hasRenderer &&
           hasClassBreakInfos &&
-          renderer.classBreakInfos.every(
+          (renderer as ClassBreaksRenderer).classBreakInfos.every(
             (cbInfo: __esri.ClassBreaksRendererClassBreakInfos) =>
               cbInfo.symbol.type === "picture-fill"
           ))) &&
