@@ -370,17 +370,9 @@ class InteractiveLegendApp {
         "screenshotModeIsActive",
         () => {
           if (this.screenshot.viewModel.screenshotModeIsActive) {
-            // if (!legendIncludedInScreenshot) {
-            //   this.interactiveLegendExpand.expanded = false;
-            // }
             this.interactiveLegendExpand.expanded = false;
             view.popup.visible = false;
-            // if (!popupIncludedInScreenshot && view.popup.visible) {
-            //   view.popup.dockEnabled = true;
-            // }
-            // if (popupIncludedInScreenshot && view.popup.visible) {
-            //   view.popup.visible = false;
-            // }
+
             if (this.layerListExpand) {
               this.layerListExpand.expanded = false;
             }
@@ -389,9 +381,6 @@ class InteractiveLegendApp {
             }
           } else {
             this.interactiveLegendExpand.expanded = true;
-            if (view.popup.dockEnabled) {
-              view.popup.dockEnabled = false;
-            }
 
             if (this.layerListExpand) {
               this.layerListExpand.expanded = true;

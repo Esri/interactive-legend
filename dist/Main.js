@@ -236,17 +236,8 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 });
                 watchUtils.watch(this.screenshot.viewModel, "screenshotModeIsActive", function () {
                     if (_this.screenshot.viewModel.screenshotModeIsActive) {
-                        // if (!legendIncludedInScreenshot) {
-                        //   this.interactiveLegendExpand.expanded = false;
-                        // }
                         _this.interactiveLegendExpand.expanded = false;
                         view.popup.visible = false;
-                        // if (!popupIncludedInScreenshot && view.popup.visible) {
-                        //   view.popup.dockEnabled = true;
-                        // }
-                        // if (popupIncludedInScreenshot && view.popup.visible) {
-                        //   view.popup.visible = false;
-                        // }
                         if (_this.layerListExpand) {
                             _this.layerListExpand.expanded = false;
                         }
@@ -256,9 +247,6 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                     }
                     else {
                         _this.interactiveLegendExpand.expanded = true;
-                        if (view.popup.dockEnabled) {
-                            view.popup.dockEnabled = false;
-                        }
                         if (_this.layerListExpand) {
                             _this.layerListExpand.expanded = true;
                         }
