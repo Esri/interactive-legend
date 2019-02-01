@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "file": "interfaces.js",
+  "sourceRoot": "",
+  "sources": ["../../src/app/interfaces/interfaces.ts"],
+  "names": [],
+  "mappings": ""
+}
