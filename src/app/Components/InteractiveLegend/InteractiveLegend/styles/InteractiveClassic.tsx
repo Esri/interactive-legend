@@ -200,6 +200,7 @@ class InteractiveClassic extends declared(Widget) {
   @property()
   searchExpressions: Collection<string> = null;
 
+  // searchViewModel
   @aliasOf("viewModel.searchViewModel")
   @property()
   searchViewModel = null;
@@ -239,11 +240,13 @@ class InteractiveClassic extends declared(Widget) {
               this.selectedStyleData.add(null);
             } else {
               const featureLayer = featureLayerView.layer as FeatureLayer;
-              const renderer = featureLayer.renderer as any;
-              const requiredFields = renderer ? renderer.requiredFields : null;
+              const renderer = featureLayer.renderer as
+                | __esri.UniqueValueRenderer
+                | __esri.ClassBreaksRenderer;
+              const field = renderer ? renderer.field : null;
               this.selectedStyleData.add({
                 layerItemId: featureLayer.id,
-                requiredFields,
+                field,
                 selectedInfoIndex: []
               });
             }
@@ -365,8 +368,7 @@ class InteractiveClassic extends declared(Widget) {
             activeLayerInfo,
             activeLayerInfoIndex,
             operationalItemIndex,
-            legendElement.infos,
-            legendElements.length
+            legendElement.infos
           );
         })
         .filter(element => !!element);
@@ -403,7 +405,6 @@ class InteractiveClassic extends declared(Widget) {
     activeLayerInfoIndex: number,
     operationalItemIndex: number,
     legendElementInfos: any[],
-    legendElementsLength: number,
     isChild?: boolean
   ): VNode {
     const { type } = legendElement;
@@ -417,63 +418,10 @@ class InteractiveClassic extends declared(Widget) {
     const legendTitle = legendElement.hasOwnProperty("title")
       ? (legendElement.title as any)
       : null;
-    let field = null;
-    const selectedStyleData = this.selectedStyleData.getItemAt(
-      operationalItemIndex
-    );
-    if (selectedStyleData) {
-      const { requiredFields } = selectedStyleData;
-      if (legendElementsLength > 1) {
-        const fieldVal =
-          legendTitle && legendTitle.hasOwnProperty("field")
-            ? legendTitle.field
-            : null;
-        const requiredFields = this.selectedStyleData.getItemAt(
-          operationalItemIndex
-        ).requiredFields;
-        if (requiredFields) {
-          const requiredFieldsCollection = new Collection();
-          requiredFields.forEach(requiredField => {
-            requiredFieldsCollection.add(requiredField);
-          });
-          if (fieldVal) {
-            field = requiredFieldsCollection.find(
-              requiredField => requiredField === fieldVal
-            );
-          }
-        }
-      } else {
-        const featureLayer = activeLayerInfo.layer as FeatureLayer;
-        const renderer = featureLayer.hasOwnProperty("uniqueValueInfos")
-          ? (featureLayer.renderer as UniqueValueRenderer)
-          : featureLayer.hasOwnProperty("classBreakInfos")
-          ? (featureLayer.renderer as ClassBreaksRenderer)
-          : (featureLayer.renderer as any);
+    const field = this.selectedStyleData.getItemAt(operationalItemIndex)
+      ? this.selectedStyleData.getItemAt(operationalItemIndex).field
+      : null;
 
-        if (requiredFields && renderer.field) {
-          const requiredFields = this.selectedStyleData.getItemAt(
-            operationalItemIndex
-          ).requiredFields;
-          const activeLayerRequiredFields = renderer.requiredFields;
-          const requiredFieldsCollection = new Collection();
-          const activeLayerFieldsCollection = new Collection();
-          requiredFields.forEach(requiredField => {
-            requiredFieldsCollection.add(requiredField);
-          });
-          activeLayerRequiredFields.forEach(activeLayerField => {
-            activeLayerFieldsCollection.add(activeLayerField);
-          });
-
-          field = requiredFieldsCollection.find(
-            requiredField =>
-              requiredField ===
-              activeLayerFieldsCollection.find(
-                requiredField2 => requiredField === requiredField2
-              )
-          );
-        }
-      }
-    }
     // build symbol table or size ramp
     if (legendElement.type === "symbol-table" || isSizeRamp) {
       const rows = (legendElement.infos as any)
@@ -486,7 +434,6 @@ class InteractiveClassic extends declared(Widget) {
             legendInfoIndex,
             field,
             legendElementIndex,
-            legendTitle,
             legendElement,
             activeLayerInfo,
             activeLayerInfoIndex,
@@ -609,6 +556,14 @@ class InteractiveClassic extends declared(Widget) {
           </div>
         ) : null}
 
+        {activeLayerInfo.layer.type !== "feature" &&
+        !activeLayerInfo.layer.hasOwnProperty("sublayers") ? (
+          <div class={CSS.error}>
+            <span class={CSS.calciteStyles.error} />
+            {i18nInteractiveLegend.featureLayerError}
+          </div>
+        ) : null}
+
         {caption}
         {content}
       </div>
@@ -726,7 +681,6 @@ class InteractiveClassic extends declared(Widget) {
     legendInfoIndex: number,
     field: string,
     legendElementIndex: number,
-    legendTitle: string,
     legendElement: LegendElement,
     activeLayerInfo: ActiveLayerInfo,
     activeLayerInfoIndex: number,
@@ -743,7 +697,6 @@ class InteractiveClassic extends declared(Widget) {
         activeLayerInfoIndex,
         operationalItemIndex,
         legendElementInfos,
-        null,
         true
       );
     }
@@ -823,35 +776,10 @@ class InteractiveClassic extends declared(Widget) {
       featureLayer.renderer.authoringInfo &&
       featureLayer.renderer.authoringInfo.type === "predominance";
     const isSizeRampAndMute = isSizeRamp && this.filterMode === "mute";
-    const selectedStyleData = this.selectedStyleData.getItemAt(
-      operationalItemIndex
-    );
-    const requiredFields = selectedStyleData
-      ? selectedStyleData &&
-        selectedStyleData.requiredFields &&
-        this.selectedStyleData.getItemAt(operationalItemIndex).requiredFields
-          .length > 0
-        ? true
-        : false
-      : null;
 
     const hasPictureFillAndIsMute = this._checkForPictureFillAndIsMute(
       activeLayerInfo
     );
-
-    const applySelect =
-      ((isRelationship ||
-        hasPictureMarkersAndIsMute ||
-        isSizeRampAndMute ||
-        hasPictureFillAndIsMute ||
-        isSizeRamp) &&
-        legendElement.infos.length > 1 &&
-        !activeLayerInfo.layer.hasOwnProperty("sublayers")) ||
-      (!requiredFields && !isPredominance)
-        ? null
-        : (field && elementInfo.hasOwnProperty("value")) || isPredominance
-        ? selectedRow
-        : null;
     const hasMoreThanOneInfo = legendElement.infos.length > 1;
 
     const featureLayerData =
@@ -860,16 +788,46 @@ class InteractiveClassic extends declared(Widget) {
             data ? activeLayerInfo.layer.id === data.layerItemId : null
           )
         : null;
-
+    const applySelect =
+      (!isRelationship &&
+        !hasPictureMarkersAndIsMute &&
+        !isSizeRampAndMute &&
+        !hasPictureFillAndIsMute &&
+        elementInfo.hasOwnProperty("value") &&
+        hasMoreThanOneInfo &&
+        !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
+        activeLayerInfo.layer.type === "feature" &&
+        field &&
+        featureLayerData &&
+        !isSizeRamp) ||
+      isPredominance
+        ? selectedRow
+        : null;
     return (
       <div
         bind={this}
         class={
-          hasMoreThanOneInfo && requiredFields && featureLayerData
+          (activeLayerInfo.layer.type === "feature" &&
+            (hasMoreThanOneInfo &&
+              field &&
+              featureLayerData &&
+              !isSizeRamp &&
+              elementInfo.hasOwnProperty("value"))) ||
+          isPredominance
             ? applySelect
             : null
         }
-        tabIndex={hasMoreThanOneInfo && applySelect ? 0 : null}
+        tabIndex={
+          (activeLayerInfo.layer.type === "feature" &&
+            (hasMoreThanOneInfo &&
+              field &&
+              featureLayerData &&
+              !isSizeRamp &&
+              elementInfo.hasOwnProperty("value"))) ||
+          isPredominance
+            ? 0
+            : null
+        }
         data-legend-index={`${legendElementIndex}`}
         data-child-index={`${legendInfoIndex}`}
         data-layer-id={`${activeLayerInfo.layer.id}`}
@@ -882,7 +840,7 @@ class InteractiveClassic extends declared(Widget) {
               elementInfo.hasOwnProperty("value") &&
               hasMoreThanOneInfo &&
               !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
-              requiredFields &&
+              activeLayerInfo.layer.type === "feature" &&
               field &&
               featureLayerData &&
               !isSizeRamp) ||
@@ -910,7 +868,6 @@ class InteractiveClassic extends declared(Widget) {
               elementInfo.hasOwnProperty("value") &&
               hasMoreThanOneInfo &&
               !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
-              requiredFields &&
               field &&
               featureLayerData &&
               !isSizeRamp) ||

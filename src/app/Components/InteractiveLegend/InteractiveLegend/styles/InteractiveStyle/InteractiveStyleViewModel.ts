@@ -417,6 +417,9 @@ class InteractiveStyleViewModel extends declared(Accessor) {
                     layerViewIndex
                   );
                   if (
+                    results.features &&
+                    results.features.hasOwnProperty("length") &&
+                    results.features.length > 0 &&
                     featureLayerViews.layer.id === results.features[0].layer.id
                   ) {
                     this.layerGraphics.splice(
@@ -933,7 +936,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       (uniqueInfo: __esri.UniqueValueInfo, uniqueInfoIndex: number) => {
         const { symbol } = uniqueInfo;
         if (colorIndexes.indexOf(uniqueInfoIndex) === -1) {
-          symbol.color = new Color(this.mutedShade);
+          symbol.color = this.mutedShade;
         }
       }
     );
@@ -1013,9 +1016,6 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         reversedColors.forEach((color, colorIndex) => {
           if (classBreakInfoIndex === colorIndex) {
             symbol.color = color;
-            if (symbol.color.hasOwnProperty("a")) {
-              symbol.color.a = 1;
-            }
           }
         });
       });
@@ -1029,9 +1029,6 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         reversedColors.forEach((color, colorIndex) => {
           if (classBreakInfoIndex === colorIndex) {
             symbol.color = color;
-            if (symbol.color.hasOwnProperty("a")) {
-              symbol.color.a = 1;
-            }
           }
         });
       } else {
@@ -1105,7 +1102,10 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     }
     this.searchViewModel.sources.forEach(searchSource => {
       this.layerListViewModel.operationalItems.forEach(operationalItem => {
-        if (searchSource.flayerId === operationalItem.layer.id) {
+        if (
+          searchSource.layer &&
+          searchSource.layer.id === operationalItem.layer.id
+        ) {
           if (filterExpression) {
             searchSource.filter = {
               where: filterExpression

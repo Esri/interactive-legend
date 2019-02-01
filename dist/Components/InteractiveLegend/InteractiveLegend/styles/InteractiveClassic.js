@@ -111,6 +111,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this.layerListViewModel = null;
             // searchExpressions
             _this.searchExpressions = null;
+            // searchViewModel
             _this.searchViewModel = null;
             // selectedStyleData
             _this.selectedStyleData = new Collection();
@@ -132,10 +133,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         else {
                             var featureLayer = featureLayerView.layer;
                             var renderer = featureLayer.renderer;
-                            var requiredFields = renderer ? renderer.requiredFields : null;
+                            var field = renderer ? renderer.field : null;
                             _this.selectedStyleData.add({
                                 layerItemId: featureLayer.id,
-                                requiredFields: requiredFields,
+                                field: field,
                                 selectedInfoIndex: []
                             });
                         }
@@ -203,14 +204,14 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     layers));
             }
             else {
-                var legendElements_1 = activeLayerInfo.legendElements;
-                if (legendElements_1 && !legendElements_1.length) {
+                var legendElements = activeLayerInfo.legendElements;
+                if (legendElements && !legendElements.length) {
                     return null;
                 }
                 var operationalItemIndex_1 = this._getOperationalItemIndex(activeLayerInfo);
-                var filteredElements = legendElements_1
+                var filteredElements = legendElements
                     .map(function (legendElement, legendElementIndex) {
-                    return _this._renderLegendForElement(legendElement, activeLayerInfo.layer, legendElementIndex, activeLayerInfo, activeLayerInfoIndex, operationalItemIndex_1, legendElement.infos, legendElements_1.length);
+                    return _this._renderLegendForElement(legendElement, activeLayerInfo.layer, legendElementIndex, activeLayerInfo, activeLayerInfoIndex, operationalItemIndex_1, legendElement.infos);
                 })
                     .filter(function (element) { return !!element; });
                 if (!filteredElements.length) {
@@ -228,7 +229,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             }
         };
         // _renderLegendForElement
-        InteractiveClassic.prototype._renderLegendForElement = function (legendElement, layer, legendElementIndex, activeLayerInfo, activeLayerInfoIndex, operationalItemIndex, legendElementInfos, legendElementsLength, isChild) {
+        InteractiveClassic.prototype._renderLegendForElement = function (legendElement, layer, legendElementIndex, activeLayerInfo, activeLayerInfoIndex, operationalItemIndex, legendElementInfos, isChild) {
             var _this = this;
             var _a;
             var type = legendElement.type;
@@ -237,55 +238,14 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var legendTitle = legendElement.hasOwnProperty("title")
                 ? legendElement.title
                 : null;
-            var field = null;
-            var selectedStyleData = this.selectedStyleData.getItemAt(operationalItemIndex);
-            if (selectedStyleData) {
-                var requiredFields = selectedStyleData.requiredFields;
-                if (legendElementsLength > 1) {
-                    var fieldVal_1 = legendTitle && legendTitle.hasOwnProperty("field")
-                        ? legendTitle.field
-                        : null;
-                    var requiredFields_1 = this.selectedStyleData.getItemAt(operationalItemIndex).requiredFields;
-                    if (requiredFields_1) {
-                        var requiredFieldsCollection_1 = new Collection();
-                        requiredFields_1.forEach(function (requiredField) {
-                            requiredFieldsCollection_1.add(requiredField);
-                        });
-                        if (fieldVal_1) {
-                            field = requiredFieldsCollection_1.find(function (requiredField) { return requiredField === fieldVal_1; });
-                        }
-                    }
-                }
-                else {
-                    var featureLayer_1 = activeLayerInfo.layer;
-                    var renderer = featureLayer_1.hasOwnProperty("uniqueValueInfos")
-                        ? featureLayer_1.renderer
-                        : featureLayer_1.hasOwnProperty("classBreakInfos")
-                            ? featureLayer_1.renderer
-                            : featureLayer_1.renderer;
-                    if (requiredFields && renderer.field) {
-                        var requiredFields_2 = this.selectedStyleData.getItemAt(operationalItemIndex).requiredFields;
-                        var activeLayerRequiredFields = renderer.requiredFields;
-                        var requiredFieldsCollection_2 = new Collection();
-                        var activeLayerFieldsCollection_1 = new Collection();
-                        requiredFields_2.forEach(function (requiredField) {
-                            requiredFieldsCollection_2.add(requiredField);
-                        });
-                        activeLayerRequiredFields.forEach(function (activeLayerField) {
-                            activeLayerFieldsCollection_1.add(activeLayerField);
-                        });
-                        field = requiredFieldsCollection_2.find(function (requiredField) {
-                            return requiredField ===
-                                activeLayerFieldsCollection_1.find(function (requiredField2) { return requiredField === requiredField2; });
-                        });
-                    }
-                }
-            }
+            var field = this.selectedStyleData.getItemAt(operationalItemIndex)
+                ? this.selectedStyleData.getItemAt(operationalItemIndex).field
+                : null;
             // build symbol table or size ramp
             if (legendElement.type === "symbol-table" || isSizeRamp) {
                 var rows = legendElement.infos
                     .map(function (info, legendInfoIndex) {
-                    return _this._renderLegendForElementInfo(info, layer, isSizeRamp, legendElement.legendType, legendInfoIndex, field, legendElementIndex, legendTitle, legendElement, activeLayerInfo, activeLayerInfoIndex, operationalItemIndex, legendElementInfos);
+                    return _this._renderLegendForElementInfo(info, layer, isSizeRamp, legendElement.legendType, legendInfoIndex, field, legendElementIndex, legendElement, activeLayerInfo, activeLayerInfoIndex, operationalItemIndex, legendElementInfos);
                 })
                     .filter(function (row) { return !!row; });
                 if (rows.length) {
@@ -364,6 +324,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     legendElementInfos.length > 1 ? (widget_1.tsx("div", { class: CSS.error },
                     widget_1.tsx("span", { class: CSS.calciteStyles.error }),
                     i18nInteractiveLegend.muteAndPictureFillError)) : null,
+                activeLayerInfo.layer.type !== "feature" &&
+                    !activeLayerInfo.layer.hasOwnProperty("sublayers") ? (widget_1.tsx("div", { class: CSS.error },
+                    widget_1.tsx("span", { class: CSS.calciteStyles.error }),
+                    i18nInteractiveLegend.featureLayerError)) : null,
                 caption,
                 content));
         };
@@ -436,12 +400,12 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     widget_1.tsx("div", { class: CSS.rampLabelsContainer, styles: rampLabelsContainerStyles }, labelsContent))));
         };
         // _renderLegendForElementInfo
-        InteractiveClassic.prototype._renderLegendForElementInfo = function (elementInfo, layer, isSizeRamp, legendType, legendInfoIndex, field, legendElementIndex, legendTitle, legendElement, activeLayerInfo, activeLayerInfoIndex, operationalItemIndex, legendElementInfos) {
+        InteractiveClassic.prototype._renderLegendForElementInfo = function (elementInfo, layer, isSizeRamp, legendType, legendInfoIndex, field, legendElementIndex, legendElement, activeLayerInfo, activeLayerInfoIndex, operationalItemIndex, legendElementInfos) {
             var _this = this;
             var _a, _b;
             // nested
             if (elementInfo.type) {
-                return this._renderLegendForElement(elementInfo, layer, legendElementIndex, activeLayerInfo, activeLayerInfoIndex, operationalItemIndex, legendElementInfos, null, true);
+                return this._renderLegendForElement(elementInfo, layer, legendElementIndex, activeLayerInfo, activeLayerInfoIndex, operationalItemIndex, legendElementInfos, true);
             }
             var content = null;
             var isStretched = styleUtils_1.isImageryStretchedLegend(layer, legendType);
@@ -492,37 +456,44 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 featureLayer.renderer.authoringInfo &&
                 featureLayer.renderer.authoringInfo.type === "predominance";
             var isSizeRampAndMute = isSizeRamp && this.filterMode === "mute";
-            var selectedStyleData = this.selectedStyleData.getItemAt(operationalItemIndex);
-            var requiredFields = selectedStyleData
-                ? selectedStyleData &&
-                    selectedStyleData.requiredFields &&
-                    this.selectedStyleData.getItemAt(operationalItemIndex).requiredFields
-                        .length > 0
-                    ? true
-                    : false
-                : null;
             var hasPictureFillAndIsMute = this._checkForPictureFillAndIsMute(activeLayerInfo);
-            var applySelect = ((isRelationship ||
-                hasPictureMarkersAndIsMute ||
-                isSizeRampAndMute ||
-                hasPictureFillAndIsMute ||
-                isSizeRamp) &&
-                legendElement.infos.length > 1 &&
-                !activeLayerInfo.layer.hasOwnProperty("sublayers")) ||
-                (!requiredFields && !isPredominance)
-                ? null
-                : (field && elementInfo.hasOwnProperty("value")) || isPredominance
-                    ? selectedRow
-                    : null;
             var hasMoreThanOneInfo = legendElement.infos.length > 1;
             var featureLayerData = this.selectedStyleData.length > 0
                 ? this.selectedStyleData.find(function (data) {
                     return data ? activeLayerInfo.layer.id === data.layerItemId : null;
                 })
                 : null;
-            return (widget_1.tsx("div", { bind: this, class: hasMoreThanOneInfo && requiredFields && featureLayerData
+            var applySelect = (!isRelationship &&
+                !hasPictureMarkersAndIsMute &&
+                !isSizeRampAndMute &&
+                !hasPictureFillAndIsMute &&
+                elementInfo.hasOwnProperty("value") &&
+                hasMoreThanOneInfo &&
+                !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
+                activeLayerInfo.layer.type === "feature" &&
+                field &&
+                featureLayerData &&
+                !isSizeRamp) ||
+                isPredominance
+                ? selectedRow
+                : null;
+            return (widget_1.tsx("div", { bind: this, class: (activeLayerInfo.layer.type === "feature" &&
+                    (hasMoreThanOneInfo &&
+                        field &&
+                        featureLayerData &&
+                        !isSizeRamp &&
+                        elementInfo.hasOwnProperty("value"))) ||
+                    isPredominance
                     ? applySelect
-                    : null, tabIndex: hasMoreThanOneInfo && applySelect ? 0 : null, "data-legend-index": "" + legendElementIndex, "data-child-index": "" + legendInfoIndex, "data-layer-id": "" + activeLayerInfo.layer.id, onclick: function (event) {
+                    : null, tabIndex: (activeLayerInfo.layer.type === "feature" &&
+                    (hasMoreThanOneInfo &&
+                        field &&
+                        featureLayerData &&
+                        !isSizeRamp &&
+                        elementInfo.hasOwnProperty("value"))) ||
+                    isPredominance
+                    ? 0
+                    : null, "data-legend-index": "" + legendElementIndex, "data-child-index": "" + legendInfoIndex, "data-layer-id": "" + activeLayerInfo.layer.id, onclick: function (event) {
                     if ((!isRelationship &&
                         !hasPictureMarkersAndIsMute &&
                         !isSizeRampAndMute &&
@@ -530,7 +501,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         elementInfo.hasOwnProperty("value") &&
                         hasMoreThanOneInfo &&
                         !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
-                        requiredFields &&
+                        activeLayerInfo.layer.type === "feature" &&
                         field &&
                         featureLayerData &&
                         !isSizeRamp) ||
@@ -545,7 +516,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         elementInfo.hasOwnProperty("value") &&
                         hasMoreThanOneInfo &&
                         !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
-                        requiredFields &&
                         field &&
                         featureLayerData &&
                         !isSizeRamp) ||

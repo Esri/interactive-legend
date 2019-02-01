@@ -17,7 +17,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "esri/core/accessorSupport/decorators", "esri/core/Handles", "esri/core/watchUtils", "esri/core/Collection", "esri/Color", "esri/widgets/LayerList/LayerListViewModel", "esri/views/layers/support/FeatureFilter"], function (require, exports, __assign, __extends, __decorate, Accessor, decorators_1, Handles, watchUtils, Collection, Color, LayerListViewModel, FeatureFilter) {
+define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "esri/core/accessorSupport/decorators", "esri/core/Handles", "esri/core/watchUtils", "esri/core/Collection", "esri/widgets/LayerList/LayerListViewModel", "esri/views/layers/support/FeatureFilter"], function (require, exports, __assign, __extends, __decorate, Accessor, decorators_1, Handles, watchUtils, Collection, LayerListViewModel, FeatureFilter) {
     "use strict";
     var InteractiveStyleViewModel = /** @class */ (function (_super) {
         __extends(InteractiveStyleViewModel, _super);
@@ -254,7 +254,10 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                             })
                                 .then(function (results) {
                                 var featureLayerViews = _this.featureLayerViews.getItemAt(layerViewIndex);
-                                if (featureLayerViews.layer.id === results.features[0].layer.id) {
+                                if (results.features &&
+                                    results.features.hasOwnProperty("length") &&
+                                    results.features.length > 0 &&
+                                    featureLayerViews.layer.id === results.features[0].layer.id) {
                                     _this.layerGraphics.splice(layerViewIndex, 1, results.features);
                                 }
                                 _this._querying = null;
@@ -607,7 +610,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             renderer.uniqueValueInfos.forEach(function (uniqueInfo, uniqueInfoIndex) {
                 var symbol = uniqueInfo.symbol;
                 if (colorIndexes.indexOf(uniqueInfoIndex) === -1) {
-                    symbol.color = new Color(_this.mutedShade);
+                    symbol.color = _this.mutedShade;
                 }
             });
             this._generateRenderer(operationalItemIndex, "unique-value", field);
@@ -655,9 +658,6 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                     reversedColors.forEach(function (color, colorIndex) {
                         if (classBreakInfoIndex === colorIndex) {
                             symbol.color = color;
-                            if (symbol.color.hasOwnProperty("a")) {
-                                symbol.color.a = 1;
-                            }
                         }
                     });
                 });
@@ -671,9 +671,6 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                     reversedColors.forEach(function (color, colorIndex) {
                         if (classBreakInfoIndex === colorIndex) {
                             symbol.color = color;
-                            if (symbol.color.hasOwnProperty("a")) {
-                                symbol.color.a = 1;
-                            }
                         }
                     });
                 }
@@ -733,7 +730,8 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             }
             this.searchViewModel.sources.forEach(function (searchSource) {
                 _this.layerListViewModel.operationalItems.forEach(function (operationalItem) {
-                    if (searchSource.flayerId === operationalItem.layer.id) {
+                    if (searchSource.layer &&
+                        searchSource.layer.id === operationalItem.layer.id) {
                         if (filterExpression) {
                             searchSource.filter = {
                                 where: filterExpression
