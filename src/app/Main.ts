@@ -212,11 +212,15 @@ class InteractiveLegendApp {
         }).then((view: MapView) =>
           findQuery(find, view).then(() => {
             let defaultShade = null;
-            if (mutedShade) {
-              const { r, g, b, a } = mutedShade;
-              defaultShade = new Color(`rgba(${r},${g},${b},${a})`);
-            } else {
+            if (!mutedShade) {
               defaultShade = new Color("rgba(169,169,169, 0.5)");
+            } else {
+              if (typeof mutedShade === "string") {
+                defaultShade = new Color(mutedShade);
+              } else {
+                const { r, g, b, a } = mutedShade;
+                defaultShade = new Color(`rgba(${r},${g},${b},${a})`);
+              }
             }
 
             const defaultStyle = style ? style : "classic";

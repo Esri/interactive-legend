@@ -125,12 +125,17 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                     return itemUtils_1.createView(__assign({}, viewProperties, { map: map })).then(function (view) {
                         return itemUtils_1.findQuery(find, view).then(function () {
                             var defaultShade = null;
-                            if (mutedShade) {
-                                var r = mutedShade.r, g = mutedShade.g, b = mutedShade.b, a = mutedShade.a;
-                                defaultShade = new Color("rgba(" + r + "," + g + "," + b + "," + a + ")");
+                            if (!mutedShade) {
+                                defaultShade = new Color("rgba(169,169,169, 0.5)");
                             }
                             else {
-                                defaultShade = new Color("rgba(169,169,169, 0.5)");
+                                if (typeof mutedShade === "string") {
+                                    defaultShade = new Color(mutedShade);
+                                }
+                                else {
+                                    var r = mutedShade.r, g = mutedShade.g, b = mutedShade.b, a = mutedShade.a;
+                                    defaultShade = new Color("rgba(" + r + "," + g + "," + b + "," + a + ")");
+                                }
                             }
                             var defaultStyle = style ? style : "classic";
                             var defaultMode = filterMode ? filterMode : "featureFilter";
