@@ -17,7 +17,8 @@
   "include": [
     "./**/*",
     "./src/app/Components/InteractiveLegend",
-    "./src/app/Components/Screenshot"
+    "./src/app/Components/Screenshot",
+    "./src/app/interfaces"
   ],
   "exclude": [
     "./node_modules",
