@@ -23,8 +23,7 @@ import {
 import {
   renderable,
   tsx,
-  accessibleHandler,
-  storeNode
+  accessibleHandler
 } from "esri/widgets/support/widget";
 
 // esri.views.MapView
@@ -549,6 +548,11 @@ class InteractiveClassic extends declared(Widget) {
       (legendElement.type === "symbol-table" &&
         legendElement.title == "Relationship") ||
       legendElement.type === "relationship-ramp";
+    const featureLayer = activeLayerInfo.layer as FeatureLayer;
+    const isPredominance =
+      featureLayer.renderer &&
+      featureLayer.renderer.authoringInfo &&
+      featureLayer.renderer.authoringInfo.type === "predominance";
     return (
       <div class={this.classes(tableClass, tableClasses)}>
         {!field &&
@@ -558,9 +562,8 @@ class InteractiveClassic extends declared(Widget) {
         !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
         !isColorRamp &&
         !isOpacityRamp &&
-        activeLayerInfo.layer.renderer.authoringInfo &&
-        activeLayerInfo.layer.renderer.authoringInfo.type !== "predominance" &&
-        !isHeatRamp ? (
+        !isHeatRamp &&
+        !isPredominance ? (
           <div class={CSS.error}>
             <span class={CSS.calciteStyles.error} />
             {i18nInteractiveLegend.noFieldAttribute}
@@ -573,31 +576,18 @@ class InteractiveClassic extends declared(Widget) {
         ) &&
         legendElementInfos.length > 1 &&
         !isRelationship &&
-        !activeLayerInfo.layer.hasOwnProperty("sublayers") ? (
+        !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
+        !isHeatRamp ? (
           <div class={CSS.error}>
             <span class={CSS.calciteStyles.error} />
             {i18nInteractiveLegend.elementInfoNoValue}
           </div>
         ) : null}
-        {/* 
-        {legendElement.title === "Predominant category" ? (
-          <div class={CSS.error}>
-            <span class={CSS.calciteStyles.error} />
-            {i18nInteractiveLegend.predominantNotSupported}
-          </div>
-        ) : null} */}
 
         {isSizeRamp ? (
           <div class={CSS.error}>
             <span class={CSS.calciteStyles.error} />
             {i18nInteractiveLegend.sizeRampFilterNotSupported}
-          </div>
-        ) : null}
-
-        {isSizeRamp && this.filterMode === "mute" ? (
-          <div class={CSS.error}>
-            <span class={CSS.calciteStyles.error} />
-            {i18nInteractiveLegend.muteAndSizeRamp}
           </div>
         ) : null}
 
@@ -827,9 +817,11 @@ class InteractiveClassic extends declared(Widget) {
       activeLayerInfo
     );
     const isRelationship = legendElement.type === "relationship-ramp";
+    const featureLayer = activeLayerInfo.layer as FeatureLayer;
     const isPredominance =
-      activeLayerInfo.layer.renderer.authoringInfo &&
-      activeLayerInfo.layer.renderer.authoringInfo.type === "predominance";
+      featureLayer.renderer &&
+      featureLayer.renderer.authoringInfo &&
+      featureLayer.renderer.authoringInfo.type === "predominance";
     const isSizeRampAndMute = isSizeRamp && this.filterMode === "mute";
     const selectedStyleData = this.selectedStyleData.getItemAt(
       operationalItemIndex
@@ -892,7 +884,8 @@ class InteractiveClassic extends declared(Widget) {
               !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
               requiredFields &&
               field &&
-              featureLayerData && !isSizeRamp) ||
+              featureLayerData &&
+              !isSizeRamp) ||
             isPredominance
           ) {
             this._handleFilterOption(
@@ -919,7 +912,8 @@ class InteractiveClassic extends declared(Widget) {
               !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
               requiredFields &&
               field &&
-              featureLayerData && !isSizeRamp) ||
+              featureLayerData &&
+              !isSizeRamp) ||
             isPredominance
           ) {
             this._handleFilterOption(
@@ -997,9 +991,9 @@ class InteractiveClassic extends declared(Widget) {
     this.filterMode === "featureFilter"
       ? this._featureFilter(
           elementInfo,
-          field
-          legendInfoIndex,
+          field,
           operationalItemIndex,
+          legendInfoIndex,
           isSizeRamp,
           legendElement,
           isPredominance,
@@ -1010,9 +1004,9 @@ class InteractiveClassic extends declared(Widget) {
           event,
           elementInfo,
           field,
-          operationalItemIndex,
           legendInfoIndex,
-          featureLayerViewIndex,
+          operationalItemIndex,
+
           isSizeRamp,
           legendElement,
           isPredominance,
@@ -1026,7 +1020,6 @@ class InteractiveClassic extends declared(Widget) {
           legendInfoIndex,
           operationalItemIndex,
           legendElement,
-          isPredominance,
           legendElementInfos
         )
       : null;
@@ -1038,6 +1031,7 @@ class InteractiveClassic extends declared(Widget) {
     field: string,
     operationalItemIndex: number,
     legendInfoIndex: number,
+    isSizeRamp: boolean,
     legendElement: LegendElement,
     isPredominance: boolean,
     legendElementInfos?: any[]
@@ -1092,7 +1086,6 @@ class InteractiveClassic extends declared(Widget) {
     legendInfoIndex: number,
     operationalItemIndex: number,
     legendElement: LegendElement,
-    isPredominance: boolean,
     legendElementInfos: any[]
   ): void {
     this._handleSelectedStyles(event);
@@ -1102,7 +1095,6 @@ class InteractiveClassic extends declared(Widget) {
       legendInfoIndex,
       operationalItemIndex,
       legendElement,
-      isPredominance,
       legendElementInfos
     );
   }
