@@ -43,7 +43,7 @@ type SymbolTableElementType =
 export interface SelectedStyleData {
   layerItemId: string;
   selectedInfoIndex: any;
-  requiredFields: any;
+  field: string;
 }
 
 export type FilterMode = "featureFilter" | "highlight" | "mute";

@@ -10,10 +10,11 @@ define({
     muteAndSizeRamp: "Mute mode is not supported in non-range size ramp.",
     predominantNotSupported: "Filtering for predominant legend type is currently not supported.",
     elementInfoNoValue: "Element info data must contain values to apply filter.",
-    sublayerFiltering: "Applying filter to sublayers is not supported.",
+    sublayerFiltering: "Filtering for sublayers is not supported.",
     muteAndPictureFillError: "Mute filter cannot be applied to picture fill symbols.",
     error: "Could not load an item to display",
-    sizeRampFilterNotSupported: "Filtering for size ramp legend type is currently not supported."
+    sizeRampFilterNotSupported: "Filtering for size ramp legend type is currently not supported.",
+    featureLayerError: "Filtering can only be applied to feature layers."
 
   }),
   "ar": 1,
