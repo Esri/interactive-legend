@@ -135,7 +135,7 @@
           "type": "color",
           "label": "Choose a muted shade",
           "fieldName": "mutedShade",
-          "transparent": true,
+          "transparency": true,
           "noColor": true
         }
       ]
