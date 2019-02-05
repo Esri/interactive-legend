@@ -142,8 +142,10 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                             var mode = drawerEnabled ? "drawer" : "auto";
                             var defaultExpandMode = mode ? mode : null;
                             if (highlightShade) {
+                                var r = highlightShade.r, g = highlightShade.g, b = highlightShade.b, a = highlightShade.a;
                                 view.highlightOptions = {
-                                    color: new Color(highlightShade)
+                                    color: new Color("rgb(" + r + "," + g + "," + b + ")"),
+                                    fillOpacity: a
                                 };
                             }
                             else {

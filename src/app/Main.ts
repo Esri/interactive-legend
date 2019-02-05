@@ -227,9 +227,13 @@ class InteractiveLegendApp {
             const defaultMode = filterMode ? filterMode : "featureFilter";
             const mode = drawerEnabled ? "drawer" : "auto";
             const defaultExpandMode = mode ? mode : null;
+
             if (highlightShade) {
+              const { r, g, b, a } = highlightShade;
+
               view.highlightOptions = {
-                color: new Color(highlightShade)
+                color: new Color(`rgb(${r},${g},${b})`),
+                fillOpacity: a
               };
             } else {
               view.highlightOptions = {
