@@ -125,8 +125,9 @@
         {
           "type": "color",
           "label": "Choose a highlighted shade",
-          "fieldName": "highlightedShade",
-          "transparency": true
+          "fieldName": "highlightShade",
+          "transparency": true,
+          "noColor": true
         },
         {
           "type": "paragraph",

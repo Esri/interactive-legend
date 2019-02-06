@@ -229,8 +229,8 @@ class InteractiveLegendApp {
             const defaultExpandMode = mode ? mode : null;
 
             if (highlightShade) {
-              const { r, g, b, a } = highlightShade;
-
+              const highlightedShade = new Color(highlightShade);
+              const { r, g, b, a } = highlightedShade;
               view.highlightOptions = {
                 color: new Color(`rgb(${r},${g},${b})`),
                 fillOpacity: a
