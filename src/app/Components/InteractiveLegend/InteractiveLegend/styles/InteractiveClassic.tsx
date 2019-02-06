@@ -81,11 +81,6 @@ import {
   LayerUID
 } from "../../../../interfaces/interfaces";
 import { renderRelationshipRamp } from "../relationshipRamp/utils";
-import {
-  UniqueValueRenderer,
-  ClassBreaksRenderer,
-  SimpleRenderer
-} from "esri/renderers";
 
 //----------------------------------
 //
@@ -1150,16 +1145,16 @@ class InteractiveClassic extends declared(Widget) {
     return (
       ((hasRenderer &&
         hasSymbol &&
-        (renderer as SimpleRenderer).symbol.type === "picture-marker") ||
+        (renderer as __esri.SimpleRenderer).symbol.type === "picture-marker") ||
         (hasRenderer &&
           hasUniqueValueInfos &&
-          (renderer as UniqueValueRenderer).uniqueValueInfos.every(
+          (renderer as __esri.UniqueValueRenderer).uniqueValueInfos.every(
             (uvInfo: __esri.UniqueValueInfo) =>
               uvInfo.symbol.type === "picture-marker"
           )) ||
         (hasRenderer &&
           hasClassBreakInfos &&
-          (renderer as ClassBreaksRenderer).classBreakInfos.every(
+          (renderer as __esri.ClassBreaksRenderer).classBreakInfos.every(
             (cbInfo: __esri.ClassBreaksRendererClassBreakInfos) =>
               cbInfo.symbol.type === "picture-marker"
           ))) &&
@@ -1183,16 +1178,16 @@ class InteractiveClassic extends declared(Widget) {
     return (
       ((hasRenderer &&
         hasSymbol &&
-        (renderer as SimpleRenderer).symbol.type === "picture-fill") ||
+        (renderer as __esri.SimpleRenderer).symbol.type === "picture-fill") ||
         (hasRenderer &&
           hasUniqueValueInfos &&
-          (renderer as UniqueValueRenderer).uniqueValueInfos.every(
+          (renderer as __esri.UniqueValueRenderer).uniqueValueInfos.every(
             (uvInfo: __esri.UniqueValueInfo) =>
               uvInfo.symbol.type === "picture-fill"
           )) ||
         (hasRenderer &&
           hasClassBreakInfos &&
-          (renderer as ClassBreaksRenderer).classBreakInfos.every(
+          (renderer as __esri.ClassBreaksRenderer).classBreakInfos.every(
             (cbInfo: __esri.ClassBreaksRendererClassBreakInfos) =>
               cbInfo.symbol.type === "picture-fill"
           ))) &&

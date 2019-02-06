@@ -196,7 +196,12 @@
     "screenshotEnabled": false,
     "legendIncludedInScreenshot": false,
     "popupIncludedInScreenshot": false,
-    "highlightShade": "#000000",
+    "highlightShade": {
+      "r": 0,
+      "g": 0,
+      "b": 0,
+      "a": 0.25
+    },
     "mutedShade": {
       "r": 169,
       "g": 169,

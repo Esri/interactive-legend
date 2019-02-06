@@ -53,7 +53,6 @@ import {
   InteractiveStyleData,
   LegendElement
 } from "../../../../../interfaces/interfaces";
-import { UniqueValueRenderer, ClassBreaksRenderer } from "esri/renderers";
 
 // HighLightState
 type HighLightState = "ready" | "querying" | "loading";
@@ -467,9 +466,11 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     ];
 
     if (clonedRenderer.hasOwnProperty("uniqueValueInfos")) {
-      (clonedRenderer as UniqueValueRenderer).uniqueValueInfos.forEach(info => {
-        originalColors.push(info.symbol.color);
-      });
+      (clonedRenderer as __esri.UniqueValueRenderer).uniqueValueInfos.forEach(
+        info => {
+          originalColors.push(info.symbol.color);
+        }
+      );
       if (!operationalItem.layer.hasOwnProperty("renderer")) {
         return;
       }
@@ -477,9 +478,11 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         operationalItemIndex
       ] = clonedRenderer;
     } else if (clonedRenderer.hasOwnProperty("classBreakInfos")) {
-      (clonedRenderer as ClassBreaksRenderer).classBreakInfos.forEach(info => {
-        originalColors.push(info.symbol.color);
-      });
+      (clonedRenderer as __esri.ClassBreaksRenderer).classBreakInfos.forEach(
+        info => {
+          originalColors.push(info.symbol.color);
+        }
+      );
       if (!operationalItem.layer.hasOwnProperty("renderer")) {
         return;
       }
