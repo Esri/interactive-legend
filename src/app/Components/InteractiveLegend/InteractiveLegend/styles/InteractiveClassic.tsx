@@ -127,7 +127,8 @@ const CSS = {
     btn: "btn",
     btnSmall: "btn-small",
     btnPrimary: "btn-primary",
-    error: "icon-ui-error"
+    error: "icon-ui-error",
+    close: "icon-ui-close"
   },
   // interactive-legend
   loaderContainer: "esri-interactive-legend__loader-container",
@@ -138,7 +139,19 @@ const CSS = {
   screenshot: "esri-interactive-legend__screenshot",
   hoverStyles: "esri-interactive-legend--layer-row",
   error: "esri-interactive-legend--error",
-  legendElements: "esri-interactive-legend__legend-elements"
+  legendElements: "esri-interactive-legend__legend-elements",
+  onboarding: {
+    mainContainer: "esri-interactive-legend__onboarding-main-container",
+    contentContainer: "esri-interactive-legend__onboarding-content-container",
+    closeContainer: "esri-interactive-legend__onboarding-close-container",
+    logoContainer: "esri-interactive-legend__onboarding-logo-container",
+    titleContainer: "esri-interactive-legend__onboarding-title-container",
+    infoContainer: "esri-interactive-legend__onboarding-info-container",
+    imgPreviewContainer:
+      "esri-interactive-legend__onboarding-img-preview-container",
+    onboardingButtonContainer:
+      "esri-interactive-legend__onboarding-button-container"
+  }
 };
 
 const KEY = "esri-legend__",
@@ -211,6 +224,12 @@ class InteractiveClassic extends declared(Widget) {
   })
   viewModel: InteractiveStyleViewModel = new InteractiveStyleViewModel();
 
+  @property()
+  onboardingPanelEnabled: boolean = null;
+
+  @property()
+  offscreen: boolean = null;
+
   // type
   @property({ readOnly: true })
   readonly type: "classic" = "classic";
@@ -270,17 +289,23 @@ class InteractiveClassic extends declared(Widget) {
       });
     });
     return (
-      <div class={this.classes(baseClasses, CSS.preventScroll)}>
-        {filteredLayers && filteredLayers.length ? (
-          <div class={CSS.legendElements}>
-            {state === "loading" || state === "querying" ? (
-              <div class={CSS.loader} />
+      <div>
+        {this.onboardingPanelEnabled ? (
+          this._renderOnboardingPanel()
+        ) : (
+          <div class={this.classes(baseClasses, CSS.preventScroll)}>
+            {filteredLayers && filteredLayers.length ? (
+              <div class={CSS.legendElements}>
+                {state === "loading" || state === "querying" ? (
+                  <div class={CSS.loader} />
+                ) : (
+                  <div> {filteredLayers}</div>
+                )}
+              </div>
             ) : (
-              <div> {filteredLayers}</div>
+              <div class={CSS.message}>{i18n.noLegend}</div>
             )}
           </div>
-        ) : (
-          <div class={CSS.message}>{i18n.noLegend}</div>
         )}
       </div>
     );
@@ -814,6 +839,7 @@ class InteractiveClassic extends declared(Widget) {
         }
         tabIndex={
           (activeLayerInfo.layer.type === "feature" &&
+            !this.offscreen &&
             (hasMoreThanOneInfo &&
               field &&
               featureLayerData &&
@@ -919,6 +945,45 @@ class InteractiveClassic extends declared(Widget) {
         class={this.classes(stretchedClasses)}
         styles={dynamicStyles}
       />
+    );
+  }
+
+  // _renderOnboardingPanel
+  private _renderOnboardingPanel(): any {
+    return (
+      <div class={this.classes(CSS.widget, CSS.onboarding.mainContainer)}>
+        <div key="onboarding-panel" class={CSS.onboarding.contentContainer}>
+          <div class={CSS.onboarding.closeContainer}>
+            <span
+              bind={this}
+              onclick={this._disableOnboarding}
+              onkeydown={this._disableOnboarding}
+              tabIndex={0}
+              class={CSS.calciteStyles.close}
+            />
+          </div>
+          <div class={CSS.onboarding.logoContainer} />
+          <div class={CSS.onboarding.titleContainer}>
+            <h3>{i18nInteractiveLegend.newInteractiveLegend}</h3>
+          </div>
+          <div class={CSS.onboarding.infoContainer}>
+            <p>{i18nInteractiveLegend.firstOnboardingWelcomeMessage}</p>
+            <p>{i18nInteractiveLegend.secondOnboardingWelcomeMessage}</p>
+          </div>
+          <div class={CSS.onboarding.imgPreviewContainer} />
+        </div>
+        <div class={CSS.onboarding.onboardingButtonContainer}>
+          <button
+            bind={this}
+            onclick={this._disableOnboarding}
+            onkeydown={this._disableOnboarding}
+            tabIndex={0}
+            class={this.classes(CSS.calciteStyles.btn)}
+          >
+            {i18nInteractiveLegend.onboardingConfirmation}
+          </button>
+        </div>
+      </div>
     );
   }
 
@@ -1051,6 +1116,13 @@ class InteractiveClassic extends declared(Widget) {
     );
   }
   // End of filter methods
+
+  // _disableOnboarding
+  @accessibleHandler()
+  private _disableOnboarding(): void {
+    this.onboardingPanelEnabled = false;
+    this.scheduleRender();
+  }
 
   // _handleSelectedStyles
   private _handleSelectedStyles(

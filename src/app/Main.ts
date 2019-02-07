@@ -263,6 +263,13 @@ class InteractiveLegendApp {
             const layerListViewModel = this.layerList
               ? this.layerList.viewModel
               : null;
+            let onboardingPanelEnabled = null;
+            if (localStorage.getItem("firstTimeUse")) {
+              onboardingPanelEnabled = false;
+            } else {
+              localStorage.setItem("firstTimeUse", `${Date.now()}`);
+              onboardingPanelEnabled = true;
+            }
 
             const interactiveLegend = new InteractiveLegend({
               view,
@@ -270,7 +277,8 @@ class InteractiveLegendApp {
               style: defaultStyle,
               filterMode: defaultMode,
               featureCountEnabled,
-              layerListViewModel
+              layerListViewModel,
+              onboardingPanelEnabled
             });
 
             const offScreenInteractiveLegend = new InteractiveLegend({
@@ -282,7 +290,8 @@ class InteractiveLegendApp {
               style: defaultStyle,
               filterMode: defaultMode,
               featureCountEnabled,
-              layerListViewModel
+              layerListViewModel,
+              offscreen: true
             });
 
             offScreenInteractiveLegend.style.selectedStyleData =

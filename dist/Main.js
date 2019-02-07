@@ -164,13 +164,22 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                             var layerListViewModel = _this.layerList
                                 ? _this.layerList.viewModel
                                 : null;
+                            var onboardingPanelEnabled = null;
+                            if (localStorage.getItem("firstTimeUse")) {
+                                onboardingPanelEnabled = false;
+                            }
+                            else {
+                                localStorage.setItem("firstTimeUse", "" + Date.now());
+                                onboardingPanelEnabled = true;
+                            }
                             var interactiveLegend = new InteractiveLegend({
                                 view: view,
                                 mutedShade: defaultShade,
                                 style: defaultStyle,
                                 filterMode: defaultMode,
                                 featureCountEnabled: featureCountEnabled,
-                                layerListViewModel: layerListViewModel
+                                layerListViewModel: layerListViewModel,
+                                onboardingPanelEnabled: onboardingPanelEnabled
                             });
                             var offScreenInteractiveLegend = new InteractiveLegend({
                                 view: view,
@@ -179,7 +188,8 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 style: defaultStyle,
                                 filterMode: defaultMode,
                                 featureCountEnabled: featureCountEnabled,
-                                layerListViewModel: layerListViewModel
+                                layerListViewModel: layerListViewModel,
+                                offscreen: true
                             });
                             offScreenInteractiveLegend.style.selectedStyleData =
                                 interactiveLegend.style.selectedStyleData;

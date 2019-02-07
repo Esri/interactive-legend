@@ -14,8 +14,11 @@ define({
     muteAndPictureFillError: "Mute filter cannot be applied to picture fill symbols.",
     error: "Could not load an item to display",
     sizeRampFilterNotSupported: "Filtering for size ramp legend type is currently not supported.",
-    featureLayerError: "Filtering can only be applied to feature layers."
-
+    featureLayerError: "Filtering can only be applied to feature layers.",
+    newInteractiveLegend: "New Interactive Legend",
+    firstOnboardingWelcomeMessage: "Welcome to the new Interactive Legend! Filter through feature layer data by selecting various legend info items.",
+    secondOnboardingWelcomeMessage: "Hover and click on the various legend elements to begin exploring!",
+    onboardingConfirmation: "Got it!"
   }),
   "ar": 1,
   "bs": 1,
