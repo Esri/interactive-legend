@@ -73,6 +73,9 @@ import Color = require("esri/Color");
 // Screenshot
 import Screenshot = require("./Components/Screenshot/Screenshot");
 
+// Info
+import Info = require("./Components/Info/Info");
+
 // Telemetry
 import Telemetry = require("telemetry/telemetry.dojo");
 
@@ -264,10 +267,10 @@ class InteractiveLegendApp {
               ? this.layerList.viewModel
               : null;
             let onboardingPanelEnabled = null;
-            if (localStorage.getItem("firstTimeUse")) {
+            if (localStorage.getItem("firstTimeUseApp")) {
               onboardingPanelEnabled = false;
             } else {
-              localStorage.setItem("firstTimeUse", `${Date.now()}`);
+              localStorage.setItem("firstTimeUseApp", `${Date.now()}`);
               onboardingPanelEnabled = true;
             }
 
@@ -311,6 +314,44 @@ class InteractiveLegendApp {
             });
 
             view.ui.add(this.interactiveLegendExpand, "bottom-left");
+
+            if (!localStorage.getItem("firstTimeUseInfo")) {
+              localStorage.setItem("firstTimeUseInfo", `${Date.now()}`);
+              const infoWidget = new Info({
+                infoContent: [
+                  {
+                    type: "list",
+                    title: "How to take a screenshot",
+                    listItems: [
+                      "Select a feature on the map",
+                      "Press the 'Screenshot' button",
+                      "Select an area to capture",
+                      "Press the 'Download Image' button"
+                    ]
+                  },
+                  {
+                    type: "explanation",
+                    title: "Including Popups and Legends in the screenshot",
+                    explanationItems: [
+                      "All items that are visible on your map will be included in the screenshot. If you would like a non-visible item to appear in the screen shot..."
+                    ]
+                  },
+                  {
+                    type: "explanation",
+                    title: "New Interactive Legend",
+                    explanationItems: [
+                      "Now you can filter on/off legend feature by selecting a legend element."
+                    ]
+                  }
+                ]
+              });
+
+              const infoExpand = new Expand({
+                content: infoWidget,
+                expanded: true
+              });
+              view.ui.add(infoExpand, "top-left");
+            }
 
             goToMarker(marker, view);
             this._addTitle(config.title);

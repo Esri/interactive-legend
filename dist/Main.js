@@ -27,7 +27,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     }
     return t;
 };
-define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/support/itemUtils", "ApplicationBase/support/domHelper", "esri/widgets/Home", "esri/widgets/LayerList", "esri/widgets/Search", "esri/layers/FeatureLayer", "esri/widgets/BasemapToggle", "esri/widgets/Expand", "esri/core/watchUtils", "esri/Color", "./Components/Screenshot/Screenshot", "telemetry/telemetry.dojo", "esri/widgets/Feature", "./Components/InteractiveLegend/InteractiveLegend"], function (require, exports, i18nInteractiveLegend, itemUtils_1, domHelper_1, Home, LayerList, Search, FeatureLayer, BasemapToggle, Expand, watchUtils, Color, Screenshot, Telemetry, FeatureWidget, InteractiveLegend) {
+define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/support/itemUtils", "ApplicationBase/support/domHelper", "esri/widgets/Home", "esri/widgets/LayerList", "esri/widgets/Search", "esri/layers/FeatureLayer", "esri/widgets/BasemapToggle", "esri/widgets/Expand", "esri/core/watchUtils", "esri/Color", "./Components/Screenshot/Screenshot", "./Components/Info/Info", "telemetry/telemetry.dojo", "esri/widgets/Feature", "./Components/InteractiveLegend/InteractiveLegend"], function (require, exports, i18nInteractiveLegend, itemUtils_1, domHelper_1, Home, LayerList, Search, FeatureLayer, BasemapToggle, Expand, watchUtils, Color, Screenshot, Info, Telemetry, FeatureWidget, InteractiveLegend) {
     "use strict";
     // CSS
     var CSS = {
@@ -165,11 +165,11 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 ? _this.layerList.viewModel
                                 : null;
                             var onboardingPanelEnabled = null;
-                            if (localStorage.getItem("firstTimeUse")) {
+                            if (localStorage.getItem("firstTimeUseApp")) {
                                 onboardingPanelEnabled = false;
                             }
                             else {
-                                localStorage.setItem("firstTimeUse", "" + Date.now());
+                                localStorage.setItem("firstTimeUseApp", "" + Date.now());
                                 onboardingPanelEnabled = true;
                             }
                             var interactiveLegend = new InteractiveLegend({
@@ -200,6 +200,42 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 mode: defaultExpandMode
                             });
                             view.ui.add(_this.interactiveLegendExpand, "bottom-left");
+                            if (!localStorage.getItem("firstTimeUseInfo")) {
+                                localStorage.setItem("firstTimeUseInfo", "" + Date.now());
+                                var infoWidget = new Info({
+                                    infoContent: [
+                                        {
+                                            type: "list",
+                                            title: "How to take a screenshot",
+                                            listItems: [
+                                                "Select a feature on the map",
+                                                "Press the 'Screenshot' button",
+                                                "Select an area to capture",
+                                                "Press the 'Download Image' button"
+                                            ]
+                                        },
+                                        {
+                                            type: "explanation",
+                                            title: "Including Popups and Legends in the screenshot",
+                                            explanationItems: [
+                                                "All items that are visible on your map will be included in the screenshot. If you would like a non-visible item to appear in the screen shot..."
+                                            ]
+                                        },
+                                        {
+                                            type: "explanation",
+                                            title: "New Interactive Legend",
+                                            explanationItems: [
+                                                "Now you can filter on/off legend feature by selecting a legend element."
+                                            ]
+                                        }
+                                    ]
+                                });
+                                var infoExpand = new Expand({
+                                    content: infoWidget,
+                                    expanded: true
+                                });
+                                view.ui.add(infoExpand, "top-left");
+                            }
                             itemUtils_1.goToMarker(marker, view);
                             _this._addTitle(config.title);
                             document.body.classList.remove(CSS.loading);
