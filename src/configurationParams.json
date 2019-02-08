@@ -6,7 +6,7 @@
           "fieldName": "webmap",
           "label": "Select",
           "itemTypes": ["Web Map"],
-          "conditions": ["renderer"],
+          "conditions": ["renderer", "4x"],
           "defaultContent": true,
           "showOnLoad": true
         },
