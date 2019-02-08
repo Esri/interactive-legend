@@ -201,8 +201,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                             });
                             view.ui.add(_this.interactiveLegendExpand, "bottom-left");
                             if (infoPanelEnabled) {
-                                localStorage.setItem("firstTimeUseInfo", "" + Date.now());
-                                var screenshotTitle = i18nInteractiveLegend.onboardingScreenshotTitle;
+                                var screenshotTitle = i18nInteractiveLegend.onboardingPanelScreenshotTitle;
                                 var onboardingPanelScreenshotStepOne = i18nInteractiveLegend.onboardingPanelScreenshotStepOne, onboardingPanelScreenshotStepTwo = i18nInteractiveLegend.onboardingPanelScreenshotStepTwo, onboardingPanelScreenshotStepThree = i18nInteractiveLegend.onboardingPanelScreenshotStepThree, onboardingPanelScreenshotStepFour = i18nInteractiveLegend.onboardingPanelScreenshotStepFour, onboardingPanelScreenshotStepFive = i18nInteractiveLegend.onboardingPanelScreenshotStepFive, newInteractiveLegend = i18nInteractiveLegend.newInteractiveLegend, firstOnboardingWelcomeMessage = i18nInteractiveLegend.firstOnboardingWelcomeMessage, secondOnboardingWelcomeMessage = i18nInteractiveLegend.secondOnboardingWelcomeMessage;
                                 var screenshotSteps = [
                                     onboardingPanelScreenshotStepOne,

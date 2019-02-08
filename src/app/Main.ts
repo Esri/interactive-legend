@@ -317,10 +317,8 @@ class InteractiveLegendApp {
             view.ui.add(this.interactiveLegendExpand, "bottom-left");
 
             if (infoPanelEnabled) {
-              localStorage.setItem("firstTimeUseInfo", `${Date.now()}`);
-
               const screenshotTitle =
-                i18nInteractiveLegend.onboardingScreenshotTitle;
+                i18nInteractiveLegend.onboardingPanelScreenshotTitle;
               const {
                 onboardingPanelScreenshotStepOne,
                 onboardingPanelScreenshotStepTwo,
