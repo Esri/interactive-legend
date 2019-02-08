@@ -338,13 +338,18 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                         : field + " = " + elementInfoHasValue + " OR " + field + " = '" + elementInfoHasValue + "'";
                 }
                 else {
+                    var singleQuote = elementInfoHasValue.indexOf("'") !== -1
+                        ? elementInfoHasValue.split("'").join("''")
+                        : null;
                     var expression = Array.isArray(elementInfo.value)
                         ? legendElementInfos.length - 1 === legendInfoIndex
                             ? field + " >= " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfoHasValue[1]
                             : field + " > " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfoHasValue[1]
-                        : isNaN(elementInfoHasValue)
-                            ? field + " = '" + elementInfoHasValue + "'"
-                            : field + " = " + elementInfoHasValue + " OR " + field + " = '" + elementInfoHasValue + "'";
+                        : singleQuote
+                            ? field + " = '" + singleQuote + "'"
+                            : isNaN(elementInfoHasValue)
+                                ? field + " = '" + elementInfoHasValue + "'"
+                                : field + " = " + elementInfoHasValue + " OR " + field + " = '" + elementInfoHasValue + "'";
                     return expression;
                 }
             }
