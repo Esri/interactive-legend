@@ -203,7 +203,7 @@
     "screenshotEnabled": false,
     "legendIncludedInScreenshot": false,
     "popupIncludedInScreenshot": false,
-    "infoPanelEnabled": true,
+    "infoPanelEnabled": false,
     "highlightShade": {
       "r": 0,
       "g": 0,
