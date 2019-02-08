@@ -6,6 +6,7 @@
           "fieldName": "webmap",
           "label": "Select",
           "itemTypes": ["Web Map"],
+          "conditions": ["renderer"],
           "defaultContent": true,
           "showOnLoad": true
         },
@@ -31,7 +32,7 @@
       ]
     },
     {
-      "category": "Widgets",
+      "category": "Options",
       "fields": [{
           "type": "paragraph",
           "value": "Select the widgets you would like to include in your app:"
@@ -113,6 +114,11 @@
               }
             ]
           }]
+        },
+        {
+          "type": "boolean",
+          "fieldName": "infoPanelEnabled",
+          "label": "Help Info"
         }
       ]
     },

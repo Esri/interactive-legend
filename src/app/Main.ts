@@ -163,7 +163,8 @@ class InteractiveLegendApp {
       basemapToggleEnabled,
       homeEnabled,
       nextBasemap,
-      searchConfig
+      searchConfig,
+      infoPanelEnabled
     } = config;
     const { webMapItems } = results;
     const validWebMapItems = webMapItems.map(response => {
@@ -315,32 +316,41 @@ class InteractiveLegendApp {
 
             view.ui.add(this.interactiveLegendExpand, "bottom-left");
 
-            if (!localStorage.getItem("firstTimeUseInfo")) {
+            if (infoPanelEnabled) {
               localStorage.setItem("firstTimeUseInfo", `${Date.now()}`);
+
+              const screenshotTitle =
+                i18nInteractiveLegend.onboardingScreenshotTitle;
+              const {
+                onboardingPanelScreenshotStepOne,
+                onboardingPanelScreenshotStepTwo,
+                onboardingPanelScreenshotStepThree,
+                onboardingPanelScreenshotStepFour,
+                onboardingPanelScreenshotStepFive,
+                newInteractiveLegend,
+                firstOnboardingWelcomeMessage,
+                secondOnboardingWelcomeMessage
+              } = i18nInteractiveLegend;
+              const screenshotSteps = [
+                onboardingPanelScreenshotStepOne,
+                onboardingPanelScreenshotStepTwo,
+                onboardingPanelScreenshotStepThree,
+                onboardingPanelScreenshotStepFour,
+                onboardingPanelScreenshotStepFive
+              ];
               const infoWidget = new Info({
                 infoContent: [
                   {
                     type: "list",
-                    title: "How to take a screenshot",
-                    listItems: [
-                      "Select a feature on the map",
-                      "Press the 'Screenshot' button",
-                      "Select an area to capture",
-                      "Press the 'Download Image' button"
-                    ]
+                    title: screenshotTitle,
+                    infoContentItems: screenshotSteps
                   },
                   {
                     type: "explanation",
-                    title: "Including Popups and Legends in the screenshot",
-                    explanationItems: [
-                      "All items that are visible on your map will be included in the screenshot. If you would like a non-visible item to appear in the screen shot..."
-                    ]
-                  },
-                  {
-                    type: "explanation",
-                    title: "New Interactive Legend",
-                    explanationItems: [
-                      "Now you can filter on/off legend feature by selecting a legend element."
+                    title: newInteractiveLegend,
+                    infoContentItems: [
+                      firstOnboardingWelcomeMessage,
+                      secondOnboardingWelcomeMessage
                     ]
                   }
                 ]
@@ -348,8 +358,11 @@ class InteractiveLegendApp {
 
               const infoExpand = new Expand({
                 content: infoWidget,
-                expanded: true
+                expanded: false
               });
+
+              infoWidget.expandWidget = infoExpand;
+
               view.ui.add(infoExpand, "top-left");
             }
 

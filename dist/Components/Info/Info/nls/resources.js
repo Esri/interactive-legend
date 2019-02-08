@@ -2,7 +2,8 @@ define({
   root: ({
     next: "Next",
     back: "back",
-    close: "Close"
+    close: "Close",
+    widgetLabel: "Info"
   }),
   "ar": 1,
   "bs": 1,

@@ -88,7 +88,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 });
                 this.telemetry.logPageView();
             }
-            var drawerEnabled = config.drawerEnabled, expandEnabled = config.expandEnabled, highlightShade = config.highlightShade, mutedShade = config.mutedShade, style = config.style, filterMode = config.filterMode, screenshotEnabled = config.screenshotEnabled, legendIncludedInScreenshot = config.legendIncludedInScreenshot, popupIncludedInScreenshot = config.popupIncludedInScreenshot, featureCountEnabled = config.featureCountEnabled, layerListEnabled = config.layerListEnabled, searchEnabled = config.searchEnabled, basemapToggleEnabled = config.basemapToggleEnabled, homeEnabled = config.homeEnabled, nextBasemap = config.nextBasemap, searchConfig = config.searchConfig;
+            var drawerEnabled = config.drawerEnabled, expandEnabled = config.expandEnabled, highlightShade = config.highlightShade, mutedShade = config.mutedShade, style = config.style, filterMode = config.filterMode, screenshotEnabled = config.screenshotEnabled, legendIncludedInScreenshot = config.legendIncludedInScreenshot, popupIncludedInScreenshot = config.popupIncludedInScreenshot, featureCountEnabled = config.featureCountEnabled, layerListEnabled = config.layerListEnabled, searchEnabled = config.searchEnabled, basemapToggleEnabled = config.basemapToggleEnabled, homeEnabled = config.homeEnabled, nextBasemap = config.nextBasemap, searchConfig = config.searchConfig, infoPanelEnabled = config.infoPanelEnabled;
             var webMapItems = results.webMapItems;
             var validWebMapItems = webMapItems.map(function (response) {
                 return response.value;
@@ -200,40 +200,39 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 mode: defaultExpandMode
                             });
                             view.ui.add(_this.interactiveLegendExpand, "bottom-left");
-                            if (!localStorage.getItem("firstTimeUseInfo")) {
+                            if (infoPanelEnabled) {
                                 localStorage.setItem("firstTimeUseInfo", "" + Date.now());
+                                var screenshotTitle = i18nInteractiveLegend.onboardingScreenshotTitle;
+                                var onboardingPanelScreenshotStepOne = i18nInteractiveLegend.onboardingPanelScreenshotStepOne, onboardingPanelScreenshotStepTwo = i18nInteractiveLegend.onboardingPanelScreenshotStepTwo, onboardingPanelScreenshotStepThree = i18nInteractiveLegend.onboardingPanelScreenshotStepThree, onboardingPanelScreenshotStepFour = i18nInteractiveLegend.onboardingPanelScreenshotStepFour, onboardingPanelScreenshotStepFive = i18nInteractiveLegend.onboardingPanelScreenshotStepFive, newInteractiveLegend = i18nInteractiveLegend.newInteractiveLegend, firstOnboardingWelcomeMessage = i18nInteractiveLegend.firstOnboardingWelcomeMessage, secondOnboardingWelcomeMessage = i18nInteractiveLegend.secondOnboardingWelcomeMessage;
+                                var screenshotSteps = [
+                                    onboardingPanelScreenshotStepOne,
+                                    onboardingPanelScreenshotStepTwo,
+                                    onboardingPanelScreenshotStepThree,
+                                    onboardingPanelScreenshotStepFour,
+                                    onboardingPanelScreenshotStepFive
+                                ];
                                 var infoWidget = new Info({
                                     infoContent: [
                                         {
                                             type: "list",
-                                            title: "How to take a screenshot",
-                                            listItems: [
-                                                "Select a feature on the map",
-                                                "Press the 'Screenshot' button",
-                                                "Select an area to capture",
-                                                "Press the 'Download Image' button"
-                                            ]
+                                            title: screenshotTitle,
+                                            infoContentItems: screenshotSteps
                                         },
                                         {
                                             type: "explanation",
-                                            title: "Including Popups and Legends in the screenshot",
-                                            explanationItems: [
-                                                "All items that are visible on your map will be included in the screenshot. If you would like a non-visible item to appear in the screen shot..."
-                                            ]
-                                        },
-                                        {
-                                            type: "explanation",
-                                            title: "New Interactive Legend",
-                                            explanationItems: [
-                                                "Now you can filter on/off legend feature by selecting a legend element."
+                                            title: newInteractiveLegend,
+                                            infoContentItems: [
+                                                firstOnboardingWelcomeMessage,
+                                                secondOnboardingWelcomeMessage
                                             ]
                                         }
                                     ]
                                 });
                                 var infoExpand = new Expand({
                                     content: infoWidget,
-                                    expanded: true
+                                    expanded: false
                                 });
+                                infoWidget.expandWidget = infoExpand;
                                 view.ui.add(infoExpand, "top-left");
                             }
                             itemUtils_1.goToMarker(marker, view);

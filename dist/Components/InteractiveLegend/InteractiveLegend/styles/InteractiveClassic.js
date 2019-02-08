@@ -25,6 +25,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
     //----------------------------------
     var CSS = {
         widget: "esri-widget",
+        interactiveLegend: "esri-interactive-legend",
         base: "esri-legend esri-widget--panel",
         service: "esri-legend__service",
         label: "esri-legend__service-label",
@@ -160,7 +161,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         InteractiveClassic.prototype.render = function () {
             var _this = this;
             var state = this.viewModel.state;
-            var activeLayerInfos = this.activeLayerInfos, baseClasses = this.classes(CSS.base, CSS.widget), filteredLayers = activeLayerInfos &&
+            var activeLayerInfos = this.activeLayerInfos, baseClasses = this.classes(CSS.base, CSS.interactiveLegend, CSS.widget), filteredLayers = activeLayerInfos &&
                 activeLayerInfos
                     .toArray()
                     .map(function (activeLayerInfo, activeLayerInfoIndex) {
@@ -173,7 +174,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     legendElements.push(legendElement);
                 });
             });
-            return (widget_1.tsx("div", null, this.onboardingPanelEnabled ? (this._renderOnboardingPanel()) : (widget_1.tsx("div", { class: this.classes(baseClasses, CSS.preventScroll) }, filteredLayers && filteredLayers.length ? (widget_1.tsx("div", { class: CSS.legendElements }, state === "loading" || state === "querying" ? (widget_1.tsx("div", { class: CSS.loader })) : (widget_1.tsx("div", null,
+            return (widget_1.tsx("div", { class: baseClasses }, this.onboardingPanelEnabled ? (this._renderOnboardingPanel()) : (widget_1.tsx("div", { class: this.classes(CSS.preventScroll) }, filteredLayers && filteredLayers.length ? (widget_1.tsx("div", { class: CSS.legendElements }, state === "loading" || state === "querying" ? (widget_1.tsx("div", { class: CSS.loader })) : (widget_1.tsx("div", null,
                 " ",
                 filteredLayers)))) : (widget_1.tsx("div", { class: CSS.message }, i18n.noLegend))))));
         };
@@ -555,10 +556,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         };
         // _renderOnboardingPanel
         InteractiveClassic.prototype._renderOnboardingPanel = function () {
-            return (widget_1.tsx("div", { class: this.classes(CSS.widget, CSS.onboarding.mainContainer) },
+            return (widget_1.tsx("div", { class: this.classes(CSS.onboarding.mainContainer) },
                 widget_1.tsx("div", { key: "onboarding-panel", class: CSS.onboarding.contentContainer },
                     widget_1.tsx("div", { class: CSS.onboarding.closeContainer },
-                        widget_1.tsx("span", { bind: this, onclick: this._disableOnboarding, onkeydown: this._disableOnboarding, tabIndex: 0, class: CSS.calciteStyles.close })),
+                        widget_1.tsx("span", { bind: this, onclick: this._disableOnboarding, onkeydown: this._disableOnboarding, tabIndex: 0, class: CSS.calciteStyles.close, title: i18nInteractiveLegend.close })),
                     widget_1.tsx("div", { class: CSS.onboarding.logoContainer }),
                     widget_1.tsx("div", { class: CSS.onboarding.titleContainer },
                         widget_1.tsx("h3", null, i18nInteractiveLegend.newInteractiveLegend)),
@@ -567,7 +568,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         widget_1.tsx("p", null, i18nInteractiveLegend.secondOnboardingWelcomeMessage)),
                     widget_1.tsx("div", { class: CSS.onboarding.imgPreviewContainer })),
                 widget_1.tsx("div", { class: CSS.onboarding.onboardingButtonContainer },
-                    widget_1.tsx("button", { bind: this, onclick: this._disableOnboarding, onkeydown: this._disableOnboarding, tabIndex: 0, class: this.classes(CSS.calciteStyles.btn) }, i18nInteractiveLegend.onboardingConfirmation))));
+                    widget_1.tsx("button", { bind: this, onclick: this._disableOnboarding, onkeydown: this._disableOnboarding, tabIndex: 0, class: this.classes(CSS.calciteStyles.btn), title: i18nInteractiveLegend.onboardingConfirmation }, i18nInteractiveLegend.onboardingConfirmation))));
         };
         //-------------------------------------------------------------------
         //

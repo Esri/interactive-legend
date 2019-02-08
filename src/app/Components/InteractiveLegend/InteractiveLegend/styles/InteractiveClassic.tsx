@@ -89,6 +89,7 @@ import { renderRelationshipRamp } from "../relationshipRamp/utils";
 //----------------------------------
 const CSS = {
   widget: "esri-widget",
+  interactiveLegend: "esri-interactive-legend",
   base: "esri-legend esri-widget--panel",
   service: "esri-legend__service",
   label: "esri-legend__service-label",
@@ -273,7 +274,7 @@ class InteractiveClassic extends declared(Widget) {
   render(): VNode {
     const { state } = this.viewModel;
     const activeLayerInfos = this.activeLayerInfos,
-      baseClasses = this.classes(CSS.base, CSS.widget),
+      baseClasses = this.classes(CSS.base, CSS.interactiveLegend, CSS.widget),
       filteredLayers =
         activeLayerInfos &&
         activeLayerInfos
@@ -289,11 +290,11 @@ class InteractiveClassic extends declared(Widget) {
       });
     });
     return (
-      <div>
+      <div class={baseClasses}>
         {this.onboardingPanelEnabled ? (
           this._renderOnboardingPanel()
         ) : (
-          <div class={this.classes(baseClasses, CSS.preventScroll)}>
+          <div class={this.classes(CSS.preventScroll)}>
             {filteredLayers && filteredLayers.length ? (
               <div class={CSS.legendElements}>
                 {state === "loading" || state === "querying" ? (
@@ -951,7 +952,7 @@ class InteractiveClassic extends declared(Widget) {
   // _renderOnboardingPanel
   private _renderOnboardingPanel(): any {
     return (
-      <div class={this.classes(CSS.widget, CSS.onboarding.mainContainer)}>
+      <div class={this.classes(CSS.onboarding.mainContainer)}>
         <div key="onboarding-panel" class={CSS.onboarding.contentContainer}>
           <div class={CSS.onboarding.closeContainer}>
             <span
@@ -960,6 +961,7 @@ class InteractiveClassic extends declared(Widget) {
               onkeydown={this._disableOnboarding}
               tabIndex={0}
               class={CSS.calciteStyles.close}
+              title={i18nInteractiveLegend.close}
             />
           </div>
           <div class={CSS.onboarding.logoContainer} />
@@ -979,6 +981,7 @@ class InteractiveClassic extends declared(Widget) {
             onkeydown={this._disableOnboarding}
             tabIndex={0}
             class={this.classes(CSS.calciteStyles.btn)}
+            title={i18nInteractiveLegend.onboardingConfirmation}
           >
             {i18nInteractiveLegend.onboardingConfirmation}
           </button>
