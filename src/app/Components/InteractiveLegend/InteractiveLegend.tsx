@@ -140,6 +140,15 @@ class InteractiveLegend extends declared(Widget) {
   @property()
   layerListViewModel: LayerListViewModel = null;
 
+  // mutedShade
+  @aliasOf("style.onboardingPanelEnabled")
+  @renderable()
+  onboardingPanelEnabled: boolean = null;
+
+  @aliasOf("style.offscreen")
+  @renderable()
+  offscreen: boolean = null;
+
   // style
   @property()
   @renderable()
@@ -149,7 +158,9 @@ class InteractiveLegend extends declared(Widget) {
     filterMode: this.filterMode,
     mutedShade: this.mutedShade,
     layerListViewModel: this.layerListViewModel,
-    searchViewModel: this.searchViewModel
+    searchViewModel: this.searchViewModel,
+    onboardingPanelEnabled: this.onboardingPanelEnabled,
+    offscreen: this.offscreen
   });
 
   // castStyle
@@ -168,7 +179,9 @@ class InteractiveLegend extends declared(Widget) {
         filterMode: this.filterMode,
         mutedShade: this.mutedShade,
         layerListViewModel: this.layerListViewModel,
-        searchViewModel: this.searchViewModel
+        searchViewModel: this.searchViewModel,
+        onboardingPanelEnabled: this.onboardingPanelEnabled,
+        offscreen: this.offscreen
       });
     }
 
@@ -187,7 +200,9 @@ class InteractiveLegend extends declared(Widget) {
       filterMode: this.filterMode,
       mutedShade: this.mutedShade,
       layerListViewModel: this.layerListViewModel,
-      searchViewModel: this.searchViewModel
+      searchViewModel: this.searchViewModel,
+      onboardingPanelEnabled: this.onboardingPanelEnabled,
+      offscreen: this.offscreen
     });
   }
 

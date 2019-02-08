@@ -25,6 +25,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
     //----------------------------------
     var CSS = {
         widget: "esri-widget",
+        interactiveLegend: "esri-interactive-legend",
         base: "esri-legend esri-widget--panel",
         service: "esri-legend__service",
         label: "esri-legend__service-label",
@@ -63,7 +64,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             btn: "btn",
             btnSmall: "btn-small",
             btnPrimary: "btn-primary",
-            error: "icon-ui-error"
+            error: "icon-ui-error",
+            close: "icon-ui-close"
         },
         // interactive-legend
         loaderContainer: "esri-interactive-legend__loader-container",
@@ -74,7 +76,17 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         screenshot: "esri-interactive-legend__screenshot",
         hoverStyles: "esri-interactive-legend--layer-row",
         error: "esri-interactive-legend--error",
-        legendElements: "esri-interactive-legend__legend-elements"
+        legendElements: "esri-interactive-legend__legend-elements",
+        onboarding: {
+            mainContainer: "esri-interactive-legend__onboarding-main-container",
+            contentContainer: "esri-interactive-legend__onboarding-content-container",
+            closeContainer: "esri-interactive-legend__onboarding-close-container",
+            logoContainer: "esri-interactive-legend__onboarding-logo-container",
+            titleContainer: "esri-interactive-legend__onboarding-title-container",
+            infoContainer: "esri-interactive-legend__onboarding-info-container",
+            imgPreviewContainer: "esri-interactive-legend__onboarding-img-preview-container",
+            onboardingButtonContainer: "esri-interactive-legend__onboarding-button-container"
+        }
     };
     var KEY = "esri-legend__", GRADIENT_WIDTH = 24;
     var InteractiveClassic = /** @class */ (function (_super) {
@@ -117,6 +129,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this.selectedStyleData = new Collection();
             // viewModel
             _this.viewModel = new InteractiveStyleViewModel();
+            _this.onboardingPanelEnabled = null;
+            _this.offscreen = null;
             // type
             _this.type = "classic";
             return _this;
@@ -147,7 +161,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         InteractiveClassic.prototype.render = function () {
             var _this = this;
             var state = this.viewModel.state;
-            var activeLayerInfos = this.activeLayerInfos, baseClasses = this.classes(CSS.base, CSS.widget), filteredLayers = activeLayerInfos &&
+            var activeLayerInfos = this.activeLayerInfos, baseClasses = this.classes(CSS.base, CSS.interactiveLegend, CSS.widget), filteredLayers = activeLayerInfos &&
                 activeLayerInfos
                     .toArray()
                     .map(function (activeLayerInfo, activeLayerInfoIndex) {
@@ -160,9 +174,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     legendElements.push(legendElement);
                 });
             });
-            return (widget_1.tsx("div", { class: this.classes(baseClasses, CSS.preventScroll) }, filteredLayers && filteredLayers.length ? (widget_1.tsx("div", { class: CSS.legendElements }, state === "loading" || state === "querying" ? (widget_1.tsx("div", { class: CSS.loader })) : (widget_1.tsx("div", null,
+            return (widget_1.tsx("div", { class: baseClasses }, this.onboardingPanelEnabled ? (this._renderOnboardingPanel()) : (widget_1.tsx("div", { class: this.classes(CSS.preventScroll) }, filteredLayers && filteredLayers.length ? (widget_1.tsx("div", { class: CSS.legendElements }, state === "loading" || state === "querying" ? (widget_1.tsx("div", { class: CSS.loader })) : (widget_1.tsx("div", null,
                 " ",
-                filteredLayers)))) : (widget_1.tsx("div", { class: CSS.message }, i18n.noLegend))));
+                filteredLayers)))) : (widget_1.tsx("div", { class: CSS.message }, i18n.noLegend))))));
         };
         InteractiveClassic.prototype.destroy = function () {
             this._handles.removeAll();
@@ -486,6 +500,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     isPredominance
                     ? applySelect
                     : null, tabIndex: (activeLayerInfo.layer.type === "feature" &&
+                    !this.offscreen &&
                     (hasMoreThanOneInfo &&
                         field &&
                         featureLayerData &&
@@ -539,6 +554,22 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             };
             return (widget_1.tsx("img", { alt: label, src: src, border: 0, width: elementInfo.width, height: elementInfo.height, class: this.classes(stretchedClasses), styles: dynamicStyles }));
         };
+        // _renderOnboardingPanel
+        InteractiveClassic.prototype._renderOnboardingPanel = function () {
+            return (widget_1.tsx("div", { class: this.classes(CSS.onboarding.mainContainer) },
+                widget_1.tsx("div", { key: "onboarding-panel", class: CSS.onboarding.contentContainer },
+                    widget_1.tsx("div", { class: CSS.onboarding.closeContainer },
+                        widget_1.tsx("span", { bind: this, onclick: this._disableOnboarding, onkeydown: this._disableOnboarding, tabIndex: 0, class: CSS.calciteStyles.close, title: i18nInteractiveLegend.close })),
+                    widget_1.tsx("div", { class: CSS.onboarding.logoContainer }),
+                    widget_1.tsx("div", { class: CSS.onboarding.titleContainer },
+                        widget_1.tsx("h3", null, i18nInteractiveLegend.newInteractiveLegend)),
+                    widget_1.tsx("div", { class: CSS.onboarding.infoContainer },
+                        widget_1.tsx("p", null, i18nInteractiveLegend.firstOnboardingWelcomeMessage),
+                        widget_1.tsx("p", null, i18nInteractiveLegend.secondOnboardingWelcomeMessage)),
+                    widget_1.tsx("div", { class: CSS.onboarding.imgPreviewContainer })),
+                widget_1.tsx("div", { class: CSS.onboarding.onboardingButtonContainer },
+                    widget_1.tsx("button", { bind: this, onclick: this._disableOnboarding, onkeydown: this._disableOnboarding, tabIndex: 0, class: this.classes(CSS.calciteStyles.btn), title: i18nInteractiveLegend.onboardingConfirmation }, i18nInteractiveLegend.onboardingConfirmation))));
+        };
         //-------------------------------------------------------------------
         //
         //  Filter methods
@@ -573,6 +604,11 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             this.viewModel.applyFeatureMute(elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos);
         };
         // End of filter methods
+        // _disableOnboarding
+        InteractiveClassic.prototype._disableOnboarding = function () {
+            this.onboardingPanelEnabled = false;
+            this.scheduleRender();
+        };
         // _handleSelectedStyles
         InteractiveClassic.prototype._handleSelectedStyles = function (event, operationalItemIndex, legendInfoIndex) {
             var node = event.currentTarget;
@@ -721,11 +757,20 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             })
         ], InteractiveClassic.prototype, "viewModel", void 0);
         __decorate([
+            decorators_1.property()
+        ], InteractiveClassic.prototype, "onboardingPanelEnabled", void 0);
+        __decorate([
+            decorators_1.property()
+        ], InteractiveClassic.prototype, "offscreen", void 0);
+        __decorate([
             decorators_1.property({ readOnly: true })
         ], InteractiveClassic.prototype, "type", void 0);
         __decorate([
             widget_1.accessibleHandler()
         ], InteractiveClassic.prototype, "_handleFilterOption", null);
+        __decorate([
+            widget_1.accessibleHandler()
+        ], InteractiveClassic.prototype, "_disableOnboarding", null);
         InteractiveClassic = __decorate([
             decorators_1.subclass("InteractiveClassic")
         ], InteractiveClassic);

@@ -81,6 +81,9 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             _this.searchViewModel = null;
             // layerListViewModel
             _this.layerListViewModel = null;
+            // mutedShade
+            _this.onboardingPanelEnabled = null;
+            _this.offscreen = null;
             // style
             _this.style = new InteractiveClassic({
                 view: _this.view,
@@ -88,7 +91,9 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 filterMode: _this.filterMode,
                 mutedShade: _this.mutedShade,
                 layerListViewModel: _this.layerListViewModel,
-                searchViewModel: _this.searchViewModel
+                searchViewModel: _this.searchViewModel,
+                onboardingPanelEnabled: _this.onboardingPanelEnabled,
+                offscreen: _this.offscreen
             });
             return _this;
         }
@@ -104,7 +109,9 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                     filterMode: this.filterMode,
                     mutedShade: this.mutedShade,
                     layerListViewModel: this.layerListViewModel,
-                    searchViewModel: this.searchViewModel
+                    searchViewModel: this.searchViewModel,
+                    onboardingPanelEnabled: this.onboardingPanelEnabled,
+                    offscreen: this.offscreen
                 });
             }
             if (value && typeof value.type === "string") {
@@ -119,7 +126,9 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 filterMode: this.filterMode,
                 mutedShade: this.mutedShade,
                 layerListViewModel: this.layerListViewModel,
-                searchViewModel: this.searchViewModel
+                searchViewModel: this.searchViewModel,
+                onboardingPanelEnabled: this.onboardingPanelEnabled,
+                offscreen: this.offscreen
             });
         };
         InteractiveLegend.prototype.postInitialize = function () {
@@ -229,6 +238,14 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         __decorate([
             decorators_1.property()
         ], InteractiveLegend.prototype, "layerListViewModel", void 0);
+        __decorate([
+            decorators_1.aliasOf("style.onboardingPanelEnabled"),
+            widget_1.renderable()
+        ], InteractiveLegend.prototype, "onboardingPanelEnabled", void 0);
+        __decorate([
+            decorators_1.aliasOf("style.offscreen"),
+            widget_1.renderable()
+        ], InteractiveLegend.prototype, "offscreen", void 0);
         __decorate([
             decorators_1.property(),
             widget_1.renderable()

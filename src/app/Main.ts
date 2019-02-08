@@ -73,6 +73,9 @@ import Color = require("esri/Color");
 // Screenshot
 import Screenshot = require("./Components/Screenshot/Screenshot");
 
+// Info
+import Info = require("./Components/Info/Info");
+
 // Telemetry
 import Telemetry = require("telemetry/telemetry.dojo");
 
@@ -160,7 +163,8 @@ class InteractiveLegendApp {
       basemapToggleEnabled,
       homeEnabled,
       nextBasemap,
-      searchConfig
+      searchConfig,
+      infoPanelEnabled
     } = config;
     const { webMapItems } = results;
     const validWebMapItems = webMapItems.map(response => {
@@ -263,6 +267,13 @@ class InteractiveLegendApp {
             const layerListViewModel = this.layerList
               ? this.layerList.viewModel
               : null;
+            let onboardingPanelEnabled = null;
+            if (localStorage.getItem("firstTimeUseApp")) {
+              onboardingPanelEnabled = false;
+            } else {
+              localStorage.setItem("firstTimeUseApp", `${Date.now()}`);
+              onboardingPanelEnabled = true;
+            }
 
             const interactiveLegend = new InteractiveLegend({
               view,
@@ -270,7 +281,8 @@ class InteractiveLegendApp {
               style: defaultStyle,
               filterMode: defaultMode,
               featureCountEnabled,
-              layerListViewModel
+              layerListViewModel,
+              onboardingPanelEnabled
             });
 
             const offScreenInteractiveLegend = new InteractiveLegend({
@@ -282,7 +294,8 @@ class InteractiveLegendApp {
               style: defaultStyle,
               filterMode: defaultMode,
               featureCountEnabled,
-              layerListViewModel
+              layerListViewModel,
+              offscreen: true
             });
 
             offScreenInteractiveLegend.style.selectedStyleData =
@@ -302,6 +315,54 @@ class InteractiveLegendApp {
             });
 
             view.ui.add(this.interactiveLegendExpand, "bottom-left");
+
+            if (infoPanelEnabled) {
+              const screenshotTitle =
+                i18nInteractiveLegend.onboardingPanelScreenshotTitle;
+              const {
+                onboardingPanelScreenshotStepOne,
+                onboardingPanelScreenshotStepTwo,
+                onboardingPanelScreenshotStepThree,
+                onboardingPanelScreenshotStepFour,
+                onboardingPanelScreenshotStepFive,
+                newInteractiveLegend,
+                firstOnboardingWelcomeMessage,
+                secondOnboardingWelcomeMessage
+              } = i18nInteractiveLegend;
+              const screenshotSteps = [
+                onboardingPanelScreenshotStepOne,
+                onboardingPanelScreenshotStepTwo,
+                onboardingPanelScreenshotStepThree,
+                onboardingPanelScreenshotStepFour,
+                onboardingPanelScreenshotStepFive
+              ];
+              const infoWidget = new Info({
+                infoContent: [
+                  {
+                    type: "list",
+                    title: screenshotTitle,
+                    infoContentItems: screenshotSteps
+                  },
+                  {
+                    type: "explanation",
+                    title: newInteractiveLegend,
+                    infoContentItems: [
+                      firstOnboardingWelcomeMessage,
+                      secondOnboardingWelcomeMessage
+                    ]
+                  }
+                ]
+              });
+
+              const infoExpand = new Expand({
+                content: infoWidget,
+                expanded: false
+              });
+
+              infoWidget.expandWidget = infoExpand;
+
+              view.ui.add(infoExpand, "top-left");
+            }
 
             goToMarker(marker, view);
             this._addTitle(config.title);

@@ -56,6 +56,10 @@
         location: `${distPath}/dist/Components/Screenshot/Screenshot`
       },
       {
+        name: "Info",
+        location: `${distPath}/dist/Components/Info/Info`
+      },
+      {
         name: "config",
         location: `${distPath}/config`
       }

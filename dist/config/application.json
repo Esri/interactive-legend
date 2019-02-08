@@ -9,6 +9,7 @@
   "screenshotEnabled": false,
   "legendIncludedInScreenshot": false,
   "popupIncludedInScreenshot": false,
+  "infoPanelEnabled": false,
   "expandEnabled": true,
   "drawerEnabled": false,
   "highlightShade": null,

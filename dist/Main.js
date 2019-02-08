@@ -27,7 +27,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     }
     return t;
 };
-define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/support/itemUtils", "ApplicationBase/support/domHelper", "esri/widgets/Home", "esri/widgets/LayerList", "esri/widgets/Search", "esri/layers/FeatureLayer", "esri/widgets/BasemapToggle", "esri/widgets/Expand", "esri/core/watchUtils", "esri/Color", "./Components/Screenshot/Screenshot", "telemetry/telemetry.dojo", "esri/widgets/Feature", "./Components/InteractiveLegend/InteractiveLegend"], function (require, exports, i18nInteractiveLegend, itemUtils_1, domHelper_1, Home, LayerList, Search, FeatureLayer, BasemapToggle, Expand, watchUtils, Color, Screenshot, Telemetry, FeatureWidget, InteractiveLegend) {
+define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/support/itemUtils", "ApplicationBase/support/domHelper", "esri/widgets/Home", "esri/widgets/LayerList", "esri/widgets/Search", "esri/layers/FeatureLayer", "esri/widgets/BasemapToggle", "esri/widgets/Expand", "esri/core/watchUtils", "esri/Color", "./Components/Screenshot/Screenshot", "./Components/Info/Info", "telemetry/telemetry.dojo", "esri/widgets/Feature", "./Components/InteractiveLegend/InteractiveLegend"], function (require, exports, i18nInteractiveLegend, itemUtils_1, domHelper_1, Home, LayerList, Search, FeatureLayer, BasemapToggle, Expand, watchUtils, Color, Screenshot, Info, Telemetry, FeatureWidget, InteractiveLegend) {
     "use strict";
     // CSS
     var CSS = {
@@ -88,7 +88,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 });
                 this.telemetry.logPageView();
             }
-            var drawerEnabled = config.drawerEnabled, expandEnabled = config.expandEnabled, highlightShade = config.highlightShade, mutedShade = config.mutedShade, style = config.style, filterMode = config.filterMode, screenshotEnabled = config.screenshotEnabled, legendIncludedInScreenshot = config.legendIncludedInScreenshot, popupIncludedInScreenshot = config.popupIncludedInScreenshot, featureCountEnabled = config.featureCountEnabled, layerListEnabled = config.layerListEnabled, searchEnabled = config.searchEnabled, basemapToggleEnabled = config.basemapToggleEnabled, homeEnabled = config.homeEnabled, nextBasemap = config.nextBasemap, searchConfig = config.searchConfig;
+            var drawerEnabled = config.drawerEnabled, expandEnabled = config.expandEnabled, highlightShade = config.highlightShade, mutedShade = config.mutedShade, style = config.style, filterMode = config.filterMode, screenshotEnabled = config.screenshotEnabled, legendIncludedInScreenshot = config.legendIncludedInScreenshot, popupIncludedInScreenshot = config.popupIncludedInScreenshot, featureCountEnabled = config.featureCountEnabled, layerListEnabled = config.layerListEnabled, searchEnabled = config.searchEnabled, basemapToggleEnabled = config.basemapToggleEnabled, homeEnabled = config.homeEnabled, nextBasemap = config.nextBasemap, searchConfig = config.searchConfig, infoPanelEnabled = config.infoPanelEnabled;
             var webMapItems = results.webMapItems;
             var validWebMapItems = webMapItems.map(function (response) {
                 return response.value;
@@ -164,13 +164,22 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                             var layerListViewModel = _this.layerList
                                 ? _this.layerList.viewModel
                                 : null;
+                            var onboardingPanelEnabled = null;
+                            if (localStorage.getItem("firstTimeUseApp")) {
+                                onboardingPanelEnabled = false;
+                            }
+                            else {
+                                localStorage.setItem("firstTimeUseApp", "" + Date.now());
+                                onboardingPanelEnabled = true;
+                            }
                             var interactiveLegend = new InteractiveLegend({
                                 view: view,
                                 mutedShade: defaultShade,
                                 style: defaultStyle,
                                 filterMode: defaultMode,
                                 featureCountEnabled: featureCountEnabled,
-                                layerListViewModel: layerListViewModel
+                                layerListViewModel: layerListViewModel,
+                                onboardingPanelEnabled: onboardingPanelEnabled
                             });
                             var offScreenInteractiveLegend = new InteractiveLegend({
                                 view: view,
@@ -179,7 +188,8 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 style: defaultStyle,
                                 filterMode: defaultMode,
                                 featureCountEnabled: featureCountEnabled,
-                                layerListViewModel: layerListViewModel
+                                layerListViewModel: layerListViewModel,
+                                offscreen: true
                             });
                             offScreenInteractiveLegend.style.selectedStyleData =
                                 interactiveLegend.style.selectedStyleData;
@@ -190,6 +200,40 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 mode: defaultExpandMode
                             });
                             view.ui.add(_this.interactiveLegendExpand, "bottom-left");
+                            if (infoPanelEnabled) {
+                                var screenshotTitle = i18nInteractiveLegend.onboardingPanelScreenshotTitle;
+                                var onboardingPanelScreenshotStepOne = i18nInteractiveLegend.onboardingPanelScreenshotStepOne, onboardingPanelScreenshotStepTwo = i18nInteractiveLegend.onboardingPanelScreenshotStepTwo, onboardingPanelScreenshotStepThree = i18nInteractiveLegend.onboardingPanelScreenshotStepThree, onboardingPanelScreenshotStepFour = i18nInteractiveLegend.onboardingPanelScreenshotStepFour, onboardingPanelScreenshotStepFive = i18nInteractiveLegend.onboardingPanelScreenshotStepFive, newInteractiveLegend = i18nInteractiveLegend.newInteractiveLegend, firstOnboardingWelcomeMessage = i18nInteractiveLegend.firstOnboardingWelcomeMessage, secondOnboardingWelcomeMessage = i18nInteractiveLegend.secondOnboardingWelcomeMessage;
+                                var screenshotSteps = [
+                                    onboardingPanelScreenshotStepOne,
+                                    onboardingPanelScreenshotStepTwo,
+                                    onboardingPanelScreenshotStepThree,
+                                    onboardingPanelScreenshotStepFour,
+                                    onboardingPanelScreenshotStepFive
+                                ];
+                                var infoWidget = new Info({
+                                    infoContent: [
+                                        {
+                                            type: "list",
+                                            title: screenshotTitle,
+                                            infoContentItems: screenshotSteps
+                                        },
+                                        {
+                                            type: "explanation",
+                                            title: newInteractiveLegend,
+                                            infoContentItems: [
+                                                firstOnboardingWelcomeMessage,
+                                                secondOnboardingWelcomeMessage
+                                            ]
+                                        }
+                                    ]
+                                });
+                                var infoExpand = new Expand({
+                                    content: infoWidget,
+                                    expanded: false
+                                });
+                                infoWidget.expandWidget = infoExpand;
+                                view.ui.add(infoExpand, "top-left");
+                            }
                             itemUtils_1.goToMarker(marker, view);
                             _this._addTitle(config.title);
                             document.body.classList.remove(CSS.loading);

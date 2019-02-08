@@ -14,7 +14,18 @@ define({
     muteAndPictureFillError: "Mute filter cannot be applied to picture fill symbols.",
     error: "Could not load an item to display",
     sizeRampFilterNotSupported: "Filtering for size ramp legend type is currently not supported.",
-    featureLayerError: "Filtering can only be applied to feature layers."
+    featureLayerError: "Filtering can only be applied to feature layers.",
+    newInteractiveLegend: "New Interactive Legend",
+    firstOnboardingWelcomeMessage: "Welcome to the new Interactive Legend! Filter through feature layer data by selecting various legend info items.",
+    secondOnboardingWelcomeMessage: "Hover and click on the various legend elements to begin exploring!",
+    onboardingConfirmation: "Got it!",
+    close: "Close",
+    onboardingPanelScreenshotTitle: "How to take a screenshot",
+    onboardingPanelScreenshotStepOne: "Press the 'Screenshot' button",
+    onboardingPanelScreenshotStepTwo: "Toggle the option(s) to include the map legend and/or popup in the screenshot",
+    onboardingPanelScreenshotStepThree: "If you wish to include a popup, select a feature on the map",
+    onboardingPanelScreenshotStepFour: "Press the 'Set Screenshot Area' button and select an area to capture",
+    onboardingPanelScreenshotStepFive: "Press the 'Download Image' button"
 
   }),
   "ar": 1,
