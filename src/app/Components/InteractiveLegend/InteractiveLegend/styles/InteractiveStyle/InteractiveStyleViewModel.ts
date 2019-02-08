@@ -558,6 +558,10 @@ class InteractiveStyleViewModel extends declared(Accessor) {
             }`
           : `${field} = ${elementInfoHasValue} OR ${field} = '${elementInfoHasValue}'`;
       } else {
+        const singleQuote =
+          elementInfoHasValue.indexOf("'") !== -1
+            ? elementInfoHasValue.split("'").join("''")
+            : null;
         const expression = Array.isArray(elementInfo.value)
           ? legendElementInfos.length - 1 === legendInfoIndex
             ? `${field} >= ${elementInfoHasValue[0]} AND ${field} <= ${
@@ -566,6 +570,8 @@ class InteractiveStyleViewModel extends declared(Accessor) {
             : `${field} > ${elementInfoHasValue[0]} AND ${field} <= ${
                 elementInfoHasValue[1]
               }`
+          : singleQuote
+          ? `${field} = '${singleQuote}'`
           : isNaN(elementInfoHasValue)
           ? `${field} = '${elementInfoHasValue}'`
           : `${field} = ${elementInfoHasValue} OR ${field} = '${elementInfoHasValue}'`;
