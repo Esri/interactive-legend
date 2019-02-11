@@ -88,7 +88,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 });
                 this.telemetry.logPageView();
             }
-            var drawerEnabled = config.drawerEnabled, expandEnabled = config.expandEnabled, highlightShade = config.highlightShade, mutedShade = config.mutedShade, style = config.style, filterMode = config.filterMode, screenshotEnabled = config.screenshotEnabled, legendIncludedInScreenshot = config.legendIncludedInScreenshot, popupIncludedInScreenshot = config.popupIncludedInScreenshot, featureCountEnabled = config.featureCountEnabled, layerListEnabled = config.layerListEnabled, searchEnabled = config.searchEnabled, basemapToggleEnabled = config.basemapToggleEnabled, homeEnabled = config.homeEnabled, nextBasemap = config.nextBasemap, searchConfig = config.searchConfig, infoPanelEnabled = config.infoPanelEnabled;
+            var drawerEnabled = config.drawerEnabled, expandEnabled = config.expandEnabled, highlightShade = config.highlightShade, mutedShade = config.mutedShade, style = config.style, filterMode = config.filterMode, screenshotEnabled = config.screenshotEnabled, legendIncludedInScreenshot = config.legendIncludedInScreenshot, popupIncludedInScreenshot = config.popupIncludedInScreenshot, featureCountEnabled = config.featureCountEnabled, layerListEnabled = config.layerListEnabled, searchEnabled = config.searchEnabled, basemapToggleEnabled = config.basemapToggleEnabled, homeEnabled = config.homeEnabled, nextBasemap = config.nextBasemap, searchConfig = config.searchConfig, infoPanelEnabled = config.infoPanelEnabled, legendScreenshotEnabled = config.legendScreenshotEnabled, popupScreenshotEnabled = config.popupScreenshotEnabled;
             var webMapItems = results.webMapItems;
             var validWebMapItems = webMapItems.map(function (response) {
                 return response.value;
@@ -155,7 +155,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 };
                             }
                             _this._handleHomeWidget(view, homeEnabled);
-                            _this._handleScreenshotWidget(screenshotEnabled, legendIncludedInScreenshot, popupIncludedInScreenshot, view);
+                            _this._handleScreenshotWidget(screenshotEnabled, legendIncludedInScreenshot, popupIncludedInScreenshot, legendScreenshotEnabled, popupScreenshotEnabled, view);
                             _this._handleBasemapToggleWidget(basemapToggleEnabled, view, nextBasemap);
                             _this.layerList = new LayerList({
                                 view: view
@@ -203,13 +203,34 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                             if (infoPanelEnabled) {
                                 var screenshotTitle = i18nInteractiveLegend.onboardingPanelScreenshotTitle;
                                 var onboardingPanelScreenshotStepOne = i18nInteractiveLegend.onboardingPanelScreenshotStepOne, onboardingPanelScreenshotStepTwo = i18nInteractiveLegend.onboardingPanelScreenshotStepTwo, onboardingPanelScreenshotStepThree = i18nInteractiveLegend.onboardingPanelScreenshotStepThree, onboardingPanelScreenshotStepFour = i18nInteractiveLegend.onboardingPanelScreenshotStepFour, onboardingPanelScreenshotStepFive = i18nInteractiveLegend.onboardingPanelScreenshotStepFive, newInteractiveLegend = i18nInteractiveLegend.newInteractiveLegend, firstOnboardingWelcomeMessage = i18nInteractiveLegend.firstOnboardingWelcomeMessage, secondOnboardingWelcomeMessage = i18nInteractiveLegend.secondOnboardingWelcomeMessage;
-                                var screenshotSteps = [
-                                    onboardingPanelScreenshotStepOne,
-                                    onboardingPanelScreenshotStepTwo,
-                                    onboardingPanelScreenshotStepThree,
-                                    onboardingPanelScreenshotStepFour,
-                                    onboardingPanelScreenshotStepFive
-                                ];
+                                var screenshotSteps = legendIncludedInScreenshot && popupIncludedInScreenshot
+                                    ? [
+                                        onboardingPanelScreenshotStepOne,
+                                        onboardingPanelScreenshotStepTwo,
+                                        onboardingPanelScreenshotStepThree,
+                                        onboardingPanelScreenshotStepFour,
+                                        onboardingPanelScreenshotStepFive
+                                    ]
+                                    : !legendIncludedInScreenshot && popupIncludedInScreenshot
+                                        ? [
+                                            onboardingPanelScreenshotStepOne,
+                                            onboardingPanelScreenshotStepTwo,
+                                            onboardingPanelScreenshotStepThree,
+                                            onboardingPanelScreenshotStepFour,
+                                            onboardingPanelScreenshotStepFive
+                                        ]
+                                        : legendIncludedInScreenshot && !popupIncludedInScreenshot
+                                            ? [
+                                                onboardingPanelScreenshotStepOne,
+                                                onboardingPanelScreenshotStepTwo,
+                                                onboardingPanelScreenshotStepFour,
+                                                onboardingPanelScreenshotStepFive
+                                            ]
+                                            : [
+                                                onboardingPanelScreenshotStepOne,
+                                                onboardingPanelScreenshotStepFour,
+                                                onboardingPanelScreenshotStepFive
+                                            ];
                                 var infoWidget = new Info({
                                     infoContent: [
                                         {
@@ -260,19 +281,19 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
             }
         };
         // _handleScreenshotWidget
-        InteractiveLegendApp.prototype._handleScreenshotWidget = function (screenshotEnabled, legendIncludedInScreenshot, popupIncludedInScreenshot, view) {
+        InteractiveLegendApp.prototype._handleScreenshotWidget = function (screenshotEnabled, legendIncludedInScreenshot, popupIncludedInScreenshot, legendScreenshotEnabled, popupScreenshotEnabled, view) {
             var _this = this;
             if (screenshotEnabled) {
-                var mapComponentSelectors = legendIncludedInScreenshot && popupIncludedInScreenshot
-                    ? ["." + CSS.legend, "." + CSS.popup]
-                    : legendIncludedInScreenshot && !popupIncludedInScreenshot
-                        ? ["." + CSS.legend]
-                        : !legendIncludedInScreenshot && popupIncludedInScreenshot
-                            ? ["." + CSS.popup]
-                            : null;
+                var mapComponentSelectors = ["." + CSS.legend, "." + CSS.popup];
                 this.screenshot = new Screenshot({
                     view: view,
-                    mapComponentSelectors: mapComponentSelectors
+                    mapComponentSelectors: mapComponentSelectors,
+                    legendIncludedInScreenshot: legendIncludedInScreenshot,
+                    popupIncludedInScreenshot: popupIncludedInScreenshot
+                });
+                var screenshotExpand = new Expand({
+                    content: this.screenshot,
+                    expanded: true
                 });
                 watchUtils.watch(view, "popup.visible", function () {
                     if (view.popup.visible) {
@@ -282,6 +303,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 graphic: view.popup.selectedFeature,
                                 container: document.querySelector(".offscreen-pop-up-container")
                             });
+                            _this.screenshot.featureWidget = _this.featureWidget;
                         }
                         else {
                             _this.featureWidget.graphic = view.popup.selectedFeature;
@@ -331,7 +353,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                         }
                     }
                 });
-                view.ui.add(this.screenshot, "top-left");
+                view.ui.add(screenshotExpand, "top-left");
             }
         };
         // _handleLayerListWidget

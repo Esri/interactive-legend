@@ -1,41 +1,69 @@
 .esri-screenshot {
+  .esri-screenshot__main-container {
+    padding: 5% 6%;
+    width: 300px;
+
+    .esri-screenshot__panel-title {
+      font-size: 1.2rem;
+    }
+
+    .esri-screenshot__panel-subtitle {
+      font-size: 1.1em;
+      color: #999;
+    }
+
+    .esri-screenshot__screenshot-option {
+      font-size: 1.2rem;
+    }
+
+    .esri-screenshot__screenshot-button-container {
+      display: flex;
+      justify-content: center;
+
+      button {
+        width: 95%;
+      }
+    }
+  }
+
   .esri-screenshot__btn {
-    background-color: #fff;
-    color: #6e6e6e;
-    border: 0;
+
     transition: background-color 200ms linear;
     transition-property: background-color;
     transition-duration: 200ms;
     transition-timing-function: linear;
     transition-delay: initial;
     border: 0;
-    background-color: #fff;
-    color: #6e6e6e;
-    padding: 0.5rem;
-    font-size: 16px;
     display: inline-block;
     width: 32px;
     height: 32px;
-  }
 
-
-  .esri-screenshot--pointer {
-    opacity: 1;
-  }
-
-  .esri-screenshot--pointer:hover {
-    cursor: pointer;
-  }
-
-  .esri-screenshot--disabled {
-    opacity: 0.55;
-  }
-
-  .esri-screenshot--disabled:hover {
-    cursor: not-allowed;
+    span {
+      position: relative;
+      right: 8px;
+    }
   }
 
 }
+
+
+.esri-screenshot--pointer {
+  opacity: 1;
+}
+
+.esri-screenshot--pointer:hover {
+  cursor: pointer;
+}
+
+.esri-screenshot--disabled {
+  opacity: 0.55;
+}
+
+.esri-screenshot--disabled:hover {
+  cursor: not-allowed;
+}
+
+
 
 
 .esri-screenshot__action-btn {

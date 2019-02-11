@@ -25,7 +25,13 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
     //----------------------------------
     var CSS = {
         base: "esri-screenshot",
+        widget: "esri-widget",
         screenshotBtn: "esri-screenshot__btn",
+        mainContainer: "esri-screenshot__main-container",
+        panelTitle: "esri-screenshot__panel-title",
+        panelSubTitle: "esri-screenshot__panel-subtitle",
+        screenshotOption: "esri-screenshot__screenshot-option",
+        buttonContainer: "esri-screenshot__screenshot-button-container",
         hide: "esri-screenshot--hide",
         screenshotCursor: "esri-screenshot__cursor",
         maskDiv: "esri-screenshot__mask-div",
@@ -43,7 +49,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         tooltip: "tooltip",
         tooltipRight: "tooltip-right",
         modifierClass: "modifier-class",
-        closeIcon: "icon-ui-close"
+        closeIcon: "icon-ui-close",
+        fieldsetCheckbox: "fieldset-checkbox",
+        button: "btn",
+        buttonRed: "btn-red"
     };
     var Screenshot = /** @class */ (function (_super) {
         __extends(Screenshot, _super);
@@ -73,14 +82,23 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             //----------------------------------
             // view
             _this.view = null;
-            // viewModel
-            _this.viewModel = new ScreenshotViewModel();
             // mapComponentSelectors
             _this.mapComponentSelectors = [];
             // iconClass
             _this.iconClass = CSS.mediaIcon;
             // label
             _this.label = i18n.widgetLabel;
+            // legendScreenshotEnabled
+            _this.legendScreenshotEnabled = null;
+            // popupScreenshotEnabled
+            _this.popupScreenshotEnabled = null;
+            // legendIncludedInScreenshot
+            _this.legendIncludedInScreenshot = null;
+            // popupIncludedInScreenshot
+            _this.popupIncludedInScreenshot = null;
+            _this.featureWidget = null;
+            // viewModel
+            _this.viewModel = new ScreenshotViewModel();
             return _this;
         }
         Screenshot.prototype.postInitialize = function () {
@@ -88,12 +106,11 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         };
         Screenshot.prototype.render = function () {
             var screenshotModeIsActive = this.viewModel.screenshotModeIsActive;
-            var screenshotBtn = this._renderScreenshotBtn(screenshotModeIsActive);
             var screenshotPreviewOverlay = this._renderScreenshotPreviewOverlay();
             var maskNode = this._renderMaskNode(screenshotModeIsActive);
-            return (widget_1.tsx("div", { class: CSS.base },
-                screenshotModeIsActive ? (widget_1.tsx("button", { bind: this, tabIndex: 0, class: this.classes(CSS.screenshotBtn, CSS.pointerCursor), onclick: this._deactivateScreenshot, onkeydown: this._deactivateScreenshot, title: i18n.deactivateScreenshot },
-                    widget_1.tsx("span", { class: CSS.closeIcon }))) : (screenshotBtn),
+            return (widget_1.tsx("div", { class: this.classes(CSS.widget, CSS.base) },
+                screenshotModeIsActive ? (widget_1.tsx("button", { bind: this, tabIndex: 0, class: this.classes(CSS.screenshotBtn, CSS.pointerCursor, CSS.button, CSS.buttonRed), onclick: this._deactivateScreenshot, onkeydown: this._deactivateScreenshot, title: i18n.deactivateScreenshot },
+                    widget_1.tsx("span", { class: CSS.closeIcon }))) : (this._renderScreenshotPanel()),
                 screenshotPreviewOverlay,
                 maskNode));
         };
@@ -112,16 +129,12 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             if (this.viewModel.screenshotModeIsActive) {
                 return;
             }
-            this.mapComponentSelectors.forEach(function (mapComponents) {
-                if (mapComponents.indexOf("popup") !== -1) {
-                    _this.view.popup.dockEnabled = true;
-                }
-            });
             this.viewModel.screenshotModeIsActive = true;
             this.view.container.classList.add(CSS.screenshotCursor);
             this._dragHandler = this.view.on("drag", function (event) {
                 _this.viewModel.setScreenshotArea(event, _this._maskNode, _this._screenshotImgNode, _this._dragHandler);
             });
+            this.scheduleRender();
         };
         //----------------------------------
         //
@@ -133,16 +146,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         //  Render Node Methods
         //
         //----------------------------------
-        // _renderScreenshotBtn
-        Screenshot.prototype._renderScreenshotBtn = function (screenshotModeIsActive) {
-            var _a;
-            var cursorStyles = (_a = {},
-                _a[CSS.disabledCursor] = screenshotModeIsActive,
-                _a[CSS.pointerCursor] = !screenshotModeIsActive,
-                _a);
-            return (widget_1.tsx("button", { bind: this, tabIndex: !screenshotModeIsActive ? 0 : -1, class: this.classes(CSS.screenshotBtn, cursorStyles), onclick: this.activateScreenshot, title: i18n.widgetLabel },
-                widget_1.tsx("span", { class: CSS.mediaIcon })));
-        };
         // _renderScreenshotPreviewBtns
         Screenshot.prototype._renderScreenshotPreviewBtns = function () {
             return (widget_1.tsx("div", null,
@@ -164,6 +167,33 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         widget_1.tsx("img", { bind: this, afterCreate: widget_1.storeNode, "data-node-ref": "_screenshotImgNode", class: CSS.screenshotImg }),
                         screenshotPreviewBtns))));
         };
+        // _renderScreenshotPanel
+        Screenshot.prototype._renderScreenshotPanel = function () {
+            var screenshotTitle = i18n.screenshotTitle, screenshotSubtitle = i18n.screenshotSubtitle, setScreenshotArea = i18n.setScreenshotArea, selectAFeature = i18n.selectAFeature;
+            return (
+            // screenshotBtn
+            widget_1.tsx("div", { key: "screenshot-panel", class: CSS.mainContainer },
+                widget_1.tsx("h1", { class: CSS.panelTitle }, screenshotTitle),
+                this.legendIncludedInScreenshot || this.popupIncludedInScreenshot ? (widget_1.tsx("h3", { class: CSS.panelSubTitle }, screenshotSubtitle)) : null,
+                this.legendIncludedInScreenshot || this.popupIncludedInScreenshot ? (widget_1.tsx("fieldset", { class: CSS.fieldsetCheckbox },
+                    this.legendIncludedInScreenshot ? (widget_1.tsx("label", { class: CSS.screenshotOption },
+                        " ",
+                        widget_1.tsx("input", { bind: this, onclick: this._toggleLegend, onkeydown: this._toggleLegend, checked: this.legendScreenshotEnabled, type: "checkbox" }),
+                        "Legend")) : null,
+                    this.popupIncludedInScreenshot ? (widget_1.tsx("label", { class: CSS.screenshotOption },
+                        widget_1.tsx("input", { bind: this, onclick: this._togglePopup, onkeydown: this._togglePopup, type: "checkbox", checked: this.popupScreenshotEnabled }),
+                        "Popup")) : null)) : null,
+                widget_1.tsx("div", { class: CSS.buttonContainer },
+                    widget_1.tsx("button", { bind: this, onclick: this.activateScreenshot, onkeydown: this.activateScreenshot, disabled: this.popupIncludedInScreenshot && this.popupScreenshotEnabled
+                            ? this.featureWidget && this.featureWidget.graphic
+                                ? false
+                                : true
+                            : false, class: CSS.button }, this.popupIncludedInScreenshot && this.popupScreenshotEnabled
+                        ? this.featureWidget && this.featureWidget.graphic
+                            ? setScreenshotArea
+                            : selectAFeature
+                        : setScreenshotArea))));
+        };
         // _renderMaskNode
         Screenshot.prototype._renderMaskNode = function (screenshotModeIsActive) {
             var _a;
@@ -173,13 +203,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             return (widget_1.tsx("div", { bind: this, class: this.classes(CSS.maskDiv, maskDivIsHidden), afterCreate: widget_1.storeNode, "data-node-ref": "_maskNode" }));
         };
         // End of render node methods
-        // _closePreview
-        Screenshot.prototype._closePreview = function () {
-            var viewModel = this.viewModel;
-            viewModel.previewIsVisible = false;
-            viewModel.screenshotModeIsActive = false;
-            this.scheduleRender();
-        };
         // _watchMapComponentSelectors
         Screenshot.prototype._watchMapComponentSelectors = function () {
             var _this = this;
@@ -215,17 +238,36 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         Screenshot.prototype._deactivateScreenshot = function () {
             this.viewModel.screenshotModeIsActive = false;
             this.view.container.classList.remove(CSS.screenshotCursor);
+            if (this.featureWidget && this.featureWidget.graphic) {
+                this.featureWidget.graphic = null;
+            }
             this._dragHandler.remove();
+            this.scheduleRender();
+        };
+        // _toggleLegend
+        Screenshot.prototype._toggleLegend = function (event) {
+            var node = event.currentTarget;
+            this.legendScreenshotEnabled = node.checked;
+            this.scheduleRender();
+        };
+        // _togglePopup
+        Screenshot.prototype._togglePopup = function (event) {
+            var node = event.currentTarget;
+            this.popupScreenshotEnabled = node.checked;
+            this.scheduleRender();
+        };
+        // _closePreview
+        Screenshot.prototype._closePreview = function () {
+            var viewModel = this.viewModel;
+            viewModel.previewIsVisible = false;
+            viewModel.screenshotModeIsActive = false;
+            this.view.popup.clear();
             this.scheduleRender();
         };
         __decorate([
             decorators_1.aliasOf("viewModel.view"),
             decorators_1.property()
         ], Screenshot.prototype, "view", void 0);
-        __decorate([
-            decorators_1.property(),
-            widget_1.renderable(["viewModel.state"])
-        ], Screenshot.prototype, "viewModel", void 0);
         __decorate([
             decorators_1.aliasOf("viewModel.mapComponentSelectors"),
             decorators_1.property()
@@ -237,12 +279,45 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             decorators_1.property()
         ], Screenshot.prototype, "label", void 0);
         __decorate([
+            decorators_1.aliasOf("viewModel.legendScreenshotEnabled"),
+            decorators_1.property()
+        ], Screenshot.prototype, "legendScreenshotEnabled", void 0);
+        __decorate([
+            decorators_1.aliasOf("viewModel.popupScreenshotEnabled"),
+            decorators_1.property()
+        ], Screenshot.prototype, "popupScreenshotEnabled", void 0);
+        __decorate([
+            decorators_1.property()
+        ], Screenshot.prototype, "legendIncludedInScreenshot", void 0);
+        __decorate([
+            decorators_1.property()
+        ], Screenshot.prototype, "popupIncludedInScreenshot", void 0);
+        __decorate([
+            decorators_1.property()
+        ], Screenshot.prototype, "featureWidget", void 0);
+        __decorate([
+            decorators_1.property(),
+            widget_1.renderable(["viewModel.state"])
+        ], Screenshot.prototype, "viewModel", void 0);
+        __decorate([
             widget_1.accessibleHandler()
         ], Screenshot.prototype, "activateScreenshot", null);
         __decorate([
             decorators_1.aliasOf("viewModel.downloadImage"),
             widget_1.accessibleHandler()
         ], Screenshot.prototype, "downloadImage", void 0);
+        __decorate([
+            widget_1.accessibleHandler()
+        ], Screenshot.prototype, "_deactivateScreenshot", null);
+        __decorate([
+            widget_1.accessibleHandler()
+        ], Screenshot.prototype, "_toggleLegend", null);
+        __decorate([
+            widget_1.accessibleHandler()
+        ], Screenshot.prototype, "_togglePopup", null);
+        __decorate([
+            widget_1.accessibleHandler()
+        ], Screenshot.prototype, "_closePreview", null);
         Screenshot = __decorate([
             decorators_1.subclass("Screenshot")
         ], Screenshot);

@@ -43,8 +43,14 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this.screenshotModeIsActive = null;
             // mapComponentSelectors
             _this.mapComponentSelectors = [];
+            // firstMapComponent
             _this.firstMapComponent = null;
+            // secondMapComponent
             _this.secondMapComponent = null;
+            // legendScreenshotEnabled
+            _this.legendScreenshotEnabled = null;
+            // popupScreenshotEnabled
+            _this.popupScreenshotEnabled = null;
             return _this;
         }
         Object.defineProperty(ScreenshotViewModel.prototype, "state", {
@@ -141,7 +147,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var combinedCanvas = document.createElement("canvas");
             var firstComponent = document.querySelector(this.mapComponentSelectors[0]);
             var secondMapComponent = document.querySelector(this.mapComponentSelectors[1]);
-            var mapComponent = firstComponent.offsetWidth && firstComponent.offsetHeight
+            var mapComponent = this.legendScreenshotEnabled
                 ? firstComponent
                 : secondMapComponent;
             html2canvas(mapComponent, {
@@ -318,12 +324,11 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var img = document.createElement("img");
             var firstComponent = document.querySelector(this.mapComponentSelectors[0]);
             var secondMapComponent = document.querySelector(this.mapComponentSelectors[1]);
-            if (this.mapComponentSelectors.length > 2 ||
-                this.mapComponentSelectors.length === 0) {
+            if (!this.legendScreenshotEnabled && !this.popupScreenshotEnabled) {
                 this._onlyTakeScreenshotOfView(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv);
             }
             else {
-                if (this.mapComponentSelectors.length === 1) {
+                if (this.legendScreenshotEnabled && !this.popupScreenshotEnabled) {
                     if (firstComponent.offsetWidth && firstComponent.offsetHeight) {
                         this._includeOneMapComponent(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv);
                     }
@@ -331,7 +336,15 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         this._onlyTakeScreenshotOfView(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv);
                     }
                 }
-                else if (this.mapComponentSelectors.length === 2) {
+                else if (this.popupScreenshotEnabled && !this.legendScreenshotEnabled) {
+                    if (secondMapComponent.offsetWidth && secondMapComponent.offsetHeight) {
+                        this._includeOneMapComponent(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv);
+                    }
+                    else {
+                        this._onlyTakeScreenshotOfView(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv);
+                    }
+                }
+                else if (this.legendScreenshotEnabled && this.popupScreenshotEnabled) {
                     if (firstComponent.offsetWidth &&
                         firstComponent.offsetHeight &&
                         secondMapComponent.offsetWidth &&
@@ -395,6 +408,12 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         __decorate([
             decorators_1.property()
         ], ScreenshotViewModel.prototype, "secondMapComponent", void 0);
+        __decorate([
+            decorators_1.property()
+        ], ScreenshotViewModel.prototype, "legendScreenshotEnabled", void 0);
+        __decorate([
+            decorators_1.property()
+        ], ScreenshotViewModel.prototype, "popupScreenshotEnabled", void 0);
         ScreenshotViewModel = __decorate([
             decorators_1.subclass("ScreenshotViewModel")
         ], ScreenshotViewModel);

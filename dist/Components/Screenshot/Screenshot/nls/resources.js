@@ -4,7 +4,12 @@ define({
     downloadImage: "Download Image",
     backButton: "Back to map",
     widgetLabel: "Screenshot",
-    deactivateScreenshot: "Deactivate screenshot mode"
+    deactivateScreenshot: "Deactivate screenshot mode",
+    setScreenshotArea: "Set screenshot area",
+    selectAFeature: "Select a feature",
+    screenshotTitle: "Screenshot",
+    screenshotSubtitle: "Select the item(s) that you would like to include in your screenshot",
+    widgetLabel: "Screenshot"
   }),
   "ar": 1,
   "bs": 1,
