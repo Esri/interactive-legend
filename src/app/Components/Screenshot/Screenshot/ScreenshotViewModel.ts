@@ -87,11 +87,21 @@ class ScreenshotViewModel extends declared(Accessor) {
   @property()
   mapComponentSelectors: string[] = [];
 
+  // firstMapComponent
   @property()
   firstMapComponent = null;
 
+  // secondMapComponent
   @property()
   secondMapComponent = null;
+
+  // legendScreenshotEnabled
+  @property()
+  legendScreenshotEnabled: boolean = null;
+
+  // popupScreenshotEnabled
+  @property()
+  popupScreenshotEnabled: boolean = null;
 
   //----------------------------------
   //
@@ -210,10 +220,9 @@ class ScreenshotViewModel extends declared(Accessor) {
       this.mapComponentSelectors[1]
     ) as HTMLElement;
 
-    const mapComponent =
-      firstComponent.offsetWidth && firstComponent.offsetHeight
-        ? firstComponent
-        : secondMapComponent;
+    const mapComponent = this.legendScreenshotEnabled
+      ? firstComponent
+      : secondMapComponent;
 
     html2canvas(mapComponent, {
       removeContainer: true,
@@ -505,10 +514,7 @@ class ScreenshotViewModel extends declared(Accessor) {
     const secondMapComponent = document.querySelector(
       this.mapComponentSelectors[1]
     ) as HTMLElement;
-    if (
-      this.mapComponentSelectors.length > 2 ||
-      this.mapComponentSelectors.length === 0
-    ) {
+    if (!this.legendScreenshotEnabled && !this.popupScreenshotEnabled) {
       this._onlyTakeScreenshotOfView(
         viewScreenshot,
         viewCanvas,
@@ -517,7 +523,7 @@ class ScreenshotViewModel extends declared(Accessor) {
         maskDiv
       );
     } else {
-      if (this.mapComponentSelectors.length === 1) {
+      if (this.legendScreenshotEnabled && !this.popupScreenshotEnabled) {
         if (firstComponent.offsetWidth && firstComponent.offsetHeight) {
           this._includeOneMapComponent(
             viewScreenshot,
@@ -535,7 +541,25 @@ class ScreenshotViewModel extends declared(Accessor) {
             maskDiv
           );
         }
-      } else if (this.mapComponentSelectors.length === 2) {
+      } else if (this.popupScreenshotEnabled && !this.legendScreenshotEnabled) {
+        if (secondMapComponent.offsetWidth && secondMapComponent.offsetHeight) {
+          this._includeOneMapComponent(
+            viewScreenshot,
+            viewCanvas,
+            img,
+            screenshotImageElement,
+            maskDiv
+          );
+        } else {
+          this._onlyTakeScreenshotOfView(
+            viewScreenshot,
+            viewCanvas,
+            img,
+            screenshotImageElement,
+            maskDiv
+          );
+        }
+      } else if (this.legendScreenshotEnabled && this.popupScreenshotEnabled) {
         if (
           firstComponent.offsetWidth &&
           firstComponent.offsetHeight &&

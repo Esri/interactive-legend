@@ -164,7 +164,9 @@ class InteractiveLegendApp {
       homeEnabled,
       nextBasemap,
       searchConfig,
-      infoPanelEnabled
+      infoPanelEnabled,
+      legendScreenshotEnabled,
+      popupScreenshotEnabled
     } = config;
     const { webMapItems } = results;
     const validWebMapItems = webMapItems.map(response => {
@@ -251,6 +253,8 @@ class InteractiveLegendApp {
               screenshotEnabled,
               legendIncludedInScreenshot,
               popupIncludedInScreenshot,
+              legendScreenshotEnabled,
+              popupScreenshotEnabled,
               view
             );
 
@@ -329,13 +333,35 @@ class InteractiveLegendApp {
                 firstOnboardingWelcomeMessage,
                 secondOnboardingWelcomeMessage
               } = i18nInteractiveLegend;
-              const screenshotSteps = [
-                onboardingPanelScreenshotStepOne,
-                onboardingPanelScreenshotStepTwo,
-                onboardingPanelScreenshotStepThree,
-                onboardingPanelScreenshotStepFour,
-                onboardingPanelScreenshotStepFive
-              ];
+              const screenshotSteps =
+                legendIncludedInScreenshot && popupIncludedInScreenshot
+                  ? [
+                      onboardingPanelScreenshotStepOne,
+                      onboardingPanelScreenshotStepTwo,
+                      onboardingPanelScreenshotStepThree,
+                      onboardingPanelScreenshotStepFour,
+                      onboardingPanelScreenshotStepFive
+                    ]
+                  : !legendIncludedInScreenshot && popupIncludedInScreenshot
+                  ? [
+                      onboardingPanelScreenshotStepOne,
+                      onboardingPanelScreenshotStepTwo,
+                      onboardingPanelScreenshotStepThree,
+                      onboardingPanelScreenshotStepFour,
+                      onboardingPanelScreenshotStepFive
+                    ]
+                  : legendIncludedInScreenshot && !popupIncludedInScreenshot
+                  ? [
+                      onboardingPanelScreenshotStepOne,
+                      onboardingPanelScreenshotStepTwo,
+                      onboardingPanelScreenshotStepFour,
+                      onboardingPanelScreenshotStepFive
+                    ]
+                  : [
+                      onboardingPanelScreenshotStepOne,
+                      onboardingPanelScreenshotStepFour,
+                      onboardingPanelScreenshotStepFive
+                    ];
               const infoWidget = new Info({
                 infoContent: [
                   {
@@ -398,21 +424,24 @@ class InteractiveLegendApp {
     screenshotEnabled: boolean,
     legendIncludedInScreenshot: boolean,
     popupIncludedInScreenshot: boolean,
+    legendScreenshotEnabled: boolean,
+    popupScreenshotEnabled: boolean,
     view: MapView
   ): void {
     if (screenshotEnabled) {
-      const mapComponentSelectors =
-        legendIncludedInScreenshot && popupIncludedInScreenshot
-          ? [`.${CSS.legend}`, `.${CSS.popup}`]
-          : legendIncludedInScreenshot && !popupIncludedInScreenshot
-          ? [`.${CSS.legend}`]
-          : !legendIncludedInScreenshot && popupIncludedInScreenshot
-          ? [`.${CSS.popup}`]
-          : null;
+      const mapComponentSelectors = [`.${CSS.legend}`, `.${CSS.popup}`];
+
       this.screenshot = new Screenshot({
         view,
-        mapComponentSelectors
+        mapComponentSelectors,
+        legendIncludedInScreenshot,
+        popupIncludedInScreenshot
       });
+      const screenshotExpand = new Expand({
+        content: this.screenshot,
+        expanded: true
+      });
+
       watchUtils.watch(view, "popup.visible", () => {
         if (view.popup.visible) {
           if (!this.featureWidget) {
@@ -423,6 +452,7 @@ class InteractiveLegendApp {
                 ".offscreen-pop-up-container"
               ) as HTMLElement
             });
+            this.screenshot.featureWidget = this.featureWidget;
           } else {
             this.featureWidget.graphic = view.popup.selectedFeature;
           }
@@ -488,7 +518,7 @@ class InteractiveLegendApp {
         }
       );
 
-      view.ui.add(this.screenshot, "top-left");
+      view.ui.add(screenshotExpand, "top-left");
     }
   }
 

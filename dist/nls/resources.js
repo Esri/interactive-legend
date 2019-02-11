@@ -1,8 +1,5 @@
 define({
   root: ({
-    takeAScreenshot: "Take a screenshot",
-    downloadImg: "Download image",
-    backToWebMap: "Back to web map",
     error: "Error",
     filteredFeatureCount: "Total filtered feature count",
     noFieldAttribute: "Field attribute is required in renderer to apply filter.",
@@ -22,11 +19,10 @@ define({
     close: "Close",
     onboardingPanelScreenshotTitle: "How to take a screenshot",
     onboardingPanelScreenshotStepOne: "Press the 'Screenshot' button",
-    onboardingPanelScreenshotStepTwo: "Toggle the option(s) to include the map legend and/or popup in the screenshot",
+    onboardingPanelScreenshotStepTwo: "Toggle the option(s) to include in the screenshot",
     onboardingPanelScreenshotStepThree: "If you wish to include a popup, select a feature on the map",
-    onboardingPanelScreenshotStepFour: "Press the 'Set Screenshot Area' button and select an area to capture",
+    onboardingPanelScreenshotStepFour: "Press the 'Set screenshot area' button and select an area to capture",
     onboardingPanelScreenshotStepFive: "Press the 'Download Image' button"
-
   }),
   "ar": 1,
   "bs": 1,

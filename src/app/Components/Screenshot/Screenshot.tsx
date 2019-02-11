@@ -24,6 +24,9 @@ import SceneView = require("esri/views/SceneView");
 // esri.core.watchUtils
 import watchUtils = require("esri/core/watchUtils");
 
+// esri.widgets.Feature
+import Feature = require("esri/widgets/Feature");
+
 //esri.widgets.support
 import {
   accessibleHandler,
@@ -42,7 +45,13 @@ import ScreenshotViewModel = require("./Screenshot/ScreenshotViewModel");
 //----------------------------------
 const CSS = {
   base: "esri-screenshot",
+  widget: "esri-widget",
   screenshotBtn: "esri-screenshot__btn",
+  mainContainer: "esri-screenshot__main-container",
+  panelTitle: "esri-screenshot__panel-title",
+  panelSubTitle: "esri-screenshot__panel-subtitle",
+  screenshotOption: "esri-screenshot__screenshot-option",
+  buttonContainer: "esri-screenshot__screenshot-button-container",
   hide: "esri-screenshot--hide",
   screenshotCursor: "esri-screenshot__cursor",
   maskDiv: "esri-screenshot__mask-div",
@@ -60,7 +69,10 @@ const CSS = {
   tooltip: "tooltip",
   tooltipRight: "tooltip-right",
   modifierClass: "modifier-class",
-  closeIcon: "icon-ui-close"
+  closeIcon: "icon-ui-close",
+  fieldsetCheckbox: "fieldset-checkbox",
+  button: "btn",
+  buttonRed: "btn-red"
 };
 
 @subclass("Screenshot")
@@ -92,11 +104,6 @@ class Screenshot extends declared(Widget) {
   @property()
   view: MapView | SceneView = null;
 
-  // viewModel
-  @property()
-  @renderable(["viewModel.state"])
-  viewModel: ScreenshotViewModel = new ScreenshotViewModel();
-
   // mapComponentSelectors
   @aliasOf("viewModel.mapComponentSelectors")
   @property()
@@ -109,6 +116,32 @@ class Screenshot extends declared(Widget) {
   // label
   @property()
   label = i18n.widgetLabel;
+
+  // legendScreenshotEnabled
+  @aliasOf("viewModel.legendScreenshotEnabled")
+  @property()
+  legendScreenshotEnabled: boolean = null;
+
+  // popupScreenshotEnabled
+  @aliasOf("viewModel.popupScreenshotEnabled")
+  @property()
+  popupScreenshotEnabled: boolean = null;
+
+  // legendIncludedInScreenshot
+  @property()
+  legendIncludedInScreenshot: boolean = null;
+
+  // popupIncludedInScreenshot
+  @property()
+  popupIncludedInScreenshot: boolean = null;
+
+  @property()
+  featureWidget: Feature = null;
+
+  // viewModel
+  @property()
+  @renderable(["viewModel.state"])
+  viewModel: ScreenshotViewModel = new ScreenshotViewModel();
 
   //----------------------------------
   //
@@ -126,16 +159,21 @@ class Screenshot extends declared(Widget) {
 
   render(): any {
     const { screenshotModeIsActive } = this.viewModel;
-    const screenshotBtn = this._renderScreenshotBtn(screenshotModeIsActive);
     const screenshotPreviewOverlay = this._renderScreenshotPreviewOverlay();
     const maskNode = this._renderMaskNode(screenshotModeIsActive);
+
     return (
-      <div class={CSS.base}>
+      <div class={this.classes(CSS.widget, CSS.base)}>
         {screenshotModeIsActive ? (
           <button
             bind={this}
             tabIndex={0}
-            class={this.classes(CSS.screenshotBtn, CSS.pointerCursor)}
+            class={this.classes(
+              CSS.screenshotBtn,
+              CSS.pointerCursor,
+              CSS.button,
+              CSS.buttonRed
+            )}
             onclick={this._deactivateScreenshot}
             onkeydown={this._deactivateScreenshot}
             title={i18n.deactivateScreenshot}
@@ -143,8 +181,9 @@ class Screenshot extends declared(Widget) {
             <span class={CSS.closeIcon} />
           </button>
         ) : (
-          screenshotBtn
+          this._renderScreenshotPanel()
         )}
+
         {screenshotPreviewOverlay}
         {maskNode}
       </div>
@@ -168,11 +207,6 @@ class Screenshot extends declared(Widget) {
     if (this.viewModel.screenshotModeIsActive) {
       return;
     }
-    this.mapComponentSelectors.forEach((mapComponents: string) => {
-      if (mapComponents.indexOf("popup") !== -1) {
-        this.view.popup.dockEnabled = true;
-      }
-    });
     this.viewModel.screenshotModeIsActive = true;
     this.view.container.classList.add(CSS.screenshotCursor);
     this._dragHandler = this.view.on("drag", (event: Event) => {
@@ -183,6 +217,7 @@ class Screenshot extends declared(Widget) {
         this._dragHandler
       );
     });
+    this.scheduleRender();
   }
 
   // downloadImage
@@ -201,26 +236,6 @@ class Screenshot extends declared(Widget) {
   //  Render Node Methods
   //
   //----------------------------------
-
-  // _renderScreenshotBtn
-  private _renderScreenshotBtn(screenshotModeIsActive: boolean): any {
-    const cursorStyles = {
-      [CSS.disabledCursor]: screenshotModeIsActive,
-      [CSS.pointerCursor]: !screenshotModeIsActive
-    };
-
-    return (
-      <button
-        bind={this}
-        tabIndex={!screenshotModeIsActive ? 0 : -1}
-        class={this.classes(CSS.screenshotBtn, cursorStyles)}
-        onclick={this.activateScreenshot}
-        title={i18n.widgetLabel}
-      >
-        <span class={CSS.mediaIcon} />
-      </button>
-    );
-  }
 
   // _renderScreenshotPreviewBtns
   private _renderScreenshotPreviewBtns(): any {
@@ -277,6 +292,75 @@ class Screenshot extends declared(Widget) {
     );
   }
 
+  // _renderScreenshotPanel
+  private _renderScreenshotPanel(): any {
+    const {
+      screenshotTitle,
+      screenshotSubtitle,
+      setScreenshotArea,
+      selectAFeature
+    } = i18n;
+    return (
+      // screenshotBtn
+      <div key="screenshot-panel" class={CSS.mainContainer}>
+        <h1 class={CSS.panelTitle}>{screenshotTitle}</h1>
+        {this.legendIncludedInScreenshot || this.popupIncludedInScreenshot ? (
+          <h3 class={CSS.panelSubTitle}>{screenshotSubtitle}</h3>
+        ) : null}
+        {this.legendIncludedInScreenshot || this.popupIncludedInScreenshot ? (
+          <fieldset class={CSS.fieldsetCheckbox}>
+            {this.legendIncludedInScreenshot ? (
+              <label class={CSS.screenshotOption}>
+                {" "}
+                <input
+                  bind={this}
+                  onclick={this._toggleLegend}
+                  onkeydown={this._toggleLegend}
+                  checked={this.legendScreenshotEnabled}
+                  type="checkbox"
+                />
+                Legend
+              </label>
+            ) : null}
+            {this.popupIncludedInScreenshot ? (
+              <label class={CSS.screenshotOption}>
+                <input
+                  bind={this}
+                  onclick={this._togglePopup}
+                  onkeydown={this._togglePopup}
+                  type="checkbox"
+                  checked={this.popupScreenshotEnabled}
+                />
+                Popup
+              </label>
+            ) : null}
+          </fieldset>
+        ) : null}
+        <div class={CSS.buttonContainer}>
+          <button
+            bind={this}
+            onclick={this.activateScreenshot}
+            onkeydown={this.activateScreenshot}
+            disabled={
+              this.popupIncludedInScreenshot && this.popupScreenshotEnabled
+                ? this.featureWidget && this.featureWidget.graphic
+                  ? false
+                  : true
+                : false
+            }
+            class={CSS.button}
+          >
+            {this.popupIncludedInScreenshot && this.popupScreenshotEnabled
+              ? this.featureWidget && this.featureWidget.graphic
+                ? setScreenshotArea
+                : selectAFeature
+              : setScreenshotArea}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // _renderMaskNode
   private _renderMaskNode(screenshotModeIsActive: boolean): any {
     const maskDivIsHidden = {
@@ -293,14 +377,6 @@ class Screenshot extends declared(Widget) {
   }
 
   // End of render node methods
-
-  // _closePreview
-  private _closePreview(): void {
-    const { viewModel } = this;
-    viewModel.previewIsVisible = false;
-    viewModel.screenshotModeIsActive = false;
-    this.scheduleRender();
-  }
 
   // _watchMapComponentSelectors
   private _watchMapComponentSelectors(): __esri.WatchHandle {
@@ -336,10 +412,40 @@ class Screenshot extends declared(Widget) {
   }
 
   // _deactivateScreenshot
+  @accessibleHandler()
   private _deactivateScreenshot(): void {
     this.viewModel.screenshotModeIsActive = false;
     this.view.container.classList.remove(CSS.screenshotCursor);
+    if (this.featureWidget && this.featureWidget.graphic) {
+      this.featureWidget.graphic = null;
+    }
     this._dragHandler.remove();
+    this.scheduleRender();
+  }
+
+  // _toggleLegend
+  @accessibleHandler()
+  private _toggleLegend(event: Event): void {
+    const node = event.currentTarget as HTMLInputElement;
+    this.legendScreenshotEnabled = node.checked;
+    this.scheduleRender();
+  }
+
+  // _togglePopup
+  @accessibleHandler()
+  private _togglePopup(event: Event): void {
+    const node = event.currentTarget as HTMLInputElement;
+    this.popupScreenshotEnabled = node.checked;
+    this.scheduleRender();
+  }
+
+  // _closePreview
+  @accessibleHandler()
+  private _closePreview(): void {
+    const { viewModel } = this;
+    viewModel.previewIsVisible = false;
+    viewModel.screenshotModeIsActive = false;
+    this.view.popup.clear();
     this.scheduleRender();
   }
 }
