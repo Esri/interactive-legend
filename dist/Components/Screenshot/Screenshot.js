@@ -169,7 +169,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         };
         // _renderScreenshotPanel
         Screenshot.prototype._renderScreenshotPanel = function () {
-            var screenshotTitle = i18n.screenshotTitle, screenshotSubtitle = i18n.screenshotSubtitle, setScreenshotArea = i18n.setScreenshotArea, selectAFeature = i18n.selectAFeature;
+            var screenshotTitle = i18n.screenshotTitle, screenshotSubtitle = i18n.screenshotSubtitle, setScreenshotArea = i18n.setScreenshotArea, selectAFeature = i18n.selectAFeature, legend = i18n.legend, popup = i18n.popup;
             return (
             // screenshotBtn
             widget_1.tsx("div", { key: "screenshot-panel", class: CSS.mainContainer },
@@ -179,10 +179,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     this.legendIncludedInScreenshot ? (widget_1.tsx("label", { class: CSS.screenshotOption },
                         " ",
                         widget_1.tsx("input", { bind: this, onclick: this._toggleLegend, onkeydown: this._toggleLegend, checked: this.legendScreenshotEnabled, type: "checkbox" }),
-                        "Legend")) : null,
+                        legend)) : null,
                     this.popupIncludedInScreenshot ? (widget_1.tsx("label", { class: CSS.screenshotOption },
                         widget_1.tsx("input", { bind: this, onclick: this._togglePopup, onkeydown: this._togglePopup, type: "checkbox", checked: this.popupScreenshotEnabled }),
-                        "Popup")) : null)) : null,
+                        popup)) : null)) : null,
                 widget_1.tsx("div", { class: CSS.buttonContainer },
                     widget_1.tsx("button", { bind: this, onclick: this.activateScreenshot, onkeydown: this.activateScreenshot, disabled: this.popupIncludedInScreenshot && this.popupScreenshotEnabled
                             ? this.featureWidget && this.featureWidget.graphic
