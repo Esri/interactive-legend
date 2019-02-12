@@ -298,7 +298,9 @@ class Screenshot extends declared(Widget) {
       screenshotTitle,
       screenshotSubtitle,
       setScreenshotArea,
-      selectAFeature
+      selectAFeature,
+      legend,
+      popup
     } = i18n;
     return (
       // screenshotBtn
@@ -319,7 +321,7 @@ class Screenshot extends declared(Widget) {
                   checked={this.legendScreenshotEnabled}
                   type="checkbox"
                 />
-                Legend
+                {legend}
               </label>
             ) : null}
             {this.popupIncludedInScreenshot ? (
@@ -331,7 +333,7 @@ class Screenshot extends declared(Widget) {
                   type="checkbox"
                   checked={this.popupScreenshotEnabled}
                 />
-                Popup
+                {popup}
               </label>
             ) : null}
           </fieldset>

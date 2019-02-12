@@ -9,7 +9,9 @@ define({
     selectAFeature: "Select a feature",
     screenshotTitle: "Screenshot",
     screenshotSubtitle: "Select the item(s) that you would like to include in your screenshot",
-    widgetLabel: "Screenshot"
+    widgetLabel: "Screenshot",
+    legend: "Legend",
+    popup: "Popup"
   }),
   "ar": 1,
   "bs": 1,
