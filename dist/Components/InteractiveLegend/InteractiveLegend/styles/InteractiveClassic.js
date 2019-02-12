@@ -65,7 +65,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             btnSmall: "btn-small",
             btnPrimary: "btn-primary",
             error: "icon-ui-error",
-            close: "icon-ui-close"
+            close: "icon-ui-close",
+            nonVisibleIcon: "esri-icon-non-visible",
+            visibleIcon: "esri-icon-visible"
         },
         // interactive-legend
         loaderContainer: "esri-interactive-legend__loader-container",
@@ -430,7 +432,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 if (featureLayerData_1) {
                     var selectedInfoIndex = featureLayerData_1.selectedInfoIndex[legendElementIndex];
                     visibleIcon = selectedInfoIndex ? (selectedInfoIndex.indexOf(legendInfoIndex) === -1 &&
-                        selectedInfoIndex.length > 0 ? (widget_1.tsx("span", { class: "esri-icon-non-visible" })) : (widget_1.tsx("span", { class: "esri-icon-visible" }))) : (widget_1.tsx("span", { class: "esri-icon-visible" }));
+                        selectedInfoIndex.length > 0 ? (widget_1.tsx("span", { class: CSS.calciteStyles.nonVisibleIcon })) : (widget_1.tsx("span", { class: CSS.calciteStyles.visibleIcon }))) : (widget_1.tsx("span", { class: CSS.calciteStyles.visibleIcon }));
                     if (activeLayerInfo.legendElements.length > 1) {
                         selectedRow = selectedInfoIndex
                             ? featureLayerData_1.selectedInfoIndex &&
