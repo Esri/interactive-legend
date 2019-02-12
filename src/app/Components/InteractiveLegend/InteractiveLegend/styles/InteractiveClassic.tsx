@@ -129,7 +129,9 @@ const CSS = {
     btnSmall: "btn-small",
     btnPrimary: "btn-primary",
     error: "icon-ui-error",
-    close: "icon-ui-close"
+    close: "icon-ui-close",
+    nonVisibleIcon: "esri-icon-non-visible",
+    visibleIcon: "esri-icon-visible"
   },
   // interactive-legend
   loaderContainer: "esri-interactive-legend__loader-container",
@@ -137,10 +139,14 @@ const CSS = {
   selectedRow: "esri-interactive-legend--selected-row",
   loader: "esri-interactive-legend__loader",
   preventScroll: "esri-interactive-legend__prevent-scroll",
-  screenshot: "esri-interactive-legend__screenshot",
   hoverStyles: "esri-interactive-legend--layer-row",
   error: "esri-interactive-legend--error",
   legendElements: "esri-interactive-legend__legend-elements",
+  interactiveLegendLayerCaption: "esri-interactive-legend__layer-caption",
+  interactiveLegendLabel: "esri-interactive-legend__label",
+  interactiveLegendLayer: "esri-interactive-legend__layer",
+  interactiveLegendService: "esri-interactive-legend__service",
+  interactiveLegendlayerBody: "esri-interactive-legend__layer-body",
   onboarding: {
     mainContainer: "esri-interactive-legend__onboarding-main-container",
     contentContainer: "esri-interactive-legend__onboarding-content-container",
@@ -262,7 +268,8 @@ class InteractiveClassic extends declared(Widget) {
               this.selectedStyleData.add({
                 layerItemId: featureLayer.id,
                 field,
-                selectedInfoIndex: []
+                selectedInfoIndex: [],
+                applyStyles: false
               });
             }
           }
@@ -348,11 +355,18 @@ class InteractiveClassic extends declared(Widget) {
     const key = `${KEY}${(activeLayerInfo.layer as LayerUID).uid}-version-${
       activeLayerInfo.version
     }`;
-
+    const featureLayerData =
+      this.selectedStyleData.length > 0
+        ? this.selectedStyleData.find(data =>
+            data ? activeLayerInfo.layer.id === data.layerItemId : null
+          )
+        : null;
+    const labelClasses =
+      featureLayerData && featureLayerData.applyStyles
+        ? this.classes(CSS.header, CSS.label, CSS.interactiveLegendLabel)
+        : this.classes(CSS.header, CSS.label);
     const labelNode = activeLayerInfo.title ? (
-      <h3 class={this.classes(CSS.header, CSS.label)}>
-        {activeLayerInfo.title}
-      </h3>
+      <h3 class={labelClasses}>{activeLayerInfo.title}</h3>
     ) : null;
 
     if (hasChildren) {
@@ -361,12 +375,16 @@ class InteractiveClassic extends declared(Widget) {
           this._renderLegendForLayer(childActiveLayerInfo, activeLayerInfoIndex)
         )
         .toArray();
-
+      const service =
+        featureLayerData && featureLayerData.applyStyles
+          ? this.classes(
+              CSS.service,
+              CSS.interactiveLegendService,
+              CSS.groupLayer
+            )
+          : this.classes(CSS.service, CSS.groupLayer);
       return (
-        <div
-          key={key}
-          class={this.classes(CSS.service, CSS.groupLayer, CSS.screenshot)}
-        >
+        <div key={key} class={service}>
           {labelNode}
           {layers}
         </div>
@@ -401,16 +419,18 @@ class InteractiveClassic extends declared(Widget) {
       const layerClasses = {
         [CSS.groupLayerChild]: !!activeLayerInfo.parent
       };
-
+      const service =
+        featureLayerData && featureLayerData.applyStyles
+          ? this.classes(
+              CSS.service,
+              CSS.interactiveLegendService,
+              layerClasses
+            )
+          : this.classes(CSS.service, layerClasses);
       return (
-        <div key={key} class={this.classes(CSS.service, layerClasses)}>
+        <div key={key} class={service}>
           {labelNode}
-          {activeLayerInfo.layer.hasOwnProperty("sublayers") ? (
-            <div class={CSS.error}>
-              <span class={CSS.calciteStyles.error} />
-              {i18nInteractiveLegend.sublayerFiltering}
-            </div>
-          ) : null}
+
           <div class={CSS.layer}>{filteredElements}</div>
         </div>
       );
@@ -496,95 +516,28 @@ class InteractiveClassic extends declared(Widget) {
         title = genTitle;
       }
     }
-
-    const tableClass = isChild ? CSS.layerChildTable : CSS.layerTable,
-      caption = title ? <div class={CSS.layerCaption}>{title}</div> : null;
+    const featureLayerData =
+      this.selectedStyleData.length > 0
+        ? this.selectedStyleData.find(data =>
+            data ? activeLayerInfo.layer.id === data.layerItemId : null
+          )
+        : null;
+    const layerCaption =
+      featureLayerData && featureLayerData.applyStyles
+        ? this.classes(CSS.layerCaption, CSS.interactiveLegendLayerCaption)
+        : CSS.layerCaption;
+    const layerTable =
+      featureLayerData && featureLayerData.applyStyles
+        ? this.classes(CSS.layerTable, "esri-interactive-legend__layer-table")
+        : CSS.layerTable;
+    const tableClass = isChild ? CSS.layerChildTable : layerTable,
+      caption = title ? <div class={layerCaption}>{title}</div> : null;
 
     const tableClasses = {
       [CSS.layerTableSizeRamp]: isSizeRamp || !isChild
     };
-
-    const hasPictureMarkersAndIsMute = this._checkForPictureMarkersAndIsMute(
-      activeLayerInfo
-    );
-
-    const hasPictureFillAndIsMute = this._checkForPictureFillAndIsMute(
-      activeLayerInfo
-    );
-
-    const isRelationship =
-      (legendElement.type === "symbol-table" &&
-        legendElement.title == "Relationship") ||
-      legendElement.type === "relationship-ramp";
-    const featureLayer = activeLayerInfo.layer as FeatureLayer;
-    const isPredominance =
-      featureLayer.renderer &&
-      featureLayer.renderer.authoringInfo &&
-      featureLayer.renderer.authoringInfo.type === "predominance";
     return (
       <div class={this.classes(tableClass, tableClasses)}>
-        {!field &&
-        legendElementInfos &&
-        legendElementInfos.length > 1 &&
-        !isRelationship &&
-        !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
-        !isColorRamp &&
-        !isOpacityRamp &&
-        !isHeatRamp &&
-        !isPredominance ? (
-          <div class={CSS.error}>
-            <span class={CSS.calciteStyles.error} />
-            {i18nInteractiveLegend.noFieldAttribute}
-          </div>
-        ) : null}
-
-        {legendElementInfos &&
-        legendElementInfos.every(
-          elementInfo => !elementInfo.hasOwnProperty("value")
-        ) &&
-        legendElementInfos.length > 1 &&
-        !isRelationship &&
-        !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
-        !isHeatRamp ? (
-          <div class={CSS.error}>
-            <span class={CSS.calciteStyles.error} />
-            {i18nInteractiveLegend.elementInfoNoValue}
-          </div>
-        ) : null}
-
-        {isSizeRamp ? (
-          <div class={CSS.error}>
-            <span class={CSS.calciteStyles.error} />
-            {i18nInteractiveLegend.sizeRampFilterNotSupported}
-          </div>
-        ) : null}
-
-        {hasPictureMarkersAndIsMute &&
-        legendElementInfos &&
-        legendElementInfos.length > 1 ? (
-          <div class={CSS.error}>
-            <span class={CSS.calciteStyles.error} />
-            {i18nInteractiveLegend.muteAndPictureMarkerError}
-          </div>
-        ) : null}
-
-        {hasPictureFillAndIsMute &&
-        legendElementInfos &&
-        legendElementInfos.length > 1 ? (
-          <div class={CSS.error}>
-            <span class={CSS.calciteStyles.error} />
-            {i18nInteractiveLegend.muteAndPictureFillError}
-          </div>
-        ) : null}
-
-        {activeLayerInfo.layer.type !== "feature" &&
-        !activeLayerInfo.layer.hasOwnProperty("sublayers") ? (
-          <div class={CSS.error}>
-            <span class={CSS.calciteStyles.error} />
-            {i18nInteractiveLegend.featureLayerError}
-          </div>
-        ) : null}
-
         {caption}
         {content}
       </div>
@@ -754,35 +707,51 @@ class InteractiveClassic extends declared(Widget) {
     };
 
     let selectedRow = null;
+    let visibleIcon = null;
     if (this.selectedStyleData.length > 0) {
       const featureLayerData = this.selectedStyleData.find(data =>
         data ? activeLayerInfo.layer.id === data.layerItemId : null
       );
       if (featureLayerData) {
-        const selectedInfoIndex = featureLayerData.selectedInfoIndex;
+        const selectedInfoIndex =
+          featureLayerData.selectedInfoIndex[legendElementIndex];
+
+        visibleIcon = selectedInfoIndex ? (
+          selectedInfoIndex.indexOf(legendInfoIndex) === -1 &&
+          selectedInfoIndex.length > 0 ? (
+            <span class={CSS.calciteStyles.nonVisibleIcon} />
+          ) : (
+            <span class={CSS.calciteStyles.visibleIcon} />
+          )
+        ) : (
+          <span class={CSS.calciteStyles.visibleIcon} />
+        );
         if (activeLayerInfo.legendElements.length > 1) {
-          selectedRow =
-            selectedInfoIndex.length > 0 &&
-            selectedInfoIndex[legendElementIndex] &&
-            selectedInfoIndex[legendElementIndex].indexOf(legendInfoIndex) !==
-              -1
+          selectedRow = selectedInfoIndex
+            ? featureLayerData.selectedInfoIndex &&
+              selectedInfoIndex.indexOf(legendInfoIndex) === -1 &&
+              selectedInfoIndex.length > 0
               ? this.classes(
                   CSS.layerRow,
                   CSS.filterLayerRow,
-                  CSS.selectedRow,
-                  CSS.hoverStyles
+                  CSS.hoverStyles,
+                  CSS.selectedRow
                 )
-              : this.classes(CSS.layerRow, CSS.filterLayerRow, CSS.hoverStyles);
+              : this.classes(CSS.layerRow, CSS.filterLayerRow, CSS.hoverStyles)
+            : this.classes(CSS.layerRow, CSS.filterLayerRow, CSS.hoverStyles);
         } else {
-          selectedRow =
-            selectedInfoIndex.indexOf(legendInfoIndex) !== -1
+          selectedRow = selectedInfoIndex
+            ? featureLayerData.selectedInfoIndex &&
+              selectedInfoIndex.indexOf(legendInfoIndex) === -1 &&
+              selectedInfoIndex.length > 0
               ? this.classes(
                   CSS.layerRow,
                   CSS.filterLayerRow,
                   CSS.selectedRow,
                   CSS.hoverStyles
                 )
-              : this.classes(CSS.layerRow, CSS.filterLayerRow, CSS.hoverStyles);
+              : this.classes(CSS.layerRow, CSS.filterLayerRow, CSS.hoverStyles)
+            : this.classes(CSS.layerRow, CSS.filterLayerRow, CSS.hoverStyles);
         }
       }
     }
@@ -824,6 +793,10 @@ class InteractiveClassic extends declared(Widget) {
       isPredominance
         ? selectedRow
         : null;
+    if (featureLayerData) {
+      featureLayerData.applyStyles = applySelect ? true : false;
+    }
+
     return (
       <div
         bind={this}
@@ -909,12 +882,21 @@ class InteractiveClassic extends declared(Widget) {
           }
         }}
       >
-        <div class={this.classes(CSS.symbolContainer, symbolClasses)}>
-          {content}
+        <div
+          class={
+            applySelect
+              ? "esri-interactive-legend__legend-info-container"
+              : null
+          }
+        >
+          <div class={this.classes(CSS.symbolContainer, symbolClasses)}>
+            {content}
+          </div>
+          <div class={this.classes(CSS.layerInfo, labelClasses)}>
+            {getTitle(elementInfo.label, false) || ""}
+          </div>
         </div>
-        <div class={this.classes(CSS.layerInfo, labelClasses)}>
-          {getTitle(elementInfo.label, false) || ""}
-        </div>
+        {applySelect ? <div>{visibleIcon}</div> : null}
       </div>
     );
   }
@@ -1142,14 +1124,7 @@ class InteractiveClassic extends declared(Widget) {
     const featureLayerData = this.selectedStyleData.find(
       layerData => layerData.layerItemId === activeLayerInfoId
     );
-    const { selectedInfoIndex } = featureLayerData;
-    const legendElementInfoIndexFromData = selectedInfoIndex.indexOf(
-      legendElementInfoIndex
-    );
-    const activeLayerInfo = this.activeLayerInfos.find(
-      activeLayerInfo =>
-        activeLayerInfo.layer.id === featureLayerData.layerItemId
-    );
+
     const legendElementChildArr =
       featureLayerData.selectedInfoIndex[legendElementIndex];
 
@@ -1165,26 +1140,20 @@ class InteractiveClassic extends declared(Widget) {
       }
     }
 
-    if (activeLayerInfo.legendElements.length === 1) {
-      legendElementInfoIndexFromData === -1
-        ? selectedInfoIndex.push(legendElementInfoIndex)
-        : selectedInfoIndex.splice(legendElementInfoIndexFromData, 1);
-    } else if (activeLayerInfo.legendElements.length > 1) {
-      if (
-        Array.isArray(legendElementChildArr) &&
-        legendElementChildArr.length >= 1
-      ) {
-        legendElementChildArr.indexOf(legendElementInfoIndex) === -1
-          ? legendElementChildArr.push(legendElementInfoIndex)
-          : legendElementChildArr.splice(
-              legendElementChildArr.indexOf(legendElementInfoIndex),
-              1
-            );
-      } else {
-        featureLayerData.selectedInfoIndex[legendElementIndex] = [
-          legendElementInfoIndex
-        ];
-      }
+    if (
+      Array.isArray(legendElementChildArr) &&
+      legendElementChildArr.length >= 1
+    ) {
+      legendElementChildArr.indexOf(legendElementInfoIndex) === -1
+        ? legendElementChildArr.push(legendElementInfoIndex)
+        : legendElementChildArr.splice(
+            legendElementChildArr.indexOf(legendElementInfoIndex),
+            1
+          );
+    } else {
+      featureLayerData.selectedInfoIndex[legendElementIndex] = [
+        legendElementInfoIndex
+      ];
     }
   }
 

@@ -73,10 +73,14 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         selectedRow: "esri-interactive-legend--selected-row",
         loader: "esri-interactive-legend__loader",
         preventScroll: "esri-interactive-legend__prevent-scroll",
-        screenshot: "esri-interactive-legend__screenshot",
         hoverStyles: "esri-interactive-legend--layer-row",
         error: "esri-interactive-legend--error",
         legendElements: "esri-interactive-legend__legend-elements",
+        interactiveLegendLayerCaption: "esri-interactive-legend__layer-caption",
+        interactiveLegendLabel: "esri-interactive-legend__label",
+        interactiveLegendLayer: "esri-interactive-legend__layer",
+        interactiveLegendService: "esri-interactive-legend__service",
+        interactiveLegendlayerBody: "esri-interactive-legend__layer-body",
         onboarding: {
             mainContainer: "esri-interactive-legend__onboarding-main-container",
             contentContainer: "esri-interactive-legend__onboarding-content-container",
@@ -151,7 +155,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                             _this.selectedStyleData.add({
                                 layerItemId: featureLayer.id,
                                 field: field,
-                                selectedInfoIndex: []
+                                selectedInfoIndex: [],
+                                applyStyles: false
                             });
                         }
                     });
@@ -206,14 +211,25 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             }
             var hasChildren = !!activeLayerInfo.children.length;
             var key = "" + KEY + activeLayerInfo.layer.uid + "-version-" + activeLayerInfo.version;
-            var labelNode = activeLayerInfo.title ? (widget_1.tsx("h3", { class: this.classes(CSS.header, CSS.label) }, activeLayerInfo.title)) : null;
+            var featureLayerData = this.selectedStyleData.length > 0
+                ? this.selectedStyleData.find(function (data) {
+                    return data ? activeLayerInfo.layer.id === data.layerItemId : null;
+                })
+                : null;
+            var labelClasses = featureLayerData && featureLayerData.applyStyles
+                ? this.classes(CSS.header, CSS.label, CSS.interactiveLegendLabel)
+                : this.classes(CSS.header, CSS.label);
+            var labelNode = activeLayerInfo.title ? (widget_1.tsx("h3", { class: labelClasses }, activeLayerInfo.title)) : null;
             if (hasChildren) {
                 var layers = activeLayerInfo.children
                     .map(function (childActiveLayerInfo) {
                     return _this._renderLegendForLayer(childActiveLayerInfo, activeLayerInfoIndex);
                 })
                     .toArray();
-                return (widget_1.tsx("div", { key: key, class: this.classes(CSS.service, CSS.groupLayer, CSS.screenshot) },
+                var service = featureLayerData && featureLayerData.applyStyles
+                    ? this.classes(CSS.service, CSS.interactiveLegendService, CSS.groupLayer)
+                    : this.classes(CSS.service, CSS.groupLayer);
+                return (widget_1.tsx("div", { key: key, class: service },
                     labelNode,
                     layers));
             }
@@ -234,11 +250,11 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 var layerClasses = (_a = {},
                     _a[CSS.groupLayerChild] = !!activeLayerInfo.parent,
                     _a);
-                return (widget_1.tsx("div", { key: key, class: this.classes(CSS.service, layerClasses) },
+                var service = featureLayerData && featureLayerData.applyStyles
+                    ? this.classes(CSS.service, CSS.interactiveLegendService, layerClasses)
+                    : this.classes(CSS.service, layerClasses);
+                return (widget_1.tsx("div", { key: key, class: service },
                     labelNode,
-                    activeLayerInfo.layer.hasOwnProperty("sublayers") ? (widget_1.tsx("div", { class: CSS.error },
-                        widget_1.tsx("span", { class: CSS.calciteStyles.error }),
-                        i18nInteractiveLegend.sublayerFiltering)) : null,
                     widget_1.tsx("div", { class: CSS.layer }, filteredElements)));
             }
         };
@@ -292,56 +308,22 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     title = genTitle;
                 }
             }
-            var tableClass = isChild ? CSS.layerChildTable : CSS.layerTable, caption = title ? widget_1.tsx("div", { class: CSS.layerCaption }, title) : null;
+            var featureLayerData = this.selectedStyleData.length > 0
+                ? this.selectedStyleData.find(function (data) {
+                    return data ? activeLayerInfo.layer.id === data.layerItemId : null;
+                })
+                : null;
+            var layerCaption = featureLayerData && featureLayerData.applyStyles
+                ? this.classes(CSS.layerCaption, CSS.interactiveLegendLayerCaption)
+                : CSS.layerCaption;
+            var layerTable = featureLayerData && featureLayerData.applyStyles
+                ? this.classes(CSS.layerTable, "esri-interactive-legend__layer-table")
+                : CSS.layerTable;
+            var tableClass = isChild ? CSS.layerChildTable : layerTable, caption = title ? widget_1.tsx("div", { class: layerCaption }, title) : null;
             var tableClasses = (_a = {},
                 _a[CSS.layerTableSizeRamp] = isSizeRamp || !isChild,
                 _a);
-            var hasPictureMarkersAndIsMute = this._checkForPictureMarkersAndIsMute(activeLayerInfo);
-            var hasPictureFillAndIsMute = this._checkForPictureFillAndIsMute(activeLayerInfo);
-            var isRelationship = (legendElement.type === "symbol-table" &&
-                legendElement.title == "Relationship") ||
-                legendElement.type === "relationship-ramp";
-            var featureLayer = activeLayerInfo.layer;
-            var isPredominance = featureLayer.renderer &&
-                featureLayer.renderer.authoringInfo &&
-                featureLayer.renderer.authoringInfo.type === "predominance";
             return (widget_1.tsx("div", { class: this.classes(tableClass, tableClasses) },
-                !field &&
-                    legendElementInfos &&
-                    legendElementInfos.length > 1 &&
-                    !isRelationship &&
-                    !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
-                    !isColorRamp &&
-                    !isOpacityRamp &&
-                    !isHeatRamp &&
-                    !isPredominance ? (widget_1.tsx("div", { class: CSS.error },
-                    widget_1.tsx("span", { class: CSS.calciteStyles.error }),
-                    i18nInteractiveLegend.noFieldAttribute)) : null,
-                legendElementInfos &&
-                    legendElementInfos.every(function (elementInfo) { return !elementInfo.hasOwnProperty("value"); }) &&
-                    legendElementInfos.length > 1 &&
-                    !isRelationship &&
-                    !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
-                    !isHeatRamp ? (widget_1.tsx("div", { class: CSS.error },
-                    widget_1.tsx("span", { class: CSS.calciteStyles.error }),
-                    i18nInteractiveLegend.elementInfoNoValue)) : null,
-                isSizeRamp ? (widget_1.tsx("div", { class: CSS.error },
-                    widget_1.tsx("span", { class: CSS.calciteStyles.error }),
-                    i18nInteractiveLegend.sizeRampFilterNotSupported)) : null,
-                hasPictureMarkersAndIsMute &&
-                    legendElementInfos &&
-                    legendElementInfos.length > 1 ? (widget_1.tsx("div", { class: CSS.error },
-                    widget_1.tsx("span", { class: CSS.calciteStyles.error }),
-                    i18nInteractiveLegend.muteAndPictureMarkerError)) : null,
-                hasPictureFillAndIsMute &&
-                    legendElementInfos &&
-                    legendElementInfos.length > 1 ? (widget_1.tsx("div", { class: CSS.error },
-                    widget_1.tsx("span", { class: CSS.calciteStyles.error }),
-                    i18nInteractiveLegend.muteAndPictureFillError)) : null,
-                activeLayerInfo.layer.type !== "feature" &&
-                    !activeLayerInfo.layer.hasOwnProperty("sublayers") ? (widget_1.tsx("div", { class: CSS.error },
-                    widget_1.tsx("span", { class: CSS.calciteStyles.error }),
-                    i18nInteractiveLegend.featureLayerError)) : null,
                 caption,
                 content));
         };
@@ -440,26 +422,32 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 _b[CSS.sizeRamp] = !isStretched && isSizeRamp,
                 _b);
             var selectedRow = null;
+            var visibleIcon = null;
             if (this.selectedStyleData.length > 0) {
                 var featureLayerData_1 = this.selectedStyleData.find(function (data) {
                     return data ? activeLayerInfo.layer.id === data.layerItemId : null;
                 });
                 if (featureLayerData_1) {
-                    var selectedInfoIndex = featureLayerData_1.selectedInfoIndex;
+                    var selectedInfoIndex = featureLayerData_1.selectedInfoIndex[legendElementIndex];
+                    visibleIcon = selectedInfoIndex ? (selectedInfoIndex.indexOf(legendInfoIndex) === -1 &&
+                        selectedInfoIndex.length > 0 ? (widget_1.tsx("span", { class: "esri-icon-non-visible" })) : (widget_1.tsx("span", { class: "esri-icon-visible" }))) : (widget_1.tsx("span", { class: "esri-icon-visible" }));
                     if (activeLayerInfo.legendElements.length > 1) {
-                        selectedRow =
-                            selectedInfoIndex.length > 0 &&
-                                selectedInfoIndex[legendElementIndex] &&
-                                selectedInfoIndex[legendElementIndex].indexOf(legendInfoIndex) !==
-                                    -1
-                                ? this.classes(CSS.layerRow, CSS.filterLayerRow, CSS.selectedRow, CSS.hoverStyles)
-                                : this.classes(CSS.layerRow, CSS.filterLayerRow, CSS.hoverStyles);
+                        selectedRow = selectedInfoIndex
+                            ? featureLayerData_1.selectedInfoIndex &&
+                                selectedInfoIndex.indexOf(legendInfoIndex) === -1 &&
+                                selectedInfoIndex.length > 0
+                                ? this.classes(CSS.layerRow, CSS.filterLayerRow, CSS.hoverStyles, CSS.selectedRow)
+                                : this.classes(CSS.layerRow, CSS.filterLayerRow, CSS.hoverStyles)
+                            : this.classes(CSS.layerRow, CSS.filterLayerRow, CSS.hoverStyles);
                     }
                     else {
-                        selectedRow =
-                            selectedInfoIndex.indexOf(legendInfoIndex) !== -1
+                        selectedRow = selectedInfoIndex
+                            ? featureLayerData_1.selectedInfoIndex &&
+                                selectedInfoIndex.indexOf(legendInfoIndex) === -1 &&
+                                selectedInfoIndex.length > 0
                                 ? this.classes(CSS.layerRow, CSS.filterLayerRow, CSS.selectedRow, CSS.hoverStyles)
-                                : this.classes(CSS.layerRow, CSS.filterLayerRow, CSS.hoverStyles);
+                                : this.classes(CSS.layerRow, CSS.filterLayerRow, CSS.hoverStyles)
+                            : this.classes(CSS.layerRow, CSS.filterLayerRow, CSS.hoverStyles);
                     }
                 }
             }
@@ -491,6 +479,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 isPredominance
                 ? selectedRow
                 : null;
+            if (featureLayerData) {
+                featureLayerData.applyStyles = applySelect ? true : false;
+            }
             return (widget_1.tsx("div", { bind: this, class: (activeLayerInfo.layer.type === "feature" &&
                     (hasMoreThanOneInfo &&
                         field &&
@@ -538,8 +529,12 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos);
                     }
                 } },
-                widget_1.tsx("div", { class: this.classes(CSS.symbolContainer, symbolClasses) }, content),
-                widget_1.tsx("div", { class: this.classes(CSS.layerInfo, labelClasses) }, styleUtils_1.getTitle(elementInfo.label, false) || "")));
+                widget_1.tsx("div", { class: applySelect
+                        ? "esri-interactive-legend__legend-info-container"
+                        : null },
+                    widget_1.tsx("div", { class: this.classes(CSS.symbolContainer, symbolClasses) }, content),
+                    widget_1.tsx("div", { class: this.classes(CSS.layerInfo, labelClasses) }, styleUtils_1.getTitle(elementInfo.label, false) || "")),
+                applySelect ? widget_1.tsx("div", null, visibleIcon) : null));
         };
         // _renderImage
         InteractiveClassic.prototype._renderImage = function (elementInfo, layer, isStretched) {
@@ -616,11 +611,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var legendElementIndex = parseInt(node.getAttribute("data-legend-index"));
             var activeLayerInfoId = node.getAttribute("data-layer-id");
             var featureLayerData = this.selectedStyleData.find(function (layerData) { return layerData.layerItemId === activeLayerInfoId; });
-            var selectedInfoIndex = featureLayerData.selectedInfoIndex;
-            var legendElementInfoIndexFromData = selectedInfoIndex.indexOf(legendElementInfoIndex);
-            var activeLayerInfo = this.activeLayerInfos.find(function (activeLayerInfo) {
-                return activeLayerInfo.layer.id === featureLayerData.layerItemId;
-            });
             var legendElementChildArr = featureLayerData.selectedInfoIndex[legendElementIndex];
             if (this.filterMode === "highlight") {
                 var highlightedFeatures = this.viewModel.interactiveStyleData
@@ -631,23 +621,16 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     return;
                 }
             }
-            if (activeLayerInfo.legendElements.length === 1) {
-                legendElementInfoIndexFromData === -1
-                    ? selectedInfoIndex.push(legendElementInfoIndex)
-                    : selectedInfoIndex.splice(legendElementInfoIndexFromData, 1);
+            if (Array.isArray(legendElementChildArr) &&
+                legendElementChildArr.length >= 1) {
+                legendElementChildArr.indexOf(legendElementInfoIndex) === -1
+                    ? legendElementChildArr.push(legendElementInfoIndex)
+                    : legendElementChildArr.splice(legendElementChildArr.indexOf(legendElementInfoIndex), 1);
             }
-            else if (activeLayerInfo.legendElements.length > 1) {
-                if (Array.isArray(legendElementChildArr) &&
-                    legendElementChildArr.length >= 1) {
-                    legendElementChildArr.indexOf(legendElementInfoIndex) === -1
-                        ? legendElementChildArr.push(legendElementInfoIndex)
-                        : legendElementChildArr.splice(legendElementChildArr.indexOf(legendElementInfoIndex), 1);
-                }
-                else {
-                    featureLayerData.selectedInfoIndex[legendElementIndex] = [
-                        legendElementInfoIndex
-                    ];
-                }
+            else {
+                featureLayerData.selectedInfoIndex[legendElementIndex] = [
+                    legendElementInfoIndex
+                ];
             }
         };
         // _getOperationalItemIndex
