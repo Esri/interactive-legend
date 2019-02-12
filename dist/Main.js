@@ -155,7 +155,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 };
                             }
                             _this._handleHomeWidget(view, homeEnabled);
-                            _this._handleScreenshotWidget(screenshotEnabled, legendIncludedInScreenshot, popupIncludedInScreenshot, legendScreenshotEnabled, popupScreenshotEnabled, view);
+                            _this._handleScreenshotWidget(screenshotEnabled, legendIncludedInScreenshot, popupIncludedInScreenshot, view);
                             _this._handleBasemapToggleWidget(basemapToggleEnabled, view, nextBasemap);
                             _this.layerList = new LayerList({
                                 view: view
@@ -281,7 +281,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
             }
         };
         // _handleScreenshotWidget
-        InteractiveLegendApp.prototype._handleScreenshotWidget = function (screenshotEnabled, legendIncludedInScreenshot, popupIncludedInScreenshot, legendScreenshotEnabled, popupScreenshotEnabled, view) {
+        InteractiveLegendApp.prototype._handleScreenshotWidget = function (screenshotEnabled, legendIncludedInScreenshot, popupIncludedInScreenshot, view) {
             var _this = this;
             if (screenshotEnabled) {
                 var mapComponentSelectors = ["." + CSS.legend, "." + CSS.popup];
@@ -293,7 +293,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 });
                 var screenshotExpand = new Expand({
                     content: this.screenshot,
-                    expanded: true
+                    expanded: false
                 });
                 watchUtils.watch(view, "popup.visible", function () {
                     if (view.popup.visible) {

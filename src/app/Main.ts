@@ -253,8 +253,6 @@ class InteractiveLegendApp {
               screenshotEnabled,
               legendIncludedInScreenshot,
               popupIncludedInScreenshot,
-              legendScreenshotEnabled,
-              popupScreenshotEnabled,
               view
             );
 
@@ -424,8 +422,6 @@ class InteractiveLegendApp {
     screenshotEnabled: boolean,
     legendIncludedInScreenshot: boolean,
     popupIncludedInScreenshot: boolean,
-    legendScreenshotEnabled: boolean,
-    popupScreenshotEnabled: boolean,
     view: MapView
   ): void {
     if (screenshotEnabled) {
@@ -439,7 +435,7 @@ class InteractiveLegendApp {
       });
       const screenshotExpand = new Expand({
         content: this.screenshot,
-        expanded: true
+        expanded: false
       });
 
       watchUtils.watch(view, "popup.visible", () => {

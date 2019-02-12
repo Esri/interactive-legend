@@ -44,6 +44,7 @@ export interface SelectedStyleData {
   layerItemId: string;
   selectedInfoIndex: any;
   field: string;
+  applyStyles: boolean;
 }
 
 export type FilterMode = "featureFilter" | "highlight" | "mute";
