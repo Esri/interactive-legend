@@ -423,7 +423,7 @@ class InteractiveLegendApp {
     legendIncludedInScreenshot: boolean,
     popupIncludedInScreenshot: boolean,
     view: MapView
-  ) {
+  ): void {
     if (screenshotEnabled) {
       const mapComponentSelectors = [`.${CSS.legend}`, `.${CSS.popup}`];
 
@@ -528,7 +528,10 @@ class InteractiveLegendApp {
   }
 
   // _handleLayerListWidget
-  private _handleLayerListWidget(layerListEnabled: boolean, view: MapView) {
+  private _handleLayerListWidget(
+    layerListEnabled: boolean,
+    view: MapView
+  ): void {
     if (layerListEnabled) {
       const layerListContent = this.layerList ? this.layerList : null;
       this.layerListExpand = new Expand({
@@ -554,7 +557,7 @@ class InteractiveLegendApp {
     basemapToggleEnabled: boolean,
     view: MapView,
     nextBasemap: string
-  ) {
+  ): void {
     const nextBaseMapVal = nextBasemap ? nextBasemap : "topo";
     if (basemapToggleEnabled) {
       const basemapToggle = new BasemapToggle({
@@ -577,7 +580,7 @@ class InteractiveLegendApp {
     interactiveLegend: InteractiveLegend,
     view: MapView,
     searchConfig: any
-  ) {
+  ): void {
     // Get any configured search settings
     if (searchEnabled) {
       const searchProperties: any = {
