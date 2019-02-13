@@ -24,7 +24,7 @@
 
 define({
   root: {
-    widgetLabel: "Legend",
+    widgetLabel: "Interactive Legend",
     points: "Points",
     lines: "Lines",
     polygons: "Polygons",

@@ -109,6 +109,7 @@ class InteractiveLegendApp {
   searchExpand: Expand = null;
   featureWidget: FeatureWidget = null;
   highlightedFeature: any = null;
+  infoExpand: Expand = null;
 
   //--------------------------------------------------------------------------
   //
@@ -148,7 +149,6 @@ class InteractiveLegendApp {
     }
 
     const {
-      drawerEnabled,
       expandEnabled,
       highlightShade,
       mutedShade,
@@ -164,9 +164,7 @@ class InteractiveLegendApp {
       homeEnabled,
       nextBasemap,
       searchConfig,
-      infoPanelEnabled,
-      legendScreenshotEnabled,
-      popupScreenshotEnabled
+      infoPanelEnabled
     } = config;
     const { webMapItems } = results;
     const validWebMapItems = webMapItems.map(response => {
@@ -231,8 +229,6 @@ class InteractiveLegendApp {
 
             const defaultStyle = style ? style : "classic";
             const defaultMode = filterMode ? filterMode : "featureFilter";
-            const mode = drawerEnabled ? "drawer" : "auto";
-            const defaultExpandMode = mode ? mode : null;
 
             if (highlightShade) {
               const highlightedShade = new Color(highlightShade);
@@ -248,13 +244,6 @@ class InteractiveLegendApp {
             }
 
             this._handleHomeWidget(view, homeEnabled);
-
-            this._handleScreenshotWidget(
-              screenshotEnabled,
-              legendIncludedInScreenshot,
-              popupIncludedInScreenshot,
-              view
-            );
 
             this._handleBasemapToggleWidget(
               basemapToggleEnabled,
@@ -311,11 +300,32 @@ class InteractiveLegendApp {
             );
 
             this.interactiveLegendExpand = new Expand({
+              view,
+              group: "left",
               content: interactiveLegend,
-              expanded: expandEnabled,
-              mode: defaultExpandMode
+              mode: "floating",
+              expanded: true,
+              expandTooltip: interactiveLegend.label
             });
 
+            this._handleScreenshotWidget(
+              screenshotEnabled,
+              legendIncludedInScreenshot,
+              popupIncludedInScreenshot,
+              view
+            );
+
+            watchUtils.whenOnce(
+              this.interactiveLegendExpand,
+              "container",
+              () => {
+                if (this.interactiveLegendExpand.container) {
+                  const container = this.interactiveLegendExpand
+                    .container as HTMLElement;
+                  container.classList.add("expand-content-z-index");
+                }
+              }
+            );
             view.ui.add(this.interactiveLegendExpand, "bottom-left");
 
             if (infoPanelEnabled) {
@@ -329,37 +339,16 @@ class InteractiveLegendApp {
                 onboardingPanelScreenshotStepFive,
                 newInteractiveLegend,
                 firstOnboardingWelcomeMessage,
-                secondOnboardingWelcomeMessage
+                secondOnboardingWelcomeMessage,
+                thirdOnboardingWelcomeMessage
               } = i18nInteractiveLegend;
-              const screenshotSteps =
-                legendIncludedInScreenshot && popupIncludedInScreenshot
-                  ? [
-                      onboardingPanelScreenshotStepOne,
-                      onboardingPanelScreenshotStepTwo,
-                      onboardingPanelScreenshotStepThree,
-                      onboardingPanelScreenshotStepFour,
-                      onboardingPanelScreenshotStepFive
-                    ]
-                  : !legendIncludedInScreenshot && popupIncludedInScreenshot
-                  ? [
-                      onboardingPanelScreenshotStepOne,
-                      onboardingPanelScreenshotStepTwo,
-                      onboardingPanelScreenshotStepThree,
-                      onboardingPanelScreenshotStepFour,
-                      onboardingPanelScreenshotStepFive
-                    ]
-                  : legendIncludedInScreenshot && !popupIncludedInScreenshot
-                  ? [
-                      onboardingPanelScreenshotStepOne,
-                      onboardingPanelScreenshotStepTwo,
-                      onboardingPanelScreenshotStepFour,
-                      onboardingPanelScreenshotStepFive
-                    ]
-                  : [
-                      onboardingPanelScreenshotStepOne,
-                      onboardingPanelScreenshotStepFour,
-                      onboardingPanelScreenshotStepFive
-                    ];
+              const screenshotSteps = [
+                onboardingPanelScreenshotStepOne,
+                onboardingPanelScreenshotStepTwo,
+                onboardingPanelScreenshotStepThree,
+                onboardingPanelScreenshotStepFour,
+                onboardingPanelScreenshotStepFive
+              ];
               const infoWidget = new Info({
                 infoContent: [
                   {
@@ -372,20 +361,31 @@ class InteractiveLegendApp {
                     title: newInteractiveLegend,
                     infoContentItems: [
                       firstOnboardingWelcomeMessage,
-                      secondOnboardingWelcomeMessage
+                      secondOnboardingWelcomeMessage,
+                      thirdOnboardingWelcomeMessage
                     ]
                   }
                 ]
               });
 
-              const infoExpand = new Expand({
+              this.infoExpand = new Expand({
+                view,
+                group: "left",
                 content: infoWidget,
-                expanded: false
+                mode: "floating",
+                expandTooltip: infoWidget.label
               });
 
-              infoWidget.expandWidget = infoExpand;
+              infoWidget.expandWidget = this.infoExpand;
 
-              view.ui.add(infoExpand, "top-left");
+              watchUtils.whenOnce(this.infoExpand, "container", () => {
+                if (this.infoExpand.container) {
+                  const container = this.infoExpand.container as HTMLElement;
+                  container.classList.add("expand-content-z-index");
+                }
+              });
+
+              view.ui.add(this.infoExpand, "top-left");
             }
 
             goToMarker(marker, view);
@@ -423,7 +423,7 @@ class InteractiveLegendApp {
     legendIncludedInScreenshot: boolean,
     popupIncludedInScreenshot: boolean,
     view: MapView
-  ): void {
+  ) {
     if (screenshotEnabled) {
       const mapComponentSelectors = [`.${CSS.legend}`, `.${CSS.popup}`];
 
@@ -434,9 +434,14 @@ class InteractiveLegendApp {
         popupIncludedInScreenshot
       });
       const screenshotExpand = new Expand({
+        view,
+        group: "left",
         content: this.screenshot,
-        expanded: false
+        mode: "floating",
+        expandTooltip: this.screenshot.label
       });
+
+      this.screenshot.expandWidget = screenshotExpand;
 
       watchUtils.watch(view, "popup.visible", () => {
         if (view.popup.visible) {
@@ -455,32 +460,36 @@ class InteractiveLegendApp {
         }
       });
 
-      watchUtils.watch(
-        this.screenshot.viewModel,
-        "screenshotModeIsActive",
-        () => {
-          if (this.screenshot.viewModel.screenshotModeIsActive) {
-            this.interactiveLegendExpand.expanded = false;
-            view.popup.visible = false;
+      // watchUtils.watch(
+      //   this.screenshot.viewModel,
+      //   "screenshotModeIsActive",
+      //   () => {
+      //     if (this.screenshot.viewModel.screenshotModeIsActive) {
+      //       this.interactiveLegendExpand.expanded = false;
+      //       view.popup.visible = false;
 
-            if (this.layerListExpand) {
-              this.layerListExpand.expanded = false;
-            }
-            if (this.searchExpand) {
-              this.searchExpand.expanded = false;
-            }
-          } else {
-            this.interactiveLegendExpand.expanded = true;
+      //       if (this.layerListExpand) {
+      //         this.layerListExpand.expanded = false;
+      //       }
+      //       if (this.searchExpand) {
+      //         this.searchExpand.expanded = false;
+      //       }
 
-            if (this.layerListExpand) {
-              this.layerListExpand.expanded = true;
-            }
-            if (this.searchExpand) {
-              this.searchExpand.expanded = true;
-            }
-          }
-        }
-      );
+      //       if (this.infoExpand) {
+      //         this.infoExpand.expanded = false;
+      //       }
+      //     } else {
+      //       this.interactiveLegendExpand.expanded = true;
+
+      //       if (this.layerListExpand) {
+      //         this.layerListExpand.expanded = true;
+      //       }
+      //       if (this.searchExpand) {
+      //         this.searchExpand.expanded = true;
+      //       }
+      //     }
+      //   }
+      // );
       watchUtils.watch(view, "popup.visible", () => {
         if (
           !view.popup.visible &&
@@ -519,17 +528,22 @@ class InteractiveLegendApp {
   }
 
   // _handleLayerListWidget
-  private _handleLayerListWidget(
-    layerListEnabled: boolean,
-    view: MapView
-  ): void {
+  private _handleLayerListWidget(layerListEnabled: boolean, view: MapView) {
     if (layerListEnabled) {
       const layerListContent = this.layerList ? this.layerList : null;
       this.layerListExpand = new Expand({
-        expandIconClass: "esri-icon-layer-list",
         view,
         content: layerListContent,
+        mode: "floating",
+        expandIconClass: "esri-icon-layer-list",
+        expandTooltip: this.layerList.label,
         expanded: true
+      });
+      watchUtils.whenOnce(this.layerListExpand, "container", () => {
+        if (this.layerListExpand.container) {
+          const container = this.layerListExpand.container as HTMLElement;
+          container.classList.add("expand-content-z-index");
+        }
       });
       view.ui.add(this.layerListExpand, "bottom-right");
     }
@@ -540,14 +554,19 @@ class InteractiveLegendApp {
     basemapToggleEnabled: boolean,
     view: MapView,
     nextBasemap: string
-  ): void {
+  ) {
     const nextBaseMapVal = nextBasemap ? nextBasemap : "topo";
     if (basemapToggleEnabled) {
       const basemapToggle = new BasemapToggle({
         view,
         nextBasemap: nextBaseMapVal
       });
-
+      watchUtils.whenOnce(basemapToggle, "container", () => {
+        if (basemapToggle.container) {
+          const container = basemapToggle.container as HTMLElement;
+          container.classList.add("expand-content-z-index");
+        }
+      });
       view.ui.add(basemapToggle, "bottom-right");
     }
   }
@@ -558,7 +577,7 @@ class InteractiveLegendApp {
     interactiveLegend: InteractiveLegend,
     view: MapView,
     searchConfig: any
-  ): void {
+  ) {
     // Get any configured search settings
     if (searchEnabled) {
       const searchProperties: any = {
@@ -605,10 +624,20 @@ class InteractiveLegendApp {
 
       const search = new Search(searchProperties);
       this.searchExpand = new Expand({
+        view,
         content: search,
-        expanded: true
+        mode: "floating",
+        expanded: true,
+        expandTooltip: search.label
       });
       interactiveLegend.searchViewModel = search.viewModel;
+
+      watchUtils.whenOnce(this.searchExpand, "container", () => {
+        if (this.searchExpand.container) {
+          const container = this.searchExpand.container as HTMLElement;
+          container.classList.add("expand-content-z-index");
+        }
+      });
 
       view.ui.add(this.searchExpand, "top-right");
     }

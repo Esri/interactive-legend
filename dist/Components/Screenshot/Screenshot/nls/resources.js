@@ -2,16 +2,16 @@ define({
   root: ({
     takeAScreenshot: "Take a screenshot",
     downloadImage: "Download Image",
-    backButton: "Back to map",
+    backButton: "Return to the map",
     widgetLabel: "Screenshot",
     deactivateScreenshot: "Deactivate screenshot mode",
-    setScreenshotArea: "Set screenshot area",
+    setScreenshotArea: "Set the map area",
     selectAFeature: "Select a feature",
-    screenshotTitle: "Screenshot",
-    screenshotSubtitle: "Select the item(s) that you would like to include in your screenshot",
+    screenshotTitle: "Capture an image",
+    screenshotSubtitle: "Select additional elements to include with the map.",
     widgetLabel: "Screenshot",
     legend: "Legend",
-    popup: "Popup"
+    popup: "Pop-up"
   }),
   "ar": 1,
   "bs": 1,

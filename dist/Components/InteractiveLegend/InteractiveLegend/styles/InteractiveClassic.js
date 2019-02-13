@@ -492,16 +492,16 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         elementInfo.hasOwnProperty("value"))) ||
                     isPredominance
                     ? applySelect
-                    : null, tabIndex: (activeLayerInfo.layer.type === "feature" &&
+                    : null, tabIndex: activeLayerInfo.layer.type === "feature" &&
                     !this.offscreen &&
-                    (hasMoreThanOneInfo &&
+                    ((hasMoreThanOneInfo &&
                         field &&
                         featureLayerData &&
                         !isSizeRamp &&
-                        elementInfo.hasOwnProperty("value"))) ||
-                    isPredominance
+                        elementInfo.hasOwnProperty("value")) ||
+                        isPredominance)
                     ? 0
-                    : null, "data-legend-index": "" + legendElementIndex, "data-child-index": "" + legendInfoIndex, "data-layer-id": "" + activeLayerInfo.layer.id, onclick: function (event) {
+                    : -1, "data-legend-index": "" + legendElementIndex, "data-child-index": "" + legendInfoIndex, "data-layer-id": "" + activeLayerInfo.layer.id, onclick: function (event) {
                     if ((!isRelationship &&
                         !hasPictureMarkersAndIsMute &&
                         !isSizeRampAndMute &&
@@ -562,7 +562,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         widget_1.tsx("h3", null, i18nInteractiveLegend.newInteractiveLegend)),
                     widget_1.tsx("div", { class: CSS.onboarding.infoContainer },
                         widget_1.tsx("p", null, i18nInteractiveLegend.firstOnboardingWelcomeMessage),
-                        widget_1.tsx("p", null, i18nInteractiveLegend.secondOnboardingWelcomeMessage)),
+                        widget_1.tsx("p", null, i18nInteractiveLegend.secondOnboardingWelcomeMessage),
+                        widget_1.tsx("p", null, i18nInteractiveLegend.thirdOnboardingWelcomeMessage)),
                     widget_1.tsx("div", { class: CSS.onboarding.imgPreviewContainer })),
                 widget_1.tsx("div", { class: CSS.onboarding.onboardingButtonContainer },
                     widget_1.tsx("button", { bind: this, onclick: this._disableOnboarding, onkeydown: this._disableOnboarding, tabIndex: 0, class: this.classes(CSS.calciteStyles.btn), title: i18nInteractiveLegend.onboardingConfirmation }, i18nInteractiveLegend.onboardingConfirmation))));
