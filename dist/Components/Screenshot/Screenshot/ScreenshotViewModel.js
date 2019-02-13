@@ -30,6 +30,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this._area = null;
             _this._canvasElement = null;
             _this._handles = new Handles();
+            _this._screenshotPromise = null;
             //----------------------------------
             //
             //  Properties
@@ -60,7 +61,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 return ready
                     ? this.previewIsVisible
                         ? "ready"
-                        : !this._area
+                        : this._screenshotPromise
                             ? "takingScreenshot"
                             : "complete"
                     : "disabled";
@@ -74,7 +75,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         //
         //----------------------------------
         // setScreenshotArea
-        ScreenshotViewModel.prototype.setScreenshotArea = function (event, maskDiv, screenshotImageElement, dragHandler) {
+        ScreenshotViewModel.prototype.setScreenshotArea = function (event, maskDiv, screenshotImageElement, dragHandler, downloadBtnNode) {
             var _this = this;
             if (event.action !== "end") {
                 event.stopPropagation();
@@ -86,24 +87,28 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 var type = this.get("view.type");
                 if (type === "2d") {
                     var view = this.view;
-                    view
+                    this._screenshotPromise = view
                         .takeScreenshot({ area: this._area })
                         .catch(function (err) {
                         console.error("ERROR: ", err);
                     })
                         .then(function (viewScreenshot) {
-                        _this._processScreenshot(viewScreenshot, screenshotImageElement, maskDiv);
+                        _this._processScreenshot(viewScreenshot, screenshotImageElement, maskDiv, downloadBtnNode);
+                        _this._screenshotPromise = null;
+                        _this.notifyChange("state");
                     });
                 }
                 else if (type === "3d") {
                     var view = this.view;
-                    view
+                    this._screenshotPromise = view
                         .takeScreenshot({ area: this._area })
                         .catch(function (err) {
                         console.error("ERROR: ", err);
                     })
                         .then(function (viewScreenshot) {
-                        _this._processScreenshot(viewScreenshot, screenshotImageElement, maskDiv);
+                        _this._processScreenshot(viewScreenshot, screenshotImageElement, maskDiv, downloadBtnNode);
+                        _this._screenshotPromise = null;
+                        _this.notifyChange("state");
                     });
                 }
             }
@@ -128,7 +133,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         //
         //----------------------------------
         // _onlyScreenshotView
-        ScreenshotViewModel.prototype._onlyTakeScreenshotOfView = function (viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv) {
+        ScreenshotViewModel.prototype._onlyTakeScreenshotOfView = function (viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv, downloadBtnNode) {
             var _this = this;
             viewCanvas.height = viewScreenshot.data.height;
             viewCanvas.width = viewScreenshot.data.width;
@@ -136,12 +141,12 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             img.src = viewScreenshot.dataUrl;
             img.onload = function () {
                 context.drawImage(img, 0, 0);
-                _this._showPreview(viewCanvas, screenshotImageElement, maskDiv);
+                _this._showPreview(viewCanvas, screenshotImageElement, maskDiv, downloadBtnNode);
                 _this._canvasElement = viewCanvas;
             };
         };
         // _includeOneMapComponent
-        ScreenshotViewModel.prototype._includeOneMapComponent = function (viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv) {
+        ScreenshotViewModel.prototype._includeOneMapComponent = function (viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv, downloadBtnNode) {
             var _this = this;
             var context = viewCanvas.getContext("2d");
             var combinedCanvas = document.createElement("canvas");
@@ -150,7 +155,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var mapComponent = this.legendScreenshotEnabled
                 ? firstComponent
                 : secondMapComponent;
-            html2canvas(mapComponent, {
+            this._screenshotPromise = html2canvas(mapComponent, {
                 removeContainer: true,
                 logging: false
             })
@@ -165,17 +170,19 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     context.drawImage(img, 0, 0);
                     _this._generateImageForOneComponent(viewCanvas, combinedCanvas, viewScreenshot, mapComponent);
                     _this._canvasElement = combinedCanvas;
-                    _this._showPreview(combinedCanvas, screenshotImageElement, maskDiv);
+                    _this._showPreview(combinedCanvas, screenshotImageElement, maskDiv, downloadBtnNode);
+                    _this._screenshotPromise = null;
+                    _this.notifyChange("state");
                 };
             });
         };
         // _includeTwoMapComponents
-        ScreenshotViewModel.prototype._includeTwoMapComponents = function (viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv) {
+        ScreenshotViewModel.prototype._includeTwoMapComponents = function (viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv, downloadBtnNode) {
             var _this = this;
             var screenshotKey = "screenshot-key";
             var viewCanvasContext = viewCanvas.getContext("2d");
             var combinedCanvasElements = document.createElement("canvas");
-            html2canvas(document.querySelector(this.mapComponentSelectors[0]), {
+            this._screenshotPromise = html2canvas(document.querySelector(this.mapComponentSelectors[0]), {
                 removeContainer: true,
                 logging: false
             })
@@ -195,13 +202,14 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 })
                     .then(function (secondMapComponent) {
                     _this.secondMapComponent = secondMapComponent;
+                    _this._screenshotPromise = null;
                     _this.notifyChange("state");
                 });
             });
-            this._handles.add(this._watchMapComponents(viewCanvas, viewScreenshot, img, viewCanvasContext, combinedCanvasElements, screenshotImageElement, maskDiv, screenshotKey), screenshotKey);
+            this._handles.add(this._watchMapComponents(viewCanvas, viewScreenshot, img, viewCanvasContext, combinedCanvasElements, screenshotImageElement, maskDiv, screenshotKey, downloadBtnNode), screenshotKey);
         };
         // _watchMapComponents
-        ScreenshotViewModel.prototype._watchMapComponents = function (viewCanvas, viewScreenshot, img, viewCanvasContext, combinedCanvasElements, screenshotImageElement, maskDiv, screenshotKey) {
+        ScreenshotViewModel.prototype._watchMapComponents = function (viewCanvas, viewScreenshot, img, viewCanvasContext, combinedCanvasElements, screenshotImageElement, maskDiv, screenshotKey, downloadBtnNode) {
             var _this = this;
             return watchUtils.init(this, "firstMapComponent, secondMapComponent", function () {
                 if (_this.firstMapComponent && _this.secondMapComponent) {
@@ -212,7 +220,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         viewCanvasContext.drawImage(img, 0, 0);
                         _this._generateImageForTwoComponents(viewCanvas, combinedCanvasElements, viewScreenshot, _this.firstMapComponent, _this.secondMapComponent);
                         _this._canvasElement = combinedCanvasElements;
-                        _this._showPreview(combinedCanvasElements, screenshotImageElement, maskDiv);
+                        _this._showPreview(combinedCanvasElements, screenshotImageElement, maskDiv, downloadBtnNode);
                         _this.firstMapComponent = null;
                         _this.secondMapComponent = null;
                         _this._handles.remove(screenshotKey);
@@ -263,15 +271,16 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         : null;
         };
         // _showPreview
-        ScreenshotViewModel.prototype._showPreview = function (canvasElement, screenshotImageElement, maskDiv) {
-            var activeElement = document.activeElement;
-            activeElement.blur();
+        ScreenshotViewModel.prototype._showPreview = function (canvasElement, screenshotImageElement, maskDiv, downloadBtnNode) {
             screenshotImageElement.width = canvasElement.width;
             screenshotImageElement.src = canvasElement.toDataURL();
             this.view.container.classList.remove("esri-screenshot__cursor");
             this._area = null;
             this._setMaskPosition(maskDiv, null);
             this.previewIsVisible = true;
+            window.setTimeout(function () {
+                downloadBtnNode.focus();
+            }, 750);
             this.notifyChange("state");
         };
         // _downloadImage
@@ -319,29 +328,29 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             this.notifyChange("state");
         };
         // _processScreenshot
-        ScreenshotViewModel.prototype._processScreenshot = function (viewScreenshot, screenshotImageElement, maskDiv) {
+        ScreenshotViewModel.prototype._processScreenshot = function (viewScreenshot, screenshotImageElement, maskDiv, downloadBtnNode) {
             var viewCanvas = document.createElement("canvas");
             var img = document.createElement("img");
             var firstComponent = document.querySelector(this.mapComponentSelectors[0]);
             var secondMapComponent = document.querySelector(this.mapComponentSelectors[1]);
             if (!this.legendScreenshotEnabled && !this.popupScreenshotEnabled) {
-                this._onlyTakeScreenshotOfView(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv);
+                this._onlyTakeScreenshotOfView(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv, downloadBtnNode);
             }
             else {
                 if (this.legendScreenshotEnabled && !this.popupScreenshotEnabled) {
                     if (firstComponent.offsetWidth && firstComponent.offsetHeight) {
-                        this._includeOneMapComponent(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv);
+                        this._includeOneMapComponent(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv, downloadBtnNode);
                     }
                     else {
-                        this._onlyTakeScreenshotOfView(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv);
+                        this._onlyTakeScreenshotOfView(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv, downloadBtnNode);
                     }
                 }
                 else if (this.popupScreenshotEnabled && !this.legendScreenshotEnabled) {
                     if (secondMapComponent.offsetWidth && secondMapComponent.offsetHeight) {
-                        this._includeOneMapComponent(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv);
+                        this._includeOneMapComponent(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv, downloadBtnNode);
                     }
                     else {
-                        this._onlyTakeScreenshotOfView(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv);
+                        this._onlyTakeScreenshotOfView(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv, downloadBtnNode);
                     }
                 }
                 else if (this.legendScreenshotEnabled && this.popupScreenshotEnabled) {
@@ -349,15 +358,15 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         firstComponent.offsetHeight &&
                         secondMapComponent.offsetWidth &&
                         secondMapComponent.offsetHeight) {
-                        this._includeTwoMapComponents(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv);
+                        this._includeTwoMapComponents(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv, downloadBtnNode);
                     }
                     else if (!firstComponent.offsetWidth ||
                         !firstComponent.offsetHeight ||
                         (!secondMapComponent.offsetWidth || !secondMapComponent.offsetHeight)) {
-                        this._includeOneMapComponent(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv);
+                        this._includeOneMapComponent(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv, downloadBtnNode);
                     }
                     else {
-                        this._onlyTakeScreenshotOfView(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv);
+                        this._onlyTakeScreenshotOfView(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv, downloadBtnNode);
                     }
                 }
             }

@@ -27,6 +27,9 @@ import watchUtils = require("esri/core/watchUtils");
 // esri.widgets.Feature
 import Feature = require("esri/widgets/Feature");
 
+// esri.widgets.Expand
+import Expand = require("esri/widgets/Expand");
+
 //esri.widgets.support
 import {
   accessibleHandler,
@@ -86,6 +89,8 @@ class Screenshot extends declared(Widget) {
   // Stored Nodes
   private _maskNode: HTMLElement = null;
   private _screenshotImgNode: HTMLImageElement = null;
+  private _downloadBtnNode: HTMLButtonElement = null;
+  private _activeScreenshotBtnNode: HTMLButtonElement = null;
 
   // _dragHandler
   private _dragHandler: any = null;
@@ -137,6 +142,9 @@ class Screenshot extends declared(Widget) {
 
   @property()
   featureWidget: Feature = null;
+
+  @property()
+  expandWidget: Expand = null;
 
   // viewModel
   @property()
@@ -214,16 +222,18 @@ class Screenshot extends declared(Widget) {
         event,
         this._maskNode,
         this._screenshotImgNode,
-        this._dragHandler
+        this._dragHandler,
+        this._downloadBtnNode
       );
     });
     this.scheduleRender();
   }
 
   // downloadImage
-  @aliasOf("viewModel.downloadImage")
   @accessibleHandler()
-  downloadImage: () => void;
+  private _downloadImage() {
+    this.viewModel.downloadImage();
+  }
 
   //----------------------------------
   //
@@ -244,9 +254,9 @@ class Screenshot extends declared(Widget) {
         <button
           bind={this}
           tabIndex={0}
-          class={this.classes(CSS.actionBtn)}
-          onclick={this.downloadImage}
-          onkeydown={this.downloadImage}
+          class={CSS.actionBtn}
+          onclick={this._downloadImage}
+          onkeydown={this._downloadImage}
           afterCreate={storeNode}
           data-node-ref="_downloadBtnNode"
           aria-label={i18n.downloadImage}
@@ -341,8 +351,11 @@ class Screenshot extends declared(Widget) {
         <div class={CSS.buttonContainer}>
           <button
             bind={this}
+            tabIndex={0}
             onclick={this.activateScreenshot}
             onkeydown={this.activateScreenshot}
+            afterCreate={storeNode}
+            data-node-ref="_activeScreenshotBtnNode"
             disabled={
               this.popupIncludedInScreenshot && this.popupScreenshotEnabled
                 ? this.featureWidget && this.featureWidget.graphic
@@ -422,6 +435,11 @@ class Screenshot extends declared(Widget) {
       this.featureWidget.graphic = null;
     }
     this._dragHandler.remove();
+
+    window.setTimeout(() => {
+      this._activeScreenshotBtnNode.focus();
+    }, 10);
+
     this.scheduleRender();
   }
 
@@ -448,6 +466,9 @@ class Screenshot extends declared(Widget) {
     viewModel.previewIsVisible = false;
     viewModel.screenshotModeIsActive = false;
     this.view.popup.clear();
+    window.setTimeout(() => {
+      this._activeScreenshotBtnNode.focus();
+    }, 10);
     this.scheduleRender();
   }
 }

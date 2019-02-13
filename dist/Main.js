@@ -52,6 +52,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
             this.searchExpand = null;
             this.featureWidget = null;
             this.highlightedFeature = null;
+            this.infoExpand = null;
         }
         //--------------------------------------------------------------------------
         //
@@ -88,7 +89,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 });
                 this.telemetry.logPageView();
             }
-            var drawerEnabled = config.drawerEnabled, expandEnabled = config.expandEnabled, highlightShade = config.highlightShade, mutedShade = config.mutedShade, style = config.style, filterMode = config.filterMode, screenshotEnabled = config.screenshotEnabled, legendIncludedInScreenshot = config.legendIncludedInScreenshot, popupIncludedInScreenshot = config.popupIncludedInScreenshot, featureCountEnabled = config.featureCountEnabled, layerListEnabled = config.layerListEnabled, searchEnabled = config.searchEnabled, basemapToggleEnabled = config.basemapToggleEnabled, homeEnabled = config.homeEnabled, nextBasemap = config.nextBasemap, searchConfig = config.searchConfig, infoPanelEnabled = config.infoPanelEnabled, legendScreenshotEnabled = config.legendScreenshotEnabled, popupScreenshotEnabled = config.popupScreenshotEnabled;
+            var expandEnabled = config.expandEnabled, highlightShade = config.highlightShade, mutedShade = config.mutedShade, style = config.style, filterMode = config.filterMode, screenshotEnabled = config.screenshotEnabled, legendIncludedInScreenshot = config.legendIncludedInScreenshot, popupIncludedInScreenshot = config.popupIncludedInScreenshot, featureCountEnabled = config.featureCountEnabled, layerListEnabled = config.layerListEnabled, searchEnabled = config.searchEnabled, basemapToggleEnabled = config.basemapToggleEnabled, homeEnabled = config.homeEnabled, nextBasemap = config.nextBasemap, searchConfig = config.searchConfig, infoPanelEnabled = config.infoPanelEnabled;
             var webMapItems = results.webMapItems;
             var validWebMapItems = webMapItems.map(function (response) {
                 return response.value;
@@ -139,8 +140,6 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                             }
                             var defaultStyle = style ? style : "classic";
                             var defaultMode = filterMode ? filterMode : "featureFilter";
-                            var mode = drawerEnabled ? "drawer" : "auto";
-                            var defaultExpandMode = mode ? mode : null;
                             if (highlightShade) {
                                 var highlightedShade = new Color(highlightShade);
                                 var r = highlightedShade.r, g = highlightedShade.g, b = highlightedShade.b, a = highlightedShade.a;
@@ -155,7 +154,6 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 };
                             }
                             _this._handleHomeWidget(view, homeEnabled);
-                            _this._handleScreenshotWidget(screenshotEnabled, legendIncludedInScreenshot, popupIncludedInScreenshot, view);
                             _this._handleBasemapToggleWidget(basemapToggleEnabled, view, nextBasemap);
                             _this.layerList = new LayerList({
                                 view: view
@@ -195,42 +193,32 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 interactiveLegend.style.selectedStyleData;
                             _this._handleSearchWidget(searchEnabled, interactiveLegend, view, searchConfig);
                             _this.interactiveLegendExpand = new Expand({
+                                view: view,
+                                group: "left",
                                 content: interactiveLegend,
-                                expanded: expandEnabled,
-                                mode: defaultExpandMode
+                                mode: "floating",
+                                expanded: true,
+                                expandTooltip: interactiveLegend.label
+                            });
+                            _this._handleScreenshotWidget(screenshotEnabled, legendIncludedInScreenshot, popupIncludedInScreenshot, view);
+                            watchUtils.whenOnce(_this.interactiveLegendExpand, "container", function () {
+                                if (_this.interactiveLegendExpand.container) {
+                                    var container_1 = _this.interactiveLegendExpand
+                                        .container;
+                                    container_1.classList.add("expand-content-z-index");
+                                }
                             });
                             view.ui.add(_this.interactiveLegendExpand, "bottom-left");
                             if (infoPanelEnabled) {
                                 var screenshotTitle = i18nInteractiveLegend.onboardingPanelScreenshotTitle;
-                                var onboardingPanelScreenshotStepOne = i18nInteractiveLegend.onboardingPanelScreenshotStepOne, onboardingPanelScreenshotStepTwo = i18nInteractiveLegend.onboardingPanelScreenshotStepTwo, onboardingPanelScreenshotStepThree = i18nInteractiveLegend.onboardingPanelScreenshotStepThree, onboardingPanelScreenshotStepFour = i18nInteractiveLegend.onboardingPanelScreenshotStepFour, onboardingPanelScreenshotStepFive = i18nInteractiveLegend.onboardingPanelScreenshotStepFive, newInteractiveLegend = i18nInteractiveLegend.newInteractiveLegend, firstOnboardingWelcomeMessage = i18nInteractiveLegend.firstOnboardingWelcomeMessage, secondOnboardingWelcomeMessage = i18nInteractiveLegend.secondOnboardingWelcomeMessage;
-                                var screenshotSteps = legendIncludedInScreenshot && popupIncludedInScreenshot
-                                    ? [
-                                        onboardingPanelScreenshotStepOne,
-                                        onboardingPanelScreenshotStepTwo,
-                                        onboardingPanelScreenshotStepThree,
-                                        onboardingPanelScreenshotStepFour,
-                                        onboardingPanelScreenshotStepFive
-                                    ]
-                                    : !legendIncludedInScreenshot && popupIncludedInScreenshot
-                                        ? [
-                                            onboardingPanelScreenshotStepOne,
-                                            onboardingPanelScreenshotStepTwo,
-                                            onboardingPanelScreenshotStepThree,
-                                            onboardingPanelScreenshotStepFour,
-                                            onboardingPanelScreenshotStepFive
-                                        ]
-                                        : legendIncludedInScreenshot && !popupIncludedInScreenshot
-                                            ? [
-                                                onboardingPanelScreenshotStepOne,
-                                                onboardingPanelScreenshotStepTwo,
-                                                onboardingPanelScreenshotStepFour,
-                                                onboardingPanelScreenshotStepFive
-                                            ]
-                                            : [
-                                                onboardingPanelScreenshotStepOne,
-                                                onboardingPanelScreenshotStepFour,
-                                                onboardingPanelScreenshotStepFive
-                                            ];
+                                var onboardingPanelScreenshotStepOne = i18nInteractiveLegend.onboardingPanelScreenshotStepOne, onboardingPanelScreenshotStepTwo = i18nInteractiveLegend.onboardingPanelScreenshotStepTwo, onboardingPanelScreenshotStepThree = i18nInteractiveLegend.onboardingPanelScreenshotStepThree, onboardingPanelScreenshotStepFour = i18nInteractiveLegend.onboardingPanelScreenshotStepFour, onboardingPanelScreenshotStepFive = i18nInteractiveLegend.onboardingPanelScreenshotStepFive, newInteractiveLegend = i18nInteractiveLegend.newInteractiveLegend, firstOnboardingWelcomeMessage = i18nInteractiveLegend.firstOnboardingWelcomeMessage, secondOnboardingWelcomeMessage = i18nInteractiveLegend.secondOnboardingWelcomeMessage, thirdOnboardingWelcomeMessage = i18nInteractiveLegend.thirdOnboardingWelcomeMessage;
+                                var screenshotSteps = [
+                                    onboardingPanelScreenshotStepOne,
+                                    onboardingPanelScreenshotStepTwo,
+                                    onboardingPanelScreenshotStepThree,
+                                    onboardingPanelScreenshotStepFour,
+                                    onboardingPanelScreenshotStepFive
+                                ];
                                 var infoWidget = new Info({
                                     infoContent: [
                                         {
@@ -243,17 +231,27 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                             title: newInteractiveLegend,
                                             infoContentItems: [
                                                 firstOnboardingWelcomeMessage,
-                                                secondOnboardingWelcomeMessage
+                                                secondOnboardingWelcomeMessage,
+                                                thirdOnboardingWelcomeMessage
                                             ]
                                         }
                                     ]
                                 });
-                                var infoExpand = new Expand({
+                                _this.infoExpand = new Expand({
+                                    view: view,
+                                    group: "left",
                                     content: infoWidget,
-                                    expanded: false
+                                    mode: "floating",
+                                    expandTooltip: infoWidget.label
                                 });
-                                infoWidget.expandWidget = infoExpand;
-                                view.ui.add(infoExpand, "top-left");
+                                infoWidget.expandWidget = _this.infoExpand;
+                                watchUtils.whenOnce(_this.infoExpand, "container", function () {
+                                    if (_this.infoExpand.container) {
+                                        var container_2 = _this.infoExpand.container;
+                                        container_2.classList.add("expand-content-z-index");
+                                    }
+                                });
+                                view.ui.add(_this.infoExpand, "top-left");
                             }
                             itemUtils_1.goToMarker(marker, view);
                             _this._addTitle(config.title);
@@ -292,9 +290,13 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                     popupIncludedInScreenshot: popupIncludedInScreenshot
                 });
                 var screenshotExpand = new Expand({
+                    view: view,
+                    group: "left",
                     content: this.screenshot,
-                    expanded: false
+                    mode: "floating",
+                    expandTooltip: this.screenshot.label
                 });
+                this.screenshot.expandWidget = screenshotExpand;
                 watchUtils.watch(view, "popup.visible", function () {
                     if (view.popup.visible) {
                         if (!_this.featureWidget) {
@@ -310,27 +312,33 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                         }
                     }
                 });
-                watchUtils.watch(this.screenshot.viewModel, "screenshotModeIsActive", function () {
-                    if (_this.screenshot.viewModel.screenshotModeIsActive) {
-                        _this.interactiveLegendExpand.expanded = false;
-                        view.popup.visible = false;
-                        if (_this.layerListExpand) {
-                            _this.layerListExpand.expanded = false;
-                        }
-                        if (_this.searchExpand) {
-                            _this.searchExpand.expanded = false;
-                        }
-                    }
-                    else {
-                        _this.interactiveLegendExpand.expanded = true;
-                        if (_this.layerListExpand) {
-                            _this.layerListExpand.expanded = true;
-                        }
-                        if (_this.searchExpand) {
-                            _this.searchExpand.expanded = true;
-                        }
-                    }
-                });
+                // watchUtils.watch(
+                //   this.screenshot.viewModel,
+                //   "screenshotModeIsActive",
+                //   () => {
+                //     if (this.screenshot.viewModel.screenshotModeIsActive) {
+                //       this.interactiveLegendExpand.expanded = false;
+                //       view.popup.visible = false;
+                //       if (this.layerListExpand) {
+                //         this.layerListExpand.expanded = false;
+                //       }
+                //       if (this.searchExpand) {
+                //         this.searchExpand.expanded = false;
+                //       }
+                //       if (this.infoExpand) {
+                //         this.infoExpand.expanded = false;
+                //       }
+                //     } else {
+                //       this.interactiveLegendExpand.expanded = true;
+                //       if (this.layerListExpand) {
+                //         this.layerListExpand.expanded = true;
+                //       }
+                //       if (this.searchExpand) {
+                //         this.searchExpand.expanded = true;
+                //       }
+                //     }
+                //   }
+                // );
                 watchUtils.watch(view, "popup.visible", function () {
                     if (!view.popup.visible &&
                         _this.screenshot.viewModel.screenshotModeIsActive &&
@@ -358,13 +366,22 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
         };
         // _handleLayerListWidget
         InteractiveLegendApp.prototype._handleLayerListWidget = function (layerListEnabled, view) {
+            var _this = this;
             if (layerListEnabled) {
                 var layerListContent = this.layerList ? this.layerList : null;
                 this.layerListExpand = new Expand({
-                    expandIconClass: "esri-icon-layer-list",
                     view: view,
                     content: layerListContent,
+                    mode: "floating",
+                    expandIconClass: "esri-icon-layer-list",
+                    expandTooltip: this.layerList.label,
                     expanded: true
+                });
+                watchUtils.whenOnce(this.layerListExpand, "container", function () {
+                    if (_this.layerListExpand.container) {
+                        var container = _this.layerListExpand.container;
+                        container.classList.add("expand-content-z-index");
+                    }
                 });
                 view.ui.add(this.layerListExpand, "bottom-right");
             }
@@ -373,15 +390,22 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
         InteractiveLegendApp.prototype._handleBasemapToggleWidget = function (basemapToggleEnabled, view, nextBasemap) {
             var nextBaseMapVal = nextBasemap ? nextBasemap : "topo";
             if (basemapToggleEnabled) {
-                var basemapToggle = new BasemapToggle({
+                var basemapToggle_1 = new BasemapToggle({
                     view: view,
                     nextBasemap: nextBaseMapVal
                 });
-                view.ui.add(basemapToggle, "bottom-right");
+                watchUtils.whenOnce(basemapToggle_1, "container", function () {
+                    if (basemapToggle_1.container) {
+                        var container = basemapToggle_1.container;
+                        container.classList.add("expand-content-z-index");
+                    }
+                });
+                view.ui.add(basemapToggle_1, "bottom-right");
             }
         };
         // _handleSearchWidget
         InteractiveLegendApp.prototype._handleSearchWidget = function (searchEnabled, interactiveLegend, view, searchConfig) {
+            var _this = this;
             // Get any configured search settings
             if (searchEnabled) {
                 var searchProperties = {
@@ -421,10 +445,19 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 }
                 var search = new Search(searchProperties);
                 this.searchExpand = new Expand({
+                    view: view,
                     content: search,
-                    expanded: true
+                    mode: "floating",
+                    expanded: true,
+                    expandTooltip: search.label
                 });
                 interactiveLegend.searchViewModel = search.viewModel;
+                watchUtils.whenOnce(this.searchExpand, "container", function () {
+                    if (_this.searchExpand.container) {
+                        var container = _this.searchExpand.container;
+                        container.classList.add("expand-content-z-index");
+                    }
+                });
                 view.ui.add(this.searchExpand, "top-right");
             }
         };

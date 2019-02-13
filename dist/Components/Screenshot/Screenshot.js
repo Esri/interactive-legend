@@ -71,6 +71,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             // Stored Nodes
             _this._maskNode = null;
             _this._screenshotImgNode = null;
+            _this._downloadBtnNode = null;
+            _this._activeScreenshotBtnNode = null;
             // _dragHandler
             _this._dragHandler = null;
             // _popupIsIncluded
@@ -97,6 +99,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             // popupIncludedInScreenshot
             _this.popupIncludedInScreenshot = null;
             _this.featureWidget = null;
+            _this.expandWidget = null;
             // viewModel
             _this.viewModel = new ScreenshotViewModel();
             return _this;
@@ -132,9 +135,13 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             this.viewModel.screenshotModeIsActive = true;
             this.view.container.classList.add(CSS.screenshotCursor);
             this._dragHandler = this.view.on("drag", function (event) {
-                _this.viewModel.setScreenshotArea(event, _this._maskNode, _this._screenshotImgNode, _this._dragHandler);
+                _this.viewModel.setScreenshotArea(event, _this._maskNode, _this._screenshotImgNode, _this._dragHandler, _this._downloadBtnNode);
             });
             this.scheduleRender();
+        };
+        // downloadImage
+        Screenshot.prototype._downloadImage = function () {
+            this.viewModel.downloadImage();
         };
         //----------------------------------
         //
@@ -149,7 +156,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         // _renderScreenshotPreviewBtns
         Screenshot.prototype._renderScreenshotPreviewBtns = function () {
             return (widget_1.tsx("div", null,
-                widget_1.tsx("button", { bind: this, tabIndex: 0, class: this.classes(CSS.actionBtn), onclick: this.downloadImage, onkeydown: this.downloadImage, afterCreate: widget_1.storeNode, "data-node-ref": "_downloadBtnNode", "aria-label": i18n.downloadImage, title: i18n.downloadImage }, i18n.downloadImage),
+                widget_1.tsx("button", { bind: this, tabIndex: 0, class: CSS.actionBtn, onclick: this._downloadImage, onkeydown: this._downloadImage, afterCreate: widget_1.storeNode, "data-node-ref": "_downloadBtnNode", "aria-label": i18n.downloadImage, title: i18n.downloadImage }, i18n.downloadImage),
                 widget_1.tsx("button", { bind: this, tabIndex: 0, class: this.classes(CSS.actionBtn, CSS.backBtn), onclick: this._closePreview, onkeydown: this._closePreview }, i18n.backButton)));
         };
         // _renderScreenshotPreviewOverlay
@@ -184,7 +191,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         widget_1.tsx("input", { bind: this, onclick: this._togglePopup, onkeydown: this._togglePopup, type: "checkbox", checked: this.popupScreenshotEnabled }),
                         popup)) : null)) : null,
                 widget_1.tsx("div", { class: CSS.buttonContainer },
-                    widget_1.tsx("button", { bind: this, onclick: this.activateScreenshot, onkeydown: this.activateScreenshot, disabled: this.popupIncludedInScreenshot && this.popupScreenshotEnabled
+                    widget_1.tsx("button", { bind: this, tabIndex: 0, onclick: this.activateScreenshot, onkeydown: this.activateScreenshot, afterCreate: widget_1.storeNode, "data-node-ref": "_activeScreenshotBtnNode", disabled: this.popupIncludedInScreenshot && this.popupScreenshotEnabled
                             ? this.featureWidget && this.featureWidget.graphic
                                 ? false
                                 : true
@@ -236,12 +243,16 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         };
         // _deactivateScreenshot
         Screenshot.prototype._deactivateScreenshot = function () {
+            var _this = this;
             this.viewModel.screenshotModeIsActive = false;
             this.view.container.classList.remove(CSS.screenshotCursor);
             if (this.featureWidget && this.featureWidget.graphic) {
                 this.featureWidget.graphic = null;
             }
             this._dragHandler.remove();
+            window.setTimeout(function () {
+                _this._activeScreenshotBtnNode.focus();
+            }, 10);
             this.scheduleRender();
         };
         // _toggleLegend
@@ -258,10 +269,14 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         };
         // _closePreview
         Screenshot.prototype._closePreview = function () {
+            var _this = this;
             var viewModel = this.viewModel;
             viewModel.previewIsVisible = false;
             viewModel.screenshotModeIsActive = false;
             this.view.popup.clear();
+            window.setTimeout(function () {
+                _this._activeScreenshotBtnNode.focus();
+            }, 10);
             this.scheduleRender();
         };
         __decorate([
@@ -296,6 +311,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             decorators_1.property()
         ], Screenshot.prototype, "featureWidget", void 0);
         __decorate([
+            decorators_1.property()
+        ], Screenshot.prototype, "expandWidget", void 0);
+        __decorate([
             decorators_1.property(),
             widget_1.renderable(["viewModel.state"])
         ], Screenshot.prototype, "viewModel", void 0);
@@ -303,9 +321,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             widget_1.accessibleHandler()
         ], Screenshot.prototype, "activateScreenshot", null);
         __decorate([
-            decorators_1.aliasOf("viewModel.downloadImage"),
             widget_1.accessibleHandler()
-        ], Screenshot.prototype, "downloadImage", void 0);
+        ], Screenshot.prototype, "_downloadImage", null);
         __decorate([
             widget_1.accessibleHandler()
         ], Screenshot.prototype, "_deactivateScreenshot", null);

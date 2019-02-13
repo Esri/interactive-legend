@@ -48,6 +48,7 @@ class ScreenshotViewModel extends declared(Accessor) {
   private _area: Area = null;
   private _canvasElement: HTMLCanvasElement = null;
   private _handles: Handles = new Handles();
+  private _screenshotPromise: IPromise<any> = null;
 
   // state
   @property({
@@ -59,7 +60,7 @@ class ScreenshotViewModel extends declared(Accessor) {
     return ready
       ? this.previewIsVisible
         ? "ready"
-        : !this._area
+        : this._screenshotPromise
         ? "takingScreenshot"
         : "complete"
       : "disabled";
@@ -114,7 +115,8 @@ class ScreenshotViewModel extends declared(Accessor) {
     event: any,
     maskDiv: HTMLElement,
     screenshotImageElement: HTMLImageElement,
-    dragHandler: any
+    dragHandler: any,
+    downloadBtnNode: HTMLButtonElement
   ): void {
     if (event.action !== "end") {
       event.stopPropagation();
@@ -125,7 +127,7 @@ class ScreenshotViewModel extends declared(Accessor) {
       const type = this.get("view.type");
       if (type === "2d") {
         const view = this.view as MapView;
-        view
+        this._screenshotPromise = view
           .takeScreenshot({ area: this._area })
           .catch((err: Error) => {
             console.error("ERROR: ", err);
@@ -134,12 +136,15 @@ class ScreenshotViewModel extends declared(Accessor) {
             this._processScreenshot(
               viewScreenshot,
               screenshotImageElement,
-              maskDiv
+              maskDiv,
+              downloadBtnNode
             );
+            this._screenshotPromise = null;
+            this.notifyChange("state");
           });
       } else if (type === "3d") {
         const view = this.view as SceneView;
-        view
+        this._screenshotPromise = view
           .takeScreenshot({ area: this._area })
           .catch((err: Error) => {
             console.error("ERROR: ", err);
@@ -148,8 +153,11 @@ class ScreenshotViewModel extends declared(Accessor) {
             this._processScreenshot(
               viewScreenshot,
               screenshotImageElement,
-              maskDiv
+              maskDiv,
+              downloadBtnNode
             );
+            this._screenshotPromise = null;
+            this.notifyChange("state");
           });
       }
     }
@@ -187,7 +195,8 @@ class ScreenshotViewModel extends declared(Accessor) {
     viewCanvas: HTMLCanvasElement,
     img: HTMLImageElement,
     screenshotImageElement: HTMLImageElement,
-    maskDiv: HTMLElement
+    maskDiv: HTMLElement,
+    downloadBtnNode: HTMLButtonElement
   ): void {
     viewCanvas.height = viewScreenshot.data.height;
     viewCanvas.width = viewScreenshot.data.width;
@@ -195,7 +204,12 @@ class ScreenshotViewModel extends declared(Accessor) {
     img.src = viewScreenshot.dataUrl;
     img.onload = () => {
       context.drawImage(img, 0, 0);
-      this._showPreview(viewCanvas, screenshotImageElement, maskDiv);
+      this._showPreview(
+        viewCanvas,
+        screenshotImageElement,
+        maskDiv,
+        downloadBtnNode
+      );
       this._canvasElement = viewCanvas;
     };
   }
@@ -206,7 +220,8 @@ class ScreenshotViewModel extends declared(Accessor) {
     viewCanvas: HTMLCanvasElement,
     img: HTMLImageElement,
     screenshotImageElement: HTMLImageElement,
-    maskDiv: HTMLElement
+    maskDiv: HTMLElement,
+    downloadBtnNode: HTMLButtonElement
   ): void {
     const context = viewCanvas.getContext("2d") as CanvasRenderingContext2D;
     const combinedCanvas = document.createElement(
@@ -224,7 +239,7 @@ class ScreenshotViewModel extends declared(Accessor) {
       ? firstComponent
       : secondMapComponent;
 
-    html2canvas(mapComponent, {
+    this._screenshotPromise = html2canvas(mapComponent, {
       removeContainer: true,
       logging: false
     })
@@ -244,7 +259,14 @@ class ScreenshotViewModel extends declared(Accessor) {
             mapComponent
           );
           this._canvasElement = combinedCanvas;
-          this._showPreview(combinedCanvas, screenshotImageElement, maskDiv);
+          this._showPreview(
+            combinedCanvas,
+            screenshotImageElement,
+            maskDiv,
+            downloadBtnNode
+          );
+          this._screenshotPromise = null;
+          this.notifyChange("state");
         };
       });
   }
@@ -255,7 +277,8 @@ class ScreenshotViewModel extends declared(Accessor) {
     viewCanvas: HTMLCanvasElement,
     img: HTMLImageElement,
     screenshotImageElement: HTMLImageElement,
-    maskDiv: HTMLElement
+    maskDiv: HTMLElement,
+    downloadBtnNode: HTMLButtonElement
   ): void {
     const screenshotKey = "screenshot-key";
     const viewCanvasContext = viewCanvas.getContext(
@@ -264,10 +287,13 @@ class ScreenshotViewModel extends declared(Accessor) {
     const combinedCanvasElements = document.createElement(
       "canvas"
     ) as HTMLCanvasElement;
-    html2canvas(document.querySelector(this.mapComponentSelectors[0]), {
-      removeContainer: true,
-      logging: false
-    })
+    this._screenshotPromise = html2canvas(
+      document.querySelector(this.mapComponentSelectors[0]),
+      {
+        removeContainer: true,
+        logging: false
+      }
+    )
       .catch((err: Error) => {
         console.error("ERROR: ", err);
       })
@@ -286,6 +312,7 @@ class ScreenshotViewModel extends declared(Accessor) {
           })
           .then((secondMapComponent: HTMLCanvasElement) => {
             this.secondMapComponent = secondMapComponent;
+            this._screenshotPromise = null;
             this.notifyChange("state");
           });
       });
@@ -298,7 +325,8 @@ class ScreenshotViewModel extends declared(Accessor) {
         combinedCanvasElements,
         screenshotImageElement,
         maskDiv,
-        screenshotKey
+        screenshotKey,
+        downloadBtnNode
       ),
       screenshotKey
     );
@@ -313,7 +341,8 @@ class ScreenshotViewModel extends declared(Accessor) {
     combinedCanvasElements: HTMLCanvasElement,
     screenshotImageElement: HTMLImageElement,
     maskDiv: HTMLElement,
-    screenshotKey: string
+    screenshotKey: string,
+    downloadBtnNode: HTMLButtonElement
   ) {
     return watchUtils.init(
       this,
@@ -336,7 +365,8 @@ class ScreenshotViewModel extends declared(Accessor) {
             this._showPreview(
               combinedCanvasElements,
               screenshotImageElement,
-              maskDiv
+              maskDiv,
+              downloadBtnNode
             );
             this.firstMapComponent = null;
             this.secondMapComponent = null;
@@ -424,17 +454,18 @@ class ScreenshotViewModel extends declared(Accessor) {
   private _showPreview(
     canvasElement: HTMLCanvasElement,
     screenshotImageElement: HTMLImageElement,
-    maskDiv: HTMLElement
+    maskDiv: HTMLElement,
+    downloadBtnNode: HTMLButtonElement
   ): void {
-    const activeElement = document.activeElement as HTMLElement;
-    activeElement.blur();
     screenshotImageElement.width = canvasElement.width;
     screenshotImageElement.src = canvasElement.toDataURL();
     this.view.container.classList.remove("esri-screenshot__cursor");
-
     this._area = null;
     this._setMaskPosition(maskDiv, null);
     this.previewIsVisible = true;
+    window.setTimeout(() => {
+      downloadBtnNode.focus();
+    }, 750);
     this.notifyChange("state");
   }
 
@@ -504,7 +535,8 @@ class ScreenshotViewModel extends declared(Accessor) {
   private _processScreenshot(
     viewScreenshot: Screenshot,
     screenshotImageElement: HTMLImageElement,
-    maskDiv: HTMLElement
+    maskDiv: HTMLElement,
+    downloadBtnNode: HTMLButtonElement
   ): void {
     const viewCanvas = document.createElement("canvas") as HTMLCanvasElement;
     const img = document.createElement("img") as HTMLImageElement;
@@ -520,7 +552,8 @@ class ScreenshotViewModel extends declared(Accessor) {
         viewCanvas,
         img,
         screenshotImageElement,
-        maskDiv
+        maskDiv,
+        downloadBtnNode
       );
     } else {
       if (this.legendScreenshotEnabled && !this.popupScreenshotEnabled) {
@@ -530,7 +563,8 @@ class ScreenshotViewModel extends declared(Accessor) {
             viewCanvas,
             img,
             screenshotImageElement,
-            maskDiv
+            maskDiv,
+            downloadBtnNode
           );
         } else {
           this._onlyTakeScreenshotOfView(
@@ -538,7 +572,8 @@ class ScreenshotViewModel extends declared(Accessor) {
             viewCanvas,
             img,
             screenshotImageElement,
-            maskDiv
+            maskDiv,
+            downloadBtnNode
           );
         }
       } else if (this.popupScreenshotEnabled && !this.legendScreenshotEnabled) {
@@ -548,7 +583,8 @@ class ScreenshotViewModel extends declared(Accessor) {
             viewCanvas,
             img,
             screenshotImageElement,
-            maskDiv
+            maskDiv,
+            downloadBtnNode
           );
         } else {
           this._onlyTakeScreenshotOfView(
@@ -556,7 +592,8 @@ class ScreenshotViewModel extends declared(Accessor) {
             viewCanvas,
             img,
             screenshotImageElement,
-            maskDiv
+            maskDiv,
+            downloadBtnNode
           );
         }
       } else if (this.legendScreenshotEnabled && this.popupScreenshotEnabled) {
@@ -571,7 +608,8 @@ class ScreenshotViewModel extends declared(Accessor) {
             viewCanvas,
             img,
             screenshotImageElement,
-            maskDiv
+            maskDiv,
+            downloadBtnNode
           );
         } else if (
           !firstComponent.offsetWidth ||
@@ -583,7 +621,8 @@ class ScreenshotViewModel extends declared(Accessor) {
             viewCanvas,
             img,
             screenshotImageElement,
-            maskDiv
+            maskDiv,
+            downloadBtnNode
           );
         } else {
           this._onlyTakeScreenshotOfView(
@@ -591,7 +630,8 @@ class ScreenshotViewModel extends declared(Accessor) {
             viewCanvas,
             img,
             screenshotImageElement,
-            maskDiv
+            maskDiv,
+            downloadBtnNode
           );
         }
       }

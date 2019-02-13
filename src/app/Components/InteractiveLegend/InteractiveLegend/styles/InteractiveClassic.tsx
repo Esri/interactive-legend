@@ -812,16 +812,16 @@ class InteractiveClassic extends declared(Widget) {
             : null
         }
         tabIndex={
-          (activeLayerInfo.layer.type === "feature" &&
-            !this.offscreen &&
-            (hasMoreThanOneInfo &&
-              field &&
-              featureLayerData &&
-              !isSizeRamp &&
-              elementInfo.hasOwnProperty("value"))) ||
-          isPredominance
+          activeLayerInfo.layer.type === "feature" &&
+          !this.offscreen &&
+          ((hasMoreThanOneInfo &&
+            field &&
+            featureLayerData &&
+            !isSizeRamp &&
+            elementInfo.hasOwnProperty("value")) ||
+            isPredominance)
             ? 0
-            : null
+            : -1
         }
         data-legend-index={`${legendElementIndex}`}
         data-child-index={`${legendInfoIndex}`}
@@ -953,6 +953,7 @@ class InteractiveClassic extends declared(Widget) {
           <div class={CSS.onboarding.infoContainer}>
             <p>{i18nInteractiveLegend.firstOnboardingWelcomeMessage}</p>
             <p>{i18nInteractiveLegend.secondOnboardingWelcomeMessage}</p>
+            <p>{i18nInteractiveLegend.thirdOnboardingWelcomeMessage}</p>
           </div>
           <div class={CSS.onboarding.imgPreviewContainer} />
         </div>

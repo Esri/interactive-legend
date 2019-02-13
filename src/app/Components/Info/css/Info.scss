@@ -1,6 +1,6 @@
 .esri-info {
   min-width: 300px;
-  padding: 5%;
+  padding: 1% 5%;
 
   .esri-info__pagination-container {
     margin: 5px auto;
@@ -50,15 +50,17 @@
         width: 10%;
         vertical-align: top;
 
-
         .esri-info__number {
           background-color: #a9a9a9;
           color: #fff;
-          height: 10%;
-          width: 100%;
+          height: 24px;
+          width: 24px;
           text-align: center;
           border-radius: 50%;
-          display: inline-block;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
         }
       }
 
