@@ -85,6 +85,14 @@ import FeatureWidget = require("esri/widgets/Feature");
 // InteractiveLegend
 import InteractiveLegend = require("./Components/InteractiveLegend/InteractiveLegend");
 
+// Splash
+import Splash = require("./Components/Splash/Splash");
+
+// Header
+import Header = require("./Components/Header/Header");
+
+import { ApplicationConfig } from "ApplicationBase/interfaces";
+
 // CSS
 const CSS = {
   loading: "configurable-application--loading",
@@ -149,23 +157,31 @@ class InteractiveLegendApp {
     }
 
     const {
-      expandEnabled,
-      highlightShade,
-      mutedShade,
-      style,
-      filterMode,
-      screenshotEnabled,
-      legendIncludedInScreenshot,
-      popupIncludedInScreenshot,
-      featureCountEnabled,
-      layerListEnabled,
-      searchEnabled,
-      basemapToggleEnabled,
       homeEnabled,
-      nextBasemap,
+      homePosition,
+      zoomControlsEnabled,
+      zoomControlsPosition,
+      searchEnabled,
       searchConfig,
-      infoPanelEnabled
+      searchPosition,
+      basemapToggleEnabled,
+      basemapTogglePosition,
+      nextBasemap,
+      layerListEnabled,
+      layerListPosition,
+      screenshotEnabled,
+      screenshotPosition,
+      popupIncludedInScreenshot,
+      legendIncludedInScreenshot,
+      infoPanelEnabled,
+      infoPanelPosition,
+      splashButtonPosition,
+      interactiveLegendPosition,
+      filterMode,
+      highlightShade,
+      mutedShade
     } = config;
+
     const { webMapItems } = results;
     const validWebMapItems = webMapItems.map(response => {
       return response.value;
@@ -183,9 +199,7 @@ class InteractiveLegendApp {
       return;
     }
 
-    config.title = !config.title
-      ? getItemTitle(firstItem)
-      : "Interactive Legend";
+    config.title = !config.title ? getItemTitle(firstItem) : config.title;
     setPageTitle(config.title);
 
     // todo: Typings will be fixed in next release.
@@ -215,6 +229,12 @@ class InteractiveLegendApp {
           map
         }).then((view: MapView) =>
           findQuery(find, view).then(() => {
+            if (!zoomControlsEnabled) {
+              view.ui.remove("zoom");
+            }
+            if (zoomControlsPosition) {
+              view.ui.move("zoom", zoomControlsPosition);
+            }
             let defaultShade = null;
             if (!mutedShade) {
               defaultShade = new Color("rgba(169,169,169, 0.5)");
@@ -227,7 +247,7 @@ class InteractiveLegendApp {
               }
             }
 
-            const defaultStyle = style ? style : "classic";
+            const defaultStyle = "classic";
             const defaultMode = filterMode ? filterMode : "featureFilter";
 
             if (highlightShade) {
@@ -243,17 +263,22 @@ class InteractiveLegendApp {
               };
             }
 
-            this._handleHomeWidget(view, homeEnabled);
+            this._handleHomeWidget(view, homeEnabled, homePosition);
 
             this._handleBasemapToggleWidget(
               basemapToggleEnabled,
               view,
-              nextBasemap
+              nextBasemap,
+              basemapTogglePosition
             );
             this.layerList = new LayerList({
               view
             });
-            this._handleLayerListWidget(layerListEnabled, view);
+            this._handleLayerListWidget(
+              layerListEnabled,
+              view,
+              layerListPosition
+            );
 
             const layerListViewModel = this.layerList
               ? this.layerList.viewModel
@@ -271,7 +296,6 @@ class InteractiveLegendApp {
               mutedShade: defaultShade,
               style: defaultStyle,
               filterMode: defaultMode,
-              featureCountEnabled,
               layerListViewModel,
               onboardingPanelEnabled
             });
@@ -284,7 +308,6 @@ class InteractiveLegendApp {
               mutedShade: defaultShade,
               style: defaultStyle,
               filterMode: defaultMode,
-              featureCountEnabled,
               layerListViewModel,
               offscreen: true
             });
@@ -296,12 +319,16 @@ class InteractiveLegendApp {
               searchEnabled,
               interactiveLegend,
               view,
-              searchConfig
+              searchConfig,
+              searchPosition
             );
-
+            const interactiveLegendGroup =
+              interactiveLegendPosition.indexOf("left") !== -1
+                ? "left"
+                : "right";
             this.interactiveLegendExpand = new Expand({
               view,
-              group: "left",
+              group: interactiveLegendGroup,
               content: interactiveLegend,
               mode: "floating",
               expanded: true,
@@ -312,7 +339,8 @@ class InteractiveLegendApp {
               screenshotEnabled,
               legendIncludedInScreenshot,
               popupIncludedInScreenshot,
-              view
+              view,
+              screenshotPosition
             );
 
             watchUtils.whenOnce(
@@ -326,7 +354,10 @@ class InteractiveLegendApp {
                 }
               }
             );
-            view.ui.add(this.interactiveLegendExpand, "bottom-left");
+            view.ui.add(
+              this.interactiveLegendExpand,
+              interactiveLegendPosition
+            );
 
             if (infoPanelEnabled) {
               const screenshotTitle =
@@ -367,10 +398,11 @@ class InteractiveLegendApp {
                   }
                 ]
               });
-
+              const infoGroup =
+                infoPanelPosition.indexOf("left") !== -1 ? "left" : "right";
               this.infoExpand = new Expand({
                 view,
-                group: "left",
+                group: infoGroup,
                 content: infoWidget,
                 mode: "floating",
                 expandTooltip: infoWidget.label
@@ -385,12 +417,15 @@ class InteractiveLegendApp {
                 }
               });
 
-              view.ui.add(this.infoExpand, "top-left");
+              view.ui.add(this.infoExpand, infoPanelPosition);
             }
 
             goToMarker(marker, view);
-            this._addTitle(config.title);
-
+            this._handleHeader(config);
+            this._handleSplash(config, view, splashButtonPosition);
+            if (config.customCSS) {
+              this._handleCustomCSS(config);
+            }
             document.body.classList.remove(CSS.loading);
           })
         )
@@ -398,23 +433,65 @@ class InteractiveLegendApp {
     });
   }
 
-  // _addTitle
-  private _addTitle(appTitle: string): void {
-    const appTitleNode = document.createElement("h1");
-    const titleContainerNode = document.querySelector(".title-container");
-    appTitleNode.classList.add("app-title");
-    appTitleNode.innerText = appTitle;
-    titleContainerNode.appendChild(appTitleNode);
-  }
-
   // _handleHomeWidget
-  private _handleHomeWidget(view: MapView, homeEnabled: boolean): void {
+  private _handleHomeWidget(
+    view: MapView,
+    homeEnabled: boolean,
+    homePosition: string
+  ): void {
     if (homeEnabled) {
       const home = new Home({
         view
       });
-      view.ui.add(home, "top-left");
+      view.ui.add(home, homePosition);
     }
+  }
+
+  // _handleHeader
+  private _handleHeader(config: ApplicationConfig): void {
+    const container = document.createElement("div");
+    const header = new Header({
+      container,
+      config
+    });
+
+    document.querySelector(".parent-container").prepend(header.container);
+
+    const parentContainer = document.querySelector(
+      ".parent-container"
+    ) as HTMLElement;
+    const parentContainerHeight = parentContainer.offsetHeight;
+    const headerContainer = header.container as HTMLElement;
+    const headerContainerHeight = headerContainer.offsetHeight;
+    document.getElementById(
+      "view-parent-container"
+    ).style.height = `${parentContainerHeight - headerContainerHeight}px`;
+  }
+
+  // _handleSplash
+  private _handleSplash(
+    config: ApplicationConfig,
+    view: MapView,
+    splashButtonPosition: string
+  ): void {
+    if (config.splash) {
+      const splash = new Splash.default({
+        config,
+        container: document.createElement("div")
+      });
+      document.body.appendChild(splash.container as HTMLElement);
+      view.ui.add(splash.createToolbarButton(), splashButtonPosition);
+
+      splash.showSplash();
+    }
+  }
+
+  // _handleCustomCSS
+  private _handleCustomCSS(config: ApplicationConfig): void {
+    const styles = document.createElement("style");
+    styles.type = "text/css";
+    styles.appendChild(document.createTextNode(config.customCSS));
+    document.head.appendChild(styles);
   }
 
   // _handleScreenshotWidget
@@ -422,7 +499,8 @@ class InteractiveLegendApp {
     screenshotEnabled: boolean,
     legendIncludedInScreenshot: boolean,
     popupIncludedInScreenshot: boolean,
-    view: MapView
+    view: MapView,
+    screenshotPosition: string
   ): void {
     if (screenshotEnabled) {
       const mapComponentSelectors = [`.${CSS.legend}`, `.${CSS.popup}`];
@@ -433,9 +511,11 @@ class InteractiveLegendApp {
         legendIncludedInScreenshot,
         popupIncludedInScreenshot
       });
+      const screenshotGroup =
+        screenshotPosition.indexOf("left") !== -1 ? "left" : "right";
       const screenshotExpand = new Expand({
         view,
-        group: "left",
+        group: screenshotGroup,
         content: this.screenshot,
         mode: "floating",
         expandTooltip: this.screenshot.label
@@ -490,6 +570,7 @@ class InteractiveLegendApp {
       //     }
       //   }
       // );
+
       watchUtils.watch(view, "popup.visible", () => {
         if (
           !view.popup.visible &&
@@ -523,24 +604,27 @@ class InteractiveLegendApp {
         }
       );
 
-      view.ui.add(screenshotExpand, "top-left");
+      view.ui.add(screenshotExpand, screenshotPosition);
     }
   }
 
   // _handleLayerListWidget
   private _handleLayerListWidget(
     layerListEnabled: boolean,
-    view: MapView
+    view: MapView,
+    layerListPosition: string
   ): void {
     if (layerListEnabled) {
       const layerListContent = this.layerList ? this.layerList : null;
+      const layerListGroup =
+        layerListPosition.indexOf("left") !== -1 ? "left" : "right";
       this.layerListExpand = new Expand({
         view,
         content: layerListContent,
         mode: "floating",
         expandIconClass: "esri-icon-layer-list",
         expandTooltip: this.layerList.label,
-        expanded: true
+        group: layerListGroup
       });
       watchUtils.whenOnce(this.layerListExpand, "container", () => {
         if (this.layerListExpand.container) {
@@ -548,7 +632,7 @@ class InteractiveLegendApp {
           container.classList.add("expand-content-z-index");
         }
       });
-      view.ui.add(this.layerListExpand, "bottom-right");
+      view.ui.add(this.layerListExpand, layerListPosition);
     }
   }
 
@@ -556,7 +640,8 @@ class InteractiveLegendApp {
   private _handleBasemapToggleWidget(
     basemapToggleEnabled: boolean,
     view: MapView,
-    nextBasemap: string
+    nextBasemap: string,
+    basemapTogglePosition: string
   ): void {
     const nextBaseMapVal = nextBasemap ? nextBasemap : "topo";
     if (basemapToggleEnabled) {
@@ -570,7 +655,7 @@ class InteractiveLegendApp {
           container.classList.add("expand-content-z-index");
         }
       });
-      view.ui.add(basemapToggle, "bottom-right");
+      view.ui.add(basemapToggle, basemapTogglePosition);
     }
   }
 
@@ -579,7 +664,8 @@ class InteractiveLegendApp {
     searchEnabled: boolean,
     interactiveLegend: InteractiveLegend,
     view: MapView,
-    searchConfig: any
+    searchConfig: any,
+    searchPosition: string
   ): void {
     // Get any configured search settings
     if (searchEnabled) {
@@ -626,12 +712,14 @@ class InteractiveLegendApp {
       }
 
       const search = new Search(searchProperties);
+      const searchGroup =
+        searchPosition.indexOf("left") !== -1 ? "left" : "right";
       this.searchExpand = new Expand({
         view,
         content: search,
         mode: "floating",
-        expanded: true,
-        expandTooltip: search.label
+        expandTooltip: search.label,
+        group: searchGroup
       });
       interactiveLegend.searchViewModel = search.viewModel;
 
@@ -642,7 +730,7 @@ class InteractiveLegendApp {
         }
       });
 
-      view.ui.add(this.searchExpand, "top-right");
+      view.ui.add(this.searchExpand, searchPosition);
     }
   }
 }
