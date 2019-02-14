@@ -143,6 +143,7 @@ class Screenshot extends declared(Widget) {
   @property()
   featureWidget: Feature = null;
 
+  @aliasOf("viewModel.expandWidget")
   @property()
   expandWidget: Expand = null;
 
@@ -163,6 +164,30 @@ class Screenshot extends declared(Widget) {
 
   postInitialize() {
     this.own([this._watchMapComponentSelectors(), this._watchPopups()]);
+    watchUtils.when(this, "expandWidget", () => {
+      if (this.expandWidget) {
+        this.own([
+          watchUtils.whenTrue(this, "viewModel.screenshotModeIsActive", () => {
+            watchUtils.whenFalse(this, "expandWidget.expanded", () => {
+              this.viewModel.screenshotModeIsActive = false;
+              this.view.container.classList.remove(CSS.screenshotCursor);
+              if (this.featureWidget && this.featureWidget.graphic) {
+                this.featureWidget.graphic = null;
+              }
+
+              if (this._dragHandler) {
+                this._dragHandler.remove();
+              }
+
+              if (this.expandWidget) {
+                this.expandWidget.expanded = false;
+              }
+              this.scheduleRender();
+            });
+          })
+        ]);
+      }
+    });
   }
 
   render(): any {
@@ -434,12 +459,17 @@ class Screenshot extends declared(Widget) {
     if (this.featureWidget && this.featureWidget.graphic) {
       this.featureWidget.graphic = null;
     }
-    this._dragHandler.remove();
+    // debugger;
+    if (this._dragHandler) {
+      this._dragHandler.remove();
+    }
 
     window.setTimeout(() => {
       this._activeScreenshotBtnNode.focus();
     }, 10);
-
+    if (this.expandWidget) {
+      this.expandWidget.expanded = false;
+    }
     this.scheduleRender();
   }
 

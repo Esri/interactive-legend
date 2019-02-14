@@ -31,6 +31,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this._canvasElement = null;
             _this._handles = new Handles();
             _this._screenshotPromise = null;
+            _this._expandWidgetGroup = null;
             //----------------------------------
             //
             //  Properties
@@ -52,6 +53,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this.legendScreenshotEnabled = null;
             // popupScreenshotEnabled
             _this.popupScreenshotEnabled = null;
+            _this.expandWidget = null;
             return _this;
         }
         Object.defineProperty(ScreenshotViewModel.prototype, "state", {
@@ -74,6 +76,16 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         //  Public Methods
         //
         //----------------------------------
+        ScreenshotViewModel.prototype.initialize = function () {
+            var _this = this;
+            watchUtils.init(this, "expandWidget", function () {
+                _this._handles.add(_this._handleExpandWidgetGroup());
+            });
+        };
+        ScreenshotViewModel.prototype.destroy = function () {
+            this._handles.removeAll();
+            this._handles = null;
+        };
         // setScreenshotArea
         ScreenshotViewModel.prototype.setScreenshotArea = function (event, maskDiv, screenshotImageElement, dragHandler, downloadBtnNode) {
             var _this = this;
@@ -393,6 +405,22 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             }
             this.notifyChange("state");
         };
+        // _handleExpandWidgetGroup
+        ScreenshotViewModel.prototype._handleExpandWidgetGroup = function () {
+            var _this = this;
+            return watchUtils.whenTrue(this, "screenshotModeIsActive", function () {
+                if (_this.expandWidget && _this.expandWidget.group) {
+                    _this._expandWidgetGroup = _this.expandWidget.group;
+                    _this.expandWidget.group = null;
+                    _this._handles.add(watchUtils.whenFalse(_this, "screenshotModeIsActive", function () {
+                        if (_this._expandWidgetGroup) {
+                            _this.expandWidget.group = _this._expandWidgetGroup;
+                            _this._expandWidgetGroup = null;
+                        }
+                    }));
+                }
+            });
+        };
         __decorate([
             decorators_1.property({
                 dependsOn: ["view.ready"],
@@ -423,6 +451,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         __decorate([
             decorators_1.property()
         ], ScreenshotViewModel.prototype, "popupScreenshotEnabled", void 0);
+        __decorate([
+            decorators_1.property()
+        ], ScreenshotViewModel.prototype, "expandWidget", void 0);
         ScreenshotViewModel = __decorate([
             decorators_1.subclass("ScreenshotViewModel")
         ], ScreenshotViewModel);

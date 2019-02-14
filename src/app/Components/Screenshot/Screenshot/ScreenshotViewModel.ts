@@ -25,6 +25,8 @@ import Handles = require("esri/core/Handles");
 // esri.core.watchUtils
 import watchUtils = require("esri/core/watchUtils");
 
+import Expand = require("esri/widgets/Expand");
+
 // esri.core.accessorSupport
 import {
   subclass,
@@ -49,6 +51,7 @@ class ScreenshotViewModel extends declared(Accessor) {
   private _canvasElement: HTMLCanvasElement = null;
   private _handles: Handles = new Handles();
   private _screenshotPromise: IPromise<any> = null;
+  private _expandWidgetGroup: string = null;
 
   // state
   @property({
@@ -104,11 +107,25 @@ class ScreenshotViewModel extends declared(Accessor) {
   @property()
   popupScreenshotEnabled: boolean = null;
 
+  @property()
+  expandWidget: Expand = null;
+
   //----------------------------------
   //
   //  Public Methods
   //
   //----------------------------------
+
+  initialize() {
+    watchUtils.init(this, "expandWidget", () => {
+      this._handles.add(this._handleExpandWidgetGroup());
+    });
+  }
+
+  destroy() {
+    this._handles.removeAll();
+    this._handles = null;
+  }
 
   // setScreenshotArea
   setScreenshotArea(
@@ -659,6 +676,24 @@ class ScreenshotViewModel extends declared(Accessor) {
       this.screenshotModeIsActive = false;
     }
     this.notifyChange("state");
+  }
+
+  // _handleExpandWidgetGroup
+  private _handleExpandWidgetGroup(): __esri.WatchHandle {
+    return watchUtils.whenTrue(this, "screenshotModeIsActive", () => {
+      if (this.expandWidget && this.expandWidget.group) {
+        this._expandWidgetGroup = this.expandWidget.group;
+        this.expandWidget.group = null;
+        this._handles.add(
+          watchUtils.whenFalse(this, "screenshotModeIsActive", () => {
+            if (this._expandWidgetGroup) {
+              this.expandWidget.group = this._expandWidgetGroup;
+              this._expandWidgetGroup = null;
+            }
+          })
+        );
+      }
+    });
   }
 }
 

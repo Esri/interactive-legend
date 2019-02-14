@@ -105,7 +105,30 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             return _this;
         }
         Screenshot.prototype.postInitialize = function () {
+            var _this = this;
             this.own([this._watchMapComponentSelectors(), this._watchPopups()]);
+            watchUtils.when(this, "expandWidget", function () {
+                if (_this.expandWidget) {
+                    _this.own([
+                        watchUtils.whenTrue(_this, "viewModel.screenshotModeIsActive", function () {
+                            watchUtils.whenFalse(_this, "expandWidget.expanded", function () {
+                                _this.viewModel.screenshotModeIsActive = false;
+                                _this.view.container.classList.remove(CSS.screenshotCursor);
+                                if (_this.featureWidget && _this.featureWidget.graphic) {
+                                    _this.featureWidget.graphic = null;
+                                }
+                                if (_this._dragHandler) {
+                                    _this._dragHandler.remove();
+                                }
+                                if (_this.expandWidget) {
+                                    _this.expandWidget.expanded = false;
+                                }
+                                _this.scheduleRender();
+                            });
+                        })
+                    ]);
+                }
+            });
         };
         Screenshot.prototype.render = function () {
             var screenshotModeIsActive = this.viewModel.screenshotModeIsActive;
@@ -249,10 +272,16 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             if (this.featureWidget && this.featureWidget.graphic) {
                 this.featureWidget.graphic = null;
             }
-            this._dragHandler.remove();
+            // debugger;
+            if (this._dragHandler) {
+                this._dragHandler.remove();
+            }
             window.setTimeout(function () {
                 _this._activeScreenshotBtnNode.focus();
             }, 10);
+            if (this.expandWidget) {
+                this.expandWidget.expanded = false;
+            }
             this.scheduleRender();
         };
         // _toggleLegend
@@ -311,6 +340,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             decorators_1.property()
         ], Screenshot.prototype, "featureWidget", void 0);
         __decorate([
+            decorators_1.aliasOf("viewModel.expandWidget"),
             decorators_1.property()
         ], Screenshot.prototype, "expandWidget", void 0);
         __decorate([
