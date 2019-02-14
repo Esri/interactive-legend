@@ -25,6 +25,8 @@ import Handles = require("esri/core/Handles");
 // esri.core.watchUtils
 import watchUtils = require("esri/core/watchUtils");
 
+import Expand = require("esri/widgets/Expand");
+
 // esri.core.accessorSupport
 import {
   subclass,
@@ -49,6 +51,7 @@ class ScreenshotViewModel extends declared(Accessor) {
   private _canvasElement: HTMLCanvasElement = null;
   private _handles: Handles = new Handles();
   private _screenshotPromise: IPromise<any> = null;
+  private _expandWidgetGroup: string = null;
 
   // state
   @property({
@@ -104,11 +107,30 @@ class ScreenshotViewModel extends declared(Accessor) {
   @property()
   popupScreenshotEnabled: boolean = null;
 
+  @property()
+  expandWidget: Expand = null;
+
+  @property()
+  dragHandler: any = null;
+
   //----------------------------------
   //
   //  Public Methods
   //
   //----------------------------------
+
+  initialize() {
+    watchUtils.init(this, "expandWidget", () => {
+      const widgetGroupKey = "widget-group-key";
+      this._handles.remove(widgetGroupKey);
+      this._handles.add(this._handleExpandWidgetGroup(), widgetGroupKey);
+    });
+  }
+
+  destroy() {
+    this._handles.removeAll();
+    this._handles = null;
+  }
 
   // setScreenshotArea
   setScreenshotArea(
@@ -123,7 +145,6 @@ class ScreenshotViewModel extends declared(Accessor) {
       this._setXYValues(event);
       this._setMaskPosition(maskDiv, this._area);
     } else {
-      dragHandler.remove();
       const type = this.get("view.type");
       if (type === "2d") {
         const view = this.view as MapView;
@@ -140,6 +161,10 @@ class ScreenshotViewModel extends declared(Accessor) {
               downloadBtnNode
             );
             this._screenshotPromise = null;
+            if (this.dragHandler) {
+              this.dragHandler.remove();
+              this.dragHandler = null;
+            }
             this.notifyChange("state");
           });
       } else if (type === "3d") {
@@ -157,6 +182,10 @@ class ScreenshotViewModel extends declared(Accessor) {
               downloadBtnNode
             );
             this._screenshotPromise = null;
+            if (dragHandler) {
+              dragHandler.remove();
+              dragHandler = null;
+            }
             this.notifyChange("state");
           });
       }
@@ -316,6 +345,7 @@ class ScreenshotViewModel extends declared(Accessor) {
             this.notifyChange("state");
           });
       });
+    this._handles.remove(screenshotKey);
     this._handles.add(
       this._watchMapComponents(
         viewCanvas,
@@ -659,6 +689,24 @@ class ScreenshotViewModel extends declared(Accessor) {
       this.screenshotModeIsActive = false;
     }
     this.notifyChange("state");
+  }
+
+  // _handleExpandWidgetGroup
+  private _handleExpandWidgetGroup(): __esri.WatchHandle {
+    return watchUtils.whenTrue(this, "screenshotModeIsActive", () => {
+      if (this.expandWidget && this.expandWidget.group) {
+        const activeModeKey = "active-mode";
+        this._handles.remove(activeModeKey);
+        this._handles.add(
+          watchUtils.whenFalse(this, "screenshotModeIsActive", () => {
+            if (this._expandWidgetGroup) {
+              this.expandWidget.expanded = true;
+            }
+          }),
+          activeModeKey
+        );
+      }
+    });
   }
 }
 

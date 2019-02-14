@@ -348,33 +348,9 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                         }
                     }
                 });
-                // watchUtils.watch(
-                //   this.screenshot.viewModel,
-                //   "screenshotModeIsActive",
-                //   () => {
-                //     if (this.screenshot.viewModel.screenshotModeIsActive) {
-                //       this.interactiveLegendExpand.expanded = false;
-                //       view.popup.visible = false;
-                //       if (this.layerListExpand) {
-                //         this.layerListExpand.expanded = false;
-                //       }
-                //       if (this.searchExpand) {
-                //         this.searchExpand.expanded = false;
-                //       }
-                //       if (this.infoExpand) {
-                //         this.infoExpand.expanded = false;
-                //       }
-                //     } else {
-                //       this.interactiveLegendExpand.expanded = true;
-                //       if (this.layerListExpand) {
-                //         this.layerListExpand.expanded = true;
-                //       }
-                //       if (this.searchExpand) {
-                //         this.searchExpand.expanded = true;
-                //       }
-                //     }
-                //   }
-                // );
+                watchUtils.watch(this.screenshot.viewModel, "screenshotModeIsActive", function () {
+                    view.popup.visible = false;
+                });
                 watchUtils.watch(view, "popup.visible", function () {
                     if (!view.popup.visible &&
                         _this.screenshot.viewModel.screenshotModeIsActive &&

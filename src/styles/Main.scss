@@ -124,16 +124,7 @@ body {
   max-width: 500px;
 }
 
-.esri-collapse__icon.icon-ui-question {
-  position: relative;
-  left: 4px;
-}
 
-.icon-ui-media {
-  position: relative;
-  left: 4px;
-  top: 1px;
-}
 
 .expand-content-z-index {
   z-index: 0;
@@ -141,4 +132,10 @@ body {
 
 .esri-widget {
   border: 0;
+}
+
+html[dir="rtl"] {
+  .title-container {
+    padding-right: 15px
+  }
 }

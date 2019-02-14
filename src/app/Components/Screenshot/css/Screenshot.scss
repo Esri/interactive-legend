@@ -172,3 +172,15 @@
   background: #0079c1;
   color: white;
 }
+
+.icon-ui-media {
+  position: relative;
+  left: 4px;
+  top: 1px;
+}
+
+html[dir="rtl"] {
+  .icon-ui-media {
+    left: -6px;
+  }
+}
