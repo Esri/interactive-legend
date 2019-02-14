@@ -21,5 +21,26 @@
 // email: contracts@esri.com
 //
 // See http://js.arcgis.com/4.9/esri/copyright.txt for details.
-
-define({widgetLabel:"Legenda",points:"Punti",lines:"Linee",polygons:"Poligoni",creatingLegend:"Creazione legenda",noLegend:"Nessuna legenda",dotValue:"1 punto = {value} {unit}",currentObservations:"Osservazioni correnti",previousObservations:"Osservazioni precedenti",high:"Massimo",low:"Minimo",esriMetersPerSecond:"m/s",esriKilometersPerHour:"km/h",esriKnots:"nodi",esriFeetPerSecond:"piedi/sec",esriMilesPerHour:"miglio orario",showNormField:"{field} diviso per {normField}",showNormPct:"{field} come una percentuale del totale",showRatio:"Rapporto di {field} a {normField}",showRatioPercent:"{field} come una percentuale di {normField}",showRatioPercentTotal:"$field} come una percentuale di {field} e {normField}"});
+define({
+  "widgetLabel": "é_Interactive Legend___________________È",
+  "points": "é_Points_____________È",
+  "lines": "é_Lines___________È",
+  "polygons": "é_Polygons_________________È",
+  "creatingLegend": "é_Creating legend________________È",
+  "noLegend": "é_No legend___________________È",
+  "dotValue": "é_1 Dot = {value} {unit}_______________________È",
+  "currentObservations": "é_Current observations_____________________È",
+  "previousObservations": "é_Previous observations______________________È",
+  "high": "é_High_________È",
+  "low": "é_Low_______È",
+  "esriMetersPerSecond": "é_m/s_______È",
+  "esriKilometersPerHour": "é_km/h_________È",
+  "esriKnots": "é_knots___________È",
+  "esriFeetPerSecond": "é_ft/sec_____________È",
+  "esriMilesPerHour": "é_mph_______È",
+  "showNormField": "é_{field} divided by {normField}_______________________________È",
+  "showNormPct": "é_{field} as a percent of the total__________________È",
+  "showRatio": "é_Ratio of {field} to {normField}_________________È",
+  "showRatioPercent": "é_{field} as a percent of {normField}___________________È",
+  "showRatioPercentTotal": "é_{field} as a percent of {field} and {normField}_________________________È"
+});

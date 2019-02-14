@@ -21,5 +21,26 @@
 // email: contracts@esri.com
 //
 // See http://js.arcgis.com/4.9/esri/copyright.txt for details.
-
-define({widgetLabel:"Llegenda",points:"Punts",lines:"Línies",polygons:"Polígons",creatingLegend:"S'està creant la llegenda",noLegend:"No hi ha cap llegenda",dotValue:"1 punt = {value} {unit}",currentObservations:"Observacions actuals",previousObservations:"Observacions anteriors",high:"Alt",low:"Baix",esriMetersPerSecond:"m/s",esriKilometersPerHour:"km/h",esriKnots:"nusos",esriFeetPerSecond:"ft/s",esriMilesPerHour:"mph",showNormField:"{field} dividit per {normField}",showNormPct:"{field} com a percentatge del total",showRatio:"Proporció entre {field} i {normField}",showRatioPercent:"{field} com a percentatge de {normField}",showRatioPercentTotal:"{field} com a percentatge de {field} i {normField}"});
+define({
+  "widgetLabel": "ó_Interactive Legend___________________à",
+  "points": "ó_Points_____________à",
+  "lines": "ó_Lines___________à",
+  "polygons": "ó_Polygons_________________à",
+  "creatingLegend": "ó_Creating legend________________à",
+  "noLegend": "ó_No legend___________________à",
+  "dotValue": "ó_1 Dot = {value} {unit}_______________________à",
+  "currentObservations": "ó_Current observations_____________________à",
+  "previousObservations": "ó_Previous observations______________________à",
+  "high": "ó_High_________à",
+  "low": "ó_Low_______à",
+  "esriMetersPerSecond": "ó_m/s_______à",
+  "esriKilometersPerHour": "ó_km/h_________à",
+  "esriKnots": "ó_knots___________à",
+  "esriFeetPerSecond": "ó_ft/sec_____________à",
+  "esriMilesPerHour": "ó_mph_______à",
+  "showNormField": "ó_{field} divided by {normField}_______________________________à",
+  "showNormPct": "ó_{field} as a percent of the total__________________à",
+  "showRatio": "ó_Ratio of {field} to {normField}_________________à",
+  "showRatioPercent": "ó_{field} as a percent of {normField}___________________à",
+  "showRatioPercentTotal": "ó_{field} as a percent of {field} and {normField}_________________________à"
+});

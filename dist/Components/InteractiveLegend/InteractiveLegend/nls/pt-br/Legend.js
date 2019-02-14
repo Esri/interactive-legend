@@ -21,5 +21,26 @@
 // email: contracts@esri.com
 //
 // See http://js.arcgis.com/4.9/esri/copyright.txt for details.
-
-define({widgetLabel:"Legenda",points:"Pontos",lines:"Linhas",polygons:"Polígonos",creatingLegend:"Não Implementado",noLegend:"Sem legendas",dotValue:"1 Ponto = ${value} ${unit}",currentObservations:"Observações atuais",previousObservations:"Observações anteriores",high:"Alto",low:"Baixo",esriMetersPerSecond:"m/s",esriKilometersPerHour:"km/h",esriKnots:"Nós",esriFeetPerSecond:"pés/seg",esriMilesPerHour:"mph",showNormField:"{field} dividido por {normField}",showNormPct:"{field} como uma porcentagem do total",showRatio:"Proporção do {field} para {normField}",showRatioPercent:"{field} como uma porcentagem do {normField}",showRatioPercentTotal:"{field} como uma porcentagem do {field} e {normField}"});
+define({
+  "widgetLabel": "ã_Interactive Legend___________________Ç",
+  "points": "ã_Points_____________Ç",
+  "lines": "ã_Lines___________Ç",
+  "polygons": "ã_Polygons_________________Ç",
+  "creatingLegend": "ã_Creating legend________________Ç",
+  "noLegend": "ã_No legend___________________Ç",
+  "dotValue": "ã_1 Dot = {value} {unit}_______________________Ç",
+  "currentObservations": "ã_Current observations_____________________Ç",
+  "previousObservations": "ã_Previous observations______________________Ç",
+  "high": "ã_High_________Ç",
+  "low": "ã_Low_______Ç",
+  "esriMetersPerSecond": "ã_m/s_______Ç",
+  "esriKilometersPerHour": "ã_km/h_________Ç",
+  "esriKnots": "ã_knots___________Ç",
+  "esriFeetPerSecond": "ã_ft/sec_____________Ç",
+  "esriMilesPerHour": "ã_mph_______Ç",
+  "showNormField": "ã_{field} divided by {normField}_______________________________Ç",
+  "showNormPct": "ã_{field} as a percent of the total__________________Ç",
+  "showRatio": "ã_Ratio of {field} to {normField}_________________Ç",
+  "showRatioPercent": "ã_{field} as a percent of {normField}___________________Ç",
+  "showRatioPercentTotal": "ã_{field} as a percent of {field} and {normField}_________________________Ç"
+});

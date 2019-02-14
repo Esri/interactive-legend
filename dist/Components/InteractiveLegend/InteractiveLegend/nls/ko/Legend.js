@@ -21,5 +21,26 @@
 // email: contracts@esri.com
 //
 // See http://js.arcgis.com/4.9/esri/copyright.txt for details.
-
-define({widgetLabel:"범례",points:"포인트",lines:"라인",polygons:"폴리곤",creatingLegend:"범례 생성",noLegend:"범례 없음",dotValue:"점 1개 = {value} {unit}",currentObservations:"현재 관찰",previousObservations:"이전 관찰",high:"높음",low:"낮음",esriMetersPerSecond:"m/s",esriKilometersPerHour:"km/h",esriKnots:"knot",esriFeetPerSecond:"ft/sec",esriMilesPerHour:"mph",showNormField:"{field}을(를) {normField}(으)로 나눔",showNormPct:"{field}을(를) 전체로 나눈 백분율",showRatio:"{field} 대 {normField}의 비율",showRatioPercent:"{field}을(를) ${normField}(으)로 나눈 백분율",showRatioPercentTotal:"{field}을(를) {field}와(과) {normField}의 합으로 나눈 백분율"});
+define({
+  "widgetLabel": "한_Interactive Legend___________________빠",
+  "points": "한_Points_____________빠",
+  "lines": "한_Lines___________빠",
+  "polygons": "한_Polygons_________________빠",
+  "creatingLegend": "한_Creating legend________________빠",
+  "noLegend": "한_No legend___________________빠",
+  "dotValue": "한_1 Dot = {value} {unit}_______________________빠",
+  "currentObservations": "한_Current observations_____________________빠",
+  "previousObservations": "한_Previous observations______________________빠",
+  "high": "한_High_________빠",
+  "low": "한_Low_______빠",
+  "esriMetersPerSecond": "한_m/s_______빠",
+  "esriKilometersPerHour": "한_km/h_________빠",
+  "esriKnots": "한_knots___________빠",
+  "esriFeetPerSecond": "한_ft/sec_____________빠",
+  "esriMilesPerHour": "한_mph_______빠",
+  "showNormField": "한_{field} divided by {normField}_______________________________빠",
+  "showNormPct": "한_{field} as a percent of the total__________________빠",
+  "showRatio": "한_Ratio of {field} to {normField}_________________빠",
+  "showRatioPercent": "한_{field} as a percent of {normField}___________________빠",
+  "showRatioPercentTotal": "한_{field} as a percent of {field} and {normField}_________________________빠"
+});

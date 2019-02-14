@@ -21,5 +21,26 @@
 // email: contracts@esri.com
 //
 // See http://js.arcgis.com/4.9/esri/copyright.txt for details.
-
-define({widgetLabel:"凡例",points:"ポイント",lines:"ライン",polygons:"ポリゴン",creatingLegend:"凡例の作成",noLegend:"凡例がありません",dotValue:"1 ドット = {value} {unit}",currentObservations:"現在の観測データ",previousObservations:"前の観測データ",high:"高",low:"低",esriMetersPerSecond:"m/s",esriKilometersPerHour:"km/h",esriKnots:"ノット",esriFeetPerSecond:"ft/sec",esriMilesPerHour:"mph",showNormField:"{field} を {normField} で割る",showNormPct:"合計に占める割合としての {field}",showRatio:"{normField} に対する {field} の比率",showRatioPercent:"{normField} に占める割合としての {field}",showRatioPercentTotal:"{field} および {normField} に占める割合としての {field}"});
+define({
+  "widgetLabel": "須_Interactive Legend___________________鷗",
+  "points": "須_Points_____________鷗",
+  "lines": "須_Lines___________鷗",
+  "polygons": "須_Polygons_________________鷗",
+  "creatingLegend": "須_Creating legend________________鷗",
+  "noLegend": "須_No legend___________________鷗",
+  "dotValue": "須_1 Dot = {value} {unit}_______________________鷗",
+  "currentObservations": "須_Current observations_____________________鷗",
+  "previousObservations": "須_Previous observations______________________鷗",
+  "high": "須_High_________鷗",
+  "low": "須_Low_______鷗",
+  "esriMetersPerSecond": "須_m/s_______鷗",
+  "esriKilometersPerHour": "須_km/h_________鷗",
+  "esriKnots": "須_knots___________鷗",
+  "esriFeetPerSecond": "須_ft/sec_____________鷗",
+  "esriMilesPerHour": "須_mph_______鷗",
+  "showNormField": "須_{field} divided by {normField}_______________________________鷗",
+  "showNormPct": "須_{field} as a percent of the total__________________鷗",
+  "showRatio": "須_Ratio of {field} to {normField}_________________鷗",
+  "showRatioPercent": "須_{field} as a percent of {normField}___________________鷗",
+  "showRatioPercentTotal": "須_{field} as a percent of {field} and {normField}_________________________鷗"
+});

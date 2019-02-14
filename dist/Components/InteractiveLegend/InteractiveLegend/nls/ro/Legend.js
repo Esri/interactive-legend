@@ -21,5 +21,26 @@
 // email: contracts@esri.com
 //
 // See http://js.arcgis.com/4.9/esri/copyright.txt for details.
-
-define({widgetLabel:"Legendă",points:"Puncte",lines:"Linii",polygons:"Poligoane",creatingLegend:"Creare legendă",noLegend:"Nicio legendă",dotValue:"1 punct = {value} {unit}",currentObservations:"Observaţii actuale",previousObservations:"Observaţii anterioare",high:"Ridicat",low:"Redus",esriMetersPerSecond:"m/s",esriKilometersPerHour:"km/h",esriKnots:"noduri",esriFeetPerSecond:"ft/sec",esriMilesPerHour:"mph",showNormField:"{field} împărţit la {normField}",showNormPct:"{field} ca procent din total",showRatio:"Raport {field} supra {normField}",showRatioPercent:"{field} ca procent din {normField}",showRatioPercentTotal:"{field} ca procent din {field} şi {normField}"});
+define({
+  "widgetLabel": "Ă_Interactive Legend___________________ș",
+  "points": "Ă_Points_____________ș",
+  "lines": "Ă_Lines___________ș",
+  "polygons": "Ă_Polygons_________________ș",
+  "creatingLegend": "Ă_Creating legend________________ș",
+  "noLegend": "Ă_No legend___________________ș",
+  "dotValue": "Ă_1 Dot = {value} {unit}_______________________ș",
+  "currentObservations": "Ă_Current observations_____________________ș",
+  "previousObservations": "Ă_Previous observations______________________ș",
+  "high": "Ă_High_________ș",
+  "low": "Ă_Low_______ș",
+  "esriMetersPerSecond": "Ă_m/s_______ș",
+  "esriKilometersPerHour": "Ă_km/h_________ș",
+  "esriKnots": "Ă_knots___________ș",
+  "esriFeetPerSecond": "Ă_ft/sec_____________ș",
+  "esriMilesPerHour": "Ă_mph_______ș",
+  "showNormField": "Ă_{field} divided by {normField}_______________________________ș",
+  "showNormPct": "Ă_{field} as a percent of the total__________________ș",
+  "showRatio": "Ă_Ratio of {field} to {normField}_________________ș",
+  "showRatioPercent": "Ă_{field} as a percent of {normField}___________________ș",
+  "showRatioPercentTotal": "Ă_{field} as a percent of {field} and {normField}_________________________ș"
+});

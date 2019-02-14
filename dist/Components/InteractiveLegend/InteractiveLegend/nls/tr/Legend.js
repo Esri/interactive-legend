@@ -21,5 +21,26 @@
 // email: contracts@esri.com
 //
 // See http://js.arcgis.com/4.9/esri/copyright.txt for details.
-
-define({widgetLabel:"Gösterge",points:"Noktalar",lines:"Çizgiler",polygons:"Alanlar",creatingLegend:"Gösterim oluşturuluyor",noLegend:"Gösterim yok",dotValue:"1 Nokta = {value} {unit}",currentObservations:"Geçerli gözlemler",previousObservations:"Önceki gözlemler",high:"Yüksek",low:"Düşük",esriMetersPerSecond:"m/sn",esriKilometersPerHour:"km/sa",esriKnots:"deniz mili",esriFeetPerSecond:"ft/sn",esriMilesPerHour:"mil/sa",showNormField:"{field} bölü {normField}",showNormPct:"toplamın yüzdesi olarak {field}",showRatio:"{field} / {normField}",showRatioPercent:"{normField} yüzdesi olarak {field}",showRatioPercentTotal:"{field} ve {normField} yüzdesi olarak {field}"});
+define({
+  "widgetLabel": "ı_Interactive Legend___________________İ",
+  "points": "ı_Points_____________İ",
+  "lines": "ı_Lines___________İ",
+  "polygons": "ı_Polygons_________________İ",
+  "creatingLegend": "ı_Creating legend________________İ",
+  "noLegend": "ı_No legend___________________İ",
+  "dotValue": "ı_1 Dot = {value} {unit}_______________________İ",
+  "currentObservations": "ı_Current observations_____________________İ",
+  "previousObservations": "ı_Previous observations______________________İ",
+  "high": "ı_High_________İ",
+  "low": "ı_Low_______İ",
+  "esriMetersPerSecond": "ı_m/s_______İ",
+  "esriKilometersPerHour": "ı_km/h_________İ",
+  "esriKnots": "ı_knots___________İ",
+  "esriFeetPerSecond": "ı_ft/sec_____________İ",
+  "esriMilesPerHour": "ı_mph_______İ",
+  "showNormField": "ı_{field} divided by {normField}_______________________________İ",
+  "showNormPct": "ı_{field} as a percent of the total__________________İ",
+  "showRatio": "ı_Ratio of {field} to {normField}_________________İ",
+  "showRatioPercent": "ı_{field} as a percent of {normField}___________________İ",
+  "showRatioPercentTotal": "ı_{field} as a percent of {field} and {normField}_________________________İ"
+});

@@ -21,5 +21,26 @@
 // email: contracts@esri.com
 //
 // See http://js.arcgis.com/4.9/esri/copyright.txt for details.
-
-define({widgetLabel:"Tegnforklaring",points:"Punkt",lines:"Linjer",polygons:"Polygoner",creatingLegend:"Oppretter tegnforklaring",noLegend:"Ingen tegnforklaring",dotValue:"1 prikk = {value} {unit}",currentObservations:"Gjeldende observasjoner",previousObservations:"Tidligere observasjoner",high:"Høy",low:"Lav",esriMetersPerSecond:"m/s",esriKilometersPerHour:"km/t",esriKnots:"knop",esriFeetPerSecond:"ft/sek",esriMilesPerHour:"mph",showNormField:"{field} delt på {normField}",showNormPct:"{field} som en prosent av totalen",showRatio:"Forholdet mellom {field} til {normField}",showRatioPercent:"{field} som en prosent av {normField}",showRatioPercentTotal:"field} som en prosent av {field} og {normField}"});
+define({
+  "widgetLabel": "å_Interactive Legend___________________ø",
+  "points": "å_Points_____________ø",
+  "lines": "å_Lines___________ø",
+  "polygons": "å_Polygons_________________ø",
+  "creatingLegend": "å_Creating legend________________ø",
+  "noLegend": "å_No legend___________________ø",
+  "dotValue": "å_1 Dot = {value} {unit}_______________________ø",
+  "currentObservations": "å_Current observations_____________________ø",
+  "previousObservations": "å_Previous observations______________________ø",
+  "high": "å_High_________ø",
+  "low": "å_Low_______ø",
+  "esriMetersPerSecond": "å_m/s_______ø",
+  "esriKilometersPerHour": "å_km/h_________ø",
+  "esriKnots": "å_knots___________ø",
+  "esriFeetPerSecond": "å_ft/sec_____________ø",
+  "esriMilesPerHour": "å_mph_______ø",
+  "showNormField": "å_{field} divided by {normField}_______________________________ø",
+  "showNormPct": "å_{field} as a percent of the total__________________ø",
+  "showRatio": "å_Ratio of {field} to {normField}_________________ø",
+  "showRatioPercent": "å_{field} as a percent of {normField}___________________ø",
+  "showRatioPercentTotal": "å_{field} as a percent of {field} and {normField}_________________________ø"
+});

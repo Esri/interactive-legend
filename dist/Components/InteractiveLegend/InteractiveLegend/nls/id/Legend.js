@@ -21,5 +21,26 @@
 // email: contracts@esri.com
 //
 // See http://js.arcgis.com/4.9/esri/copyright.txt for details.
-
-define({widgetLabel:"Legenda",points:"Titik",lines:"Garis",polygons:"Polygon",creatingLegend:"Membuat legenda",noLegend:"Tidak ada legenda",dotValue:"1 Titik = {value} {unit}",currentObservations:"Observasi saat ini",previousObservations:"Observasi sebelumnya",high:"Tinggi",low:"Rendah",esriMetersPerSecond:"m/dtk",esriKilometersPerHour:"km/j",esriKnots:"knot",esriFeetPerSecond:"kaki/dtk",esriMilesPerHour:"mph",showNormField:"{field} dibagi oleh {normField}",showNormPct:"{field} sebagai persentase dari total",showRatio:"Rasio {field} ke {normField}",showRatioPercent:"{field} sebagai persentase dari {normField}",showRatioPercentTotal:"{field} sebagai persentase dari {field} dan {normField}"});
+define({
+  "widgetLabel": "ng_Interactive Legend___________________ny",
+  "points": "ng_Points_____________ny",
+  "lines": "ng_Lines___________ny",
+  "polygons": "ng_Polygons_________________ny",
+  "creatingLegend": "ng_Creating legend________________ny",
+  "noLegend": "ng_No legend___________________ny",
+  "dotValue": "ng_1 Dot = {value} {unit}_______________________ny",
+  "currentObservations": "ng_Current observations_____________________ny",
+  "previousObservations": "ng_Previous observations______________________ny",
+  "high": "ng_High_________ny",
+  "low": "ng_Low_______ny",
+  "esriMetersPerSecond": "ng_m/s_______ny",
+  "esriKilometersPerHour": "ng_km/h_________ny",
+  "esriKnots": "ng_knots___________ny",
+  "esriFeetPerSecond": "ng_ft/sec_____________ny",
+  "esriMilesPerHour": "ng_mph_______ny",
+  "showNormField": "ng_{field} divided by {normField}_______________________________ny",
+  "showNormPct": "ng_{field} as a percent of the total__________________ny",
+  "showRatio": "ng_Ratio of {field} to {normField}_________________ny",
+  "showRatioPercent": "ng_{field} as a percent of {normField}___________________ny",
+  "showRatioPercentTotal": "ng_{field} as a percent of {field} and {normField}_________________________ny"
+});
