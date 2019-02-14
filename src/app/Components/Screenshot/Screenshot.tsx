@@ -30,6 +30,8 @@ import Feature = require("esri/widgets/Feature");
 // esri.widgets.Expand
 import Expand = require("esri/widgets/Expand");
 
+import Handles = require("esri/core/Handles");
+
 //esri.widgets.support
 import {
   accessibleHandler,
@@ -92,11 +94,10 @@ class Screenshot extends declared(Widget) {
   private _downloadBtnNode: HTMLButtonElement = null;
   private _activeScreenshotBtnNode: HTMLButtonElement = null;
 
-  // _dragHandler
-  private _dragHandler: any = null;
-
   // _popupIsIncluded
   private _popupIsIncluded: boolean = null;
+
+  private _handles: Handles = new Handles();
 
   //----------------------------------
   //
@@ -164,30 +165,7 @@ class Screenshot extends declared(Widget) {
 
   postInitialize() {
     this.own([this._watchMapComponentSelectors(), this._watchPopups()]);
-    watchUtils.when(this, "expandWidget", () => {
-      if (this.expandWidget) {
-        this.own([
-          watchUtils.whenTrue(this, "viewModel.screenshotModeIsActive", () => {
-            watchUtils.whenFalse(this, "expandWidget.expanded", () => {
-              this.viewModel.screenshotModeIsActive = false;
-              this.view.container.classList.remove(CSS.screenshotCursor);
-              if (this.featureWidget && this.featureWidget.graphic) {
-                this.featureWidget.graphic = null;
-              }
-
-              if (this._dragHandler) {
-                this._dragHandler.remove();
-              }
-
-              if (this.expandWidget) {
-                this.expandWidget.expanded = false;
-              }
-              this.scheduleRender();
-            });
-          })
-        ]);
-      }
-    });
+    this._handleExpandWidget();
   }
 
   render(): any {
@@ -224,6 +202,9 @@ class Screenshot extends declared(Widget) {
   }
 
   destroy() {
+    this._handles.removeAll();
+    this._handles.destroy();
+    this._handles = null;
     this._maskNode = null;
     this._screenshotImgNode = null;
   }
@@ -242,12 +223,12 @@ class Screenshot extends declared(Widget) {
     }
     this.viewModel.screenshotModeIsActive = true;
     this.view.container.classList.add(CSS.screenshotCursor);
-    this._dragHandler = this.view.on("drag", (event: Event) => {
+    this.viewModel.dragHandler = this.view.on("drag", (event: Event) => {
       this.viewModel.setScreenshotArea(
         event,
         this._maskNode,
         this._screenshotImgNode,
-        this._dragHandler,
+        this.viewModel.dragHandler,
         this._downloadBtnNode
       );
     });
@@ -442,7 +423,7 @@ class Screenshot extends declared(Widget) {
       if (
         this._popupIsIncluded &&
         !this.view.popup.visible &&
-        this._dragHandler
+        this.viewModel.dragHandler
       ) {
         this.viewModel.screenshotModeIsActive = false;
         this.view.container.classList.remove(CSS.screenshotCursor);
@@ -459,17 +440,15 @@ class Screenshot extends declared(Widget) {
     if (this.featureWidget && this.featureWidget.graphic) {
       this.featureWidget.graphic = null;
     }
-    // debugger;
-    if (this._dragHandler) {
-      this._dragHandler.remove();
+    if (this.viewModel.dragHandler) {
+      this.viewModel.dragHandler.remove();
+      this.viewModel.dragHandler = null;
     }
 
     window.setTimeout(() => {
       this._activeScreenshotBtnNode.focus();
     }, 10);
-    if (this.expandWidget) {
-      this.expandWidget.expanded = false;
-    }
+
     this.scheduleRender();
   }
 
@@ -500,6 +479,54 @@ class Screenshot extends declared(Widget) {
       this._activeScreenshotBtnNode.focus();
     }, 10);
     this.scheduleRender();
+  }
+
+  // _handleExpandWidget
+  private _handleExpandWidget(): void {
+    const expandWidgetKey = "expand-widget";
+    this._handles.remove(expandWidgetKey);
+    this._handles.add(
+      watchUtils.when(this, "expandWidget", () => {
+        if (this.expandWidget) {
+          const screenshotModeIsActiveKey = "screenshot-active";
+
+          this._handles.remove(screenshotModeIsActiveKey);
+          this._handles.add(
+            watchUtils.whenTrue(
+              this,
+              "viewModel.screenshotModeIsActive",
+              () => {
+                const expandedKey = "expanded";
+                this._handles.remove(expandedKey);
+                this._handles.add(
+                  watchUtils.whenFalse(this, "expandWidget.expanded", () => {
+                    this.viewModel.screenshotModeIsActive = false;
+                    this.view.container.classList.remove(CSS.screenshotCursor);
+                    if (this.featureWidget && this.featureWidget.graphic) {
+                      this.featureWidget.graphic = null;
+                    }
+                    if (this.viewModel.dragHandler) {
+                      this.viewModel.dragHandler.remove();
+                      this.viewModel.dragHandler = null;
+                    }
+
+                    // console.log(this.viewModel.dragHandler);
+
+                    if (this.expandWidget) {
+                      this.expandWidget.expanded = false;
+                    }
+                    this.scheduleRender();
+                  }),
+                  expandedKey
+                );
+              }
+            ),
+            screenshotModeIsActiveKey
+          );
+        }
+      }),
+      expandWidgetKey
+    );
   }
 }
 

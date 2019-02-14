@@ -110,6 +110,9 @@ class ScreenshotViewModel extends declared(Accessor) {
   @property()
   expandWidget: Expand = null;
 
+  @property()
+  dragHandler: any = null;
+
   //----------------------------------
   //
   //  Public Methods
@@ -118,7 +121,9 @@ class ScreenshotViewModel extends declared(Accessor) {
 
   initialize() {
     watchUtils.init(this, "expandWidget", () => {
-      this._handles.add(this._handleExpandWidgetGroup());
+      const widgetGroupKey = "widget-group-key";
+      this._handles.remove(widgetGroupKey);
+      this._handles.add(this._handleExpandWidgetGroup(), widgetGroupKey);
     });
   }
 
@@ -140,7 +145,6 @@ class ScreenshotViewModel extends declared(Accessor) {
       this._setXYValues(event);
       this._setMaskPosition(maskDiv, this._area);
     } else {
-      dragHandler.remove();
       const type = this.get("view.type");
       if (type === "2d") {
         const view = this.view as MapView;
@@ -157,6 +161,10 @@ class ScreenshotViewModel extends declared(Accessor) {
               downloadBtnNode
             );
             this._screenshotPromise = null;
+            if (this.dragHandler) {
+              this.dragHandler.remove();
+              this.dragHandler = null;
+            }
             this.notifyChange("state");
           });
       } else if (type === "3d") {
@@ -174,6 +182,10 @@ class ScreenshotViewModel extends declared(Accessor) {
               downloadBtnNode
             );
             this._screenshotPromise = null;
+            if (dragHandler) {
+              dragHandler.remove();
+              dragHandler = null;
+            }
             this.notifyChange("state");
           });
       }
@@ -333,6 +345,7 @@ class ScreenshotViewModel extends declared(Accessor) {
             this.notifyChange("state");
           });
       });
+    this._handles.remove(screenshotKey);
     this._handles.add(
       this._watchMapComponents(
         viewCanvas,
@@ -684,13 +697,16 @@ class ScreenshotViewModel extends declared(Accessor) {
       if (this.expandWidget && this.expandWidget.group) {
         this._expandWidgetGroup = this.expandWidget.group;
         this.expandWidget.group = null;
+        const activeModeKey = "active-mode";
+        this._handles.remove(activeModeKey);
         this._handles.add(
           watchUtils.whenFalse(this, "screenshotModeIsActive", () => {
             if (this._expandWidgetGroup) {
               this.expandWidget.group = this._expandWidgetGroup;
               this._expandWidgetGroup = null;
             }
-          })
+          }),
+          activeModeKey
         );
       }
     });

@@ -54,6 +54,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             // popupScreenshotEnabled
             _this.popupScreenshotEnabled = null;
             _this.expandWidget = null;
+            _this.dragHandler = null;
             return _this;
         }
         Object.defineProperty(ScreenshotViewModel.prototype, "state", {
@@ -79,7 +80,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         ScreenshotViewModel.prototype.initialize = function () {
             var _this = this;
             watchUtils.init(this, "expandWidget", function () {
-                _this._handles.add(_this._handleExpandWidgetGroup());
+                var widgetGroupKey = "widget-group-key";
+                _this._handles.remove(widgetGroupKey);
+                _this._handles.add(_this._handleExpandWidgetGroup(), widgetGroupKey);
             });
         };
         ScreenshotViewModel.prototype.destroy = function () {
@@ -95,7 +98,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 this._setMaskPosition(maskDiv, this._area);
             }
             else {
-                dragHandler.remove();
                 var type = this.get("view.type");
                 if (type === "2d") {
                     var view = this.view;
@@ -107,6 +109,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         .then(function (viewScreenshot) {
                         _this._processScreenshot(viewScreenshot, screenshotImageElement, maskDiv, downloadBtnNode);
                         _this._screenshotPromise = null;
+                        if (_this.dragHandler) {
+                            _this.dragHandler.remove();
+                            _this.dragHandler = null;
+                        }
                         _this.notifyChange("state");
                     });
                 }
@@ -120,6 +126,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         .then(function (viewScreenshot) {
                         _this._processScreenshot(viewScreenshot, screenshotImageElement, maskDiv, downloadBtnNode);
                         _this._screenshotPromise = null;
+                        if (dragHandler) {
+                            dragHandler.remove();
+                            dragHandler = null;
+                        }
                         _this.notifyChange("state");
                     });
                 }
@@ -218,6 +228,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     _this.notifyChange("state");
                 });
             });
+            this._handles.remove(screenshotKey);
             this._handles.add(this._watchMapComponents(viewCanvas, viewScreenshot, img, viewCanvasContext, combinedCanvasElements, screenshotImageElement, maskDiv, screenshotKey, downloadBtnNode), screenshotKey);
         };
         // _watchMapComponents
@@ -412,12 +423,14 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 if (_this.expandWidget && _this.expandWidget.group) {
                     _this._expandWidgetGroup = _this.expandWidget.group;
                     _this.expandWidget.group = null;
+                    var activeModeKey = "active-mode";
+                    _this._handles.remove(activeModeKey);
                     _this._handles.add(watchUtils.whenFalse(_this, "screenshotModeIsActive", function () {
                         if (_this._expandWidgetGroup) {
                             _this.expandWidget.group = _this._expandWidgetGroup;
                             _this._expandWidgetGroup = null;
                         }
-                    }));
+                    }), activeModeKey);
                 }
             });
         };
@@ -454,6 +467,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         __decorate([
             decorators_1.property()
         ], ScreenshotViewModel.prototype, "expandWidget", void 0);
+        __decorate([
+            decorators_1.property()
+        ], ScreenshotViewModel.prototype, "dragHandler", void 0);
         ScreenshotViewModel = __decorate([
             decorators_1.subclass("ScreenshotViewModel")
         ], ScreenshotViewModel);

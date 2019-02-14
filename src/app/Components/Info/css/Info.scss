@@ -103,3 +103,21 @@
     margin-bottom: 5px;
   }
 }
+
+
+.esri-collapse__icon.icon-ui-question {
+  position: relative;
+  left: 4px;
+}
+
+html[dir="rtl"] {
+  .esri-collapse__icon.icon-ui-question {
+    left: -7px;
+  }
+
+  .esri-info__number {
+    position: relative;
+    left: 20px;
+  }
+
+}

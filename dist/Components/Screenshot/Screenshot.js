@@ -16,7 +16,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "dojo/i18n!./Screenshot/nls/resources", "esri/widgets/Widget", "esri/core/accessorSupport/decorators", "esri/core/watchUtils", "esri/widgets/support/widget", "./Screenshot/ScreenshotViewModel"], function (require, exports, __extends, __decorate, i18n, Widget, decorators_1, watchUtils, widget_1, ScreenshotViewModel) {
+define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "dojo/i18n!./Screenshot/nls/resources", "esri/widgets/Widget", "esri/core/accessorSupport/decorators", "esri/core/watchUtils", "esri/core/Handles", "esri/widgets/support/widget", "./Screenshot/ScreenshotViewModel"], function (require, exports, __extends, __decorate, i18n, Widget, decorators_1, watchUtils, Handles, widget_1, ScreenshotViewModel) {
     "use strict";
     //----------------------------------
     //
@@ -73,10 +73,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this._screenshotImgNode = null;
             _this._downloadBtnNode = null;
             _this._activeScreenshotBtnNode = null;
-            // _dragHandler
-            _this._dragHandler = null;
             // _popupIsIncluded
             _this._popupIsIncluded = null;
+            _this._handles = new Handles();
             //----------------------------------
             //
             //  Properties
@@ -105,30 +104,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             return _this;
         }
         Screenshot.prototype.postInitialize = function () {
-            var _this = this;
             this.own([this._watchMapComponentSelectors(), this._watchPopups()]);
-            watchUtils.when(this, "expandWidget", function () {
-                if (_this.expandWidget) {
-                    _this.own([
-                        watchUtils.whenTrue(_this, "viewModel.screenshotModeIsActive", function () {
-                            watchUtils.whenFalse(_this, "expandWidget.expanded", function () {
-                                _this.viewModel.screenshotModeIsActive = false;
-                                _this.view.container.classList.remove(CSS.screenshotCursor);
-                                if (_this.featureWidget && _this.featureWidget.graphic) {
-                                    _this.featureWidget.graphic = null;
-                                }
-                                if (_this._dragHandler) {
-                                    _this._dragHandler.remove();
-                                }
-                                if (_this.expandWidget) {
-                                    _this.expandWidget.expanded = false;
-                                }
-                                _this.scheduleRender();
-                            });
-                        })
-                    ]);
-                }
-            });
+            this._handleExpandWidget();
         };
         Screenshot.prototype.render = function () {
             var screenshotModeIsActive = this.viewModel.screenshotModeIsActive;
@@ -141,6 +118,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 maskNode));
         };
         Screenshot.prototype.destroy = function () {
+            this._handles.removeAll();
+            this._handles.destroy();
+            this._handles = null;
             this._maskNode = null;
             this._screenshotImgNode = null;
         };
@@ -157,8 +137,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             }
             this.viewModel.screenshotModeIsActive = true;
             this.view.container.classList.add(CSS.screenshotCursor);
-            this._dragHandler = this.view.on("drag", function (event) {
-                _this.viewModel.setScreenshotArea(event, _this._maskNode, _this._screenshotImgNode, _this._dragHandler, _this._downloadBtnNode);
+            this.viewModel.dragHandler = this.view.on("drag", function (event) {
+                _this.viewModel.setScreenshotArea(event, _this._maskNode, _this._screenshotImgNode, _this.viewModel.dragHandler, _this._downloadBtnNode);
             });
             this.scheduleRender();
         };
@@ -257,7 +237,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             return watchUtils.init(this, "view.popup.visible", function () {
                 if (_this._popupIsIncluded &&
                     !_this.view.popup.visible &&
-                    _this._dragHandler) {
+                    _this.viewModel.dragHandler) {
                     _this.viewModel.screenshotModeIsActive = false;
                     _this.view.container.classList.remove(CSS.screenshotCursor);
                     _this.scheduleRender();
@@ -272,16 +252,13 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             if (this.featureWidget && this.featureWidget.graphic) {
                 this.featureWidget.graphic = null;
             }
-            // debugger;
-            if (this._dragHandler) {
-                this._dragHandler.remove();
+            if (this.viewModel.dragHandler) {
+                this.viewModel.dragHandler.remove();
+                this.viewModel.dragHandler = null;
             }
             window.setTimeout(function () {
                 _this._activeScreenshotBtnNode.focus();
             }, 10);
-            if (this.expandWidget) {
-                this.expandWidget.expanded = false;
-            }
             this.scheduleRender();
         };
         // _toggleLegend
@@ -307,6 +284,38 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 _this._activeScreenshotBtnNode.focus();
             }, 10);
             this.scheduleRender();
+        };
+        // _handleExpandWidget
+        Screenshot.prototype._handleExpandWidget = function () {
+            var _this = this;
+            var expandWidgetKey = "expand-widget";
+            this._handles.remove(expandWidgetKey);
+            this._handles.add(watchUtils.when(this, "expandWidget", function () {
+                if (_this.expandWidget) {
+                    var screenshotModeIsActiveKey = "screenshot-active";
+                    _this._handles.remove(screenshotModeIsActiveKey);
+                    _this._handles.add(watchUtils.whenTrue(_this, "viewModel.screenshotModeIsActive", function () {
+                        var expandedKey = "expanded";
+                        _this._handles.remove(expandedKey);
+                        _this._handles.add(watchUtils.whenFalse(_this, "expandWidget.expanded", function () {
+                            _this.viewModel.screenshotModeIsActive = false;
+                            _this.view.container.classList.remove(CSS.screenshotCursor);
+                            if (_this.featureWidget && _this.featureWidget.graphic) {
+                                _this.featureWidget.graphic = null;
+                            }
+                            if (_this.viewModel.dragHandler) {
+                                _this.viewModel.dragHandler.remove();
+                                _this.viewModel.dragHandler = null;
+                            }
+                            // console.log(this.viewModel.dragHandler);
+                            if (_this.expandWidget) {
+                                _this.expandWidget.expanded = false;
+                            }
+                            _this.scheduleRender();
+                        }), expandedKey);
+                    }), screenshotModeIsActiveKey);
+                }
+            }), expandWidgetKey);
         };
         __decorate([
             decorators_1.aliasOf("viewModel.view"),
