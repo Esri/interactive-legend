@@ -307,7 +307,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                                 _this.viewModel.dragHandler.remove();
                                 _this.viewModel.dragHandler = null;
                             }
-                            // console.log(this.viewModel.dragHandler);
                             if (_this.expandWidget) {
                                 _this.expandWidget.expanded = false;
                             }

@@ -695,15 +695,12 @@ class ScreenshotViewModel extends declared(Accessor) {
   private _handleExpandWidgetGroup(): __esri.WatchHandle {
     return watchUtils.whenTrue(this, "screenshotModeIsActive", () => {
       if (this.expandWidget && this.expandWidget.group) {
-        this._expandWidgetGroup = this.expandWidget.group;
-        this.expandWidget.group = null;
         const activeModeKey = "active-mode";
         this._handles.remove(activeModeKey);
         this._handles.add(
           watchUtils.whenFalse(this, "screenshotModeIsActive", () => {
             if (this._expandWidgetGroup) {
-              this.expandWidget.group = this._expandWidgetGroup;
-              this._expandWidgetGroup = null;
+              this.expandWidget.expanded = true;
             }
           }),
           activeModeKey

@@ -421,14 +421,11 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var _this = this;
             return watchUtils.whenTrue(this, "screenshotModeIsActive", function () {
                 if (_this.expandWidget && _this.expandWidget.group) {
-                    _this._expandWidgetGroup = _this.expandWidget.group;
-                    _this.expandWidget.group = null;
                     var activeModeKey = "active-mode";
                     _this._handles.remove(activeModeKey);
                     _this._handles.add(watchUtils.whenFalse(_this, "screenshotModeIsActive", function () {
                         if (_this._expandWidgetGroup) {
-                            _this.expandWidget.group = _this._expandWidgetGroup;
-                            _this._expandWidgetGroup = null;
+                            _this.expandWidget.expanded = true;
                         }
                     }), activeModeKey);
                 }

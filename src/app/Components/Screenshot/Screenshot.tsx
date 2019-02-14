@@ -509,9 +509,6 @@ class Screenshot extends declared(Widget) {
                       this.viewModel.dragHandler.remove();
                       this.viewModel.dragHandler = null;
                     }
-
-                    // console.log(this.viewModel.dragHandler);
-
                     if (this.expandWidget) {
                       this.expandWidget.expanded = false;
                     }
