@@ -27,7 +27,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     }
     return t;
 };
-define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/support/itemUtils", "ApplicationBase/support/domHelper", "esri/widgets/Home", "esri/widgets/LayerList", "esri/widgets/Search", "esri/layers/FeatureLayer", "esri/widgets/BasemapToggle", "esri/widgets/Expand", "esri/core/watchUtils", "esri/Color", "./Components/Screenshot/Screenshot", "./Components/Info/Info", "telemetry/telemetry.dojo", "esri/widgets/Feature", "./Components/InteractiveLegend/InteractiveLegend"], function (require, exports, i18nInteractiveLegend, itemUtils_1, domHelper_1, Home, LayerList, Search, FeatureLayer, BasemapToggle, Expand, watchUtils, Color, Screenshot, Info, Telemetry, FeatureWidget, InteractiveLegend) {
+define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/support/itemUtils", "ApplicationBase/support/domHelper", "esri/widgets/Home", "esri/widgets/LayerList", "esri/widgets/Search", "esri/layers/FeatureLayer", "esri/widgets/BasemapToggle", "esri/widgets/Expand", "esri/core/watchUtils", "esri/Color", "./Components/Screenshot/Screenshot", "./Components/Info/Info", "telemetry/telemetry.dojo", "esri/widgets/Feature", "./Components/InteractiveLegend/InteractiveLegend", "./Components/Splash/Splash", "./Components/Header/Header"], function (require, exports, i18nInteractiveLegend, itemUtils_1, domHelper_1, Home, LayerList, Search, FeatureLayer, BasemapToggle, Expand, watchUtils, Color, Screenshot, Info, Telemetry, FeatureWidget, InteractiveLegend, Splash, Header) {
     "use strict";
     // CSS
     var CSS = {
@@ -89,7 +89,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 });
                 this.telemetry.logPageView();
             }
-            var expandEnabled = config.expandEnabled, highlightShade = config.highlightShade, mutedShade = config.mutedShade, style = config.style, filterMode = config.filterMode, screenshotEnabled = config.screenshotEnabled, legendIncludedInScreenshot = config.legendIncludedInScreenshot, popupIncludedInScreenshot = config.popupIncludedInScreenshot, featureCountEnabled = config.featureCountEnabled, layerListEnabled = config.layerListEnabled, searchEnabled = config.searchEnabled, basemapToggleEnabled = config.basemapToggleEnabled, homeEnabled = config.homeEnabled, nextBasemap = config.nextBasemap, searchConfig = config.searchConfig, infoPanelEnabled = config.infoPanelEnabled;
+            var homeEnabled = config.homeEnabled, homePosition = config.homePosition, zoomControlsEnabled = config.zoomControlsEnabled, zoomControlsPosition = config.zoomControlsPosition, searchEnabled = config.searchEnabled, searchConfig = config.searchConfig, searchPosition = config.searchPosition, basemapToggleEnabled = config.basemapToggleEnabled, basemapTogglePosition = config.basemapTogglePosition, nextBasemap = config.nextBasemap, layerListEnabled = config.layerListEnabled, layerListPosition = config.layerListPosition, screenshotEnabled = config.screenshotEnabled, screenshotPosition = config.screenshotPosition, popupIncludedInScreenshot = config.popupIncludedInScreenshot, legendIncludedInScreenshot = config.legendIncludedInScreenshot, infoPanelEnabled = config.infoPanelEnabled, infoPanelPosition = config.infoPanelPosition, splashButtonPosition = config.splashButtonPosition, interactiveLegendPosition = config.interactiveLegendPosition, filterMode = config.filterMode, highlightShade = config.highlightShade, mutedShade = config.mutedShade;
             var webMapItems = results.webMapItems;
             var validWebMapItems = webMapItems.map(function (response) {
                 return response.value;
@@ -106,9 +106,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 });
                 return;
             }
-            config.title = !config.title
-                ? itemUtils_1.getItemTitle(firstItem)
-                : "Interactive Legend";
+            config.title = !config.title ? itemUtils_1.getItemTitle(firstItem) : config.title;
             domHelper_1.setPageTitle(config.title);
             // todo: Typings will be fixed in next release.
             var portalItem = this.base.results.applicationItem.value;
@@ -125,6 +123,12 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 itemUtils_1.createMapFromItem({ item: item, appProxies: appProxies }).then(function (map) {
                     return itemUtils_1.createView(__assign({}, viewProperties, { map: map })).then(function (view) {
                         return itemUtils_1.findQuery(find, view).then(function () {
+                            if (!zoomControlsEnabled) {
+                                view.ui.remove("zoom");
+                            }
+                            if (zoomControlsPosition) {
+                                view.ui.move("zoom", zoomControlsPosition);
+                            }
                             var defaultShade = null;
                             if (!mutedShade) {
                                 defaultShade = new Color("rgba(169,169,169, 0.5)");
@@ -138,7 +142,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                     defaultShade = new Color("rgba(" + r + "," + g + "," + b + "," + a + ")");
                                 }
                             }
-                            var defaultStyle = style ? style : "classic";
+                            var defaultStyle = "classic";
                             var defaultMode = filterMode ? filterMode : "featureFilter";
                             if (highlightShade) {
                                 var highlightedShade = new Color(highlightShade);
@@ -153,12 +157,12 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                     color: new Color("#000000")
                                 };
                             }
-                            _this._handleHomeWidget(view, homeEnabled);
-                            _this._handleBasemapToggleWidget(basemapToggleEnabled, view, nextBasemap);
+                            _this._handleHomeWidget(view, homeEnabled, homePosition);
+                            _this._handleBasemapToggleWidget(basemapToggleEnabled, view, nextBasemap, basemapTogglePosition);
                             _this.layerList = new LayerList({
                                 view: view
                             });
-                            _this._handleLayerListWidget(layerListEnabled, view);
+                            _this._handleLayerListWidget(layerListEnabled, view, layerListPosition);
                             var layerListViewModel = _this.layerList
                                 ? _this.layerList.viewModel
                                 : null;
@@ -175,7 +179,6 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 mutedShade: defaultShade,
                                 style: defaultStyle,
                                 filterMode: defaultMode,
-                                featureCountEnabled: featureCountEnabled,
                                 layerListViewModel: layerListViewModel,
                                 onboardingPanelEnabled: onboardingPanelEnabled
                             });
@@ -185,22 +188,24 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 mutedShade: defaultShade,
                                 style: defaultStyle,
                                 filterMode: defaultMode,
-                                featureCountEnabled: featureCountEnabled,
                                 layerListViewModel: layerListViewModel,
                                 offscreen: true
                             });
                             offScreenInteractiveLegend.style.selectedStyleData =
                                 interactiveLegend.style.selectedStyleData;
-                            _this._handleSearchWidget(searchEnabled, interactiveLegend, view, searchConfig);
+                            _this._handleSearchWidget(searchEnabled, interactiveLegend, view, searchConfig, searchPosition);
+                            var interactiveLegendGroup = interactiveLegendPosition.indexOf("left") !== -1
+                                ? "left"
+                                : "right";
                             _this.interactiveLegendExpand = new Expand({
                                 view: view,
-                                group: "left",
+                                group: interactiveLegendGroup,
                                 content: interactiveLegend,
                                 mode: "floating",
                                 expanded: true,
                                 expandTooltip: interactiveLegend.label
                             });
-                            _this._handleScreenshotWidget(screenshotEnabled, legendIncludedInScreenshot, popupIncludedInScreenshot, view);
+                            _this._handleScreenshotWidget(screenshotEnabled, legendIncludedInScreenshot, popupIncludedInScreenshot, view, screenshotPosition);
                             watchUtils.whenOnce(_this.interactiveLegendExpand, "container", function () {
                                 if (_this.interactiveLegendExpand.container) {
                                     var container_1 = _this.interactiveLegendExpand
@@ -208,7 +213,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                     container_1.classList.add("expand-content-z-index");
                                 }
                             });
-                            view.ui.add(_this.interactiveLegendExpand, "bottom-left");
+                            view.ui.add(_this.interactiveLegendExpand, interactiveLegendPosition);
                             if (infoPanelEnabled) {
                                 var screenshotTitle = i18nInteractiveLegend.onboardingPanelScreenshotTitle;
                                 var onboardingPanelScreenshotStepOne = i18nInteractiveLegend.onboardingPanelScreenshotStepOne, onboardingPanelScreenshotStepTwo = i18nInteractiveLegend.onboardingPanelScreenshotStepTwo, onboardingPanelScreenshotStepThree = i18nInteractiveLegend.onboardingPanelScreenshotStepThree, onboardingPanelScreenshotStepFour = i18nInteractiveLegend.onboardingPanelScreenshotStepFour, onboardingPanelScreenshotStepFive = i18nInteractiveLegend.onboardingPanelScreenshotStepFive, newInteractiveLegend = i18nInteractiveLegend.newInteractiveLegend, firstOnboardingWelcomeMessage = i18nInteractiveLegend.firstOnboardingWelcomeMessage, secondOnboardingWelcomeMessage = i18nInteractiveLegend.secondOnboardingWelcomeMessage, thirdOnboardingWelcomeMessage = i18nInteractiveLegend.thirdOnboardingWelcomeMessage;
@@ -237,9 +242,10 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                         }
                                     ]
                                 });
+                                var infoGroup = infoPanelPosition.indexOf("left") !== -1 ? "left" : "right";
                                 _this.infoExpand = new Expand({
                                     view: view,
-                                    group: "left",
+                                    group: infoGroup,
                                     content: infoWidget,
                                     mode: "floating",
                                     expandTooltip: infoWidget.label
@@ -251,35 +257,64 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                         container_2.classList.add("expand-content-z-index");
                                     }
                                 });
-                                view.ui.add(_this.infoExpand, "top-left");
+                                view.ui.add(_this.infoExpand, infoPanelPosition);
                             }
                             itemUtils_1.goToMarker(marker, view);
-                            _this._addTitle(config.title);
+                            _this._handleHeader(config);
+                            _this._handleSplash(config, view, splashButtonPosition);
+                            if (config.customCSS) {
+                                _this._handleCustomCSS(config);
+                            }
                             document.body.classList.remove(CSS.loading);
                         });
                     });
                 });
             });
         };
-        // _addTitle
-        InteractiveLegendApp.prototype._addTitle = function (appTitle) {
-            var appTitleNode = document.createElement("h1");
-            var titleContainerNode = document.querySelector(".title-container");
-            appTitleNode.classList.add("app-title");
-            appTitleNode.innerText = appTitle;
-            titleContainerNode.appendChild(appTitleNode);
-        };
         // _handleHomeWidget
-        InteractiveLegendApp.prototype._handleHomeWidget = function (view, homeEnabled) {
+        InteractiveLegendApp.prototype._handleHomeWidget = function (view, homeEnabled, homePosition) {
             if (homeEnabled) {
                 var home = new Home({
                     view: view
                 });
-                view.ui.add(home, "top-left");
+                view.ui.add(home, homePosition);
             }
         };
+        // _handleHeader
+        InteractiveLegendApp.prototype._handleHeader = function (config) {
+            var container = document.createElement("div");
+            var header = new Header({
+                container: container,
+                config: config
+            });
+            document.querySelector(".parent-container").prepend(header.container);
+            var parentContainer = document.querySelector(".parent-container");
+            var parentContainerHeight = parentContainer.offsetHeight;
+            var headerContainer = header.container;
+            var headerContainerHeight = headerContainer.offsetHeight;
+            document.getElementById("view-parent-container").style.height = parentContainerHeight - headerContainerHeight + "px";
+        };
+        // _handleSplash
+        InteractiveLegendApp.prototype._handleSplash = function (config, view, splashButtonPosition) {
+            if (config.splash) {
+                var splash = new Splash.default({
+                    config: config,
+                    container: document.createElement("div")
+                });
+                document.body.appendChild(splash.container);
+                view.ui.add(splash.createToolbarButton(), splashButtonPosition);
+                splash.showSplash();
+            }
+        };
+        // _handleCustomCSS
+        InteractiveLegendApp.prototype._handleCustomCSS = function (config) {
+            var styles = document.createElement("style");
+            styles.type = "text/css";
+            styles.appendChild(document.createTextNode(config.customCSS));
+            document.head.appendChild(styles);
+        };
         // _handleScreenshotWidget
-        InteractiveLegendApp.prototype._handleScreenshotWidget = function (screenshotEnabled, legendIncludedInScreenshot, popupIncludedInScreenshot, view) {
+        InteractiveLegendApp.prototype._handleScreenshotWidget = function (screenshotEnabled, legendIncludedInScreenshot, popupIncludedInScreenshot, view, screenshotPosition) {
             var _this = this;
             if (screenshotEnabled) {
                 var mapComponentSelectors = ["." + CSS.legend, "." + CSS.popup];
@@ -289,9 +324,10 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                     legendIncludedInScreenshot: legendIncludedInScreenshot,
                     popupIncludedInScreenshot: popupIncludedInScreenshot
                 });
+                var screenshotGroup = screenshotPosition.indexOf("left") !== -1 ? "left" : "right";
                 var screenshotExpand = new Expand({
                     view: view,
-                    group: "left",
+                    group: screenshotGroup,
                     content: this.screenshot,
                     mode: "floating",
                     expandTooltip: this.screenshot.label
@@ -361,21 +397,22 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                         }
                     }
                 });
-                view.ui.add(screenshotExpand, "top-left");
+                view.ui.add(screenshotExpand, screenshotPosition);
             }
         };
         // _handleLayerListWidget
-        InteractiveLegendApp.prototype._handleLayerListWidget = function (layerListEnabled, view) {
+        InteractiveLegendApp.prototype._handleLayerListWidget = function (layerListEnabled, view, layerListPosition) {
             var _this = this;
             if (layerListEnabled) {
                 var layerListContent = this.layerList ? this.layerList : null;
+                var layerListGroup = layerListPosition.indexOf("left") !== -1 ? "left" : "right";
                 this.layerListExpand = new Expand({
                     view: view,
                     content: layerListContent,
                     mode: "floating",
                     expandIconClass: "esri-icon-layer-list",
                     expandTooltip: this.layerList.label,
-                    expanded: true
+                    group: layerListGroup
                 });
                 watchUtils.whenOnce(this.layerListExpand, "container", function () {
                     if (_this.layerListExpand.container) {
@@ -383,11 +420,11 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                         container.classList.add("expand-content-z-index");
                     }
                 });
-                view.ui.add(this.layerListExpand, "bottom-right");
+                view.ui.add(this.layerListExpand, layerListPosition);
             }
         };
         // _handleBasemapToggleWidget
-        InteractiveLegendApp.prototype._handleBasemapToggleWidget = function (basemapToggleEnabled, view, nextBasemap) {
+        InteractiveLegendApp.prototype._handleBasemapToggleWidget = function (basemapToggleEnabled, view, nextBasemap, basemapTogglePosition) {
             var nextBaseMapVal = nextBasemap ? nextBasemap : "topo";
             if (basemapToggleEnabled) {
                 var basemapToggle_1 = new BasemapToggle({
@@ -400,11 +437,11 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                         container.classList.add("expand-content-z-index");
                     }
                 });
-                view.ui.add(basemapToggle_1, "bottom-right");
+                view.ui.add(basemapToggle_1, basemapTogglePosition);
             }
         };
         // _handleSearchWidget
-        InteractiveLegendApp.prototype._handleSearchWidget = function (searchEnabled, interactiveLegend, view, searchConfig) {
+        InteractiveLegendApp.prototype._handleSearchWidget = function (searchEnabled, interactiveLegend, view, searchConfig, searchPosition) {
             var _this = this;
             // Get any configured search settings
             if (searchEnabled) {
@@ -444,12 +481,13 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                     }
                 }
                 var search = new Search(searchProperties);
+                var searchGroup = searchPosition.indexOf("left") !== -1 ? "left" : "right";
                 this.searchExpand = new Expand({
                     view: view,
                     content: search,
                     mode: "floating",
-                    expanded: true,
-                    expandTooltip: search.label
+                    expandTooltip: search.label,
+                    group: searchGroup
                 });
                 interactiveLegend.searchViewModel = search.viewModel;
                 watchUtils.whenOnce(this.searchExpand, "container", function () {
@@ -458,7 +496,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                         container.classList.add("expand-content-z-index");
                     }
                 });
-                view.ui.add(this.searchExpand, "top-right");
+                view.ui.add(this.searchExpand, searchPosition);
             }
         };
         return InteractiveLegendApp;

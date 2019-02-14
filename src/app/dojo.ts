@@ -60,6 +60,14 @@
         location: `${distPath}/dist/Components/Info/Info`
       },
       {
+        name: "Splash",
+        location: `${distPath}/dist/Components/Splash/Splash`
+      },
+      {
+        name: "Header",
+        location: `${distPath}/dist/Components/Header/Header`
+      },
+      {
         name: "config",
         location: `${distPath}/config`
       }
