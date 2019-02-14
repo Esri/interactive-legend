@@ -21,5 +21,26 @@
 // email: contracts@esri.com
 //
 // See http://js.arcgis.com/4.9/esri/copyright.txt for details.
-
-define({widgetLabel:"图例",points:"点",lines:"线",polygons:"面",creatingLegend:"创建图例",noLegend:"无图例",dotValue:"1 点 = {value} {unit}",currentObservations:"当前观测点",previousObservations:"之前的观测点",high:"高",low:"低",esriMetersPerSecond:"米/秒",esriKilometersPerHour:"千米/小时",esriKnots:"节",esriFeetPerSecond:"英尺/秒",esriMilesPerHour:"mph",showNormField:"{field} 除以 {normField}",showNormPct:"{field} 作为总数的百分比",showRatio:"{field} 与 {normField} 的百分比",showRatioPercent:"{field} 作为 {normField} 的百分比",showRatioPercentTotal:"{field} 作为 {field} 和 {normField} 的百分比"});
+define({
+  "widgetLabel": "试_Interactive Legend___________________验",
+  "points": "试_Points_____________验",
+  "lines": "试_Lines___________验",
+  "polygons": "试_Polygons_________________验",
+  "creatingLegend": "试_Creating legend________________验",
+  "noLegend": "试_No legend___________________验",
+  "dotValue": "试_1 Dot = {value} {unit}_______________________验",
+  "currentObservations": "试_Current observations_____________________验",
+  "previousObservations": "试_Previous observations______________________验",
+  "high": "试_High_________验",
+  "low": "试_Low_______验",
+  "esriMetersPerSecond": "试_m/s_______验",
+  "esriKilometersPerHour": "试_km/h_________验",
+  "esriKnots": "试_knots___________验",
+  "esriFeetPerSecond": "试_ft/sec_____________验",
+  "esriMilesPerHour": "试_mph_______验",
+  "showNormField": "试_{field} divided by {normField}_______________________________验",
+  "showNormPct": "试_{field} as a percent of the total__________________验",
+  "showRatio": "试_Ratio of {field} to {normField}_________________验",
+  "showRatioPercent": "试_{field} as a percent of {normField}___________________验",
+  "showRatioPercentTotal": "试_{field} as a percent of {field} and {normField}_________________________验"
+});

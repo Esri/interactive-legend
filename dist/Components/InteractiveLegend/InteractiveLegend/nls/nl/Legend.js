@@ -21,5 +21,26 @@
 // email: contracts@esri.com
 //
 // See http://js.arcgis.com/4.9/esri/copyright.txt for details.
-
-define({widgetLabel:"Legenda",points:"Punten",lines:"Lijnen",polygons:"Vlakken",creatingLegend:"Legenda maken",noLegend:"Geen legenda",dotValue:"1 punt = {value} {unit}",currentObservations:"Huidige observaties",previousObservations:"Vorige observaties",high:"Hoog",low:"Laag",esriMetersPerSecond:"m/s",esriKilometersPerHour:"km/u",esriKnots:"knopen",esriFeetPerSecond:"ft/sec",esriMilesPerHour:"mpu",showNormField:"{field} gedeeld door {normField}",showNormPct:"{field} als procent van het totaal",showRatio:"Verhouding van {field} tot {normField}",showRatioPercent:"{field} als een procent van {normField}",showRatioPercentTotal:"{field} als een procent van {field} en {normField}"});
+define({
+  "widgetLabel": "Ĳ_Interactive Legend___________________ä",
+  "points": "Ĳ_Points_____________ä",
+  "lines": "Ĳ_Lines___________ä",
+  "polygons": "Ĳ_Polygons_________________ä",
+  "creatingLegend": "Ĳ_Creating legend________________ä",
+  "noLegend": "Ĳ_No legend___________________ä",
+  "dotValue": "Ĳ_1 Dot = {value} {unit}_______________________ä",
+  "currentObservations": "Ĳ_Current observations_____________________ä",
+  "previousObservations": "Ĳ_Previous observations______________________ä",
+  "high": "Ĳ_High_________ä",
+  "low": "Ĳ_Low_______ä",
+  "esriMetersPerSecond": "Ĳ_m/s_______ä",
+  "esriKilometersPerHour": "Ĳ_km/h_________ä",
+  "esriKnots": "Ĳ_knots___________ä",
+  "esriFeetPerSecond": "Ĳ_ft/sec_____________ä",
+  "esriMilesPerHour": "Ĳ_mph_______ä",
+  "showNormField": "Ĳ_{field} divided by {normField}_______________________________ä",
+  "showNormPct": "Ĳ_{field} as a percent of the total__________________ä",
+  "showRatio": "Ĳ_Ratio of {field} to {normField}_________________ä",
+  "showRatioPercent": "Ĳ_{field} as a percent of {normField}___________________ä",
+  "showRatioPercentTotal": "Ĳ_{field} as a percent of {field} and {normField}_________________________ä"
+});

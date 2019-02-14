@@ -21,5 +21,26 @@
 // email: contracts@esri.com
 //
 // See http://js.arcgis.com/4.9/esri/copyright.txt for details.
-
-define({widgetLabel:"คำอธิบายสัญลักษณ์",points:"จุด",lines:"เส้น",polygons:"พื้นที่รูปปิด",creatingLegend:"สร้างสัญลักษณ์",noLegend:"ไม่มีสัญลักษณ์",dotValue:"1 จุด = {value} {unit}",currentObservations:"จุดสังเกตปัจจุบัน",previousObservations:"จุดสังเกตก่อนนี้",high:"สูง",low:"ต่ำ",esriMetersPerSecond:"เมตร/วินาที",esriKilometersPerHour:"กิโลเมตร/ชั่วโมง",esriKnots:"น็อต",esriFeetPerSecond:"ฟุต/วินาที",esriMilesPerHour:"ไมล์ ต่อ ชั่วโมง",showNormField:"{field} หารด้วย {normField}",showNormPct:"{field} เป็นร้อยละของทั้งหมด",showRatio:"อัตราส่วนของ {field} ไปยัง {normField}",showRatioPercent:"{field} เป็นร้อยละของ {normField}",showRatioPercentTotal:"{field} เป็นร้อยละของ {field} และ {normField}"});
+define({
+  "widgetLabel": "ก้_Interactive Legend___________________ษฺ",
+  "points": "ก้_Points_____________ษฺ",
+  "lines": "ก้_Lines___________ษฺ",
+  "polygons": "ก้_Polygons_________________ษฺ",
+  "creatingLegend": "ก้_Creating legend________________ษฺ",
+  "noLegend": "ก้_No legend___________________ษฺ",
+  "dotValue": "ก้_1 Dot = {value} {unit}_______________________ษฺ",
+  "currentObservations": "ก้_Current observations_____________________ษฺ",
+  "previousObservations": "ก้_Previous observations______________________ษฺ",
+  "high": "ก้_High_________ษฺ",
+  "low": "ก้_Low_______ษฺ",
+  "esriMetersPerSecond": "ก้_m/s_______ษฺ",
+  "esriKilometersPerHour": "ก้_km/h_________ษฺ",
+  "esriKnots": "ก้_knots___________ษฺ",
+  "esriFeetPerSecond": "ก้_ft/sec_____________ษฺ",
+  "esriMilesPerHour": "ก้_mph_______ษฺ",
+  "showNormField": "ก้_{field} divided by {normField}_______________________________ษฺ",
+  "showNormPct": "ก้_{field} as a percent of the total__________________ษฺ",
+  "showRatio": "ก้_Ratio of {field} to {normField}_________________ษฺ",
+  "showRatioPercent": "ก้_{field} as a percent of {normField}___________________ษฺ",
+  "showRatioPercentTotal": "ก้_{field} as a percent of {field} and {normField}_________________________ษฺ"
+});

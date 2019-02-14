@@ -21,5 +21,26 @@
 // email: contracts@esri.com
 //
 // See http://js.arcgis.com/4.9/esri/copyright.txt for details.
-
-define({widgetLabel:"लिजेंड",points:"बिंदु",lines:"रेखाएँ",polygons:"बहुभुज",creatingLegend:"लीजेंड बनाना",noLegend:"कोई लीजेंड नहीं",dotValue:"1 डॉट = {value} {unit}",currentObservations:"वर्तमान अवलोकन",previousObservations:"पिछले अवलोकन",high:"उच्च",low:"निम्न",esriMetersPerSecond:"m/s",esriKilometersPerHour:"km/h",esriKnots:"knots",esriFeetPerSecond:"ft/sec",esriMilesPerHour:"mph",showNormField:"{field} {normField} से विभाजित",showNormPct:"कुल के प्रतिशत के रूप में {field}",showRatio:"{field} का {normField} से अनुपात",showRatioPercent:"{normField} के प्रतिशत के रूप में {field}",showRatioPercentTotal:"{field} और {normField} के प्रतिशत के रूप में {field}"});
+define({
+  "widgetLabel": "आ_Interactive Legend___________________ज",
+  "points": "आ_Points_____________ज",
+  "lines": "आ_Lines___________ज",
+  "polygons": "आ_Polygons_________________ज",
+  "creatingLegend": "आ_Creating legend________________ज",
+  "noLegend": "आ_No legend___________________ज",
+  "dotValue": "आ_1 Dot = {value} {unit}_______________________ज",
+  "currentObservations": "आ_Current observations_____________________ज",
+  "previousObservations": "आ_Previous observations______________________ज",
+  "high": "आ_High_________ज",
+  "low": "आ_Low_______ज",
+  "esriMetersPerSecond": "आ_m/s_______ज",
+  "esriKilometersPerHour": "आ_km/h_________ज",
+  "esriKnots": "आ_knots___________ज",
+  "esriFeetPerSecond": "आ_ft/sec_____________ज",
+  "esriMilesPerHour": "आ_mph_______ज",
+  "showNormField": "आ_{field} divided by {normField}_______________________________ज",
+  "showNormPct": "आ_{field} as a percent of the total__________________ज",
+  "showRatio": "आ_Ratio of {field} to {normField}_________________ज",
+  "showRatioPercent": "आ_{field} as a percent of {normField}___________________ज",
+  "showRatioPercentTotal": "आ_{field} as a percent of {field} and {normField}_________________________ज"
+});

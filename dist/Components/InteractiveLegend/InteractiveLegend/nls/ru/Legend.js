@@ -21,5 +21,26 @@
 // email: contracts@esri.com
 //
 // See http://js.arcgis.com/4.9/esri/copyright.txt for details.
-
-define({widgetLabel:"Легенда",points:"Точки",lines:"Линии",polygons:"Полигоны",creatingLegend:"Построение легенды",noLegend:"Без легенды",dotValue:"1 точка = {value} {unit}",currentObservations:"Текущие наблюдения",previousObservations:"Предыдущие наблюдения",high:"Высокий",low:"Низкий",esriMetersPerSecond:"м/с",esriKilometersPerHour:"км/ч",esriKnots:"узлы",esriFeetPerSecond:"фт/сек",esriMilesPerHour:"миль/час",showNormField:"{field} деленное на {normField}",showNormPct:"{field} в процентах от общего",showRatio:"Доля {field} по отношению к {normField}",showRatioPercent:"{field} в процентах от {normField}",showRatioPercentTotal:"{field} в процентах от {field} и {normField}"});
+define({
+  "widgetLabel": "Ж_Interactive Legend___________________Я",
+  "points": "Ж_Points_____________Я",
+  "lines": "Ж_Lines___________Я",
+  "polygons": "Ж_Polygons_________________Я",
+  "creatingLegend": "Ж_Creating legend________________Я",
+  "noLegend": "Ж_No legend___________________Я",
+  "dotValue": "Ж_1 Dot = {value} {unit}_______________________Я",
+  "currentObservations": "Ж_Current observations_____________________Я",
+  "previousObservations": "Ж_Previous observations______________________Я",
+  "high": "Ж_High_________Я",
+  "low": "Ж_Low_______Я",
+  "esriMetersPerSecond": "Ж_m/s_______Я",
+  "esriKilometersPerHour": "Ж_km/h_________Я",
+  "esriKnots": "Ж_knots___________Я",
+  "esriFeetPerSecond": "Ж_ft/sec_____________Я",
+  "esriMilesPerHour": "Ж_mph_______Я",
+  "showNormField": "Ж_{field} divided by {normField}_______________________________Я",
+  "showNormPct": "Ж_{field} as a percent of the total__________________Я",
+  "showRatio": "Ж_Ratio of {field} to {normField}_________________Я",
+  "showRatioPercent": "Ж_{field} as a percent of {normField}___________________Я",
+  "showRatioPercentTotal": "Ж_{field} as a percent of {field} and {normField}_________________________Я"
+});

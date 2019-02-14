@@ -21,5 +21,26 @@
 // email: contracts@esri.com
 //
 // See http://js.arcgis.com/4.9/esri/copyright.txt for details.
-
-define({widgetLabel:"Jelmagyarázat",points:"Pontok",lines:"Vonalak",polygons:"Polygonok",creatingLegend:"Jelmagyarázat létrehozása",noLegend:"Nincs jelmagyarázat",dotValue:"1 pont = {value} {unit}",currentObservations:"Jelenlegi megfigyelések",previousObservations:"Előző megfigyelések",high:"Magas",low:"Alacsony",esriMetersPerSecond:"m/s",esriKilometersPerHour:"km/h",esriKnots:"csomó",esriFeetPerSecond:"ft/sec",esriMilesPerHour:"mph",showNormField:"{field} osztva a(z) {normField} értékével",showNormPct:"{field} az összes százalékaként",showRatio:"A(z) {field} és a(z) {normField} aránya",showRatioPercent:"{field} a(z) {normField} százalékaként",showRatioPercentTotal:"{field} a(z) {field} és {normField} százalékaként"});
+define({
+  "widgetLabel": "í_Interactive Legend___________________ő",
+  "points": "í_Points_____________ő",
+  "lines": "í_Lines___________ő",
+  "polygons": "í_Polygons_________________ő",
+  "creatingLegend": "í_Creating legend________________ő",
+  "noLegend": "í_No legend___________________ő",
+  "dotValue": "í_1 Dot = {value} {unit}_______________________ő",
+  "currentObservations": "í_Current observations_____________________ő",
+  "previousObservations": "í_Previous observations______________________ő",
+  "high": "í_High_________ő",
+  "low": "í_Low_______ő",
+  "esriMetersPerSecond": "í_m/s_______ő",
+  "esriKilometersPerHour": "í_km/h_________ő",
+  "esriKnots": "í_knots___________ő",
+  "esriFeetPerSecond": "í_ft/sec_____________ő",
+  "esriMilesPerHour": "í_mph_______ő",
+  "showNormField": "í_{field} divided by {normField}_______________________________ő",
+  "showNormPct": "í_{field} as a percent of the total__________________ő",
+  "showRatio": "í_Ratio of {field} to {normField}_________________ő",
+  "showRatioPercent": "í_{field} as a percent of {normField}___________________ő",
+  "showRatioPercentTotal": "í_{field} as a percent of {field} and {normField}_________________________ő"
+});
