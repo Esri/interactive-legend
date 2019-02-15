@@ -147,6 +147,10 @@ const CSS = {
   interactiveLegendLayer: "esri-interactive-legend__layer",
   interactiveLegendService: "esri-interactive-legend__service",
   interactiveLegendlayerBody: "esri-interactive-legend__layer-body",
+  interactiveLegendVisibleIcon: "esri-interactive-legend__visible-icon",
+  interactiveLegendNonVisibleIcon: "esri-interactive-legend__non-visible-icon",
+  interactiveLegendLayerRow: "esri-interactive-legend__ramp-layer-row",
+  interactiveStyles: "esri-interactive-legend__interactive-styles",
   onboarding: {
     mainContainer: "esri-interactive-legend__onboarding-main-container",
     contentContainer: "esri-interactive-legend__onboarding-content-container",
@@ -269,7 +273,7 @@ class InteractiveClassic extends declared(Widget) {
                 layerItemId: featureLayer.id,
                 field,
                 selectedInfoIndex: [],
-                applyStyles: false
+                applyStyles: null
               });
             }
           }
@@ -365,8 +369,15 @@ class InteractiveClassic extends declared(Widget) {
       featureLayerData && featureLayerData.applyStyles
         ? this.classes(CSS.header, CSS.label, CSS.interactiveLegendLabel)
         : this.classes(CSS.header, CSS.label);
+    const titleContainer =
+      featureLayerData && featureLayerData.applyStyles
+        ? "esri-interactive-legend__title-container"
+        : null;
+
     const labelNode = activeLayerInfo.title ? (
-      <h3 class={labelClasses}>{activeLayerInfo.title}</h3>
+      <div class={titleContainer}>
+        <h3 class={labelClasses}>{activeLayerInfo.title}</h3>
+      </div>
     ) : null;
 
     if (hasChildren) {
@@ -427,11 +438,21 @@ class InteractiveClassic extends declared(Widget) {
               layerClasses
             )
           : this.classes(CSS.service, layerClasses);
+
+      const layer =
+        featureLayerData && featureLayerData.applyStyles
+          ? this.classes(CSS.layer, CSS.interactiveLegendLayer)
+          : CSS.layer;
+      const interactiveStyles =
+        featureLayerData && featureLayerData.applyStyles
+          ? CSS.interactiveStyles
+          : null;
       return (
         <div key={key} class={service}>
-          {labelNode}
-
-          <div class={CSS.layer}>{filteredElements}</div>
+          <div class={interactiveStyles}>
+            {labelNode}
+            <div class={layer}>{filteredElements}</div>
+          </div>
         </div>
       );
     }
@@ -492,7 +513,7 @@ class InteractiveClassic extends declared(Widget) {
       legendElement.type === "opacity-ramp" ||
       legendElement.type === "heatmap-ramp"
     ) {
-      content = this._renderLegendForRamp(legendElement);
+      content = this._renderLegendForRamp(legendElement, activeLayerInfo);
     } else if (legendElement.type === "relationship-ramp") {
       content = renderRelationshipRamp(legendElement, this.id);
     }
@@ -546,7 +567,8 @@ class InteractiveClassic extends declared(Widget) {
 
   // _renderLegendForRamp
   private _renderLegendForRamp(
-    legendElement: ColorRampElement | OpacityRampElement | HeatmapRampElement
+    legendElement: ColorRampElement | OpacityRampElement | HeatmapRampElement,
+    activeLayerInfo: ActiveLayerInfo
   ): VNode {
     const rampStops: any[] = legendElement.infos;
     const isOpacityRamp = legendElement.type === "opacity-ramp";
@@ -625,8 +647,9 @@ class InteractiveClassic extends declared(Widget) {
 
     const symbolContainerStyles = { width: `${GRADIENT_WIDTH}px` },
       rampLabelsContainerStyles = { height: `${rampHeight}px` };
+
     return (
-      <div class={this.classes(CSS.layerRow)}>
+      <div class={CSS.layerRow}>
         <div class={CSS.symbolContainer} styles={symbolContainerStyles}>
           <div
             class={CSS.rampContainer}
@@ -719,9 +742,19 @@ class InteractiveClassic extends declared(Widget) {
         visibleIcon = selectedInfoIndex ? (
           selectedInfoIndex.indexOf(legendInfoIndex) === -1 &&
           selectedInfoIndex.length > 0 ? (
-            <span class={CSS.calciteStyles.nonVisibleIcon} />
+            <span
+              class={this.classes(
+                CSS.calciteStyles.nonVisibleIcon,
+                CSS.interactiveLegendNonVisibleIcon
+              )}
+            />
           ) : (
-            <span class={CSS.calciteStyles.visibleIcon} />
+            <span
+              class={this.classes(
+                CSS.calciteStyles.visibleIcon,
+                CSS.interactiveLegendVisibleIcon
+              )}
+            />
           )
         ) : (
           <span class={CSS.calciteStyles.visibleIcon} />
@@ -793,7 +826,7 @@ class InteractiveClassic extends declared(Widget) {
       isPredominance
         ? selectedRow
         : null;
-    if (featureLayerData) {
+    if (featureLayerData && featureLayerData.applyStyles === null) {
       featureLayerData.applyStyles = applySelect ? true : false;
     }
 
@@ -1122,9 +1155,9 @@ class InteractiveClassic extends declared(Widget) {
     );
     const legendElementIndex = parseInt(node.getAttribute("data-legend-index"));
     const activeLayerInfoId = node.getAttribute("data-layer-id");
-    const featureLayerData = this.selectedStyleData.find(
-      layerData => layerData.layerItemId === activeLayerInfoId
-    );
+    const featureLayerData = this.selectedStyleData.find(layerData => {
+      return layerData ? layerData.layerItemId === activeLayerInfoId : null;
+    });
 
     const legendElementChildArr =
       featureLayerData.selectedInfoIndex[legendElementIndex];
