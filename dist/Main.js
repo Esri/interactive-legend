@@ -123,6 +123,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 itemUtils_1.createMapFromItem({ item: item, appProxies: appProxies }).then(function (map) {
                     return itemUtils_1.createView(__assign({}, viewProperties, { map: map })).then(function (view) {
                         return itemUtils_1.findQuery(find, view).then(function () {
+                            _this._handleBasemapToggleWidget(basemapToggleEnabled, view, nextBasemap, basemapTogglePosition);
                             if (!zoomControlsEnabled) {
                                 view.ui.remove("zoom");
                             }
@@ -158,7 +159,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 };
                             }
                             _this._handleHomeWidget(view, homeEnabled, homePosition);
-                            _this._handleBasemapToggleWidget(basemapToggleEnabled, view, nextBasemap, basemapTogglePosition);
+                            _this._handleSplash(config, view, splashButtonPosition);
                             _this.layerList = new LayerList({
                                 view: view
                             });
@@ -205,7 +206,6 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 expanded: true,
                                 expandTooltip: interactiveLegend.label
                             });
-                            _this._handleScreenshotWidget(screenshotEnabled, legendIncludedInScreenshot, popupIncludedInScreenshot, view, screenshotPosition);
                             watchUtils.whenOnce(_this.interactiveLegendExpand, "container", function () {
                                 if (_this.interactiveLegendExpand.container) {
                                     var container_1 = _this.interactiveLegendExpand
@@ -259,9 +259,9 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 });
                                 view.ui.add(_this.infoExpand, infoPanelPosition);
                             }
+                            _this._handleScreenshotWidget(screenshotEnabled, legendIncludedInScreenshot, popupIncludedInScreenshot, view, screenshotPosition);
                             itemUtils_1.goToMarker(marker, view);
                             _this._handleHeader(config);
-                            _this._handleSplash(config, view, splashButtonPosition);
                             if (config.customCSS) {
                                 _this._handleCustomCSS(config);
                             }

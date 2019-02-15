@@ -229,6 +229,12 @@ class InteractiveLegendApp {
           map
         }).then((view: MapView) =>
           findQuery(find, view).then(() => {
+            this._handleBasemapToggleWidget(
+              basemapToggleEnabled,
+              view,
+              nextBasemap,
+              basemapTogglePosition
+            );
             if (!zoomControlsEnabled) {
               view.ui.remove("zoom");
             }
@@ -262,15 +268,9 @@ class InteractiveLegendApp {
                 color: new Color("#000000")
               };
             }
-
             this._handleHomeWidget(view, homeEnabled, homePosition);
+            this._handleSplash(config, view, splashButtonPosition);
 
-            this._handleBasemapToggleWidget(
-              basemapToggleEnabled,
-              view,
-              nextBasemap,
-              basemapTogglePosition
-            );
             this.layerList = new LayerList({
               view
             });
@@ -334,14 +334,6 @@ class InteractiveLegendApp {
               expanded: true,
               expandTooltip: interactiveLegend.label
             });
-
-            this._handleScreenshotWidget(
-              screenshotEnabled,
-              legendIncludedInScreenshot,
-              popupIncludedInScreenshot,
-              view,
-              screenshotPosition
-            );
 
             watchUtils.whenOnce(
               this.interactiveLegendExpand,
@@ -420,9 +412,16 @@ class InteractiveLegendApp {
               view.ui.add(this.infoExpand, infoPanelPosition);
             }
 
+            this._handleScreenshotWidget(
+              screenshotEnabled,
+              legendIncludedInScreenshot,
+              popupIncludedInScreenshot,
+              view,
+              screenshotPosition
+            );
+
             goToMarker(marker, view);
             this._handleHeader(config);
-            this._handleSplash(config, view, splashButtonPosition);
             if (config.customCSS) {
               this._handleCustomCSS(config);
             }
