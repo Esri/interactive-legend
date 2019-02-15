@@ -292,7 +292,10 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
             var parentContainerHeight = parentContainer.offsetHeight;
             var headerContainer = header.container;
             var headerContainerHeight = headerContainer.offsetHeight;
-            document.getElementById("view-parent-container").style.height = parentContainerHeight - headerContainerHeight + "px";
+            var hcProportion = headerContainerHeight * 100;
+            var hcHeightPercentage = parseFloat((hcProportion / parentContainerHeight).toFixed(4));
+            var viewParentContainerPercentage = 100 - hcHeightPercentage;
+            document.getElementById("view-parent-container").style.height = viewParentContainerPercentage + "%";
         };
         // _handleSplash
         InteractiveLegendApp.prototype._handleSplash = function (config, view, splashButtonPosition) {
