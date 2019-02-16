@@ -1,5 +1,6 @@
 .esri-interactive-legend {
   min-width: 300px;
+  outline: none;
 }
 
 
@@ -178,4 +179,8 @@
 
 
 
+}
+
+:not(.esri-interactive-legend__filter-layer-row) {
+  outline: none;
 }
