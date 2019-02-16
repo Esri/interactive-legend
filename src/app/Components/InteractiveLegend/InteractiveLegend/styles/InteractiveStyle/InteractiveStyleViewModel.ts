@@ -47,6 +47,8 @@ import LayerListViewModel = require("esri/widgets/LayerList/LayerListViewModel")
 // esri.views.layers.support.FeatureFilter
 import FeatureFilter = require("esri/views/layers/support/FeatureFilter");
 
+import FeatureEffect = require("esri/views/layers/support/FeatureEffect");
+
 // interfaces
 import {
   FilterMode,
@@ -71,12 +73,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   @property()
   interactiveStyleData: InteractiveStyleData = {
     queryExpressions: [],
-    highlightedFeatures: [],
-    originalRenderers: [],
-    originalColors: [],
-    colorIndexes: [],
-    mutedValues: [],
-    classBreakInfosIndex: []
+    highlightedFeatures: []
   };
 
   //----------------------------------
@@ -154,9 +151,6 @@ class InteractiveStyleViewModel extends declared(Accessor) {
               this.searchExpressions.add(null);
             });
             this._storeFeatureData(layerViewKey);
-            if (this.filterMode === "mute") {
-              this._storeOriginalRenderersAndColors();
-            }
           }),
           watchUtils.whenFalse(this, "view.updating", () => {
             this.layerListViewModel.operationalItems.forEach(() => {
@@ -199,7 +193,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     legendElementInfos?: any[]
   ): void {
     if (isPredominance) {
-      const queryExpression = this._handlePredominanceFeatureFilter(
+      const queryExpression = this._handlePredominanceExpression(
         elementInfo,
         operationalItemIndex
       ).join(" AND ");
@@ -252,36 +246,62 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     legendInfoIndex: number,
     operationalItemIndex: number,
     legendElement: LegendElement,
-    legendElementInfos: any[]
+    legendElementInfos: any[],
+    isPredominance: boolean
   ): void {
-    const originalRenderer = this.interactiveStyleData.originalRenderers[
+    const featureLayer = this.layerListViewModel.operationalItems.getItemAt(
       operationalItemIndex
-    ];
-    if (!originalRenderer) {
-      return;
-    }
-    if (originalRenderer.hasOwnProperty("uniqueValueInfos")) {
-      this._muteUniqueValues(legendInfoIndex, field, operationalItemIndex);
+    ).layer as FeatureLayer;
+    const { renderer } = featureLayer;
+    if (isPredominance) {
+      const queryExpression = this._handlePredominanceExpression(
+        elementInfo,
+        operationalItemIndex
+      ).join(" AND ");
+
+      const queryExpressions = this.interactiveStyleData.queryExpressions[
+        operationalItemIndex
+      ];
+      const expressionIndex = queryExpressions.indexOf(queryExpression);
+      if (queryExpressions.length === 0 || expressionIndex === -1) {
+        queryExpressions.push(queryExpression);
+      } else {
+        queryExpressions.splice(expressionIndex, 1);
+      }
+
+      const featureLayerView = this.featureLayerViews.getItemAt(
+        operationalItemIndex
+      );
+      const filterExpression = queryExpressions.join(" OR ");
+      this._setSearchExpression(filterExpression);
+      featureLayerView.effect = new FeatureEffect({
+        outsideEffect: "opacity(30%) grayscale(100%)",
+        filter: {
+          where: filterExpression
+        }
+      });
+    } else if (renderer.hasOwnProperty("uniqueValueInfos")) {
+      this._muteUniqueValues(
+        elementInfo,
+        field,
+        operationalItemIndex,
+        legendElement,
+        legendInfoIndex,
+        legendElementInfos
+      );
     } else if (
       Array.isArray(elementInfo.value) &&
       elementInfo.value.length === 2
     ) {
-      this._muteRangeValues(legendInfoIndex, field, operationalItemIndex);
+      this._muteRangeValues(
+        elementInfo,
+        field,
+        operationalItemIndex,
+        legendElement,
+        legendInfoIndex,
+        legendElementInfos
+      );
     }
-
-    this._generateQueryExpressions(
-      elementInfo,
-      field,
-      operationalItemIndex,
-      legendElement,
-      null,
-      legendElementInfos
-    );
-    const queryExpressions = this.interactiveStyleData.queryExpressions[
-      operationalItemIndex
-    ];
-    const filterExpression = queryExpressions.join(" OR ");
-    this._setSearchExpression(filterExpression);
   }
 
   // applyFeatureHighlight
@@ -290,20 +310,11 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     field: string,
     legendInfoIndex: number,
     operationalItemIndex: number,
-    isSizeRamp: boolean,
     legendElement: LegendElement,
     isPredominance: boolean,
     legendElementInfos: any[]
   ): void {
-    if (isSizeRamp) {
-      this._highlightSizeRamp(
-        legendInfoIndex,
-        field,
-        legendElementInfos,
-        elementInfo,
-        operationalItemIndex
-      );
-    } else if (isPredominance) {
+    if (isPredominance) {
       this._handlePredominanceHighlight(
         elementInfo,
         legendElementInfos,
@@ -364,20 +375,9 @@ class InteractiveStyleViewModel extends declared(Accessor) {
 
   // _setUpDataContainers
   private _setUpDataContainers(): void {
-    const {
-      highlightedFeatures,
-      queryExpressions,
-      mutedValues,
-      originalColors,
-      colorIndexes,
-      classBreakInfosIndex
-    } = this.interactiveStyleData;
+    const { highlightedFeatures, queryExpressions } = this.interactiveStyleData;
     highlightedFeatures.push([]);
     queryExpressions.push([]);
-    mutedValues.push([]);
-    originalColors.push([]);
-    colorIndexes.push([]);
-    classBreakInfosIndex.push([]);
   }
 
   // _queryFeatureLayerData
@@ -438,60 +438,6 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     });
   }
 
-  // _storeOriginalRenderersAndColors
-  private _storeOriginalRenderersAndColors(): void {
-    this.interactiveStyleData.originalRenderers = [];
-    this.layerListViewModel.operationalItems.forEach(
-      (operationalItem, operationalItemIndex) => {
-        if (operationalItem.layer.hasOwnProperty("renderer")) {
-          this._useLayerFromOperationalItem(
-            operationalItem,
-            operationalItemIndex
-          );
-        }
-      }
-    );
-  }
-
-  // _useLayerFromOperationalItem
-  private _useLayerFromOperationalItem(
-    operationalItem: ListItem,
-    operationalItemIndex: number
-  ): void {
-    const clonedItem = operationalItem.clone();
-    const featureLayer = clonedItem.layer as FeatureLayer;
-    const clonedRenderer = featureLayer.renderer;
-    const originalColors = this.interactiveStyleData.originalColors[
-      operationalItemIndex
-    ];
-
-    if (clonedRenderer.hasOwnProperty("uniqueValueInfos")) {
-      (clonedRenderer as __esri.UniqueValueRenderer).uniqueValueInfos.forEach(
-        info => {
-          originalColors.push(info.symbol.color);
-        }
-      );
-      if (!operationalItem.layer.hasOwnProperty("renderer")) {
-        return;
-      }
-      this.interactiveStyleData.originalRenderers[
-        operationalItemIndex
-      ] = clonedRenderer;
-    } else if (clonedRenderer.hasOwnProperty("classBreakInfos")) {
-      (clonedRenderer as __esri.ClassBreaksRenderer).classBreakInfos.forEach(
-        info => {
-          originalColors.push(info.symbol.color);
-        }
-      );
-      if (!operationalItem.layer.hasOwnProperty("renderer")) {
-        return;
-      }
-      this.interactiveStyleData.originalRenderers[
-        operationalItemIndex
-      ] = clonedRenderer;
-    }
-  }
-
   //----------------------------------
   //
   //  Feature Filter Methods
@@ -507,6 +453,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     legendInfoIndex?: number,
     legendElementInfos?: any[]
   ): void {
+    // debugger;
     const queryExpression = this._generateQueryExpression(
       elementInfo,
       field,
@@ -537,18 +484,6 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     const elementInfoHasValue = elementInfo.hasOwnProperty("value")
       ? value
       : label;
-    if (
-      legendElement.type === "size-ramp" &&
-      this.filterMode === "featureFilter"
-    ) {
-      const expression = this._handleSizeRampFeatureFilter(
-        legendInfoIndex,
-        field,
-        legendElementInfos,
-        elementInfo
-      );
-      return expression;
-    }
 
     if (legendElement.type === "symbol-table") {
       if (label.indexOf(">") !== -1) {
@@ -580,58 +515,8 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     }
   }
 
-  // LOGIC MAY CHANGE FOR SIZE RAMP FILTER
-  // _handleSizeRampFeatureFilter
-  private _handleSizeRampFeatureFilter(
-    legendInfoIndex: number,
-    field: string,
-    legendElementInfos: any[],
-    elementInfo: any
-  ): string {
-    // FIRST LEGEND INFO
-    if (legendInfoIndex === 0) {
-      return `${field} >= ${elementInfo.value}`;
-    }
-    // SECOND LEGEND INFO
-    else if (legendInfoIndex === 1) {
-      const midPoint =
-        legendElementInfos[1].value -
-        (legendElementInfos[1].value - legendElementInfos[2].value) / 2;
-      return `${field} < ${
-        legendElementInfos[0].value
-      } AND ${field} >= ${midPoint}`;
-    }
-    // SECOND TO LAST LEGEND INFO
-    else if (legendInfoIndex === legendElementInfos.length - 2) {
-      const secondToLastInfo =
-        legendElementInfos[legendElementInfos.length - 2];
-      const lastInfo = legendElementInfos[legendElementInfos.length - 1];
-      const midPoint =
-        (secondToLastInfo.value - lastInfo.value) / 2 + secondToLastInfo.value;
-      return `${field} > ${lastInfo.value} AND ${field} <= ${midPoint}`;
-    }
-    // LAST LEGEND INFO
-    else if (legendInfoIndex === legendElementInfos.length - 1) {
-      return `${field} <= ${elementInfo.value}`;
-    }
-    // ANY LEGEND INFO IN BETWEEN
-    else {
-      const midPoint1 =
-        (legendElementInfos[legendInfoIndex - 1].value -
-          legendElementInfos[legendInfoIndex].value) /
-          2 +
-        legendElementInfos[legendInfoIndex].value;
-      const midPoint2 =
-        legendElementInfos[legendInfoIndex].value -
-        (legendElementInfos[legendInfoIndex].value -
-          legendElementInfos[legendInfoIndex + 1].value) /
-          2;
-      return `${field} < ${midPoint1} AND ${field} > ${midPoint2}`;
-    }
-  }
-
-  // _handlePredominanceFeatureFilter
-  private _handlePredominanceFeatureFilter(
+  // _handlePredominanceExpression
+  private _handlePredominanceExpression(
     elementInfo: any,
     operationalItemIndex: number
   ): string[] {
@@ -745,94 +630,6 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     highlightedFeatureData[legendInfoIndex] = [highlight];
   }
 
-  // LOGIC MAY CHANGE FOR SIZE RAMP FILTER
-  // _highlightSizeRamp
-  private _highlightSizeRamp(
-    legendInfoIndex: number,
-    field: string,
-    legendElementInfos: any[],
-    elementInfo: any,
-    operationalItemIndex: number
-  ): void {
-    const features = [];
-    const highlightedFeatureData = this.interactiveStyleData
-      .highlightedFeatures[operationalItemIndex];
-
-    if (highlightedFeatureData[legendInfoIndex]) {
-      this._removeHighlight(operationalItemIndex, legendInfoIndex);
-      return;
-    }
-
-    this.layerGraphics.getItemAt(operationalItemIndex).forEach(feature => {
-      // FIRST LEGEND INFO
-      if (legendInfoIndex === 0) {
-        if (feature.attributes[field] >= elementInfo.value) {
-          features.push(feature);
-        }
-      }
-      // SECOND LEGEND INFO
-      else if (legendInfoIndex === 1) {
-        const midPoint =
-          legendElementInfos[1].value -
-          (legendElementInfos[1].value - legendElementInfos[2].value) / 2;
-        if (
-          feature.attributes[field] < legendElementInfos[0].value &&
-          feature.attributes[field] >= midPoint
-        ) {
-          features.push(feature);
-        }
-      }
-      // SECOND TO LAST LEGEND INFO
-      else if (legendInfoIndex === legendElementInfos.length - 2) {
-        const secondToLastInfo =
-          legendElementInfos[legendElementInfos.length - 2];
-        const lastInfo = legendElementInfos[legendElementInfos.length - 1];
-        const midPoint =
-          (secondToLastInfo.value - lastInfo.value) / 2 +
-          secondToLastInfo.value;
-        if (
-          feature.attributes[field] > lastInfo.value &&
-          feature.attributes[field] <= midPoint
-        ) {
-          features.push(feature);
-        }
-      }
-      // LAST LEGEND INFO
-      else if (legendInfoIndex === legendElementInfos.length - 1) {
-        if (feature.attributes[field] <= elementInfo.value) {
-          features.push(feature);
-        }
-      }
-      // ANY LEGEND INFO IN BETWEEN
-      else {
-        const midPoint1 =
-          (legendElementInfos[legendInfoIndex - 1].value -
-            legendElementInfos[legendInfoIndex].value) /
-            2 +
-          legendElementInfos[legendInfoIndex].value;
-        const midPoint2 =
-          legendElementInfos[legendInfoIndex].value -
-          (legendElementInfos[legendInfoIndex].value -
-            legendElementInfos[legendInfoIndex + 1].value) /
-            2;
-        if (
-          feature.attributes[field] < midPoint1 &&
-          feature.attributes[field] > midPoint2
-        ) {
-          features.push(feature);
-        }
-      }
-    });
-
-    if (features.length === 0) {
-      return;
-    }
-    const highlight = this.featureLayerViews
-      .getItemAt(operationalItemIndex)
-      .highlight([...features]);
-    highlightedFeatureData[legendInfoIndex] = [highlight];
-  }
-
   // _handlePredominanceHighlight
   private _handlePredominanceHighlight(
     elementInfo: any,
@@ -917,189 +714,69 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   //----------------------------------
 
   private _muteUniqueValues(
-    legendInfoIndex: number,
+    elementInfo: any,
     field: string,
-    operationalItemIndex: number
+    operationalItemIndex: number,
+    legendElement: LegendElement,
+    legendInfoIndex: number,
+    legendElementInfos: any[]
   ): void {
-    const featureLayer = this.layerListViewModel.operationalItems.getItemAt(
-      operationalItemIndex
-    ).layer as FeatureLayer;
-    const colorIndexes = this.interactiveStyleData.colorIndexes[
-      operationalItemIndex
-    ];
-
-    if (colorIndexes.indexOf(legendInfoIndex) === -1) {
-      colorIndexes.push(legendInfoIndex);
-    } else {
-      colorIndexes.splice(colorIndexes.indexOf(legendInfoIndex), 1);
-    }
-
-    this._resetMutedUniqueValues(operationalItemIndex);
-    if (colorIndexes.length === 0) {
-      this._resetMutedUniqueValues(operationalItemIndex);
-      this._generateRenderer(operationalItemIndex, "unique-value", field);
-      return;
-    }
-    const renderer = featureLayer.renderer as any;
-    renderer.uniqueValueInfos.forEach(
-      (uniqueInfo: __esri.UniqueValueInfo, uniqueInfoIndex: number) => {
-        const { symbol } = uniqueInfo;
-        if (colorIndexes.indexOf(uniqueInfoIndex) === -1) {
-          symbol.color = this.mutedShade;
-        }
-      }
+    this._generateQueryExpressions(
+      elementInfo,
+      field,
+      operationalItemIndex,
+      legendElement,
+      legendInfoIndex,
+      legendElementInfos
     );
-    this._generateRenderer(operationalItemIndex, "unique-value", field);
-  }
-
-  // _resetMutedUniqueValues
-  private _resetMutedUniqueValues(operationalItemIndex: number): void {
-    const featureLayer = this.layerListViewModel.operationalItems.getItemAt(
-      operationalItemIndex
-    ).layer as FeatureLayer;
-    const originalColors = this.interactiveStyleData.originalColors[
+    const queryExpressions = this.interactiveStyleData.queryExpressions[
       operationalItemIndex
     ];
-    originalColors.forEach((original, originalIndex) => {
-      const uvr = featureLayer.renderer as __esri.UniqueValueRenderer;
-      uvr.uniqueValueInfos.forEach((newItem, newIndex) => {
-        if (originalIndex === newIndex) {
-          newItem.symbol.color = original;
-        }
-      });
+    const featureLayerView = this.featureLayerViews.getItemAt(
+      operationalItemIndex
+    );
+    const filterExpression = queryExpressions.join(" OR ");
+    this._setSearchExpression(filterExpression);
+
+    featureLayerView.effect = new FeatureEffect({
+      outsideEffect: "opacity(30%) grayscale(100%)",
+      filter: {
+        where: filterExpression
+      }
     });
   }
 
   // _muteRangeValues
   private _muteRangeValues(
-    legendInfoIndex: number,
+    elementInfo: any,
     field: string,
-    operationalItemIndex: number
-  ): void {
-    const featureLayer = this.layerListViewModel.operationalItems.getItemAt(
-      operationalItemIndex
-    ).layer as any;
-    const classBreakInfos = featureLayer.renderer.classBreakInfos;
-    const originalColors = this.interactiveStyleData.originalColors[
-      operationalItemIndex
-    ];
-    const reversedClassBreakInfos = [];
-    const reversedColors = [];
-    for (let i = classBreakInfos.length - 1; i >= 0; i--) {
-      reversedClassBreakInfos.push(classBreakInfos[i]);
-      reversedColors.push(originalColors[i]);
-    }
-    const classBreakInfosIndex = this.interactiveStyleData.classBreakInfosIndex[
-      operationalItemIndex
-    ];
-    if (classBreakInfosIndex.indexOf(legendInfoIndex) === -1) {
-      classBreakInfosIndex.push(legendInfoIndex);
-    } else {
-      classBreakInfosIndex.splice(
-        classBreakInfosIndex.indexOf(legendInfoIndex),
-        1
-      );
-    }
-
-    this._applyColors(
-      operationalItemIndex,
-      reversedColors,
-      reversedClassBreakInfos,
-      field
-    );
-  }
-
-  // _applyColors
-  private _applyColors(
     operationalItemIndex: number,
-    reversedColors: Color[],
-    reversedClassBreakInfos: any[],
-    field: string
+    legendElement: LegendElement,
+    legendInfoIndex: number,
+    legendElementInfos: any[]
   ): void {
-    const classBreakInfosIndex = this.interactiveStyleData.classBreakInfosIndex[
+    this._generateQueryExpressions(
+      elementInfo,
+      field,
+      operationalItemIndex,
+      legendElement,
+      legendInfoIndex,
+      legendElementInfos
+    );
+    const queryExpressions = this.interactiveStyleData.queryExpressions[
       operationalItemIndex
     ];
-    if (classBreakInfosIndex.length === 0) {
-      reversedClassBreakInfos.forEach((classBreakInfo, classBreakInfoIndex) => {
-        const { symbol } = classBreakInfo;
-        reversedColors.forEach((color, colorIndex) => {
-          if (classBreakInfoIndex === colorIndex) {
-            symbol.color = color;
-          }
-        });
-      });
-      this._generateRenderer(operationalItemIndex, "class-breaks", field);
-      return;
-    }
-    reversedClassBreakInfos.forEach((classBreakInfo, classBreakInfoIndex) => {
-      const { symbol } = classBreakInfo;
-      const { mutedShade } = this;
-      if (classBreakInfosIndex.indexOf(classBreakInfoIndex) !== -1) {
-        reversedColors.forEach((color, colorIndex) => {
-          if (classBreakInfoIndex === colorIndex) {
-            symbol.color = color;
-          }
-        });
-      } else {
-        symbol.color = mutedShade;
+    const featureLayerView = this.featureLayerViews.getItemAt(
+      operationalItemIndex
+    );
+    const filterExpression = queryExpressions.join(" OR ");
+    this._setSearchExpression(filterExpression);
+    featureLayerView.effect = new FeatureEffect({
+      outsideEffect: "opacity(30%) grayscale(100%)",
+      filter: {
+        where: filterExpression
       }
     });
-    this._generateRenderer(operationalItemIndex, "class-breaks", field);
-  }
-
-  // _generateRenderer
-  private _generateRenderer(
-    operationalItemIndex: number,
-    type: string,
-    field: string
-  ): void {
-    const featureLayer = this.layerListViewModel.operationalItems.getItemAt(
-      operationalItemIndex
-    ).layer as any;
-    const { defaultLabel, defaultSymbol } = featureLayer.renderer;
-    const visualVariables =
-      featureLayer.renderer.hasOwnProperty("visualVariables") &&
-      featureLayer.renderer.visualVariables
-        ? [...featureLayer.renderer.visualVariables]
-        : null;
-    const {
-      authoringInfo,
-      valueExpression,
-      valueExpressionTitle
-    } = featureLayer.renderer;
-    const renderer =
-      type === "unique-value" &&
-      authoringInfo &&
-      authoringInfo.hasOwnProperty("type") &&
-      authoringInfo.type === "predominance"
-        ? {
-            authoringInfo,
-            type,
-            field,
-            uniqueValueInfos: [...featureLayer.renderer.uniqueValueInfos],
-            defaultLabel,
-            defaultSymbol,
-            visualVariables,
-            valueExpression,
-            valueExpressionTitle
-          }
-        : type === "unique-value"
-        ? {
-            type,
-            field,
-            uniqueValueInfos: [...featureLayer.renderer.uniqueValueInfos],
-            defaultLabel,
-            defaultSymbol,
-            visualVariables
-          }
-        : {
-            type,
-            field,
-            classBreakInfos: [...featureLayer.renderer.classBreakInfos],
-            defaultLabel,
-            defaultSymbol
-          };
-    featureLayer.renderer = renderer;
   }
 
   // End of filter methods

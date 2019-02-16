@@ -529,7 +529,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         featureLayerData &&
                         !isSizeRamp) ||
                         isPredominance) {
-                        _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos);
+                        _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos);
                     }
                 }, onkeydown: function (event) {
                     if ((!isRelationship &&
@@ -543,7 +543,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         featureLayerData &&
                         !isSizeRamp) ||
                         isPredominance) {
-                        _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos);
+                        _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos);
                     }
                 } },
                 widget_1.tsx("div", { class: applySelect
@@ -588,33 +588,33 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         //  Filter methods
         //
         //-------------------------------------------------------------------
-        InteractiveClassic.prototype._handleFilterOption = function (event, elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos) {
+        InteractiveClassic.prototype._handleFilterOption = function (event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos) {
             this.filterMode === "featureFilter"
-                ? this._featureFilter(elementInfo, field, operationalItemIndex, legendInfoIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos)
+                ? this._featureFilter(elementInfo, field, operationalItemIndex, legendInfoIndex, legendElement, isPredominance, legendElementInfos)
                 : this.filterMode === "highlight"
-                    ? this._featureHighlight(event, elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos)
+                    ? this._featureHighlight(event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos)
                     : this.filterMode === "mute"
-                        ? this._featureMute(event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos)
+                        ? this._featureMute(event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos, isPredominance)
                         : null;
         };
         //_filterFeatures
-        InteractiveClassic.prototype._featureFilter = function (elementInfo, field, operationalItemIndex, legendInfoIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos) {
+        InteractiveClassic.prototype._featureFilter = function (elementInfo, field, operationalItemIndex, legendInfoIndex, legendElement, isPredominance, legendElementInfos) {
             this._handleSelectedStyles(event);
             this.viewModel.applyFeatureFilter(elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, isPredominance, legendElementInfos);
         };
         // _highlightFeatures
-        InteractiveClassic.prototype._featureHighlight = function (event, elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos) {
+        InteractiveClassic.prototype._featureHighlight = function (event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos) {
             var state = this.viewModel.state;
             if (state === "querying") {
                 return;
             }
-            this.viewModel.applyFeatureHighlight(elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos);
+            this.viewModel.applyFeatureHighlight(elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos);
             this._handleSelectedStyles(event, operationalItemIndex, legendInfoIndex);
         };
         // _muteFeatures
-        InteractiveClassic.prototype._featureMute = function (event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos) {
+        InteractiveClassic.prototype._featureMute = function (event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos, isPredominance) {
             this._handleSelectedStyles(event);
-            this.viewModel.applyFeatureMute(elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos);
+            this.viewModel.applyFeatureMute(elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos, isPredominance);
         };
         // End of filter methods
         // _disableOnboarding

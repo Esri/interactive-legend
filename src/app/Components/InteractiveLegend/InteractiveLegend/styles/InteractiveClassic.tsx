@@ -880,7 +880,6 @@ class InteractiveClassic extends declared(Widget) {
               field,
               legendInfoIndex,
               operationalItemIndex,
-              isSizeRamp,
               legendElement,
               isPredominance,
               legendElementInfos
@@ -907,7 +906,6 @@ class InteractiveClassic extends declared(Widget) {
               field,
               legendInfoIndex,
               operationalItemIndex,
-              isSizeRamp,
               legendElement,
               isPredominance,
               legendElementInfos
@@ -1019,7 +1017,6 @@ class InteractiveClassic extends declared(Widget) {
     field: string,
     legendInfoIndex: number,
     operationalItemIndex: number,
-    isSizeRamp: boolean,
     legendElement: LegendElement,
     isPredominance: boolean,
     legendElementInfos?: any[]
@@ -1030,7 +1027,6 @@ class InteractiveClassic extends declared(Widget) {
           field,
           operationalItemIndex,
           legendInfoIndex,
-          isSizeRamp,
           legendElement,
           isPredominance,
           legendElementInfos
@@ -1042,8 +1038,6 @@ class InteractiveClassic extends declared(Widget) {
           field,
           legendInfoIndex,
           operationalItemIndex,
-
-          isSizeRamp,
           legendElement,
           isPredominance,
           legendElementInfos
@@ -1056,7 +1050,8 @@ class InteractiveClassic extends declared(Widget) {
           legendInfoIndex,
           operationalItemIndex,
           legendElement,
-          legendElementInfos
+          legendElementInfos,
+          isPredominance
         )
       : null;
   }
@@ -1067,7 +1062,6 @@ class InteractiveClassic extends declared(Widget) {
     field: string,
     operationalItemIndex: number,
     legendInfoIndex: number,
-    isSizeRamp: boolean,
     legendElement: LegendElement,
     isPredominance: boolean,
     legendElementInfos?: any[]
@@ -1091,7 +1085,6 @@ class InteractiveClassic extends declared(Widget) {
     field: string,
     legendInfoIndex: number,
     operationalItemIndex: number,
-    isSizeRamp: boolean,
     legendElement: LegendElement,
     isPredominance: boolean,
     legendElementInfos: any[]
@@ -1106,7 +1099,6 @@ class InteractiveClassic extends declared(Widget) {
       field,
       legendInfoIndex,
       operationalItemIndex,
-      isSizeRamp,
       legendElement,
       isPredominance,
       legendElementInfos
@@ -1122,7 +1114,8 @@ class InteractiveClassic extends declared(Widget) {
     legendInfoIndex: number,
     operationalItemIndex: number,
     legendElement: LegendElement,
-    legendElementInfos: any[]
+    legendElementInfos: any[],
+    isPredominance: boolean
   ): void {
     this._handleSelectedStyles(event);
     this.viewModel.applyFeatureMute(
@@ -1131,7 +1124,8 @@ class InteractiveClassic extends declared(Widget) {
       legendInfoIndex,
       operationalItemIndex,
       legendElement,
-      legendElementInfos
+      legendElementInfos,
+      isPredominance
     );
   }
   // End of filter methods
