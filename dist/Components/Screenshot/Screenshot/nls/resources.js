@@ -6,7 +6,7 @@ define({
     widgetLabel: "Screenshot",
     deactivateScreenshot: "Deactivate screenshot mode",
     setScreenshotArea: "Set the map area",
-    selectAFeature: "Select a feature",
+    selectAFeature: "Select a feature on the map",
     screenshotTitle: "Capture an image",
     screenshotSubtitle: "Select additional elements to include with the map.",
     widgetLabel: "Screenshot",
