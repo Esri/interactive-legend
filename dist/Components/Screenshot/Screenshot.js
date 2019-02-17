@@ -73,6 +73,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this._screenshotImgNode = null;
             _this._downloadBtnNode = null;
             _this._activeScreenshotBtnNode = null;
+            _this._selectFeatureAlertIsVisible = null;
             // _popupIsIncluded
             _this._popupIsIncluded = null;
             _this._handles = new Handles();
@@ -104,7 +105,22 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             return _this;
         }
         Screenshot.prototype.postInitialize = function () {
-            this.own([this._watchMapComponentSelectors(), this._watchPopups()]);
+            var _this = this;
+            this.own([
+                this._watchMapComponentSelectors(),
+                this._watchPopups(),
+                watchUtils.watch(this, "popupScreenshotEnabled", function () {
+                    if (_this.popupScreenshotEnabled && _this.popupIncludedInScreenshot) {
+                        if (!_this.view.popup.visible) {
+                            _this._selectFeatureAlertIsVisible = true;
+                        }
+                        else {
+                            _this._selectFeatureAlertIsVisible = false;
+                        }
+                        _this.scheduleRender();
+                    }
+                })
+            ]);
             this._handleExpandWidget();
         };
         Screenshot.prototype.render = function () {
@@ -179,10 +195,18 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         };
         // _renderScreenshotPanel
         Screenshot.prototype._renderScreenshotPanel = function () {
+            var _a;
             var screenshotTitle = i18n.screenshotTitle, screenshotSubtitle = i18n.screenshotSubtitle, setScreenshotArea = i18n.setScreenshotArea, selectAFeature = i18n.selectAFeature, legend = i18n.legend, popup = i18n.popup;
+            var alertIsActive = (_a = {},
+                _a["is-active"] = this._selectFeatureAlertIsVisible,
+                _a);
             return (
             // screenshotBtn
             widget_1.tsx("div", { key: "screenshot-panel", class: CSS.mainContainer },
+                this._selectFeatureAlertIsVisible ? (widget_1.tsx("div", { key: "feature-alert", class: this.classes("alert", "alert-green", "modifier-class", alertIsActive) },
+                    i18n.selectAFeature,
+                    widget_1.tsx("button", { bind: this, onclick: this._removeSelectFeatureAlert, onkeydown: this._removeSelectFeatureAlert, class: "alert-close" },
+                        widget_1.tsx("span", { class: "icon-ui-close" })))) : null,
                 widget_1.tsx("h1", { class: CSS.panelTitle }, screenshotTitle),
                 this.legendIncludedInScreenshot || this.popupIncludedInScreenshot ? (widget_1.tsx("h3", { class: CSS.panelSubTitle }, screenshotSubtitle)) : null,
                 this.legendIncludedInScreenshot || this.popupIncludedInScreenshot ? (widget_1.tsx("fieldset", { class: CSS.fieldsetCheckbox },
@@ -213,6 +237,11 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             return (widget_1.tsx("div", { bind: this, class: this.classes(CSS.maskDiv, maskDivIsHidden), afterCreate: widget_1.storeNode, "data-node-ref": "_maskNode" }));
         };
         // End of render node methods
+        Screenshot.prototype._removeSelectFeatureAlert = function () {
+            this._selectFeatureAlertIsVisible = false;
+            console.log(this._selectFeatureAlertIsVisible);
+            this.scheduleRender();
+        };
         // _watchMapComponentSelectors
         Screenshot.prototype._watchMapComponentSelectors = function () {
             var _this = this;

@@ -333,7 +333,8 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                     group: screenshotGroup,
                     content: this.screenshot,
                     mode: "floating",
-                    expandTooltip: this.screenshot.label
+                    expandTooltip: this.screenshot.label,
+                    expanded: true
                 });
                 this.screenshot.expandWidget = screenshotExpand;
                 watchUtils.watch(view, "popup.visible", function () {

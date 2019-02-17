@@ -93,6 +93,7 @@ class Screenshot extends declared(Widget) {
   private _screenshotImgNode: HTMLImageElement = null;
   private _downloadBtnNode: HTMLButtonElement = null;
   private _activeScreenshotBtnNode: HTMLButtonElement = null;
+  private _selectFeatureAlertIsVisible: boolean = null;
 
   // _popupIsIncluded
   private _popupIsIncluded: boolean = null;
@@ -164,7 +165,20 @@ class Screenshot extends declared(Widget) {
   }
 
   postInitialize() {
-    this.own([this._watchMapComponentSelectors(), this._watchPopups()]);
+    this.own([
+      this._watchMapComponentSelectors(),
+      this._watchPopups(),
+      watchUtils.watch(this, "popupScreenshotEnabled", () => {
+        if (this.popupScreenshotEnabled && this.popupIncludedInScreenshot) {
+          if (!this.view.popup.visible) {
+            this._selectFeatureAlertIsVisible = true;
+          } else {
+            this._selectFeatureAlertIsVisible = false;
+          }
+          this.scheduleRender();
+        }
+      })
+    ]);
     this._handleExpandWidget();
   }
 
@@ -318,9 +332,35 @@ class Screenshot extends declared(Widget) {
       legend,
       popup
     } = i18n;
+
+    const alertIsActive = {
+      ["is-active"]: this._selectFeatureAlertIsVisible
+    };
     return (
       // screenshotBtn
       <div key="screenshot-panel" class={CSS.mainContainer}>
+        {this._selectFeatureAlertIsVisible ? (
+          <div
+            key="feature-alert"
+            class={this.classes(
+              "alert",
+              "alert-green",
+              "modifier-class",
+              alertIsActive
+            )}
+          >
+            {i18n.selectAFeature}
+            <button
+              bind={this}
+              onclick={this._removeSelectFeatureAlert}
+              onkeydown={this._removeSelectFeatureAlert}
+              class="alert-close"
+            >
+              <span class="icon-ui-close" />
+            </button>
+          </div>
+        ) : null}
+
         <h1 class={CSS.panelTitle}>{screenshotTitle}</h1>
         {this.legendIncludedInScreenshot || this.popupIncludedInScreenshot ? (
           <h3 class={CSS.panelSubTitle}>{screenshotSubtitle}</h3>
@@ -398,6 +438,12 @@ class Screenshot extends declared(Widget) {
   }
 
   // End of render node methods
+
+  private _removeSelectFeatureAlert() {
+    this._selectFeatureAlertIsVisible = false;
+    console.log(this._selectFeatureAlertIsVisible);
+    this.scheduleRender();
+  }
 
   // _watchMapComponentSelectors
   private _watchMapComponentSelectors(): __esri.WatchHandle {
