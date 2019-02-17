@@ -16,7 +16,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "dojo/i18n!./Screenshot/nls/resources", "esri/widgets/Widget", "esri/core/accessorSupport/decorators", "esri/core/watchUtils", "esri/core/Handles", "esri/widgets/support/widget", "./Screenshot/ScreenshotViewModel"], function (require, exports, __extends, __decorate, i18n, Widget, decorators_1, watchUtils, Handles, widget_1, ScreenshotViewModel) {
+define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "dojo/i18n!./Screenshot/nls/resources", "esri/widgets/Widget", "esri/core/accessorSupport/decorators", "esri/core/watchUtils", "esri/widgets/Feature", "esri/core/Handles", "esri/widgets/support/widget", "./Screenshot/ScreenshotViewModel"], function (require, exports, __extends, __decorate, i18n, Widget, decorators_1, watchUtils, Feature, Handles, widget_1, ScreenshotViewModel) {
     "use strict";
     //----------------------------------
     //
@@ -52,7 +52,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         closeIcon: "icon-ui-close",
         fieldsetCheckbox: "fieldset-checkbox",
         button: "btn",
-        buttonRed: "btn-red"
+        buttonRed: "btn-red",
+        alert: "alert",
+        greenAlert: "alert-green",
+        alertClose: "alert-close"
     };
     var Screenshot = /** @class */ (function (_super) {
         __extends(Screenshot, _super);
@@ -98,7 +101,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this.legendIncludedInScreenshot = null;
             // popupIncludedInScreenshot
             _this.popupIncludedInScreenshot = null;
-            _this.featureWidget = null;
+            _this.featureWidget = new Feature();
             _this.expandWidget = null;
             // viewModel
             _this.viewModel = new ScreenshotViewModel();
@@ -109,16 +112,20 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             this.own([
                 this._watchMapComponentSelectors(),
                 this._watchPopups(),
-                watchUtils.watch(this, "popupScreenshotEnabled", function () {
-                    if (_this.popupScreenshotEnabled && _this.popupIncludedInScreenshot) {
-                        if (!_this.view.popup.visible) {
-                            _this._selectFeatureAlertIsVisible = true;
+                watchUtils.when(this, "featureWidget", function () {
+                    watchUtils.watch(_this, "popupScreenshotEnabled", function () {
+                        if (_this.popupScreenshotEnabled && _this.popupIncludedInScreenshot) {
+                            watchUtils.init(_this, "featureWidget.graphic", function () {
+                                if (!_this.featureWidget.graphic) {
+                                    _this._selectFeatureAlertIsVisible = true;
+                                }
+                                else {
+                                    _this._selectFeatureAlertIsVisible = false;
+                                }
+                                _this.scheduleRender();
+                            });
                         }
-                        else {
-                            _this._selectFeatureAlertIsVisible = false;
-                        }
-                        _this.scheduleRender();
-                    }
+                    });
                 })
             ]);
             this._handleExpandWidget();
@@ -203,10 +210,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             return (
             // screenshotBtn
             widget_1.tsx("div", { key: "screenshot-panel", class: CSS.mainContainer },
-                this._selectFeatureAlertIsVisible ? (widget_1.tsx("div", { key: "feature-alert", class: this.classes("alert", "alert-green", "modifier-class", alertIsActive) },
+                this._selectFeatureAlertIsVisible ? (widget_1.tsx("div", { key: "feature-alert", class: this.classes(CSS.alert, CSS.greenAlert, CSS.modifierClass, alertIsActive) },
                     i18n.selectAFeature,
-                    widget_1.tsx("button", { bind: this, onclick: this._removeSelectFeatureAlert, onkeydown: this._removeSelectFeatureAlert, class: "alert-close" },
-                        widget_1.tsx("span", { class: "icon-ui-close" })))) : null,
+                    widget_1.tsx("button", { bind: this, onclick: this._removeSelectFeatureAlert, onkeydown: this._removeSelectFeatureAlert, class: CSS.alertClose },
+                        widget_1.tsx("span", { class: CSS.closeIcon })))) : null,
                 widget_1.tsx("h1", { class: CSS.panelTitle }, screenshotTitle),
                 this.legendIncludedInScreenshot || this.popupIncludedInScreenshot ? (widget_1.tsx("h3", { class: CSS.panelSubTitle }, screenshotSubtitle)) : null,
                 this.legendIncludedInScreenshot || this.popupIncludedInScreenshot ? (widget_1.tsx("fieldset", { class: CSS.fieldsetCheckbox },
@@ -222,11 +229,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                             ? this.featureWidget && this.featureWidget.graphic
                                 ? false
                                 : true
-                            : false, class: CSS.button }, this.popupIncludedInScreenshot && this.popupScreenshotEnabled
-                        ? this.featureWidget && this.featureWidget.graphic
-                            ? setScreenshotArea
-                            : selectAFeature
-                        : setScreenshotArea))));
+                            : false, class: CSS.button }, setScreenshotArea))));
         };
         // _renderMaskNode
         Screenshot.prototype._renderMaskNode = function (screenshotModeIsActive) {
@@ -237,11 +240,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             return (widget_1.tsx("div", { bind: this, class: this.classes(CSS.maskDiv, maskDivIsHidden), afterCreate: widget_1.storeNode, "data-node-ref": "_maskNode" }));
         };
         // End of render node methods
-        Screenshot.prototype._removeSelectFeatureAlert = function () {
-            this._selectFeatureAlertIsVisible = false;
-            console.log(this._selectFeatureAlertIsVisible);
-            this.scheduleRender();
-        };
         // _watchMapComponentSelectors
         Screenshot.prototype._watchMapComponentSelectors = function () {
             var _this = this;
@@ -345,6 +343,11 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 }
             }), expandWidgetKey);
         };
+        // _removeSelectFeatureAlert
+        Screenshot.prototype._removeSelectFeatureAlert = function () {
+            this._selectFeatureAlertIsVisible = false;
+            this.scheduleRender();
+        };
         __decorate([
             decorators_1.aliasOf("viewModel.view"),
             decorators_1.property()
@@ -402,6 +405,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         __decorate([
             widget_1.accessibleHandler()
         ], Screenshot.prototype, "_closePreview", null);
+        __decorate([
+            widget_1.accessibleHandler()
+        ], Screenshot.prototype, "_removeSelectFeatureAlert", null);
         Screenshot = __decorate([
             decorators_1.subclass("Screenshot")
         ], Screenshot);

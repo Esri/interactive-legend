@@ -523,8 +523,7 @@ class InteractiveLegendApp {
         group: screenshotGroup,
         content: this.screenshot,
         mode: "floating",
-        expandTooltip: this.screenshot.label,
-        expanded: true
+        expandTooltip: this.screenshot.label
       });
 
       this.screenshot.expandWidget = screenshotExpand;

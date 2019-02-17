@@ -77,7 +77,10 @@ const CSS = {
   closeIcon: "icon-ui-close",
   fieldsetCheckbox: "fieldset-checkbox",
   button: "btn",
-  buttonRed: "btn-red"
+  buttonRed: "btn-red",
+  alert: "alert",
+  greenAlert: "alert-green",
+  alertClose: "alert-close"
 };
 
 @subclass("Screenshot")
@@ -143,7 +146,7 @@ class Screenshot extends declared(Widget) {
   popupIncludedInScreenshot: boolean = null;
 
   @property()
-  featureWidget: Feature = null;
+  featureWidget = new Feature();
 
   @aliasOf("viewModel.expandWidget")
   @property()
@@ -168,15 +171,19 @@ class Screenshot extends declared(Widget) {
     this.own([
       this._watchMapComponentSelectors(),
       this._watchPopups(),
-      watchUtils.watch(this, "popupScreenshotEnabled", () => {
-        if (this.popupScreenshotEnabled && this.popupIncludedInScreenshot) {
-          if (!this.view.popup.visible) {
-            this._selectFeatureAlertIsVisible = true;
-          } else {
-            this._selectFeatureAlertIsVisible = false;
+      watchUtils.when(this, "featureWidget", () => {
+        watchUtils.watch(this, "popupScreenshotEnabled", () => {
+          if (this.popupScreenshotEnabled && this.popupIncludedInScreenshot) {
+            watchUtils.init(this, "featureWidget.graphic", () => {
+              if (!this.featureWidget.graphic) {
+                this._selectFeatureAlertIsVisible = true;
+              } else {
+                this._selectFeatureAlertIsVisible = false;
+              }
+              this.scheduleRender();
+            });
           }
-          this.scheduleRender();
-        }
+        });
       })
     ]);
     this._handleExpandWidget();
@@ -343,9 +350,9 @@ class Screenshot extends declared(Widget) {
           <div
             key="feature-alert"
             class={this.classes(
-              "alert",
-              "alert-green",
-              "modifier-class",
+              CSS.alert,
+              CSS.greenAlert,
+              CSS.modifierClass,
               alertIsActive
             )}
           >
@@ -354,9 +361,9 @@ class Screenshot extends declared(Widget) {
               bind={this}
               onclick={this._removeSelectFeatureAlert}
               onkeydown={this._removeSelectFeatureAlert}
-              class="alert-close"
+              class={CSS.alertClose}
             >
-              <span class="icon-ui-close" />
+              <span class={CSS.closeIcon} />
             </button>
           </div>
         ) : null}
@@ -411,11 +418,7 @@ class Screenshot extends declared(Widget) {
             }
             class={CSS.button}
           >
-            {this.popupIncludedInScreenshot && this.popupScreenshotEnabled
-              ? this.featureWidget && this.featureWidget.graphic
-                ? setScreenshotArea
-                : selectAFeature
-              : setScreenshotArea}
+            {setScreenshotArea}
           </button>
         </div>
       </div>
@@ -438,12 +441,6 @@ class Screenshot extends declared(Widget) {
   }
 
   // End of render node methods
-
-  private _removeSelectFeatureAlert() {
-    this._selectFeatureAlertIsVisible = false;
-    console.log(this._selectFeatureAlertIsVisible);
-    this.scheduleRender();
-  }
 
   // _watchMapComponentSelectors
   private _watchMapComponentSelectors(): __esri.WatchHandle {
@@ -570,6 +567,12 @@ class Screenshot extends declared(Widget) {
       }),
       expandWidgetKey
     );
+  }
+  // _removeSelectFeatureAlert
+  @accessibleHandler()
+  private _removeSelectFeatureAlert(): void {
+    this._selectFeatureAlertIsVisible = false;
+    this.scheduleRender();
   }
 }
 
