@@ -454,11 +454,12 @@ class InteractiveLegendApp {
       config
     });
 
-    document.querySelector(".parent-container").prepend(header.container);
-
     const parentContainer = document.querySelector(
       ".parent-container"
     ) as HTMLElement;
+
+    parentContainer.prepend(header.container);
+
     const parentContainerHeight = parentContainer.offsetHeight;
     const headerContainer = header.container as HTMLElement;
     const headerContainerHeight = headerContainer.offsetHeight;

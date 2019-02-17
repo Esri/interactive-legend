@@ -287,8 +287,8 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 container: container,
                 config: config
             });
-            document.querySelector(".parent-container").prepend(header.container);
             var parentContainer = document.querySelector(".parent-container");
+            parentContainer.prepend(header.container);
             var parentContainerHeight = parentContainer.offsetHeight;
             var headerContainer = header.container;
             var headerContainerHeight = headerContainer.offsetHeight;
