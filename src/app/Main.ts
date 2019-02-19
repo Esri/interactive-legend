@@ -368,6 +368,7 @@ class InteractiveLegendApp {
                 secondOnboardingWelcomeMessage,
                 thirdOnboardingWelcomeMessage
               } = i18nInteractiveLegend;
+
               const screenshotSteps = [
                 onboardingPanelScreenshotStepOne,
                 onboardingPanelScreenshotStepTwo,
@@ -457,13 +458,14 @@ class InteractiveLegendApp {
       config
     });
 
-    document.querySelector(".parent-container").prepend(header.container);
-
     const parentContainer = document.querySelector(
       ".parent-container"
     ) as HTMLElement;
-    const parentContainerHeight = parentContainer.offsetHeight;
+
     const headerContainer = header.container as HTMLElement;
+
+    parentContainer.insertBefore(headerContainer, parentContainer.firstChild);
+    const parentContainerHeight = parentContainer.offsetHeight;
     const headerContainerHeight = headerContainer.offsetHeight;
     const hcProportion = headerContainerHeight * 100;
     const hcHeightPercentage = parseFloat(

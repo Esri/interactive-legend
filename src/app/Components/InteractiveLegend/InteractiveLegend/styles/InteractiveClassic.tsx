@@ -831,7 +831,7 @@ class InteractiveClassic extends declared(Widget) {
         field &&
         featureLayerData &&
         !isSizeRamp) ||
-      isPredominance
+      (isPredominance && !isSizeRamp)
         ? selectedRow
         : null;
     if (featureLayerData && featureLayerData.applyStyles === null) {
@@ -848,7 +848,7 @@ class InteractiveClassic extends declared(Widget) {
               featureLayerData &&
               !isSizeRamp &&
               elementInfo.hasOwnProperty("value"))) ||
-          isPredominance
+          (isPredominance && !isSizeRamp)
             ? applySelect
             : null
         }
@@ -860,7 +860,7 @@ class InteractiveClassic extends declared(Widget) {
             featureLayerData &&
             !isSizeRamp &&
             elementInfo.hasOwnProperty("value")) ||
-            isPredominance)
+            (isPredominance && !isSizeRamp))
             ? 0
             : -1
         }
@@ -880,7 +880,7 @@ class InteractiveClassic extends declared(Widget) {
               field &&
               featureLayerData &&
               !isSizeRamp) ||
-            isPredominance
+            (isPredominance && !isSizeRamp)
           ) {
             this._handleFilterOption(
               event,
@@ -906,7 +906,7 @@ class InteractiveClassic extends declared(Widget) {
               field &&
               featureLayerData &&
               !isSizeRamp) ||
-            isPredominance
+            (isPredominance && !isSizeRamp)
           ) {
             this._handleFilterOption(
               event,

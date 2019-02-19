@@ -495,7 +495,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 field &&
                 featureLayerData &&
                 !isSizeRamp) ||
-                isPredominance
+                (isPredominance && !isSizeRamp)
                 ? selectedRow
                 : null;
             if (featureLayerData && featureLayerData.applyStyles === null) {
@@ -507,7 +507,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         featureLayerData &&
                         !isSizeRamp &&
                         elementInfo.hasOwnProperty("value"))) ||
-                    isPredominance
+                    (isPredominance && !isSizeRamp)
                     ? applySelect
                     : null, tabIndex: activeLayerInfo.layer.type === "feature" &&
                     !this.offscreen &&
@@ -516,7 +516,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         featureLayerData &&
                         !isSizeRamp &&
                         elementInfo.hasOwnProperty("value")) ||
-                        isPredominance)
+                        (isPredominance && !isSizeRamp))
                     ? 0
                     : -1, "data-legend-index": "" + legendElementIndex, "data-child-index": "" + legendInfoIndex, "data-layer-id": "" + activeLayerInfo.layer.id, onclick: function (event) {
                     if ((!isRelationship &&
@@ -530,8 +530,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         field &&
                         featureLayerData &&
                         !isSizeRamp) ||
-                        isPredominance) {
-                        _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos);
+                        (isPredominance && !isSizeRamp)) {
+                        _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos);
                     }
                 }, onkeydown: function (event) {
                     if ((!isRelationship &&
@@ -544,8 +544,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         field &&
                         featureLayerData &&
                         !isSizeRamp) ||
-                        isPredominance) {
-                        _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos);
+                        (isPredominance && !isSizeRamp)) {
+                        _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos);
                     }
                 } },
                 widget_1.tsx("div", { class: applySelect
