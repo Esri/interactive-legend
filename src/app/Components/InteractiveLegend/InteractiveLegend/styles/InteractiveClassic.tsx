@@ -228,6 +228,14 @@ class InteractiveClassic extends declared(Widget) {
   @property()
   selectedStyleData: Collection<SelectedStyleData> = new Collection();
 
+  @aliasOf("viewModel.opacity")
+  @property()
+  opacity: number = null;
+
+  @aliasOf("viewModel.grayScale")
+  @property()
+  grayScale: number = null;
+
   // viewModel
   @renderable(["viewModel.state"])
   @property({

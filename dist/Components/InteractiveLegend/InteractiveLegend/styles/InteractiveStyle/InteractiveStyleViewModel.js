@@ -56,7 +56,12 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             _this.layerListViewModel = new LayerListViewModel();
             // searchExpressions
             _this.searchExpressions = new Collection();
+            // searchViewModel
             _this.searchViewModel = null;
+            // opacity
+            _this.opacity = null;
+            // grayScale
+            _this.grayScale = null;
             return _this;
         }
         Object.defineProperty(InteractiveStyleViewModel.prototype, "state", {
@@ -166,9 +171,11 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 }
                 var featureLayerView = this.featureLayerViews.getItemAt(operationalItemIndex);
                 var filterExpression = queryExpressions.join(" OR ");
+                var opacity = this.opacity ? this.opacity : 30;
+                var grayScale = this.grayScale ? this.grayScale : 100;
                 this._setSearchExpression(filterExpression);
                 featureLayerView.effect = new FeatureEffect({
-                    outsideEffect: "opacity(30%) grayscale(100%)",
+                    outsideEffect: "opacity(" + opacity + "%) grayscale(" + grayScale + "%)",
                     filter: {
                         where: filterExpression
                     }
@@ -456,9 +463,11 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
             var featureLayerView = this.featureLayerViews.getItemAt(operationalItemIndex);
             var filterExpression = queryExpressions.join(" OR ");
+            var opacity = this.opacity ? this.opacity : 30;
+            var grayScale = this.grayScale ? this.grayScale : 100;
             this._setSearchExpression(filterExpression);
             featureLayerView.effect = new FeatureEffect({
-                outsideEffect: "opacity(30%) grayscale(100%)",
+                outsideEffect: "opacity(" + opacity + "%) grayscale(" + grayScale + "%)",
                 filter: {
                     where: filterExpression
                 }
@@ -470,9 +479,11 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
             var featureLayerView = this.featureLayerViews.getItemAt(operationalItemIndex);
             var filterExpression = queryExpressions.join(" OR ");
+            var opacity = this.opacity ? this.opacity : 30;
+            var grayScale = this.grayScale ? this.grayScale : 100;
             this._setSearchExpression(filterExpression);
             featureLayerView.effect = new FeatureEffect({
-                outsideEffect: "opacity(30%) grayscale(100%)",
+                outsideEffect: "opacity(" + opacity + "%) grayscale(" + grayScale + "%)",
                 filter: {
                     where: filterExpression
                 }
@@ -537,6 +548,12 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         __decorate([
             decorators_1.property()
         ], InteractiveStyleViewModel.prototype, "searchViewModel", void 0);
+        __decorate([
+            decorators_1.property()
+        ], InteractiveStyleViewModel.prototype, "opacity", void 0);
+        __decorate([
+            decorators_1.property()
+        ], InteractiveStyleViewModel.prototype, "grayScale", void 0);
         InteractiveStyleViewModel = __decorate([
             decorators_1.subclass("InteractiveStyleViewModel")
         ], InteractiveStyleViewModel);

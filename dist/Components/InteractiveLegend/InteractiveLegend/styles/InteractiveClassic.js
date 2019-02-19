@@ -137,6 +137,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this.searchViewModel = null;
             // selectedStyleData
             _this.selectedStyleData = new Collection();
+            _this.opacity = null;
+            _this.grayScale = null;
             // viewModel
             _this.viewModel = new InteractiveStyleViewModel();
             _this.onboardingPanelEnabled = null;
@@ -753,6 +755,14 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         __decorate([
             decorators_1.property()
         ], InteractiveClassic.prototype, "selectedStyleData", void 0);
+        __decorate([
+            decorators_1.aliasOf("viewModel.opacity"),
+            decorators_1.property()
+        ], InteractiveClassic.prototype, "opacity", void 0);
+        __decorate([
+            decorators_1.aliasOf("viewModel.grayScale"),
+            decorators_1.property()
+        ], InteractiveClassic.prototype, "grayScale", void 0);
         __decorate([
             widget_1.renderable(["viewModel.state"]),
             decorators_1.property({

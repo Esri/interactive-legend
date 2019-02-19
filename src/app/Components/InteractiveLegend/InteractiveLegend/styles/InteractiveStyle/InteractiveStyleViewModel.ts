@@ -129,8 +129,17 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   @property()
   searchExpressions: Collection<string> = new Collection();
 
+  // searchViewModel
   @property()
-  searchViewModel = null;
+  searchViewModel: any = null;
+
+  // opacity
+  @property()
+  opacity: number = null;
+
+  // grayScale
+  @property()
+  grayScale: number = null;
 
   //----------------------------------
   //
@@ -273,9 +282,11 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         operationalItemIndex
       );
       const filterExpression = queryExpressions.join(" OR ");
+      const opacity = this.opacity ? this.opacity : 30;
+      const grayScale = this.grayScale ? this.grayScale : 100;
       this._setSearchExpression(filterExpression);
       featureLayerView.effect = new FeatureEffect({
-        outsideEffect: "opacity(30%) grayscale(100%)",
+        outsideEffect: `opacity(${opacity}%) grayscale(${grayScale}%)`,
         filter: {
           where: filterExpression
         }
@@ -736,10 +747,11 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       operationalItemIndex
     );
     const filterExpression = queryExpressions.join(" OR ");
+    const opacity = this.opacity ? this.opacity : 30;
+    const grayScale = this.grayScale ? this.grayScale : 100;
     this._setSearchExpression(filterExpression);
-
     featureLayerView.effect = new FeatureEffect({
-      outsideEffect: "opacity(30%) grayscale(100%)",
+      outsideEffect: `opacity(${opacity}%) grayscale(${grayScale}%)`,
       filter: {
         where: filterExpression
       }
@@ -770,9 +782,11 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       operationalItemIndex
     );
     const filterExpression = queryExpressions.join(" OR ");
+    const opacity = this.opacity ? this.opacity : 30;
+    const grayScale = this.grayScale ? this.grayScale : 100;
     this._setSearchExpression(filterExpression);
     featureLayerView.effect = new FeatureEffect({
-      outsideEffect: "opacity(30%) grayscale(100%)",
+      outsideEffect: `opacity(${opacity}%) grayscale(${grayScale}%)`,
       filter: {
         where: filterExpression
       }
