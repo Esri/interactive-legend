@@ -80,7 +80,8 @@ const CSS = {
   buttonRed: "btn-red",
   alert: "alert",
   greenAlert: "alert-green",
-  alertClose: "alert-close"
+  alertClose: "alert-close",
+  popupAlert: "esri-screenshot_popup-alert"
 };
 
 @subclass("Screenshot")
@@ -172,18 +173,24 @@ class Screenshot extends declared(Widget) {
       this._watchMapComponentSelectors(),
       this._watchPopups(),
       watchUtils.when(this, "featureWidget", () => {
-        watchUtils.watch(this, "popupScreenshotEnabled", () => {
-          if (this.popupScreenshotEnabled && this.popupIncludedInScreenshot) {
-            watchUtils.init(this, "featureWidget.graphic", () => {
-              if (!this.featureWidget.graphic) {
-                this._selectFeatureAlertIsVisible = true;
-              } else {
-                this._selectFeatureAlertIsVisible = false;
-              }
-              this.scheduleRender();
-            });
-          }
-        });
+        this.own([
+          watchUtils.watch(this, "popupScreenshotEnabled", () => {
+            if (this.popupScreenshotEnabled && this.popupIncludedInScreenshot) {
+              this.own([
+                watchUtils.init(this, "featureWidget.graphic", () => {
+                  if (!this.featureWidget.graphic) {
+                    this._selectFeatureAlertIsVisible = true;
+                  } else {
+                    this._selectFeatureAlertIsVisible = false;
+                  }
+                })
+              ]);
+            } else {
+              this._selectFeatureAlertIsVisible = false;
+            }
+            this.scheduleRender();
+          })
+        ]);
       })
     ]);
     this._handleExpandWidget();
@@ -345,11 +352,12 @@ class Screenshot extends declared(Widget) {
     };
     return (
       // screenshotBtn
-      <div key="screenshot-panel" class={CSS.mainContainer}>
+      <div key="screenshot-panel" class={CSS.base}>
         {this._selectFeatureAlertIsVisible ? (
           <div
             key="feature-alert"
             class={this.classes(
+              CSS.popupAlert,
               CSS.alert,
               CSS.greenAlert,
               CSS.modifierClass,
@@ -367,59 +375,60 @@ class Screenshot extends declared(Widget) {
             </button>
           </div>
         ) : null}
-
-        <h1 class={CSS.panelTitle}>{screenshotTitle}</h1>
-        {this.legendIncludedInScreenshot || this.popupIncludedInScreenshot ? (
-          <h3 class={CSS.panelSubTitle}>{screenshotSubtitle}</h3>
-        ) : null}
-        {this.legendIncludedInScreenshot || this.popupIncludedInScreenshot ? (
-          <fieldset class={CSS.fieldsetCheckbox}>
-            {this.legendIncludedInScreenshot ? (
-              <label class={CSS.screenshotOption}>
-                {" "}
-                <input
-                  bind={this}
-                  onclick={this._toggleLegend}
-                  onkeydown={this._toggleLegend}
-                  checked={this.legendScreenshotEnabled}
-                  type="checkbox"
-                />
-                {legend}
-              </label>
-            ) : null}
-            {this.popupIncludedInScreenshot ? (
-              <label class={CSS.screenshotOption}>
-                <input
-                  bind={this}
-                  onclick={this._togglePopup}
-                  onkeydown={this._togglePopup}
-                  type="checkbox"
-                  checked={this.popupScreenshotEnabled}
-                />
-                {popup}
-              </label>
-            ) : null}
-          </fieldset>
-        ) : null}
-        <div class={CSS.buttonContainer}>
-          <button
-            bind={this}
-            tabIndex={0}
-            onclick={this.activateScreenshot}
-            onkeydown={this.activateScreenshot}
-            afterCreate={storeNode}
-            data-node-ref="_activeScreenshotBtnNode"
-            disabled={
-              this.popupIncludedInScreenshot && this.popupScreenshotEnabled
-                ? this.featureWidget && this.featureWidget.graphic
-                  ? false
-                  : true
-                : false
-            }
-            class={CSS.button}
-          >
-            {setScreenshotArea}
-          </button>
+        <div class={CSS.mainContainer}>
+          <h1 class={CSS.panelTitle}>{screenshotTitle}</h1>
+          {this.legendIncludedInScreenshot || this.popupIncludedInScreenshot ? (
+            <h3 class={CSS.panelSubTitle}>{screenshotSubtitle}</h3>
+          ) : null}
+          {this.legendIncludedInScreenshot || this.popupIncludedInScreenshot ? (
+            <fieldset class={CSS.fieldsetCheckbox}>
+              {this.legendIncludedInScreenshot ? (
+                <label class={CSS.screenshotOption}>
+                  {" "}
+                  <input
+                    bind={this}
+                    onclick={this._toggleLegend}
+                    onkeydown={this._toggleLegend}
+                    checked={this.legendScreenshotEnabled}
+                    type="checkbox"
+                  />
+                  {legend}
+                </label>
+              ) : null}
+              {this.popupIncludedInScreenshot ? (
+                <label class={CSS.screenshotOption}>
+                  <input
+                    bind={this}
+                    onclick={this._togglePopup}
+                    onkeydown={this._togglePopup}
+                    type="checkbox"
+                    checked={this.popupScreenshotEnabled}
+                  />
+                  {popup}
+                </label>
+              ) : null}
+            </fieldset>
+          ) : null}
+          <div class={CSS.buttonContainer}>
+            <button
+              bind={this}
+              tabIndex={0}
+              onclick={this.activateScreenshot}
+              onkeydown={this.activateScreenshot}
+              afterCreate={storeNode}
+              data-node-ref="_activeScreenshotBtnNode"
+              disabled={
+                this.popupIncludedInScreenshot && this.popupScreenshotEnabled
+                  ? this.featureWidget && this.featureWidget.graphic
+                    ? false
+                    : true
+                  : false
+              }
+              class={CSS.button}
+            >
+              {setScreenshotArea}
+            </button>
+          </div>
         </div>
       </div>
     );

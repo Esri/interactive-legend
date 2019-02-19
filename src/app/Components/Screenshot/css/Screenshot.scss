@@ -1,6 +1,8 @@
 .esri-screenshot {
+  padding-top: 1%;
+
   .esri-screenshot__main-container {
-    padding: 5% 6%;
+    padding: 1% 5% 6%;
     width: 300px;
 
     .esri-screenshot__panel-title {
@@ -63,6 +65,10 @@
   cursor: not-allowed;
 }
 
+.esri-screenshot_popup-alert {
+  width: 95%;
+  margin: 0 auto;
+}
 
 
 
