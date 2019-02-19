@@ -179,7 +179,9 @@ class InteractiveLegendApp {
       interactiveLegendPosition,
       filterMode,
       highlightShade,
-      mutedShade
+      mutedShade,
+      muteOpacity,
+      muteGrayScale
     } = config;
 
     const { webMapItems } = results;
@@ -297,9 +299,10 @@ class InteractiveLegendApp {
               style: defaultStyle,
               filterMode: defaultMode,
               layerListViewModel,
-              onboardingPanelEnabled
+              onboardingPanelEnabled,
+              opacity: muteOpacity,
+              grayScale: muteGrayScale
             });
-
             const offScreenInteractiveLegend = new InteractiveLegend({
               view,
               container: document.querySelector(

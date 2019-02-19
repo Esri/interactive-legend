@@ -231,11 +231,6 @@ interface SizeRampStop {
 interface InteractiveStyleData {
   queryExpressions: string[][];
   highlightedFeatures: any[][];
-  originalRenderers: any[];
-  originalColors: Color[][];
-  colorIndexes: number[][];
-  mutedValues: any[][];
-  classBreakInfosIndex: number[][];
 }
 
 interface ActiveLayerInfoProps extends ActiveLayerInfo {
