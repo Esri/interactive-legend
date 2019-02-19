@@ -41,8 +41,14 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         stepNumberContainer: "esri-info__number-container",
         stepNumber: "esri-info__number",
         explanationItem: "esri-info__explanation-item",
+        contentContainer: "esri-info__content-container",
+        lastPageButtons: "esri-info__last-page-button-container",
+        backButtonContainer: "esri-info__back-button-container",
+        closeButtonContainer: "esri-info__close-button-container",
         calciteStyles: {
-            btn: "btn"
+            btn: "btn",
+            btnHalf: "btn-half",
+            btnClear: "btn-clear"
         },
         icons: {
             widgetIcon: "icon-ui-question"
@@ -97,16 +103,23 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             ]);
         };
         Info.prototype.render = function () {
+            var back = i18n.back;
             var content = this._renderContent();
             var paginationNodes = this.infoContent.length > 1 ? this._generatePaginationNodes() : null;
             return (widget_1.tsx("div", { class: this.classes(CSS.widget, CSS.base) },
                 paginationNodes ? (widget_1.tsx("div", { class: CSS.paginationContainer }, paginationNodes)) : null,
-                widget_1.tsx("div", { class: CSS.titleContainer },
-                    widget_1.tsx("h1", null, this.infoContent[this.selectedItemIndex].title)),
-                widget_1.tsx("div", { class: CSS.infoContent }, content),
-                paginationNodes && this.selectedItemIndex !== 0 ? (widget_1.tsx("div", { key: "previous-page", class: CSS.back },
-                    widget_1.tsx("span", { bind: this, onclick: this._previousPage, onkeydown: this._previousPage, tabIndex: 0, class: CSS.backText, title: i18n.back }, i18n.back))) : null,
-                widget_1.tsx("div", { class: CSS.buttonContainer }, this.selectedItemIndex !== this.infoContent.length - 1 ? (widget_1.tsx("button", { bind: this, onclick: this._nextPage, onkeydown: this._nextPage, tabIndex: 0, class: this.classes(CSS.nextButton, CSS.calciteStyles.btn), title: i18n.next }, i18n.next)) : (widget_1.tsx("button", { bind: this, onclick: this._closeInfoPanel, onkeydown: this._closeInfoPanel, tabIndex: 0, class: this.classes(CSS.nextButton, CSS.calciteStyles.btn), title: i18n.close }, i18n.close)))));
+                widget_1.tsx("div", { class: CSS.contentContainer },
+                    widget_1.tsx("div", { class: CSS.titleContainer },
+                        widget_1.tsx("h1", null, this.infoContent[this.selectedItemIndex].title)),
+                    widget_1.tsx("div", { class: CSS.infoContent }, content)),
+                widget_1.tsx("div", { class: CSS.buttonContainer }, this.selectedItemIndex !== this.infoContent.length - 1 ? (widget_1.tsx("button", { bind: this, onclick: this._nextPage, onkeydown: this._nextPage, tabIndex: 0, class: this.classes(CSS.nextButton, CSS.calciteStyles.btn), title: i18n.next }, i18n.next)) : (widget_1.tsx("div", { class: CSS.lastPageButtons },
+                    " ",
+                    widget_1.tsx("div", { class: CSS.backButtonContainer },
+                        widget_1.tsx("button", { bind: this, onclick: this._previousPage, onkeydown: this._previousPage, tabIndex: 0, class: this.classes(CSS.calciteStyles.btn, CSS.calciteStyles.btnClear), title: i18n.back },
+                            back.charAt(0).toUpperCase(),
+                            back.substring(1, i18n.back.length))),
+                    widget_1.tsx("div", { class: CSS.closeButtonContainer },
+                        widget_1.tsx("button", { bind: this, onclick: this._closeInfoPanel, onkeydown: this._closeInfoPanel, tabIndex: 0, class: CSS.calciteStyles.btn, title: i18n.close }, i18n.close)))))));
         };
         //   _renderContent
         Info.prototype._renderContent = function () {
@@ -138,10 +151,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             return (widget_1.tsx("li", { class: CSS.listItem },
                 widget_1.tsx("div", { class: CSS.stepNumberContainer },
                     widget_1.tsx("div", { class: CSS.stepNumber }, "" + (listItemIndex + 1))),
-                widget_1.tsx("div", { class: CSS.listItemTextContainer },
-                    widget_1.tsx("span", null, listItem))));
+                widget_1.tsx("div", { class: CSS.listItemTextContainer }, listItem)));
         };
-        //   _generateExplanationNode
         Info.prototype._generateExplanationNode = function (contentItem) {
             var _this = this;
             var explanationItemNodes = contentItem.infoContentItems.map(function (explanationItem, explanationItemIndex) {
@@ -149,11 +160,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             });
             return widget_1.tsx("div", null, explanationItemNodes);
         };
-        //   _generateExplanationItemNodes
         Info.prototype._generateExplanationItemNodes = function (explanationItem, explanationItemIndex) {
             return (widget_1.tsx("p", { key: explanationItemIndex, class: CSS.explanationItem }, explanationItem));
         };
-        //   _generatePaginationNodes
         Info.prototype._generatePaginationNodes = function () {
             var _this = this;
             this._paginationNodes = [];

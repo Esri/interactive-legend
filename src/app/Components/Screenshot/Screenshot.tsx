@@ -81,7 +81,8 @@ const CSS = {
   alert: "alert",
   greenAlert: "alert-green",
   alertClose: "alert-close",
-  popupAlert: "esri-screenshot_popup-alert"
+  popupAlert: "esri-screenshot__popup-alert",
+  screenshotfieldSetCheckbox: "esri-screenshot__field-set-checkbox"
 };
 
 @subclass("Screenshot")
@@ -381,7 +382,12 @@ class Screenshot extends declared(Widget) {
             <h3 class={CSS.panelSubTitle}>{screenshotSubtitle}</h3>
           ) : null}
           {this.legendIncludedInScreenshot || this.popupIncludedInScreenshot ? (
-            <fieldset class={CSS.fieldsetCheckbox}>
+            <fieldset
+              class={this.classes(
+                CSS.fieldsetCheckbox,
+                CSS.screenshotfieldSetCheckbox
+              )}
+            >
               {this.legendIncludedInScreenshot ? (
                 <label class={CSS.screenshotOption}>
                   {" "}
