@@ -16,7 +16,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "dojo/i18n!./Screenshot/nls/resources", "esri/widgets/Widget", "esri/core/accessorSupport/decorators", "esri/core/watchUtils", "esri/core/Handles", "esri/widgets/support/widget", "./Screenshot/ScreenshotViewModel"], function (require, exports, __extends, __decorate, i18n, Widget, decorators_1, watchUtils, Handles, widget_1, ScreenshotViewModel) {
+define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "dojo/i18n!./Screenshot/nls/resources", "esri/widgets/Widget", "esri/core/accessorSupport/decorators", "esri/core/watchUtils", "esri/widgets/Feature", "esri/core/Handles", "esri/widgets/support/widget", "./Screenshot/ScreenshotViewModel"], function (require, exports, __extends, __decorate, i18n, Widget, decorators_1, watchUtils, Feature, Handles, widget_1, ScreenshotViewModel) {
     "use strict";
     //----------------------------------
     //
@@ -52,7 +52,11 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         closeIcon: "icon-ui-close",
         fieldsetCheckbox: "fieldset-checkbox",
         button: "btn",
-        buttonRed: "btn-red"
+        buttonRed: "btn-red",
+        alert: "alert",
+        greenAlert: "alert-green",
+        alertClose: "alert-close",
+        popupAlert: "esri-screenshot_popup-alert"
     };
     var Screenshot = /** @class */ (function (_super) {
         __extends(Screenshot, _super);
@@ -73,6 +77,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this._screenshotImgNode = null;
             _this._downloadBtnNode = null;
             _this._activeScreenshotBtnNode = null;
+            _this._selectFeatureAlertIsVisible = null;
             // _popupIsIncluded
             _this._popupIsIncluded = null;
             _this._handles = new Handles();
@@ -97,14 +102,40 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this.legendIncludedInScreenshot = null;
             // popupIncludedInScreenshot
             _this.popupIncludedInScreenshot = null;
-            _this.featureWidget = null;
+            _this.featureWidget = new Feature();
             _this.expandWidget = null;
             // viewModel
             _this.viewModel = new ScreenshotViewModel();
             return _this;
         }
         Screenshot.prototype.postInitialize = function () {
-            this.own([this._watchMapComponentSelectors(), this._watchPopups()]);
+            var _this = this;
+            this.own([
+                this._watchMapComponentSelectors(),
+                this._watchPopups(),
+                watchUtils.when(this, "featureWidget", function () {
+                    _this.own([
+                        watchUtils.watch(_this, "popupScreenshotEnabled", function () {
+                            if (_this.popupScreenshotEnabled && _this.popupIncludedInScreenshot) {
+                                _this.own([
+                                    watchUtils.init(_this, "featureWidget.graphic", function () {
+                                        if (!_this.featureWidget.graphic) {
+                                            _this._selectFeatureAlertIsVisible = true;
+                                        }
+                                        else {
+                                            _this._selectFeatureAlertIsVisible = false;
+                                        }
+                                    })
+                                ]);
+                            }
+                            else {
+                                _this._selectFeatureAlertIsVisible = false;
+                            }
+                            _this.scheduleRender();
+                        })
+                    ]);
+                })
+            ]);
             this._handleExpandWidget();
         };
         Screenshot.prototype.render = function () {
@@ -179,30 +210,35 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         };
         // _renderScreenshotPanel
         Screenshot.prototype._renderScreenshotPanel = function () {
+            var _a;
             var screenshotTitle = i18n.screenshotTitle, screenshotSubtitle = i18n.screenshotSubtitle, setScreenshotArea = i18n.setScreenshotArea, selectAFeature = i18n.selectAFeature, legend = i18n.legend, popup = i18n.popup;
+            var alertIsActive = (_a = {},
+                _a["is-active"] = this._selectFeatureAlertIsVisible,
+                _a);
             return (
             // screenshotBtn
-            widget_1.tsx("div", { key: "screenshot-panel", class: CSS.mainContainer },
-                widget_1.tsx("h1", { class: CSS.panelTitle }, screenshotTitle),
-                this.legendIncludedInScreenshot || this.popupIncludedInScreenshot ? (widget_1.tsx("h3", { class: CSS.panelSubTitle }, screenshotSubtitle)) : null,
-                this.legendIncludedInScreenshot || this.popupIncludedInScreenshot ? (widget_1.tsx("fieldset", { class: CSS.fieldsetCheckbox },
-                    this.legendIncludedInScreenshot ? (widget_1.tsx("label", { class: CSS.screenshotOption },
-                        " ",
-                        widget_1.tsx("input", { bind: this, onclick: this._toggleLegend, onkeydown: this._toggleLegend, checked: this.legendScreenshotEnabled, type: "checkbox" }),
-                        legend)) : null,
-                    this.popupIncludedInScreenshot ? (widget_1.tsx("label", { class: CSS.screenshotOption },
-                        widget_1.tsx("input", { bind: this, onclick: this._togglePopup, onkeydown: this._togglePopup, type: "checkbox", checked: this.popupScreenshotEnabled }),
-                        popup)) : null)) : null,
-                widget_1.tsx("div", { class: CSS.buttonContainer },
-                    widget_1.tsx("button", { bind: this, tabIndex: 0, onclick: this.activateScreenshot, onkeydown: this.activateScreenshot, afterCreate: widget_1.storeNode, "data-node-ref": "_activeScreenshotBtnNode", disabled: this.popupIncludedInScreenshot && this.popupScreenshotEnabled
-                            ? this.featureWidget && this.featureWidget.graphic
-                                ? false
-                                : true
-                            : false, class: CSS.button }, this.popupIncludedInScreenshot && this.popupScreenshotEnabled
-                        ? this.featureWidget && this.featureWidget.graphic
-                            ? setScreenshotArea
-                            : selectAFeature
-                        : setScreenshotArea))));
+            widget_1.tsx("div", { key: "screenshot-panel", class: CSS.base },
+                this._selectFeatureAlertIsVisible ? (widget_1.tsx("div", { key: "feature-alert", class: this.classes(CSS.popupAlert, CSS.alert, CSS.greenAlert, CSS.modifierClass, alertIsActive) },
+                    i18n.selectAFeature,
+                    widget_1.tsx("button", { bind: this, onclick: this._removeSelectFeatureAlert, onkeydown: this._removeSelectFeatureAlert, class: CSS.alertClose },
+                        widget_1.tsx("span", { class: CSS.closeIcon })))) : null,
+                widget_1.tsx("div", { class: CSS.mainContainer },
+                    widget_1.tsx("h1", { class: CSS.panelTitle }, screenshotTitle),
+                    this.legendIncludedInScreenshot || this.popupIncludedInScreenshot ? (widget_1.tsx("h3", { class: CSS.panelSubTitle }, screenshotSubtitle)) : null,
+                    this.legendIncludedInScreenshot || this.popupIncludedInScreenshot ? (widget_1.tsx("fieldset", { class: CSS.fieldsetCheckbox },
+                        this.legendIncludedInScreenshot ? (widget_1.tsx("label", { class: CSS.screenshotOption },
+                            " ",
+                            widget_1.tsx("input", { bind: this, onclick: this._toggleLegend, onkeydown: this._toggleLegend, checked: this.legendScreenshotEnabled, type: "checkbox" }),
+                            legend)) : null,
+                        this.popupIncludedInScreenshot ? (widget_1.tsx("label", { class: CSS.screenshotOption },
+                            widget_1.tsx("input", { bind: this, onclick: this._togglePopup, onkeydown: this._togglePopup, type: "checkbox", checked: this.popupScreenshotEnabled }),
+                            popup)) : null)) : null,
+                    widget_1.tsx("div", { class: CSS.buttonContainer },
+                        widget_1.tsx("button", { bind: this, tabIndex: 0, onclick: this.activateScreenshot, onkeydown: this.activateScreenshot, afterCreate: widget_1.storeNode, "data-node-ref": "_activeScreenshotBtnNode", disabled: this.popupIncludedInScreenshot && this.popupScreenshotEnabled
+                                ? this.featureWidget && this.featureWidget.graphic
+                                    ? false
+                                    : true
+                                : false, class: CSS.button }, setScreenshotArea)))));
         };
         // _renderMaskNode
         Screenshot.prototype._renderMaskNode = function (screenshotModeIsActive) {
@@ -316,6 +352,11 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 }
             }), expandWidgetKey);
         };
+        // _removeSelectFeatureAlert
+        Screenshot.prototype._removeSelectFeatureAlert = function () {
+            this._selectFeatureAlertIsVisible = false;
+            this.scheduleRender();
+        };
         __decorate([
             decorators_1.aliasOf("viewModel.view"),
             decorators_1.property()
@@ -373,6 +414,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         __decorate([
             widget_1.accessibleHandler()
         ], Screenshot.prototype, "_closePreview", null);
+        __decorate([
+            widget_1.accessibleHandler()
+        ], Screenshot.prototype, "_removeSelectFeatureAlert", null);
         Screenshot = __decorate([
             decorators_1.subclass("Screenshot")
         ], Screenshot);

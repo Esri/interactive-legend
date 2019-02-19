@@ -287,10 +287,10 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 container: container,
                 config: config
             });
-            document.querySelector(".parent-container").prepend(header.container);
             var parentContainer = document.querySelector(".parent-container");
-            var parentContainerHeight = parentContainer.offsetHeight;
             var headerContainer = header.container;
+            parentContainer.insertBefore(headerContainer, parentContainer.firstChild);
+            var parentContainerHeight = parentContainer.offsetHeight;
             var headerContainerHeight = headerContainer.offsetHeight;
             var hcProportion = headerContainerHeight * 100;
             var hcHeightPercentage = parseFloat((hcProportion / parentContainerHeight).toFixed(4));

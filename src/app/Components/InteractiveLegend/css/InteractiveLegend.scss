@@ -91,30 +91,38 @@
 
 .esri-interactive-legend__onboarding-main-container {
   padding-bottom: 5%;
+  color: #4c4c4c;
 }
 
 .esri-interactive-legend__onboarding-content-container {
-  padding: 4% 7% 0% 7%;
+  padding: 0% 6%;
 }
 
 .esri-interactive-legend__onboarding-close-container {
   position: absolute;
-  right: 3px;
+  right: 10px;
+  top: 10px;
+  font-size: 13px;
 }
 
 .esri-interactive-legend__onboarding-close-container:hover {
   cursor: pointer;
 }
 
+.esri-interactive-legend__onboarding-title-container {
+  padding-top: 9%;
+}
+
 .esri-interactive-legend__onboarding-title-container h3 {
-  font-size: 1.29rem;
+  font-size: 1.3rem;
   margin: 3% 0;
-  text-align: center;
+  color: #0079c1;
 }
 
 .esri-interactive-legend__onboarding-info-container {
-  font-size: 17px;
+  font-size: 16px;
   line-height: 26px;
+  width: 95%;
 }
 
 .esri-interactive-legend__onboarding-button-container button {
