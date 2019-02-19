@@ -288,9 +288,9 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 config: config
             });
             var parentContainer = document.querySelector(".parent-container");
-            parentContainer.prepend(header.container);
-            var parentContainerHeight = parentContainer.offsetHeight;
             var headerContainer = header.container;
+            parentContainer.insertBefore(headerContainer, parentContainer.firstChild);
+            var parentContainerHeight = parentContainer.offsetHeight;
             var headerContainerHeight = headerContainer.offsetHeight;
             var hcProportion = headerContainerHeight * 100;
             var hcHeightPercentage = parseFloat((hcProportion / parentContainerHeight).toFixed(4));
