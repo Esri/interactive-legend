@@ -1,6 +1,6 @@
 .esri-info {
   min-width: 300px;
-  padding: 1% 5%;
+  padding: 3% 7%;
 
   .esri-info__pagination-container {
     margin: 5px auto;
@@ -31,15 +31,18 @@
   }
 
   .esri-info__title-container {
+    margin-bottom: 2vh;
+
     h1 {
-      font-size: 1.3rem;
-      text-align: center;
+      font-size: 20px;
+      color: #0079c1;
+      font-weight: 500;
     }
   }
 
   .esri-info__list {
     list-style-type: none;
-    padding-left: 3%;
+    padding-left: 0;
 
     .esri-info__list-item {
       margin-top: 3%;
@@ -51,15 +54,16 @@
         vertical-align: top;
 
         .esri-info__number {
-          background-color: #a9a9a9;
+          background-color: #959595;
           color: #fff;
-          height: 24px;
-          width: 24px;
+          height: 22px;
+          width: 22px;
           text-align: center;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
+          font-size: 10px;
 
         }
       }
@@ -69,6 +73,7 @@
         display: inline-block;
         position: relative;
         left: 10px;
+        font-size: 15px;
       }
 
     }
@@ -88,8 +93,7 @@
   }
 
   .esri-info__button-container {
-    width: 90%;
-    margin: 0 auto;
+    width: 100%;
 
     .esri-info__next {
       width: 100%;
@@ -98,12 +102,35 @@
   }
 
   .esri-info__explanation-item {
-    font-size: 1.1em;
+    font-size: 17px;
     line-height: 25px;
-    margin-bottom: 5px;
+    margin-bottom: 7%;
   }
 }
 
+.esri-info__last-page-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: 5vh;
+  margin-bottom: 0.5vh;
+
+  .esri-info__back-button-container,
+  .esri-info__close-button-container {
+    display: inline-block;
+    width: 48%;
+    margin: 0 auto;
+
+    button {
+      display: inline-block;
+      width: 100%;
+      margin: 0 auto;
+    }
+  }
+
+
+}
 
 .esri-collapse__icon.icon-ui-question {
   position: relative;
@@ -118,6 +145,10 @@ html[dir="rtl"] {
   .esri-info__number {
     position: relative;
     left: 20px;
+  }
+
+  .esri-info__list {
+    padding-right: 21px;
   }
 
 }

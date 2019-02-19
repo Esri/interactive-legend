@@ -7,15 +7,19 @@
 
     .esri-screenshot__panel-title {
       font-size: 1.2rem;
+      padding-top: 3%;
     }
 
     .esri-screenshot__panel-subtitle {
       font-size: 1.1em;
       color: #999;
+      margin-top: 5%;
+      margin-bottom: 5%;
     }
 
     .esri-screenshot__screenshot-option {
       font-size: 1.2rem;
+      margin-bottom: 4%;
     }
 
     .esri-screenshot__screenshot-button-container {
@@ -23,7 +27,7 @@
       justify-content: center;
 
       button {
-        width: 95%;
+        width: 100%;
       }
     }
   }
@@ -65,9 +69,13 @@
   cursor: not-allowed;
 }
 
-.esri-screenshot_popup-alert {
+.esri-screenshot__popup-alert {
   width: 95%;
   margin: 0 auto;
+}
+
+.esri-screenshot__field-set-checkbox {
+  margin-bottom: 7%;
 }
 
 

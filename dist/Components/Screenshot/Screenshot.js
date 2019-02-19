@@ -56,7 +56,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         alert: "alert",
         greenAlert: "alert-green",
         alertClose: "alert-close",
-        popupAlert: "esri-screenshot_popup-alert"
+        popupAlert: "esri-screenshot__popup-alert",
+        screenshotfieldSetCheckbox: "esri-screenshot__field-set-checkbox"
     };
     var Screenshot = /** @class */ (function (_super) {
         __extends(Screenshot, _super);
@@ -225,7 +226,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 widget_1.tsx("div", { class: CSS.mainContainer },
                     widget_1.tsx("h1", { class: CSS.panelTitle }, screenshotTitle),
                     this.legendIncludedInScreenshot || this.popupIncludedInScreenshot ? (widget_1.tsx("h3", { class: CSS.panelSubTitle }, screenshotSubtitle)) : null,
-                    this.legendIncludedInScreenshot || this.popupIncludedInScreenshot ? (widget_1.tsx("fieldset", { class: CSS.fieldsetCheckbox },
+                    this.legendIncludedInScreenshot || this.popupIncludedInScreenshot ? (widget_1.tsx("fieldset", { class: this.classes(CSS.fieldsetCheckbox, CSS.screenshotfieldSetCheckbox) },
                         this.legendIncludedInScreenshot ? (widget_1.tsx("label", { class: CSS.screenshotOption },
                             " ",
                             widget_1.tsx("input", { bind: this, onclick: this._toggleLegend, onkeydown: this._toggleLegend, checked: this.legendScreenshotEnabled, type: "checkbox" }),

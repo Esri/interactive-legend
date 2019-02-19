@@ -58,8 +58,14 @@ const CSS = {
   stepNumberContainer: "esri-info__number-container",
   stepNumber: "esri-info__number",
   explanationItem: "esri-info__explanation-item",
+  contentContainer: "esri-info__content-container",
+  lastPageButtons: "esri-info__last-page-button-container",
+  backButtonContainer: "esri-info__back-button-container",
+  closeButtonContainer: "esri-info__close-button-container",
   calciteStyles: {
-    btn: "btn"
+    btn: "btn",
+    btnHalf: "btn-half",
+    btnClear: "btn-clear"
   },
   icons: {
     widgetIcon: "icon-ui-question"
@@ -136,8 +142,9 @@ class Info extends declared(Widget) {
       })
     ]);
   }
-
   render() {
+    const back = i18n.back;
+
     const content = this._renderContent();
     const paginationNodes =
       this.infoContent.length > 1 ? this._generatePaginationNodes() : null;
@@ -146,12 +153,14 @@ class Info extends declared(Widget) {
         {paginationNodes ? (
           <div class={CSS.paginationContainer}>{paginationNodes}</div>
         ) : null}
-        <div class={CSS.titleContainer}>
-          <h1>{this.infoContent[this.selectedItemIndex].title}</h1>
+        <div class={CSS.contentContainer}>
+          <div class={CSS.titleContainer}>
+            <h1>{this.infoContent[this.selectedItemIndex].title}</h1>
+          </div>
+          <div class={CSS.infoContent}>{content}</div>
         </div>
-        <div class={CSS.infoContent}>{content}</div>
 
-        {paginationNodes && this.selectedItemIndex !== 0 ? (
+        {/* {paginationNodes && this.selectedItemIndex !== 0 ? (
           <div key="previous-page" class={CSS.back}>
             <span
               bind={this}
@@ -163,8 +172,9 @@ class Info extends declared(Widget) {
             >
               {i18n.back}
             </span>
+
           </div>
-        ) : null}
+        ) : null} */}
 
         <div class={CSS.buttonContainer}>
           {this.selectedItemIndex !== this.infoContent.length - 1 ? (
@@ -179,16 +189,37 @@ class Info extends declared(Widget) {
               {i18n.next}
             </button>
           ) : (
-            <button
-              bind={this}
-              onclick={this._closeInfoPanel}
-              onkeydown={this._closeInfoPanel}
-              tabIndex={0}
-              class={this.classes(CSS.nextButton, CSS.calciteStyles.btn)}
-              title={i18n.close}
-            >
-              {i18n.close}
-            </button>
+            <div class={CSS.lastPageButtons}>
+              {" "}
+              <div class={CSS.backButtonContainer}>
+                <button
+                  bind={this}
+                  onclick={this._previousPage}
+                  onkeydown={this._previousPage}
+                  tabIndex={0}
+                  class={this.classes(
+                    CSS.calciteStyles.btn,
+                    CSS.calciteStyles.btnClear
+                  )}
+                  title={i18n.back}
+                >
+                  {back.charAt(0).toUpperCase()}
+                  {back.substring(1, i18n.back.length)}
+                </button>
+              </div>
+              <div class={CSS.closeButtonContainer}>
+                <button
+                  bind={this}
+                  onclick={this._closeInfoPanel}
+                  onkeydown={this._closeInfoPanel}
+                  tabIndex={0}
+                  class={CSS.calciteStyles.btn}
+                  title={i18n.close}
+                >
+                  {i18n.close}
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </div>
@@ -229,14 +260,11 @@ class Info extends declared(Widget) {
         <div class={CSS.stepNumberContainer}>
           <div class={CSS.stepNumber}>{`${listItemIndex + 1}`}</div>
         </div>
-        <div class={CSS.listItemTextContainer}>
-          <span>{listItem}</span>
-        </div>
+        <div class={CSS.listItemTextContainer}>{listItem}</div>
       </li>
     );
   }
 
-  //   _generateExplanationNode
   private _generateExplanationNode(contentItem: any): any {
     const explanationItemNodes = contentItem.infoContentItems.map(
       (explanationItem, explanationItemIndex) => {
@@ -249,7 +277,6 @@ class Info extends declared(Widget) {
     return <div>{explanationItemNodes}</div>;
   }
 
-  //   _generateExplanationItemNodes
   private _generateExplanationItemNodes(
     explanationItem: string,
     explanationItemIndex: number
@@ -261,7 +288,6 @@ class Info extends declared(Widget) {
     );
   }
 
-  //   _generatePaginationNodes
   private _generatePaginationNodes(): any {
     this._paginationNodes = [];
     return this.infoContent.map((contentItem, contentItemIndex) => {

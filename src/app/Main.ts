@@ -365,6 +365,7 @@ class InteractiveLegendApp {
                 secondOnboardingWelcomeMessage,
                 thirdOnboardingWelcomeMessage
               } = i18nInteractiveLegend;
+
               const screenshotSteps = [
                 onboardingPanelScreenshotStepOne,
                 onboardingPanelScreenshotStepTwo,
