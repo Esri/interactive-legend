@@ -23,7 +23,7 @@
   "customHeaderEnabled": false,
   "headHTML": null,
   "splash": false,
-  "splashOnStart": true,
+  "splashOnStart": false,
   "splashTitle": "Splash start",
   "splashContent": "Splash content",
   "splashButtonText": "Okay",

@@ -531,7 +531,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         featureLayerData &&
                         !isSizeRamp) ||
                         (isPredominance && !isSizeRamp)) {
-                        _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos);
+                        _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos);
                     }
                 }, onkeydown: function (event) {
                     if ((!isRelationship &&
@@ -545,7 +545,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         featureLayerData &&
                         !isSizeRamp) ||
                         (isPredominance && !isSizeRamp)) {
-                        _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, isSizeRamp, legendElement, isPredominance, legendElementInfos);
+                        _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos);
                     }
                 } },
                 widget_1.tsx("div", { class: applySelect
