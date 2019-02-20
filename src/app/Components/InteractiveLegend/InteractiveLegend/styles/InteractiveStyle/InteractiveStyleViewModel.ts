@@ -282,8 +282,8 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         operationalItemIndex
       );
       const filterExpression = queryExpressions.join(" OR ");
-      const opacity = this.opacity ? this.opacity : 30;
-      const grayScale = this.grayScale ? this.grayScale : 100;
+      const opacity = this.opacity === null ? 30 : this.opacity;
+      const grayScale = this.grayScale === null ? 100 : this.grayScale;
       this._setSearchExpression(filterExpression);
       featureLayerView.effect = new FeatureEffect({
         outsideEffect: `opacity(${opacity}%) grayscale(${grayScale}%)`,
@@ -747,8 +747,8 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       operationalItemIndex
     );
     const filterExpression = queryExpressions.join(" OR ");
-    const opacity = this.opacity ? this.opacity : 30;
-    const grayScale = this.grayScale ? this.grayScale : 100;
+    const opacity = this.opacity === null ? 30 : this.opacity;
+    const grayScale = this.grayScale === null ? 100 : this.grayScale;
     this._setSearchExpression(filterExpression);
     featureLayerView.effect = new FeatureEffect({
       outsideEffect: `opacity(${opacity}%) grayscale(${grayScale}%)`,
@@ -782,8 +782,8 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       operationalItemIndex
     );
     const filterExpression = queryExpressions.join(" OR ");
-    const opacity = this.opacity ? this.opacity : 30;
-    const grayScale = this.grayScale ? this.grayScale : 100;
+    const opacity = this.opacity === null ? 30 : this.opacity;
+    const grayScale = this.grayScale === null ? 100 : this.grayScale;
     this._setSearchExpression(filterExpression);
     featureLayerView.effect = new FeatureEffect({
       outsideEffect: `opacity(${opacity}%) grayscale(${grayScale}%)`,
