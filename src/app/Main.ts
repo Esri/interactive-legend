@@ -376,23 +376,36 @@ class InteractiveLegendApp {
                 onboardingPanelScreenshotStepFour,
                 onboardingPanelScreenshotStepFive
               ];
+              const infoContent = screenshotEnabled
+                ? [
+                    {
+                      type: "list",
+                      title: screenshotTitle,
+                      infoContentItems: screenshotSteps
+                    },
+                    {
+                      type: "explanation",
+                      title: newInteractiveLegend,
+                      infoContentItems: [
+                        firstOnboardingWelcomeMessage,
+                        secondOnboardingWelcomeMessage,
+                        thirdOnboardingWelcomeMessage
+                      ]
+                    }
+                  ]
+                : [
+                    {
+                      type: "explanation",
+                      title: newInteractiveLegend,
+                      infoContentItems: [
+                        firstOnboardingWelcomeMessage,
+                        secondOnboardingWelcomeMessage,
+                        thirdOnboardingWelcomeMessage
+                      ]
+                    }
+                  ];
               const infoWidget = new Info({
-                infoContent: [
-                  {
-                    type: "list",
-                    title: screenshotTitle,
-                    infoContentItems: screenshotSteps
-                  },
-                  {
-                    type: "explanation",
-                    title: newInteractiveLegend,
-                    infoContentItems: [
-                      firstOnboardingWelcomeMessage,
-                      secondOnboardingWelcomeMessage,
-                      thirdOnboardingWelcomeMessage
-                    ]
-                  }
-                ]
+                infoContent
               });
               const infoGroup =
                 infoPanelPosition.indexOf("left") !== -1 ? "left" : "right";

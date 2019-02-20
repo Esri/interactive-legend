@@ -45,9 +45,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         lastPageButtons: "esri-info__last-page-button-container",
         backButtonContainer: "esri-info__back-button-container",
         closeButtonContainer: "esri-info__close-button-container",
+        singlePageButton: "esri-info__single-page-button",
         calciteStyles: {
             btn: "btn",
-            btnHalf: "btn-half",
             btnClear: "btn-clear"
         },
         icons: {
@@ -112,14 +112,15 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     widget_1.tsx("div", { class: CSS.titleContainer },
                         widget_1.tsx("h1", null, this.infoContent[this.selectedItemIndex].title)),
                     widget_1.tsx("div", { class: CSS.infoContent }, content)),
-                widget_1.tsx("div", { class: CSS.buttonContainer }, this.selectedItemIndex !== this.infoContent.length - 1 ? (widget_1.tsx("button", { bind: this, onclick: this._nextPage, onkeydown: this._nextPage, tabIndex: 0, class: this.classes(CSS.nextButton, CSS.calciteStyles.btn), title: i18n.next }, i18n.next)) : (widget_1.tsx("div", { class: CSS.lastPageButtons },
+                widget_1.tsx("div", { class: CSS.buttonContainer }, this.selectedItemIndex !== this.infoContent.length - 1 ? (widget_1.tsx("button", { bind: this, onclick: this._nextPage, onkeydown: this._nextPage, tabIndex: 0, class: this.classes(CSS.nextButton, CSS.calciteStyles.btn), title: i18n.next }, i18n.next)) : this.infoContent.length > 1 ? (widget_1.tsx("div", { class: CSS.lastPageButtons },
                     " ",
                     widget_1.tsx("div", { class: CSS.backButtonContainer },
                         widget_1.tsx("button", { bind: this, onclick: this._previousPage, onkeydown: this._previousPage, tabIndex: 0, class: this.classes(CSS.calciteStyles.btn, CSS.calciteStyles.btnClear), title: i18n.back },
                             back.charAt(0).toUpperCase(),
                             back.substring(1, i18n.back.length))),
                     widget_1.tsx("div", { class: CSS.closeButtonContainer },
-                        widget_1.tsx("button", { bind: this, onclick: this._closeInfoPanel, onkeydown: this._closeInfoPanel, tabIndex: 0, class: CSS.calciteStyles.btn, title: i18n.close }, i18n.close)))))));
+                        widget_1.tsx("button", { bind: this, onclick: this._closeInfoPanel, onkeydown: this._closeInfoPanel, tabIndex: 0, class: CSS.calciteStyles.btn, title: i18n.close }, i18n.close)))) : (widget_1.tsx("div", { class: CSS.lastPageButtons },
+                    widget_1.tsx("button", { bind: this, onclick: this._closeInfoPanel, onkeydown: this._closeInfoPanel, tabIndex: 0, class: this.classes(CSS.calciteStyles.btn, CSS.singlePageButton), title: i18n.close }, i18n.close))))));
         };
         //   _renderContent
         Info.prototype._renderContent = function () {
@@ -153,6 +154,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     widget_1.tsx("div", { class: CSS.stepNumber }, "" + (listItemIndex + 1))),
                 widget_1.tsx("div", { class: CSS.listItemTextContainer }, listItem)));
         };
+        // _generateExplanationNode
         Info.prototype._generateExplanationNode = function (contentItem) {
             var _this = this;
             var explanationItemNodes = contentItem.infoContentItems.map(function (explanationItem, explanationItemIndex) {
@@ -160,9 +162,11 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             });
             return widget_1.tsx("div", null, explanationItemNodes);
         };
+        // _generateExplanationItemNodes
         Info.prototype._generateExplanationItemNodes = function (explanationItem, explanationItemIndex) {
             return (widget_1.tsx("p", { key: explanationItemIndex, class: CSS.explanationItem }, explanationItem));
         };
+        // _generatePaginationNodes
         Info.prototype._generatePaginationNodes = function () {
             var _this = this;
             this._paginationNodes = [];

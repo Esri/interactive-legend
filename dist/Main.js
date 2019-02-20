@@ -226,8 +226,8 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                     onboardingPanelScreenshotStepFour,
                                     onboardingPanelScreenshotStepFive
                                 ];
-                                var infoWidget = new Info({
-                                    infoContent: [
+                                var infoContent = screenshotEnabled
+                                    ? [
                                         {
                                             type: "list",
                                             title: screenshotTitle,
@@ -243,6 +243,19 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                             ]
                                         }
                                     ]
+                                    : [
+                                        {
+                                            type: "explanation",
+                                            title: newInteractiveLegend,
+                                            infoContentItems: [
+                                                firstOnboardingWelcomeMessage,
+                                                secondOnboardingWelcomeMessage,
+                                                thirdOnboardingWelcomeMessage
+                                            ]
+                                        }
+                                    ];
+                                var infoWidget = new Info({
+                                    infoContent: infoContent
                                 });
                                 var infoGroup = infoPanelPosition.indexOf("left") !== -1 ? "left" : "right";
                                 _this.infoExpand = new Expand({

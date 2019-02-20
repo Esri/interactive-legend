@@ -17,7 +17,7 @@
   "screenshotPosition": "top-left",
   "popupIncludedInScreenshot": false,
   "legendIncludedInScreenshot": false,
-  "infoPanelEnabled": false,
+  "infoPanelEnabled": true,
   "infoPanelPosition": "top-left",
   "title": null,
   "customHeaderEnabled": false,
