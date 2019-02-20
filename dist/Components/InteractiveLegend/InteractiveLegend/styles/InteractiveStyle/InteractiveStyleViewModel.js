@@ -171,8 +171,8 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 }
                 var featureLayerView = this.featureLayerViews.getItemAt(operationalItemIndex);
                 var filterExpression = queryExpressions.join(" OR ");
-                var opacity = this.opacity ? this.opacity : 30;
-                var grayScale = this.grayScale ? this.grayScale : 100;
+                var opacity = this.opacity === null ? 30 : this.opacity;
+                var grayScale = this.grayScale === null ? 100 : this.grayScale;
                 this._setSearchExpression(filterExpression);
                 featureLayerView.effect = new FeatureEffect({
                     outsideEffect: "opacity(" + opacity + "%) grayscale(" + grayScale + "%)",
@@ -463,8 +463,8 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
             var featureLayerView = this.featureLayerViews.getItemAt(operationalItemIndex);
             var filterExpression = queryExpressions.join(" OR ");
-            var opacity = this.opacity ? this.opacity : 30;
-            var grayScale = this.grayScale ? this.grayScale : 100;
+            var opacity = this.opacity === null ? 30 : this.opacity;
+            var grayScale = this.grayScale === null ? 100 : this.grayScale;
             this._setSearchExpression(filterExpression);
             featureLayerView.effect = new FeatureEffect({
                 outsideEffect: "opacity(" + opacity + "%) grayscale(" + grayScale + "%)",
@@ -479,8 +479,8 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
             var featureLayerView = this.featureLayerViews.getItemAt(operationalItemIndex);
             var filterExpression = queryExpressions.join(" OR ");
-            var opacity = this.opacity ? this.opacity : 30;
-            var grayScale = this.grayScale ? this.grayScale : 100;
+            var opacity = this.opacity === null ? 30 : this.opacity;
+            var grayScale = this.grayScale === null ? 100 : this.grayScale;
             this._setSearchExpression(filterExpression);
             featureLayerView.effect = new FeatureEffect({
                 outsideEffect: "opacity(" + opacity + "%) grayscale(" + grayScale + "%)",
