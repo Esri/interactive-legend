@@ -304,6 +304,11 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                         ? field + " > " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfo.value[1]
                         : field + " = " + elementInfoHasValue + " OR " + field + " = '" + elementInfoHasValue + "'";
                 }
+                else if (!elementInfo.hasOwnProperty("value")) {
+                    var test = field + " IS NOT '" + legendElementInfos[0].value + "'";
+                    console.log(test);
+                    return test;
+                }
                 else {
                     var singleQuote = elementInfoHasValue.indexOf("'") !== -1
                         ? elementInfoHasValue.split("'").join("''")

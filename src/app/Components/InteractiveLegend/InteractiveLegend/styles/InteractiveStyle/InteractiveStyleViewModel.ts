@@ -503,6 +503,10 @@ class InteractiveStyleViewModel extends declared(Accessor) {
               elementInfo.value[1]
             }`
           : `${field} = ${elementInfoHasValue} OR ${field} = '${elementInfoHasValue}'`;
+      } else if (!elementInfo.hasOwnProperty("value")) {
+        const test = `${field} IS NOT '${legendElementInfos[0].value}'`;
+        console.log(test);
+        return test;
       } else {
         const singleQuote =
           elementInfoHasValue.indexOf("'") !== -1

@@ -488,7 +488,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 !hasPictureMarkersAndIsMute &&
                 !isSizeRampAndMute &&
                 !hasPictureFillAndIsMute &&
-                elementInfo.hasOwnProperty("value") &&
                 hasMoreThanOneInfo &&
                 !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
                 activeLayerInfo.layer.type === "feature" &&
@@ -502,20 +501,12 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 featureLayerData.applyStyles = applySelect ? true : false;
             }
             return (widget_1.tsx("div", { bind: this, class: (activeLayerInfo.layer.type === "feature" &&
-                    (hasMoreThanOneInfo &&
-                        field &&
-                        featureLayerData &&
-                        !isSizeRamp &&
-                        elementInfo.hasOwnProperty("value"))) ||
+                    (hasMoreThanOneInfo && field && featureLayerData && !isSizeRamp)) ||
                     (isPredominance && !isSizeRamp)
                     ? applySelect
                     : null, tabIndex: activeLayerInfo.layer.type === "feature" &&
                     !this.offscreen &&
-                    ((hasMoreThanOneInfo &&
-                        field &&
-                        featureLayerData &&
-                        !isSizeRamp &&
-                        elementInfo.hasOwnProperty("value")) ||
+                    ((hasMoreThanOneInfo && field && featureLayerData && !isSizeRamp) ||
                         (isPredominance && !isSizeRamp))
                     ? 0
                     : -1, "data-legend-index": "" + legendElementIndex, "data-child-index": "" + legendInfoIndex, "data-layer-id": "" + activeLayerInfo.layer.id, onclick: function (event) {
@@ -523,7 +514,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         !hasPictureMarkersAndIsMute &&
                         !isSizeRampAndMute &&
                         !hasPictureFillAndIsMute &&
-                        elementInfo.hasOwnProperty("value") &&
                         hasMoreThanOneInfo &&
                         !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
                         activeLayerInfo.layer.type === "feature" &&
@@ -538,7 +528,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         !hasPictureMarkersAndIsMute &&
                         !isSizeRampAndMute &&
                         !hasPictureFillAndIsMute &&
-                        elementInfo.hasOwnProperty("value") &&
                         hasMoreThanOneInfo &&
                         !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
                         field &&
