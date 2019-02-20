@@ -179,7 +179,9 @@ class InteractiveLegendApp {
       interactiveLegendPosition,
       filterMode,
       highlightShade,
-      mutedShade
+      mutedShade,
+      muteOpacity,
+      muteGrayScale
     } = config;
 
     const { webMapItems } = results;
@@ -297,9 +299,10 @@ class InteractiveLegendApp {
               style: defaultStyle,
               filterMode: defaultMode,
               layerListViewModel,
-              onboardingPanelEnabled
+              onboardingPanelEnabled,
+              opacity: muteOpacity,
+              grayScale: muteGrayScale
             });
-
             const offScreenInteractiveLegend = new InteractiveLegend({
               view,
               container: document.querySelector(
@@ -373,23 +376,36 @@ class InteractiveLegendApp {
                 onboardingPanelScreenshotStepFour,
                 onboardingPanelScreenshotStepFive
               ];
+              const infoContent = screenshotEnabled
+                ? [
+                    {
+                      type: "list",
+                      title: screenshotTitle,
+                      infoContentItems: screenshotSteps
+                    },
+                    {
+                      type: "explanation",
+                      title: newInteractiveLegend,
+                      infoContentItems: [
+                        firstOnboardingWelcomeMessage,
+                        secondOnboardingWelcomeMessage,
+                        thirdOnboardingWelcomeMessage
+                      ]
+                    }
+                  ]
+                : [
+                    {
+                      type: "explanation",
+                      title: newInteractiveLegend,
+                      infoContentItems: [
+                        firstOnboardingWelcomeMessage,
+                        secondOnboardingWelcomeMessage,
+                        thirdOnboardingWelcomeMessage
+                      ]
+                    }
+                  ];
               const infoWidget = new Info({
-                infoContent: [
-                  {
-                    type: "list",
-                    title: screenshotTitle,
-                    infoContentItems: screenshotSteps
-                  },
-                  {
-                    type: "explanation",
-                    title: newInteractiveLegend,
-                    infoContentItems: [
-                      firstOnboardingWelcomeMessage,
-                      secondOnboardingWelcomeMessage,
-                      thirdOnboardingWelcomeMessage
-                    ]
-                  }
-                ]
+                infoContent
               });
               const infoGroup =
                 infoPanelPosition.indexOf("left") !== -1 ? "left" : "right";

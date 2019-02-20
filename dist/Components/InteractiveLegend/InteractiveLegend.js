@@ -84,6 +84,8 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             // mutedShade
             _this.onboardingPanelEnabled = null;
             _this.offscreen = null;
+            _this.opacity = null;
+            _this.grayScale = null;
             // style
             _this.style = new InteractiveClassic({
                 view: _this.view,
@@ -93,7 +95,9 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 layerListViewModel: _this.layerListViewModel,
                 searchViewModel: _this.searchViewModel,
                 onboardingPanelEnabled: _this.onboardingPanelEnabled,
-                offscreen: _this.offscreen
+                offscreen: _this.offscreen,
+                opacity: _this.opacity,
+                grayScale: _this.grayScale
             });
             return _this;
         }
@@ -111,7 +115,9 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                     layerListViewModel: this.layerListViewModel,
                     searchViewModel: this.searchViewModel,
                     onboardingPanelEnabled: this.onboardingPanelEnabled,
-                    offscreen: this.offscreen
+                    offscreen: this.offscreen,
+                    opacity: this.opacity,
+                    grayScale: this.grayScale
                 });
             }
             if (value && typeof value.type === "string") {
@@ -128,7 +134,9 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 layerListViewModel: this.layerListViewModel,
                 searchViewModel: this.searchViewModel,
                 onboardingPanelEnabled: this.onboardingPanelEnabled,
-                offscreen: this.offscreen
+                offscreen: this.offscreen,
+                opacity: this.opacity,
+                grayScale: this.grayScale
             });
         };
         InteractiveLegend.prototype.postInitialize = function () {
@@ -246,6 +254,14 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             decorators_1.aliasOf("style.offscreen"),
             widget_1.renderable()
         ], InteractiveLegend.prototype, "offscreen", void 0);
+        __decorate([
+            decorators_1.aliasOf("style.opacity"),
+            widget_1.renderable()
+        ], InteractiveLegend.prototype, "opacity", void 0);
+        __decorate([
+            decorators_1.aliasOf("style.grayScale"),
+            widget_1.renderable()
+        ], InteractiveLegend.prototype, "grayScale", void 0);
         __decorate([
             decorators_1.property(),
             widget_1.renderable()

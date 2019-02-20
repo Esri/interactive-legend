@@ -62,9 +62,9 @@ const CSS = {
   lastPageButtons: "esri-info__last-page-button-container",
   backButtonContainer: "esri-info__back-button-container",
   closeButtonContainer: "esri-info__close-button-container",
+  singlePageButton: "esri-info__single-page-button",
   calciteStyles: {
     btn: "btn",
-    btnHalf: "btn-half",
     btnClear: "btn-clear"
   },
   icons: {
@@ -188,7 +188,7 @@ class Info extends declared(Widget) {
             >
               {i18n.next}
             </button>
-          ) : (
+          ) : this.infoContent.length > 1 ? (
             <div class={CSS.lastPageButtons}>
               {" "}
               <div class={CSS.backButtonContainer}>
@@ -219,6 +219,22 @@ class Info extends declared(Widget) {
                   {i18n.close}
                 </button>
               </div>
+            </div>
+          ) : (
+            <div class={CSS.lastPageButtons}>
+              <button
+                bind={this}
+                onclick={this._closeInfoPanel}
+                onkeydown={this._closeInfoPanel}
+                tabIndex={0}
+                class={this.classes(
+                  CSS.calciteStyles.btn,
+                  CSS.singlePageButton
+                )}
+                title={i18n.close}
+              >
+                {i18n.close}
+              </button>
             </div>
           )}
         </div>
@@ -265,6 +281,7 @@ class Info extends declared(Widget) {
     );
   }
 
+  // _generateExplanationNode
   private _generateExplanationNode(contentItem: any): any {
     const explanationItemNodes = contentItem.infoContentItems.map(
       (explanationItem, explanationItemIndex) => {
@@ -277,6 +294,7 @@ class Info extends declared(Widget) {
     return <div>{explanationItemNodes}</div>;
   }
 
+  // _generateExplanationItemNodes
   private _generateExplanationItemNodes(
     explanationItem: string,
     explanationItemIndex: number
@@ -288,6 +306,7 @@ class Info extends declared(Widget) {
     );
   }
 
+  // _generatePaginationNodes
   private _generatePaginationNodes(): any {
     this._paginationNodes = [];
     return this.infoContent.map((contentItem, contentItemIndex) => {

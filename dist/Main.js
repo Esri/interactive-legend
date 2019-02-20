@@ -89,7 +89,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 });
                 this.telemetry.logPageView();
             }
-            var homeEnabled = config.homeEnabled, homePosition = config.homePosition, zoomControlsEnabled = config.zoomControlsEnabled, zoomControlsPosition = config.zoomControlsPosition, searchEnabled = config.searchEnabled, searchConfig = config.searchConfig, searchPosition = config.searchPosition, basemapToggleEnabled = config.basemapToggleEnabled, basemapTogglePosition = config.basemapTogglePosition, nextBasemap = config.nextBasemap, layerListEnabled = config.layerListEnabled, layerListPosition = config.layerListPosition, screenshotEnabled = config.screenshotEnabled, screenshotPosition = config.screenshotPosition, popupIncludedInScreenshot = config.popupIncludedInScreenshot, legendIncludedInScreenshot = config.legendIncludedInScreenshot, infoPanelEnabled = config.infoPanelEnabled, infoPanelPosition = config.infoPanelPosition, splashButtonPosition = config.splashButtonPosition, interactiveLegendPosition = config.interactiveLegendPosition, filterMode = config.filterMode, highlightShade = config.highlightShade, mutedShade = config.mutedShade;
+            var homeEnabled = config.homeEnabled, homePosition = config.homePosition, zoomControlsEnabled = config.zoomControlsEnabled, zoomControlsPosition = config.zoomControlsPosition, searchEnabled = config.searchEnabled, searchConfig = config.searchConfig, searchPosition = config.searchPosition, basemapToggleEnabled = config.basemapToggleEnabled, basemapTogglePosition = config.basemapTogglePosition, nextBasemap = config.nextBasemap, layerListEnabled = config.layerListEnabled, layerListPosition = config.layerListPosition, screenshotEnabled = config.screenshotEnabled, screenshotPosition = config.screenshotPosition, popupIncludedInScreenshot = config.popupIncludedInScreenshot, legendIncludedInScreenshot = config.legendIncludedInScreenshot, infoPanelEnabled = config.infoPanelEnabled, infoPanelPosition = config.infoPanelPosition, splashButtonPosition = config.splashButtonPosition, interactiveLegendPosition = config.interactiveLegendPosition, filterMode = config.filterMode, highlightShade = config.highlightShade, mutedShade = config.mutedShade, muteOpacity = config.muteOpacity, muteGrayScale = config.muteGrayScale;
             var webMapItems = results.webMapItems;
             var validWebMapItems = webMapItems.map(function (response) {
                 return response.value;
@@ -181,7 +181,9 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 style: defaultStyle,
                                 filterMode: defaultMode,
                                 layerListViewModel: layerListViewModel,
-                                onboardingPanelEnabled: onboardingPanelEnabled
+                                onboardingPanelEnabled: onboardingPanelEnabled,
+                                opacity: muteOpacity,
+                                grayScale: muteGrayScale
                             });
                             var offScreenInteractiveLegend = new InteractiveLegend({
                                 view: view,
@@ -224,8 +226,8 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                     onboardingPanelScreenshotStepFour,
                                     onboardingPanelScreenshotStepFive
                                 ];
-                                var infoWidget = new Info({
-                                    infoContent: [
+                                var infoContent = screenshotEnabled
+                                    ? [
                                         {
                                             type: "list",
                                             title: screenshotTitle,
@@ -241,6 +243,19 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                             ]
                                         }
                                     ]
+                                    : [
+                                        {
+                                            type: "explanation",
+                                            title: newInteractiveLegend,
+                                            infoContentItems: [
+                                                firstOnboardingWelcomeMessage,
+                                                secondOnboardingWelcomeMessage,
+                                                thirdOnboardingWelcomeMessage
+                                            ]
+                                        }
+                                    ];
+                                var infoWidget = new Info({
+                                    infoContent: infoContent
                                 });
                                 var infoGroup = infoPanelPosition.indexOf("left") !== -1 ? "left" : "right";
                                 _this.infoExpand = new Expand({

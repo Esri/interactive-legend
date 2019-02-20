@@ -348,12 +348,29 @@
       ]
     },
     {
-      "category": "Filter Settings",
+      "category": "Visualization Settings",
       "fields": [{
+          "type": "subcategory",
+          "label": "Visualization Mode"
+        },
+        {
+          "type": "paragraph",
+          "value": "The Feature Filter mode shows the selected features on the map."
+        },
+        {
+          "type": "paragraph",
+          "value": "The Highlight mode will select features using the default highlight or a custom color that you specify."
+        },
+        {
+          "type": "paragraph",
+          "value": "The Mute mode will apply opacity and grayscale to features of legend elements that are not selected."
+        },
+        {
           "type": "options",
           "fieldName": "filterMode",
-          "tooltip": "Select a filter mode",
-          "label": "Filter Mode",
+          "tooltip": "Select a mode",
+          "label": "Select a mode",
+
           "options": [{
               "label": "Feature Filter",
               "value": "featureFilter"
@@ -368,28 +385,46 @@
             }
           ]
         },
+
         {
-          "type": "paragraph",
-          "value": "Filter Mode: Highlight Configuration"
+          "type": "subcategory",
+          "label": "Highlight"
         },
         {
           "type": "color",
-          "label": "Choose a highlighted shade",
+          "label": "Choose a highlight color. Default: Black, rgba(0,0,0,0.25)",
           "fieldName": "highlightShade",
           "transparency": true,
           "noColor": true
         },
         {
-          "type": "paragraph",
-          "value": "Filter Mode: Mute Configuration"
+          "type": "subcategory",
+          "label": "Mute"
         },
         {
-          "type": "color",
-          "label": "Choose a muted shade",
-          "fieldName": "mutedShade",
-          "transparency": true,
-          "noColor": true
+          "type": "number",
+          "fieldName": "muteOpacity",
+          "label": "Enter opacity value (1 - 100)%. Default: 30%:",
+          "tooltip": "Enter opacity value (1 - 100)%. Default: 30%",
+          "constraints": {
+            "min": 1,
+            "max": 100,
+            "places": 1
+          }
+        },
+
+        {
+          "type": "number",
+          "fieldName": "muteGrayScale",
+          "label": "Enter gray scale value (1 - 100)%. Default: 100%:",
+          "tooltip": "Enter gray scale value (1 - 100)%. Default: 100%",
+          "constraints": {
+            "min": 1,
+            "max": 100,
+            "places": 1
+          }
         }
+
       ]
     },
     {
@@ -483,17 +518,13 @@
     "splash": false,
     "splashOnStart": true,
     "splashButtonPosition": "top-right",
+    "muteOpacity": 30,
+    "muteGrayScale": 100,
     "highlightShade": {
       "r": 0,
       "g": 0,
       "b": 0,
       "a": 0.25
-    },
-    "mutedShade": {
-      "r": 169,
-      "g": 169,
-      "b": 169,
-      "a": 0.5
     }
   }
 }

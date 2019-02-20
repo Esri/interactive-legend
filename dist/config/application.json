@@ -33,6 +33,8 @@
   "filterMode": "featureFilter",
   "highlightShade": null,
   "mutedShade": null,
+  "muteOpacity": null,
+  "muteGrayScale": null,
   "webmap": "default",
   "webscene": "",
   "portalUrl": "https://arcgis.com",
