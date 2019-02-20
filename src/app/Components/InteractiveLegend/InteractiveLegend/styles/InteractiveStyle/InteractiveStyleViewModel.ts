@@ -47,6 +47,7 @@ import LayerListViewModel = require("esri/widgets/LayerList/LayerListViewModel")
 // esri.views.layers.support.FeatureFilter
 import FeatureFilter = require("esri/views/layers/support/FeatureFilter");
 
+// esri.views.layers.support.FeatureEffect
 import FeatureEffect = require("esri/views/layers/support/FeatureEffect");
 
 // interfaces
@@ -504,9 +505,19 @@ class InteractiveStyleViewModel extends declared(Accessor) {
             }`
           : `${field} = ${elementInfoHasValue} OR ${field} = '${elementInfoHasValue}'`;
       } else if (!elementInfo.hasOwnProperty("value")) {
-        const test = `${field} IS NOT '${legendElementInfos[0].value}'`;
-        console.log(test);
-        return test;
+        const test = `${field} <> ${legendElementInfos[0].value}`;
+        let expression = [];
+        legendElementInfos.forEach(legendElementInfo => {
+          if (legendElementInfo.value) {
+            expression.push(
+              `${field} <> ${legendElementInfo.value} AND ${field} <> '${
+                legendElementInfo.value
+              }'`
+            );
+          }
+        });
+        const newExpression = expression.join(" AND ");
+        return newExpression;
       } else {
         const singleQuote =
           elementInfoHasValue.indexOf("'") !== -1
