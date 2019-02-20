@@ -89,7 +89,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 });
                 this.telemetry.logPageView();
             }
-            var homeEnabled = config.homeEnabled, homePosition = config.homePosition, zoomControlsEnabled = config.zoomControlsEnabled, zoomControlsPosition = config.zoomControlsPosition, searchEnabled = config.searchEnabled, searchConfig = config.searchConfig, searchPosition = config.searchPosition, basemapToggleEnabled = config.basemapToggleEnabled, basemapTogglePosition = config.basemapTogglePosition, nextBasemap = config.nextBasemap, layerListEnabled = config.layerListEnabled, layerListPosition = config.layerListPosition, screenshotEnabled = config.screenshotEnabled, screenshotPosition = config.screenshotPosition, popupIncludedInScreenshot = config.popupIncludedInScreenshot, legendIncludedInScreenshot = config.legendIncludedInScreenshot, infoPanelEnabled = config.infoPanelEnabled, infoPanelPosition = config.infoPanelPosition, splashButtonPosition = config.splashButtonPosition, interactiveLegendPosition = config.interactiveLegendPosition, filterMode = config.filterMode, highlightShade = config.highlightShade, mutedShade = config.mutedShade, muteOpacity = config.muteOpacity, muteGrayScale = config.muteGrayScale;
+            var homeEnabled = config.homeEnabled, homePosition = config.homePosition, zoomControlsEnabled = config.zoomControlsEnabled, zoomControlsPosition = config.zoomControlsPosition, searchEnabled = config.searchEnabled, searchConfig = config.searchConfig, searchPosition = config.searchPosition, basemapToggleEnabled = config.basemapToggleEnabled, basemapTogglePosition = config.basemapTogglePosition, nextBasemap = config.nextBasemap, layerListEnabled = config.layerListEnabled, layerListPosition = config.layerListPosition, screenshotEnabled = config.screenshotEnabled, screenshotPosition = config.screenshotPosition, popupIncludedInScreenshot = config.popupIncludedInScreenshot, legendIncludedInScreenshot = config.legendIncludedInScreenshot, infoPanelEnabled = config.infoPanelEnabled, infoPanelPosition = config.infoPanelPosition, splashButtonPosition = config.splashButtonPosition, interactiveLegendPosition = config.interactiveLegendPosition, filterMode = config.filterMode, highlightShade = config.highlightShade, mutedShade = config.mutedShade, muteOpacity = config.muteOpacity, muteGrayScale = config.muteGrayScale, searchOpenAtStart = config.searchOpenAtStart;
             var webMapItems = results.webMapItems;
             var validWebMapItems = webMapItems.map(function (response) {
                 return response.value;
@@ -196,7 +196,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                             });
                             offScreenInteractiveLegend.style.selectedStyleData =
                                 interactiveLegend.style.selectedStyleData;
-                            _this._handleSearchWidget(searchEnabled, interactiveLegend, view, searchConfig, searchPosition);
+                            _this._handleSearchWidget(searchEnabled, interactiveLegend, view, searchConfig, searchPosition, searchOpenAtStart);
                             var interactiveLegendGroup = interactiveLegendPosition.indexOf("left") !== -1
                                 ? "left"
                                 : "right";
@@ -435,7 +435,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
             }
         };
         // _handleSearchWidget
-        InteractiveLegendApp.prototype._handleSearchWidget = function (searchEnabled, interactiveLegend, view, searchConfig, searchPosition) {
+        InteractiveLegendApp.prototype._handleSearchWidget = function (searchEnabled, interactiveLegend, view, searchConfig, searchPosition, searchOpenAtStart) {
             var _this = this;
             // Get any configured search settings
             if (searchEnabled) {
@@ -481,7 +481,8 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                     content: search,
                     mode: "floating",
                     expandTooltip: search.label,
-                    group: searchGroup
+                    group: searchGroup,
+                    expanded: searchOpenAtStart
                 });
                 interactiveLegend.searchViewModel = search.viewModel;
                 watchUtils.whenOnce(this.searchExpand, "container", function () {

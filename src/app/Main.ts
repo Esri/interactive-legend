@@ -181,7 +181,8 @@ class InteractiveLegendApp {
       highlightShade,
       mutedShade,
       muteOpacity,
-      muteGrayScale
+      muteGrayScale,
+      searchOpenAtStart
     } = config;
 
     const { webMapItems } = results;
@@ -323,7 +324,8 @@ class InteractiveLegendApp {
               interactiveLegend,
               view,
               searchConfig,
-              searchPosition
+              searchPosition,
+              searchOpenAtStart
             );
             const interactiveLegendGroup =
               interactiveLegendPosition.indexOf("left") !== -1
@@ -664,7 +666,8 @@ class InteractiveLegendApp {
     interactiveLegend: InteractiveLegend,
     view: MapView,
     searchConfig: any,
-    searchPosition: string
+    searchPosition: string,
+    searchOpenAtStart: boolean
   ): void {
     // Get any configured search settings
     if (searchEnabled) {
@@ -718,7 +721,8 @@ class InteractiveLegendApp {
         content: search,
         mode: "floating",
         expandTooltip: search.label,
-        group: searchGroup
+        group: searchGroup,
+        expanded: searchOpenAtStart
       });
       interactiveLegend.searchViewModel = search.viewModel;
 
