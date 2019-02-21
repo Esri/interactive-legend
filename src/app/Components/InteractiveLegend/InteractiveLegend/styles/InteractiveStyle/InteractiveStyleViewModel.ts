@@ -47,6 +47,7 @@ import LayerListViewModel = require("esri/widgets/LayerList/LayerListViewModel")
 // esri.views.layers.support.FeatureFilter
 import FeatureFilter = require("esri/views/layers/support/FeatureFilter");
 
+// esri.views.layers.support.FeatureEffect
 import FeatureEffect = require("esri/views/layers/support/FeatureEffect");
 
 // interfaces
@@ -348,7 +349,8 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         legendInfoIndex,
         elementInfo,
         field,
-        operationalItemIndex
+        operationalItemIndex,
+        legendElementInfos
       );
     }
 
@@ -503,6 +505,23 @@ class InteractiveStyleViewModel extends declared(Accessor) {
               elementInfo.value[1]
             }`
           : `${field} = ${elementInfoHasValue} OR ${field} = '${elementInfoHasValue}'`;
+      } else if (!elementInfo.hasOwnProperty("value")) {
+        const expressionList = [];
+
+        legendElementInfos.forEach(legendElementInfo => {
+          if (legendElementInfo.value) {
+            const { value } = legendElementInfo;
+            const singleQuote =
+              value.indexOf("'") !== -1 ? value.split("'").join("''") : null;
+            const expression = singleQuote
+              ? `${field} <> '${singleQuote}'`
+              : isNaN(value)
+              ? `${field} <> '${value}'`
+              : `${field} <> ${value} AND ${field} <> '${value}'`;
+            expressionList.push(expression);
+          }
+        });
+        return expressionList.join(" AND ");
       } else {
         const singleQuote =
           elementInfoHasValue.indexOf("'") !== -1
@@ -604,7 +623,8 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     legendInfoIndex: number,
     elementInfo: any,
     field: string,
-    operationalItemIndex: number
+    operationalItemIndex: number,
+    legendElementInfos: any[]
   ): void {
     const features = [];
     const highlightedFeatures = [];
@@ -616,17 +636,32 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       highlightedFeatureData[legendInfoIndex] = null;
       return;
     }
-    this.layerGraphics.getItemAt(operationalItemIndex).map(feature => {
-      const attributes = feature.attributes;
 
-      if (
-        elementInfo.value == attributes[field] ||
-        elementInfo.value == attributes[field.toLowerCase()] ||
-        elementInfo.value == attributes[field.toUpperCase()]
-      ) {
-        features.push(feature);
-      }
-    });
+    if (elementInfo.hasOwnProperty("value")) {
+      this.layerGraphics.getItemAt(operationalItemIndex).map(feature => {
+        const attributes = feature.attributes;
+
+        if (
+          elementInfo.value == attributes[field] ||
+          elementInfo.value == attributes[field.toLowerCase()] ||
+          elementInfo.value == attributes[field.toUpperCase()]
+        ) {
+          features.push(feature);
+        }
+      });
+    } else {
+      const elementInfoCollection = new Collection(legendElementInfos);
+      this.layerGraphics.getItemAt(operationalItemIndex).map(feature => {
+        const itemExists = elementInfoCollection.find(elementInfo => {
+          if (elementInfo.value) {
+            return elementInfo.value == feature.attributes[field];
+          }
+        });
+        if (!itemExists) {
+          features.push(feature);
+        }
+      });
+    }
 
     features.forEach(feature => {
       highlightedFeatures.push(feature);

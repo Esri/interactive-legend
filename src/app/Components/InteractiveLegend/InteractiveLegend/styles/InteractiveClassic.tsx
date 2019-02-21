@@ -824,7 +824,6 @@ class InteractiveClassic extends declared(Widget) {
         !hasPictureMarkersAndIsMute &&
         !isSizeRampAndMute &&
         !hasPictureFillAndIsMute &&
-        elementInfo.hasOwnProperty("value") &&
         hasMoreThanOneInfo &&
         !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
         activeLayerInfo.layer.type === "feature" &&
@@ -843,11 +842,7 @@ class InteractiveClassic extends declared(Widget) {
         bind={this}
         class={
           (activeLayerInfo.layer.type === "feature" &&
-            (hasMoreThanOneInfo &&
-              field &&
-              featureLayerData &&
-              !isSizeRamp &&
-              elementInfo.hasOwnProperty("value"))) ||
+            (hasMoreThanOneInfo && field && featureLayerData && !isSizeRamp)) ||
           (isPredominance && !isSizeRamp)
             ? applySelect
             : null
@@ -855,11 +850,7 @@ class InteractiveClassic extends declared(Widget) {
         tabIndex={
           activeLayerInfo.layer.type === "feature" &&
           !this.offscreen &&
-          ((hasMoreThanOneInfo &&
-            field &&
-            featureLayerData &&
-            !isSizeRamp &&
-            elementInfo.hasOwnProperty("value")) ||
+          ((hasMoreThanOneInfo && field && featureLayerData && !isSizeRamp) ||
             (isPredominance && !isSizeRamp))
             ? 0
             : -1
@@ -873,7 +864,6 @@ class InteractiveClassic extends declared(Widget) {
               !hasPictureMarkersAndIsMute &&
               !isSizeRampAndMute &&
               !hasPictureFillAndIsMute &&
-              elementInfo.hasOwnProperty("value") &&
               hasMoreThanOneInfo &&
               !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
               activeLayerInfo.layer.type === "feature" &&
@@ -900,7 +890,6 @@ class InteractiveClassic extends declared(Widget) {
               !hasPictureMarkersAndIsMute &&
               !isSizeRampAndMute &&
               !hasPictureFillAndIsMute &&
-              elementInfo.hasOwnProperty("value") &&
               hasMoreThanOneInfo &&
               !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
               field &&
