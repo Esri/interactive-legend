@@ -508,6 +508,7 @@
     "infoPanelPosition": "top-left",
     "searchEnabled": false,
     "searchPosition": "top-right",
+    "searchOpenAtStart": false,
     "layerListEnabled": false,
     "layerListPosition": "bottom-right",
     "basemapToggleEnabled": false,
