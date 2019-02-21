@@ -31,7 +31,7 @@
   "splashButtonPosition": "top-right",
   "customCSS": null,
   "interactiveLegendPosition": "bottom-left",
-  "filterMode": "highlight",
+  "filterMode": "featureFilter",
   "highlightShade": null,
   "mutedShade": null,
   "muteOpacity": null,
