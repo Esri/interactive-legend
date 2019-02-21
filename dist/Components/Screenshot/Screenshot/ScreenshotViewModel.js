@@ -50,10 +50,12 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             // secondMapComponent
             _this.secondMapComponent = null;
             // legendScreenshotEnabled
-            _this.legendScreenshotEnabled = null;
+            _this.legendScreenshotEnabled = true;
             // popupScreenshotEnabled
             _this.popupScreenshotEnabled = null;
+            // expandWidget
             _this.expandWidget = null;
+            // dragHandler
             _this.dragHandler = null;
             return _this;
         }

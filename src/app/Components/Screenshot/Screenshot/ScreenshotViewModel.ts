@@ -101,15 +101,17 @@ class ScreenshotViewModel extends declared(Accessor) {
 
   // legendScreenshotEnabled
   @property()
-  legendScreenshotEnabled: boolean = null;
+  legendScreenshotEnabled = true;
 
   // popupScreenshotEnabled
   @property()
   popupScreenshotEnabled: boolean = null;
 
+  // expandWidget
   @property()
   expandWidget: Expand = null;
 
+  // dragHandler
   @property()
   dragHandler: any = null;
 
