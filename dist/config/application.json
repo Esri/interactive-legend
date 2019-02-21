@@ -11,7 +11,7 @@
   "searchPosition": "top-right",
   "basemapToggleEnabled": false,
   "basemapTogglePosition": "bottom-right",
-  "nextBasemap": "topo",
+  "nextBasemap": "dark-gray",
   "layerListEnabled": false,
   "layerListPosition": "bottom-right",
   "screenshotEnabled": true,
@@ -31,7 +31,7 @@
   "splashButtonPosition": "top-right",
   "customCSS": null,
   "interactiveLegendPosition": "bottom-left",
-  "filterMode": "featureFilter",
+  "filterMode": "highlight",
   "highlightShade": null,
   "mutedShade": null,
   "muteOpacity": null,
@@ -79,7 +79,6 @@
         }
       }
     }
-
   },
   "helperServices": {
     "geometry": {
