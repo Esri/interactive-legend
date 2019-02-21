@@ -44,9 +44,7 @@
     "legendIncludedInScreenshot",
     "popupIncludedInScreenshot",
     "homeEnabled",
-    "basemapToggleEnabled",
-    "highlightShade",
-    "mutedShade"
+    "basemapToggleEnabled"
   ],
   "webMap": {
     "default": "e2b122dacaa54ce0949843f3503c6cde",

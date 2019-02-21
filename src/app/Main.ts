@@ -178,7 +178,7 @@ class InteractiveLegendApp {
       splashButtonPosition,
       interactiveLegendPosition,
       filterMode,
-      highlightShade,
+      // highlightShade,
       mutedShade,
       muteOpacity,
       muteGrayScale,
@@ -259,18 +259,18 @@ class InteractiveLegendApp {
             const defaultStyle = "classic";
             const defaultMode = filterMode ? filterMode : "featureFilter";
 
-            if (highlightShade) {
-              const highlightedShade = new Color(highlightShade);
-              const { r, g, b, a } = highlightedShade;
-              view.highlightOptions = {
-                color: new Color(`rgb(${r},${g},${b})`),
-                fillOpacity: a
-              };
-            } else {
-              view.highlightOptions = {
-                color: new Color("#000000")
-              };
-            }
+            // if (highlightShade) {
+            //   const highlightedShade = new Color(highlightShade);
+            //   const { r, g, b, a } = highlightedShade;
+            //   view.highlightOptions = {
+            //     color: new Color(`rgb(${r},${g},${b})`),
+            //     fillOpacity: a
+            //   };
+            // } else {
+            //   view.highlightOptions = {
+            //     color: new Color("#000000")
+            //   };
+            // }
             this._handleHomeWidget(view, homeEnabled, homePosition);
             this._handleSplash(config, view, splashButtonPosition);
 
@@ -551,7 +551,6 @@ class InteractiveLegendApp {
         if (view.popup.visible) {
           if (!this.featureWidget) {
             this.featureWidget = new FeatureWidget({
-              view,
               graphic: view.popup.selectedFeature,
               container: document.querySelector(
                 ".offscreen-pop-up-container"

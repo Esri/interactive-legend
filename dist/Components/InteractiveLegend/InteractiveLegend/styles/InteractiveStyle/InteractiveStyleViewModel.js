@@ -29,11 +29,11 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             //
             //----------------------------------
             _this._handles = new Handles();
-            _this._querying = true;
+            // private _querying: boolean | IPromise<any> = true;
             // interactiveStyleData
             _this.interactiveStyleData = {
-                queryExpressions: [],
-                highlightedFeatures: []
+                queryExpressions: []
+                // highlightedFeatures: []
             };
             //----------------------------------
             //
@@ -46,10 +46,9 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             _this.activeLayerInfos = null;
             // featureLayerViews
             _this.featureLayerViews = new Collection();
-            // layerGraphics
-            _this.layerGraphics = new Collection();
-            // mutedShade
-            _this.mutedShade = null;
+            // // layerGraphics
+            // @property()
+            // layerGraphics: Collection<Graphic[]> = new Collection();
             // filterMode
             _this.filterMode = null;
             // layerListViewModel
@@ -67,13 +66,11 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         Object.defineProperty(InteractiveStyleViewModel.prototype, "state", {
             // state
             get: function () {
-                return this.get("view.ready")
-                    ? this.filterMode === "highlight"
-                        ? this._querying
-                            ? "querying"
-                            : "ready"
-                        : "ready"
-                    : "loading";
+                return this.view
+                    ? this.get("view.ready")
+                        ? "ready"
+                        : "loading"
+                    : "disabled";
             },
             enumerable: true,
             configurable: true
@@ -97,14 +94,14 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                                 _this.searchExpressions.add(null);
                             });
                             _this._storeFeatureData(layerViewKey);
-                        }),
-                        watchUtils.whenFalse(_this, "view.updating", function () {
-                            _this.layerListViewModel.operationalItems.forEach(function () {
-                                if (_this.filterMode === "highlight") {
-                                    _this._queryFeatures(layerViewKey);
-                                }
-                            });
                         })
+                        // watchUtils.whenFalse(this, "view.updating", () => {
+                        //   this.layerListViewModel.operationalItems.forEach(() => {
+                        //     if (this.filterMode === "highlight") {
+                        //       this._queryFeatures(layerViewKey);
+                        //     }
+                        //   });
+                        // })
                     ]);
                 })
             ]);
@@ -112,9 +109,9 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         InteractiveStyleViewModel.prototype.destroy = function () {
             this._handles.removeAll();
             this._handles.destroy();
-            this.layerGraphics = null;
+            // this.layerGraphics = null;
             this._handles = null;
-            this._querying = null;
+            // this._querying = null;
             var interactiveStyleData = this.interactiveStyleData;
             for (var interactiveStyleDataProp in interactiveStyleData) {
                 interactiveStyleData[interactiveStyleDataProp] = null;
@@ -189,23 +186,57 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 this._muteRangeValues(elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, legendElementInfos);
             }
         };
-        // applyFeatureHighlight
-        InteractiveStyleViewModel.prototype.applyFeatureHighlight = function (elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos) {
-            if (isPredominance) {
-                this._handlePredominanceHighlight(elementInfo, legendElementInfos, operationalItemIndex, legendInfoIndex);
-            }
-            else if (Array.isArray(elementInfo.value) &&
-                elementInfo.value.length === 2) {
-                this._highlightRangeValues(legendInfoIndex, elementInfo, field, operationalItemIndex, legendElementInfos);
-            }
-            else {
-                this._highlightUniqueValues(legendInfoIndex, elementInfo, field, operationalItemIndex, legendElementInfos);
-            }
-            this._generateQueryExpressions(elementInfo, field, operationalItemIndex, legendElement, null, legendElementInfos);
-            var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
-            var filterExpression = queryExpressions.join(" OR ");
-            this._setSearchExpression(filterExpression);
-        };
+        // // applyFeatureHighlight
+        // applyFeatureHighlight(
+        //   elementInfo: any,
+        //   field: string,
+        //   legendInfoIndex: number,
+        //   operationalItemIndex: number,
+        //   legendElement: LegendElement,
+        //   isPredominance: boolean,
+        //   legendElementInfos: any[]
+        // ): void {
+        //   if (isPredominance) {
+        //     this._handlePredominanceHighlight(
+        //       elementInfo,
+        //       legendElementInfos,
+        //       operationalItemIndex,
+        //       legendInfoIndex
+        //     );
+        //   } else if (
+        //     Array.isArray(elementInfo.value) &&
+        //     elementInfo.value.length === 2
+        //   ) {
+        //     this._highlightRangeValues(
+        //       legendInfoIndex,
+        //       elementInfo,
+        //       field,
+        //       operationalItemIndex,
+        //       legendElementInfos
+        //     );
+        //   } else {
+        //     this._highlightUniqueValues(
+        //       legendInfoIndex,
+        //       elementInfo,
+        //       field,
+        //       operationalItemIndex,
+        //       legendElementInfos
+        //     );
+        //   }
+        //   this._generateQueryExpressions(
+        //     elementInfo,
+        //     field,
+        //     operationalItemIndex,
+        //     legendElement,
+        //     null,
+        //     legendElementInfos
+        //   );
+        //   const queryExpressions = this.interactiveStyleData.queryExpressions[
+        //     operationalItemIndex
+        //   ];
+        //   const filterExpression = queryExpressions.join(" OR ");
+        //   this._setSearchExpression(filterExpression);
+        // }
         //----------------------------------
         //
         //  Private methods
@@ -218,62 +249,72 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 _this._setUpDataContainers();
                 var featureLayerView = operationalItem.layerView;
                 _this.featureLayerViews.push(featureLayerView);
-                _this._queryFeatureLayerData(layerViewKey);
+                // this._queryFeatureLayerData(layerViewKey);
             });
         };
         // _setUpDataContainers
         InteractiveStyleViewModel.prototype._setUpDataContainers = function () {
-            var _a = this.interactiveStyleData, highlightedFeatures = _a.highlightedFeatures, queryExpressions = _a.queryExpressions;
-            highlightedFeatures.push([]);
+            // const { highlightedFeatures, queryExpressions } = this.interactiveStyleData;
+            var queryExpressions = this.interactiveStyleData.queryExpressions;
+            // highlightedFeatures.push([]);
             queryExpressions.push([]);
         };
-        // _queryFeatureLayerData
-        InteractiveStyleViewModel.prototype._queryFeatureLayerData = function (layerViewKey) {
-            var _a = this, _handles = _a._handles, layerGraphics = _a.layerGraphics, layerListViewModel = _a.layerListViewModel;
-            _handles.remove(layerViewKey);
-            layerGraphics.removeAll();
-            layerListViewModel.operationalItems.forEach(function () {
-                layerGraphics.add(null);
-            });
-            this._queryFeatures(layerViewKey);
-        };
-        // queryFeatures
-        InteractiveStyleViewModel.prototype._queryFeatures = function (layerViewKey) {
-            var _this = this;
-            this.featureLayerViews.forEach(function (layerView, layerViewIndex) {
-                if (layerView) {
-                    _this._handles.add(watchUtils.whenFalseOnce(layerView, "updating", function () {
-                        if (!layerView) {
-                            return;
-                        }
-                        if (typeof layerView.queryFeatures !== "function") {
-                            _this._querying = null;
-                            _this.notifyChange("state");
-                        }
-                        else {
-                            _this._querying = layerView
-                                .queryFeatures()
-                                .catch(function (err) {
-                                _this._querying = null;
-                                _this.notifyChange("state");
-                                console.error("FEATURE QUERY ERROR: ", err);
-                            })
-                                .then(function (results) {
-                                var featureLayerViews = _this.featureLayerViews.getItemAt(layerViewIndex);
-                                if (results.features &&
-                                    results.features.hasOwnProperty("length") &&
-                                    results.features.length > 0 &&
-                                    featureLayerViews.layer.id === results.features[0].layer.id) {
-                                    _this.layerGraphics.splice(layerViewIndex, 1, results.features);
-                                }
-                                _this._querying = null;
-                                _this.notifyChange("state");
-                            });
-                        }
-                    }), layerViewKey);
-                }
-            });
-        };
+        // // _queryFeatureLayerData
+        // private _queryFeatureLayerData(layerViewKey: string): void {
+        //   const { _handles, layerGraphics, layerListViewModel } = this;
+        //   _handles.remove(layerViewKey);
+        //   layerGraphics.removeAll();
+        //   layerListViewModel.operationalItems.forEach(() => {
+        //     layerGraphics.add(null);
+        //   });
+        //   this._queryFeatures(layerViewKey);
+        // }
+        // // queryFeatures
+        // private _queryFeatures(layerViewKey: string): void {
+        //   this.featureLayerViews.forEach((layerView, layerViewIndex) => {
+        //     if (layerView) {
+        //       this._handles.add(
+        //         watchUtils.whenFalseOnce(layerView, "updating", () => {
+        //           if (!layerView) {
+        //             return;
+        //           }
+        //           if (typeof layerView.queryFeatures !== "function") {
+        //             this._querying = null;
+        //             this.notifyChange("state");
+        //           } else {
+        //             this._querying = layerView
+        //               .queryFeatures()
+        //               .catch(err => {
+        //                 this._querying = null;
+        //                 this.notifyChange("state");
+        //                 console.error("FEATURE QUERY ERROR: ", err);
+        //               })
+        //               .then((results: any) => {
+        //                 const featureLayerViews = this.featureLayerViews.getItemAt(
+        //                   layerViewIndex
+        //                 );
+        //                 if (
+        //                   results.features &&
+        //                   results.features.hasOwnProperty("length") &&
+        //                   results.features.length > 0 &&
+        //                   featureLayerViews.layer.id === results.features[0].layer.id
+        //                 ) {
+        //                   this.layerGraphics.splice(
+        //                     layerViewIndex,
+        //                     1,
+        //                     results.features
+        //                   );
+        //                 }
+        //                 this._querying = null;
+        //                 this.notifyChange("state");
+        //               });
+        //           }
+        //         }),
+        //         layerViewKey
+        //       );
+        //     }
+        //   });
+        // }
         //----------------------------------
         //
         //  Feature Filter Methods
@@ -281,7 +322,6 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         //----------------------------------
         // _generateQueryExpressions
         InteractiveStyleViewModel.prototype._generateQueryExpressions = function (elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, legendElementInfos) {
-            // debugger;
             var queryExpression = this._generateQueryExpression(elementInfo, field, legendInfoIndex, legendElement, legendElementInfos);
             var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
             var expressionIndex = queryExpressions.indexOf(queryExpression);
@@ -356,134 +396,174 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         //  Highlight Methods
         //
         //----------------------------------
-        // _highlightRangeValues
-        InteractiveStyleViewModel.prototype._highlightRangeValues = function (legendInfoIndex, elementInfo, field, operationalItemIndex, legendElementInfos) {
-            var features = [];
-            var highlightedFeatures = this.interactiveStyleData.highlightedFeatures[operationalItemIndex];
-            var elementInfoValue = elementInfo.value;
-            if (highlightedFeatures[legendInfoIndex]) {
-                this._removeHighlight(operationalItemIndex, legendInfoIndex);
-                return;
-            }
-            this.layerGraphics.getItemAt(operationalItemIndex).forEach(function (feature) {
-                var fieldValue = feature.attributes[field];
-                if (legendElementInfos.length - 1 === legendInfoIndex) {
-                    if (fieldValue >= elementInfoValue[0] &&
-                        fieldValue <= elementInfoValue[1]) {
-                        features.push(feature);
-                    }
-                }
-                else {
-                    if (fieldValue > elementInfoValue[0] &&
-                        fieldValue <= elementInfoValue[1]) {
-                        features.push(feature);
-                    }
-                }
-            });
-            if (features.length === 0) {
-                return;
-            }
-            var highlight = this.featureLayerViews
-                .getItemAt(operationalItemIndex)
-                .highlight(features.slice());
-            highlightedFeatures[legendInfoIndex] = [highlight];
-        };
-        // _highlightUniqueValue
-        InteractiveStyleViewModel.prototype._highlightUniqueValues = function (legendInfoIndex, elementInfo, field, operationalItemIndex, legendElementInfos) {
-            var features = [];
-            var highlightedFeatures = [];
-            var highlightedFeatureData = this.interactiveStyleData
-                .highlightedFeatures[operationalItemIndex];
-            if (highlightedFeatureData[legendInfoIndex]) {
-                highlightedFeatureData[legendInfoIndex][0].remove();
-                highlightedFeatureData[legendInfoIndex] = null;
-                return;
-            }
-            if (elementInfo.hasOwnProperty("value")) {
-                this.layerGraphics.getItemAt(operationalItemIndex).map(function (feature) {
-                    var attributes = feature.attributes;
-                    if (elementInfo.value == attributes[field] ||
-                        elementInfo.value == attributes[field.toLowerCase()] ||
-                        elementInfo.value == attributes[field.toUpperCase()]) {
-                        features.push(feature);
-                    }
-                });
-            }
-            else {
-                var elementInfoCollection_1 = new Collection(legendElementInfos);
-                this.layerGraphics.getItemAt(operationalItemIndex).map(function (feature) {
-                    var itemExists = elementInfoCollection_1.find(function (elementInfo) {
-                        if (elementInfo.value) {
-                            return elementInfo.value == feature.attributes[field];
-                        }
-                    });
-                    if (!itemExists) {
-                        features.push(feature);
-                    }
-                });
-            }
-            features.forEach(function (feature) {
-                highlightedFeatures.push(feature);
-            });
-            if (features.length === 0) {
-                return;
-            }
-            var highlight = this.featureLayerViews
-                .getItemAt(operationalItemIndex)
-                .highlight(highlightedFeatures.slice());
-            highlightedFeatureData[legendInfoIndex] = [highlight];
-        };
-        // _handlePredominanceHighlight
-        InteractiveStyleViewModel.prototype._handlePredominanceHighlight = function (elementInfo, legendElementInfos, operationalItemIndex, legendInfoIndex) {
-            var predominantFeatures = this.layerGraphics.getItemAt(operationalItemIndex);
-            var objectIdField = this.featureLayerViews.getItemAt(operationalItemIndex).layer.objectIdField;
-            var featuresToHighlight = [];
-            predominantFeatures.forEach(function (predominantFeature) {
-                var itemsToCompare = [];
-                for (var attr in predominantFeature.attributes) {
-                    if (attr !== elementInfo.value &&
-                        attr !== objectIdField &&
-                        legendElementInfos.find(function (elementInfo) { return elementInfo.value === elementInfo.value; })) {
-                        var item = {};
-                        item[attr] = predominantFeature.attributes[attr];
-                        itemsToCompare.push(item);
-                    }
-                }
-                var pass = true;
-                itemsToCompare.forEach(function (itemToCompare) {
-                    for (var key in itemToCompare) {
-                        if (predominantFeature.attributes[elementInfo.value] <
-                            itemToCompare[key]) {
-                            pass = false;
-                            break;
-                        }
-                    }
-                });
-                if (pass) {
-                    featuresToHighlight.push(predominantFeature);
-                }
-            });
-            this.interactiveStyleData.highlightedFeatures;
-            var highlightedFeatures = this.interactiveStyleData.highlightedFeatures[operationalItemIndex];
-            var highlightedFeatureData = this.interactiveStyleData
-                .highlightedFeatures[operationalItemIndex];
-            if (highlightedFeatureData[legendInfoIndex]) {
-                this._removeHighlight(operationalItemIndex, legendInfoIndex);
-                return;
-            }
-            var highlight = this.featureLayerViews
-                .getItemAt(operationalItemIndex)
-                .highlight(featuresToHighlight.slice());
-            highlightedFeatures[legendInfoIndex] = [highlight];
-        };
-        // _removeHighlight
-        InteractiveStyleViewModel.prototype._removeHighlight = function (operationalItemIndex, legendInfoIndex) {
-            var highlightedFeatures = this.interactiveStyleData.highlightedFeatures[operationalItemIndex];
-            highlightedFeatures[legendInfoIndex].forEach(function (feature) {
-                feature.remove();
-            });
-            highlightedFeatures[legendInfoIndex] = null;
-        };
+        // // _highlightRangeValues
+        // private _highlightRangeValues(
+        //   legendInfoIndex: number,
+        //   elementInfo: any,
+        //   field: string,
+        //   operationalItemIndex: number,
+        //   legendElementInfos: any[]
+        // ): void {
+        //   const features = [];
+        //   const highlightedFeatures = this.interactiveStyleData.highlightedFeatures[
+        //     operationalItemIndex
+        //   ];
+        //   const elementInfoValue = elementInfo.value;
+        //   if (highlightedFeatures[legendInfoIndex]) {
+        //     this._removeHighlight(operationalItemIndex, legendInfoIndex);
+        //     return;
+        //   }
+        //   this.layerGraphics.getItemAt(operationalItemIndex).forEach(feature => {
+        //     const fieldValue = feature.attributes[field];
+        //     if (legendElementInfos.length - 1 === legendInfoIndex) {
+        //       if (
+        //         fieldValue >= elementInfoValue[0] &&
+        //         fieldValue <= elementInfoValue[1]
+        //       ) {
+        //         features.push(feature);
+        //       }
+        //     } else {
+        //       if (
+        //         fieldValue > elementInfoValue[0] &&
+        //         fieldValue <= elementInfoValue[1]
+        //       ) {
+        //         features.push(feature);
+        //       }
+        //     }
+        //   });
+        //   if (features.length === 0) {
+        //     return;
+        //   }
+        //   const highlight = this.featureLayerViews
+        //     .getItemAt(operationalItemIndex)
+        //     .highlight([...features]);
+        //   highlightedFeatures[legendInfoIndex] = [highlight];
+        // }
+        // // _highlightUniqueValue
+        // private _highlightUniqueValues(
+        //   legendInfoIndex: number,
+        //   elementInfo: any,
+        //   field: string,
+        //   operationalItemIndex: number,
+        //   legendElementInfos: any[]
+        // ): void {
+        //   const features = [];
+        //   const highlightedFeatures = [];
+        //   const highlightedFeatureData = this.interactiveStyleData
+        //     .highlightedFeatures[operationalItemIndex];
+        //   if (highlightedFeatureData[legendInfoIndex]) {
+        //     highlightedFeatureData[legendInfoIndex][0].remove();
+        //     highlightedFeatureData[legendInfoIndex] = null;
+        //     return;
+        //   }
+        //   if (elementInfo.hasOwnProperty("value")) {
+        //     this.layerGraphics.getItemAt(operationalItemIndex).map(feature => {
+        //       const attributes = feature.attributes;
+        //       if (
+        //         elementInfo.value == attributes[field] ||
+        //         elementInfo.value == attributes[field.toLowerCase()] ||
+        //         elementInfo.value == attributes[field.toUpperCase()]
+        //       ) {
+        //         features.push(feature);
+        //       }
+        //     });
+        //   } else {
+        //     const elementInfoCollection = new Collection(legendElementInfos);
+        //     this.layerGraphics.getItemAt(operationalItemIndex).map(feature => {
+        //       const itemExists = elementInfoCollection.find(elementInfo => {
+        //         if (elementInfo.value) {
+        //           return elementInfo.value == feature.attributes[field];
+        //         }
+        //       });
+        //       if (!itemExists) {
+        //         features.push(feature);
+        //       }
+        //     });
+        //   }
+        //   features.forEach(feature => {
+        //     highlightedFeatures.push(feature);
+        //   });
+        //   if (features.length === 0) {
+        //     return;
+        //   }
+        //   const highlight = this.featureLayerViews
+        //     .getItemAt(operationalItemIndex)
+        //     .highlight([...highlightedFeatures]);
+        //   highlightedFeatureData[legendInfoIndex] = [highlight];
+        // }
+        // // _handlePredominanceHighlight
+        // private _handlePredominanceHighlight(
+        //   elementInfo: any,
+        //   legendElementInfos: any[],
+        //   operationalItemIndex: number,
+        //   legendInfoIndex: number
+        // ): void {
+        //   const predominantFeatures = this.layerGraphics.getItemAt(
+        //     operationalItemIndex
+        //   );
+        //   const { objectIdField } = this.featureLayerViews.getItemAt(
+        //     operationalItemIndex
+        //   ).layer;
+        //   const featuresToHighlight = [];
+        //   predominantFeatures.forEach(predominantFeature => {
+        //     const itemsToCompare = [];
+        //     for (const attr in predominantFeature.attributes) {
+        //       if (
+        //         attr !== elementInfo.value &&
+        //         attr !== objectIdField &&
+        //         legendElementInfos.find(
+        //           elementInfo => elementInfo.value === elementInfo.value
+        //         )
+        //       ) {
+        //         const item = {};
+        //         item[attr] = predominantFeature.attributes[attr];
+        //         itemsToCompare.push(item);
+        //       }
+        //     }
+        //     let pass = true;
+        //     itemsToCompare.forEach(itemToCompare => {
+        //       for (const key in itemToCompare) {
+        //         if (
+        //           predominantFeature.attributes[elementInfo.value] <
+        //           itemToCompare[key]
+        //         ) {
+        //           pass = false;
+        //           break;
+        //         }
+        //       }
+        //     });
+        //     if (pass) {
+        //       featuresToHighlight.push(predominantFeature);
+        //     }
+        //   });
+        //   this.interactiveStyleData.highlightedFeatures;
+        //   const highlightedFeatures = this.interactiveStyleData.highlightedFeatures[
+        //     operationalItemIndex
+        //   ];
+        //   const highlightedFeatureData = this.interactiveStyleData
+        //     .highlightedFeatures[operationalItemIndex];
+        //   if (highlightedFeatureData[legendInfoIndex]) {
+        //     this._removeHighlight(operationalItemIndex, legendInfoIndex);
+        //     return;
+        //   }
+        //   const highlight = this.featureLayerViews
+        //     .getItemAt(operationalItemIndex)
+        //     .highlight([...featuresToHighlight]);
+        //   highlightedFeatures[legendInfoIndex] = [highlight];
+        // }
+        // // _removeHighlight
+        // private _removeHighlight(
+        //   operationalItemIndex: number,
+        //   legendInfoIndex: number
+        // ): void {
+        //   const highlightedFeatures = this.interactiveStyleData.highlightedFeatures[
+        //     operationalItemIndex
+        //   ];
+        //   highlightedFeatures[legendInfoIndex].forEach(feature => {
+        //     feature.remove();
+        //   });
+        //   highlightedFeatures[legendInfoIndex] = null;
+        // }
         //----------------------------------
         //
         //  Mute Methods
@@ -561,12 +641,6 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 readOnly: true
             })
         ], InteractiveStyleViewModel.prototype, "state", null);
-        __decorate([
-            decorators_1.property()
-        ], InteractiveStyleViewModel.prototype, "layerGraphics", void 0);
-        __decorate([
-            decorators_1.property()
-        ], InteractiveStyleViewModel.prototype, "mutedShade", void 0);
         __decorate([
             decorators_1.property()
         ], InteractiveStyleViewModel.prototype, "filterMode", void 0);

@@ -47,7 +47,9 @@ export interface SelectedStyleData {
   applyStyles: boolean;
 }
 
-export type FilterMode = "featureFilter" | "highlight" | "mute";
+// export type FilterMode = "featureFilter" | "highlight" | "mute";
+
+export type FilterMode = "featureFilter" | "mute";
 
 interface SymbolTableElementInfo {
   label: RampTitle | string;
@@ -230,7 +232,7 @@ interface SizeRampStop {
 
 interface InteractiveStyleData {
   queryExpressions: string[][];
-  highlightedFeatures: any[][];
+  // highlightedFeatures: any[][];
 }
 
 interface ActiveLayerInfoProps extends ActiveLayerInfo {
