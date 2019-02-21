@@ -30,6 +30,7 @@ import Feature = require("esri/widgets/Feature");
 // esri.widgets.Expand
 import Expand = require("esri/widgets/Expand");
 
+// esri.core.Handles
 import Handles = require("esri/core/Handles");
 
 //esri.widgets.support
