@@ -349,7 +349,8 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         legendInfoIndex,
         elementInfo,
         field,
-        operationalItemIndex
+        operationalItemIndex,
+        legendElementInfos
       );
     }
 
@@ -505,19 +506,22 @@ class InteractiveStyleViewModel extends declared(Accessor) {
             }`
           : `${field} = ${elementInfoHasValue} OR ${field} = '${elementInfoHasValue}'`;
       } else if (!elementInfo.hasOwnProperty("value")) {
-        const test = `${field} <> ${legendElementInfos[0].value}`;
-        let expression = [];
+        const expressionList = [];
+
         legendElementInfos.forEach(legendElementInfo => {
           if (legendElementInfo.value) {
-            expression.push(
-              `${field} <> ${legendElementInfo.value} AND ${field} <> '${
-                legendElementInfo.value
-              }'`
-            );
+            const { value } = legendElementInfo;
+            const singleQuote =
+              value.indexOf("'") !== -1 ? value.split("'").join("''") : null;
+            const expression = singleQuote
+              ? `${field} <> '${singleQuote}'`
+              : isNaN(value)
+              ? `${field} <> '${value}'`
+              : `${field} <> ${value} AND ${field} <> '${value}'`;
+            expressionList.push(expression);
           }
         });
-        const newExpression = expression.join(" AND ");
-        return newExpression;
+        return expressionList.join(" AND ");
       } else {
         const singleQuote =
           elementInfoHasValue.indexOf("'") !== -1
@@ -619,7 +623,8 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     legendInfoIndex: number,
     elementInfo: any,
     field: string,
-    operationalItemIndex: number
+    operationalItemIndex: number,
+    legendElementInfos: any[]
   ): void {
     const features = [];
     const highlightedFeatures = [];
@@ -631,17 +636,32 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       highlightedFeatureData[legendInfoIndex] = null;
       return;
     }
-    this.layerGraphics.getItemAt(operationalItemIndex).map(feature => {
-      const attributes = feature.attributes;
 
-      if (
-        elementInfo.value == attributes[field] ||
-        elementInfo.value == attributes[field.toLowerCase()] ||
-        elementInfo.value == attributes[field.toUpperCase()]
-      ) {
-        features.push(feature);
-      }
-    });
+    if (elementInfo.hasOwnProperty("value")) {
+      this.layerGraphics.getItemAt(operationalItemIndex).map(feature => {
+        const attributes = feature.attributes;
+
+        if (
+          elementInfo.value == attributes[field] ||
+          elementInfo.value == attributes[field.toLowerCase()] ||
+          elementInfo.value == attributes[field.toUpperCase()]
+        ) {
+          features.push(feature);
+        }
+      });
+    } else {
+      const elementInfoCollection = new Collection(legendElementInfos);
+      this.layerGraphics.getItemAt(operationalItemIndex).map(feature => {
+        const itemExists = elementInfoCollection.find(elementInfo => {
+          if (elementInfo.value) {
+            return elementInfo.value == feature.attributes[field];
+          }
+        });
+        if (!itemExists) {
+          features.push(feature);
+        }
+      });
+    }
 
     features.forEach(feature => {
       highlightedFeatures.push(feature);

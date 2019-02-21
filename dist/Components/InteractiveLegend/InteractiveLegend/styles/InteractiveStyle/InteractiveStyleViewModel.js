@@ -199,7 +199,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 this._highlightRangeValues(legendInfoIndex, elementInfo, field, operationalItemIndex, legendElementInfos);
             }
             else {
-                this._highlightUniqueValues(legendInfoIndex, elementInfo, field, operationalItemIndex);
+                this._highlightUniqueValues(legendInfoIndex, elementInfo, field, operationalItemIndex, legendElementInfos);
             }
             this._generateQueryExpressions(elementInfo, field, operationalItemIndex, legendElement, null, legendElementInfos);
             var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
@@ -305,15 +305,20 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                         : field + " = " + elementInfoHasValue + " OR " + field + " = '" + elementInfoHasValue + "'";
                 }
                 else if (!elementInfo.hasOwnProperty("value")) {
-                    var test = field + " <> " + legendElementInfos[0].value;
-                    var expression_1 = [];
+                    var expressionList_1 = [];
                     legendElementInfos.forEach(function (legendElementInfo) {
                         if (legendElementInfo.value) {
-                            expression_1.push(field + " <> " + legendElementInfo.value + " AND " + field + " <> '" + legendElementInfo.value + "'");
+                            var value_1 = legendElementInfo.value;
+                            var singleQuote = value_1.indexOf("'") !== -1 ? value_1.split("'").join("''") : null;
+                            var expression = singleQuote
+                                ? field + " <> '" + singleQuote + "'"
+                                : isNaN(value_1)
+                                    ? field + " <> '" + value_1 + "'"
+                                    : field + " <> " + value_1 + " AND " + field + " <> '" + value_1 + "'";
+                            expressionList_1.push(expression);
                         }
                     });
-                    var newExpression = expression_1.join(" AND ");
-                    return newExpression;
+                    return expressionList_1.join(" AND ");
                 }
                 else {
                     var singleQuote = elementInfoHasValue.indexOf("'") !== -1
@@ -384,7 +389,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             highlightedFeatures[legendInfoIndex] = [highlight];
         };
         // _highlightUniqueValue
-        InteractiveStyleViewModel.prototype._highlightUniqueValues = function (legendInfoIndex, elementInfo, field, operationalItemIndex) {
+        InteractiveStyleViewModel.prototype._highlightUniqueValues = function (legendInfoIndex, elementInfo, field, operationalItemIndex, legendElementInfos) {
             var features = [];
             var highlightedFeatures = [];
             var highlightedFeatureData = this.interactiveStyleData
@@ -394,14 +399,29 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 highlightedFeatureData[legendInfoIndex] = null;
                 return;
             }
-            this.layerGraphics.getItemAt(operationalItemIndex).map(function (feature) {
-                var attributes = feature.attributes;
-                if (elementInfo.value == attributes[field] ||
-                    elementInfo.value == attributes[field.toLowerCase()] ||
-                    elementInfo.value == attributes[field.toUpperCase()]) {
-                    features.push(feature);
-                }
-            });
+            if (elementInfo.hasOwnProperty("value")) {
+                this.layerGraphics.getItemAt(operationalItemIndex).map(function (feature) {
+                    var attributes = feature.attributes;
+                    if (elementInfo.value == attributes[field] ||
+                        elementInfo.value == attributes[field.toLowerCase()] ||
+                        elementInfo.value == attributes[field.toUpperCase()]) {
+                        features.push(feature);
+                    }
+                });
+            }
+            else {
+                var elementInfoCollection_1 = new Collection(legendElementInfos);
+                this.layerGraphics.getItemAt(operationalItemIndex).map(function (feature) {
+                    var itemExists = elementInfoCollection_1.find(function (elementInfo) {
+                        if (elementInfo.value) {
+                            return elementInfo.value == feature.attributes[field];
+                        }
+                    });
+                    if (!itemExists) {
+                        features.push(feature);
+                    }
+                });
+            }
             features.forEach(function (feature) {
                 highlightedFeatures.push(feature);
             });
