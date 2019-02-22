@@ -137,11 +137,15 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this.searchViewModel = null;
             // selectedStyleData
             _this.selectedStyleData = new Collection();
+            // opacity
             _this.opacity = null;
+            // grayScale
             _this.grayScale = null;
             // viewModel
             _this.viewModel = new InteractiveStyleViewModel();
+            // onboardingPanelEnabled
             _this.onboardingPanelEnabled = null;
+            // offscreen
             _this.offscreen = null;
             // type
             _this.type = "classic";
@@ -470,14 +474,12 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     }
                 }
             }
-            var hasPictureMarkersAndIsMute = this._checkForPictureMarkersAndIsMute(activeLayerInfo);
             var isRelationship = legendElement.type === "relationship-ramp";
             var featureLayer = activeLayerInfo.layer;
             var isPredominance = featureLayer.renderer &&
                 featureLayer.renderer.authoringInfo &&
                 featureLayer.renderer.authoringInfo.type === "predominance";
             var isSizeRampAndMute = isSizeRamp && this.filterMode === "mute";
-            var hasPictureFillAndIsMute = this._checkForPictureFillAndIsMute(activeLayerInfo);
             var hasMoreThanOneInfo = legendElement.infos.length > 1;
             var featureLayerData = this.selectedStyleData.length > 0
                 ? this.selectedStyleData.find(function (data) {
@@ -485,9 +487,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 })
                 : null;
             var applySelect = (!isRelationship &&
-                !hasPictureMarkersAndIsMute &&
                 !isSizeRampAndMute &&
-                !hasPictureFillAndIsMute &&
                 hasMoreThanOneInfo &&
                 !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
                 activeLayerInfo.layer.type === "feature" &&
@@ -511,9 +511,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     ? 0
                     : -1, "data-legend-index": "" + legendElementIndex, "data-child-index": "" + legendInfoIndex, "data-layer-id": "" + activeLayerInfo.layer.id, onclick: function (event) {
                     if ((!isRelationship &&
-                        !hasPictureMarkersAndIsMute &&
                         !isSizeRampAndMute &&
-                        !hasPictureFillAndIsMute &&
                         hasMoreThanOneInfo &&
                         !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
                         activeLayerInfo.layer.type === "feature" &&
@@ -525,9 +523,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     }
                 }, onkeydown: function (event) {
                     if ((!isRelationship &&
-                        !hasPictureMarkersAndIsMute &&
                         !isSizeRampAndMute &&
-                        !hasPictureFillAndIsMute &&
                         hasMoreThanOneInfo &&
                         !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
                         field &&
@@ -707,58 +703,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 }
             });
             return itemIndex;
-        };
-        // _checkForPictureMarkersAndIsMute
-        InteractiveClassic.prototype._checkForPictureMarkersAndIsMute = function (activeLayerInfo) {
-            var layer = activeLayerInfo.layer;
-            var hasRenderer = layer.hasOwnProperty("renderer");
-            if (!hasRenderer) {
-                return false;
-            }
-            var renderer = layer.renderer;
-            var hasSymbol = renderer.hasOwnProperty("symbol");
-            var hasUniqueValueInfos = renderer.hasOwnProperty("uniqueValueInfos");
-            var hasClassBreakInfos = renderer.hasOwnProperty("classBreakInfos");
-            return (((hasRenderer &&
-                hasSymbol &&
-                renderer.symbol.type === "picture-marker") ||
-                (hasRenderer &&
-                    hasUniqueValueInfos &&
-                    renderer.uniqueValueInfos.every(function (uvInfo) {
-                        return uvInfo.symbol.type === "picture-marker";
-                    })) ||
-                (hasRenderer &&
-                    hasClassBreakInfos &&
-                    renderer.classBreakInfos.every(function (cbInfo) {
-                        return cbInfo.symbol.type === "picture-marker";
-                    }))) &&
-                this.filterMode === "mute");
-        };
-        // _checkForPictureFillAndIsMute
-        InteractiveClassic.prototype._checkForPictureFillAndIsMute = function (activeLayerInfo) {
-            var layer = activeLayerInfo.layer;
-            var hasRenderer = layer.hasOwnProperty("renderer");
-            if (!hasRenderer) {
-                return false;
-            }
-            var renderer = layer.renderer;
-            var hasSymbol = renderer.hasOwnProperty("symbol");
-            var hasUniqueValueInfos = renderer.hasOwnProperty("uniqueValueInfos");
-            var hasClassBreakInfos = renderer.hasOwnProperty("classBreakInfos");
-            return (((hasRenderer &&
-                hasSymbol &&
-                renderer.symbol.type === "picture-fill") ||
-                (hasRenderer &&
-                    hasUniqueValueInfos &&
-                    renderer.uniqueValueInfos.every(function (uvInfo) {
-                        return uvInfo.symbol.type === "picture-fill";
-                    })) ||
-                (hasRenderer &&
-                    hasClassBreakInfos &&
-                    renderer.classBreakInfos.every(function (cbInfo) {
-                        return cbInfo.symbol.type === "picture-fill";
-                    }))) &&
-                this.filterMode === "mute");
         };
         __decorate([
             decorators_1.aliasOf("viewModel.activeLayerInfos"),

@@ -223,10 +223,12 @@ class InteractiveClassic extends declared(Widget) {
   @property()
   selectedStyleData: Collection<SelectedStyleData> = new Collection();
 
+  // opacity
   @aliasOf("viewModel.opacity")
   @property()
   opacity: number = null;
 
+  // grayScale
   @aliasOf("viewModel.grayScale")
   @property()
   grayScale: number = null;
@@ -238,9 +240,11 @@ class InteractiveClassic extends declared(Widget) {
   })
   viewModel: InteractiveStyleViewModel = new InteractiveStyleViewModel();
 
+  // onboardingPanelEnabled
   @property()
   onboardingPanelEnabled: boolean = null;
 
+  // offscreen
   @property()
   offscreen: boolean = null;
 
@@ -791,10 +795,6 @@ class InteractiveClassic extends declared(Widget) {
         }
       }
     }
-
-    const hasPictureMarkersAndIsMute = this._checkForPictureMarkersAndIsMute(
-      activeLayerInfo
-    );
     const isRelationship = legendElement.type === "relationship-ramp";
     const featureLayer = activeLayerInfo.layer as FeatureLayer;
     const isPredominance =
@@ -803,9 +803,6 @@ class InteractiveClassic extends declared(Widget) {
       featureLayer.renderer.authoringInfo.type === "predominance";
     const isSizeRampAndMute = isSizeRamp && this.filterMode === "mute";
 
-    const hasPictureFillAndIsMute = this._checkForPictureFillAndIsMute(
-      activeLayerInfo
-    );
     const hasMoreThanOneInfo = legendElement.infos.length > 1;
 
     const featureLayerData =
@@ -816,9 +813,7 @@ class InteractiveClassic extends declared(Widget) {
         : null;
     const applySelect =
       (!isRelationship &&
-        !hasPictureMarkersAndIsMute &&
         !isSizeRampAndMute &&
-        !hasPictureFillAndIsMute &&
         hasMoreThanOneInfo &&
         !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
         activeLayerInfo.layer.type === "feature" &&
@@ -856,9 +851,7 @@ class InteractiveClassic extends declared(Widget) {
         onclick={(event: Event) => {
           if (
             (!isRelationship &&
-              !hasPictureMarkersAndIsMute &&
               !isSizeRampAndMute &&
-              !hasPictureFillAndIsMute &&
               hasMoreThanOneInfo &&
               !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
               activeLayerInfo.layer.type === "feature" &&
@@ -882,9 +875,7 @@ class InteractiveClassic extends declared(Widget) {
         onkeydown={(event: Event) => {
           if (
             (!isRelationship &&
-              !hasPictureMarkersAndIsMute &&
               !isSizeRampAndMute &&
-              !hasPictureFillAndIsMute &&
               hasMoreThanOneInfo &&
               !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
               field &&
@@ -1213,72 +1204,6 @@ class InteractiveClassic extends declared(Widget) {
       }
     );
     return itemIndex;
-  }
-
-  // _checkForPictureMarkersAndIsMute
-  private _checkForPictureMarkersAndIsMute(
-    activeLayerInfo: ActiveLayerInfo
-  ): boolean {
-    const { layer } = activeLayerInfo;
-    const hasRenderer = layer.hasOwnProperty("renderer");
-    if (!hasRenderer) {
-      return false;
-    }
-    const { renderer } = layer as FeatureLayer;
-    const hasSymbol = renderer.hasOwnProperty("symbol");
-    const hasUniqueValueInfos = renderer.hasOwnProperty("uniqueValueInfos");
-    const hasClassBreakInfos = renderer.hasOwnProperty("classBreakInfos");
-    return (
-      ((hasRenderer &&
-        hasSymbol &&
-        (renderer as __esri.SimpleRenderer).symbol.type === "picture-marker") ||
-        (hasRenderer &&
-          hasUniqueValueInfos &&
-          (renderer as __esri.UniqueValueRenderer).uniqueValueInfos.every(
-            (uvInfo: __esri.UniqueValueInfo) =>
-              uvInfo.symbol.type === "picture-marker"
-          )) ||
-        (hasRenderer &&
-          hasClassBreakInfos &&
-          (renderer as __esri.ClassBreaksRenderer).classBreakInfos.every(
-            (cbInfo: __esri.ClassBreaksRendererClassBreakInfos) =>
-              cbInfo.symbol.type === "picture-marker"
-          ))) &&
-      this.filterMode === "mute"
-    );
-  }
-
-  // _checkForPictureFillAndIsMute
-  private _checkForPictureFillAndIsMute(
-    activeLayerInfo: ActiveLayerInfo
-  ): boolean {
-    const { layer } = activeLayerInfo;
-    const hasRenderer = layer.hasOwnProperty("renderer");
-    if (!hasRenderer) {
-      return false;
-    }
-    const { renderer } = layer as FeatureLayer;
-    const hasSymbol = renderer.hasOwnProperty("symbol");
-    const hasUniqueValueInfos = renderer.hasOwnProperty("uniqueValueInfos");
-    const hasClassBreakInfos = renderer.hasOwnProperty("classBreakInfos");
-    return (
-      ((hasRenderer &&
-        hasSymbol &&
-        (renderer as __esri.SimpleRenderer).symbol.type === "picture-fill") ||
-        (hasRenderer &&
-          hasUniqueValueInfos &&
-          (renderer as __esri.UniqueValueRenderer).uniqueValueInfos.every(
-            (uvInfo: __esri.UniqueValueInfo) =>
-              uvInfo.symbol.type === "picture-fill"
-          )) ||
-        (hasRenderer &&
-          hasClassBreakInfos &&
-          (renderer as __esri.ClassBreaksRenderer).classBreakInfos.every(
-            (cbInfo: __esri.ClassBreaksRendererClassBreakInfos) =>
-              cbInfo.symbol.type === "picture-fill"
-          ))) &&
-      this.filterMode === "mute"
-    );
   }
 }
 
