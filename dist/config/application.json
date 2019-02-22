@@ -32,8 +32,6 @@
   "customCSS": null,
   "interactiveLegendPosition": "bottom-left",
   "filterMode": "featureFilter",
-  "highlightShade": null,
-  "mutedShade": null,
   "muteOpacity": null,
   "muteGrayScale": null,
   "webmap": "default",

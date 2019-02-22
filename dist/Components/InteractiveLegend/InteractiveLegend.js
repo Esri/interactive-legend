@@ -74,14 +74,12 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             _this.label = i18n.widgetLabel;
             // layerInfos
             _this.layerInfos = null;
-            // mutedShade
-            _this.mutedShade = null;
             // searchExpressions
             _this.searchExpressions = null;
             _this.searchViewModel = null;
             // layerListViewModel
             _this.layerListViewModel = null;
-            // mutedShade
+            // onboardingPanelEnabled
             _this.onboardingPanelEnabled = null;
             _this.offscreen = null;
             _this.opacity = null;
@@ -91,7 +89,6 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 view: _this.view,
                 activeLayerInfos: _this.activeLayerInfos,
                 filterMode: _this.filterMode,
-                mutedShade: _this.mutedShade,
                 layerListViewModel: _this.layerListViewModel,
                 searchViewModel: _this.searchViewModel,
                 onboardingPanelEnabled: _this.onboardingPanelEnabled,
@@ -111,7 +108,6 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                     view: this.view,
                     activeLayerInfos: this.activeLayerInfos,
                     filterMode: this.filterMode,
-                    mutedShade: this.mutedShade,
                     layerListViewModel: this.layerListViewModel,
                     searchViewModel: this.searchViewModel,
                     onboardingPanelEnabled: this.onboardingPanelEnabled,
@@ -130,7 +126,6 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 view: this.view,
                 activeLayerInfos: this.activeLayerInfos,
                 filterMode: this.filterMode,
-                mutedShade: this.mutedShade,
                 layerListViewModel: this.layerListViewModel,
                 searchViewModel: this.searchViewModel,
                 onboardingPanelEnabled: this.onboardingPanelEnabled,
@@ -231,10 +226,6 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             decorators_1.aliasOf("viewModel.layerInfos"),
             widget_1.renderable()
         ], InteractiveLegend.prototype, "layerInfos", void 0);
-        __decorate([
-            decorators_1.aliasOf("style.mutedShade"),
-            widget_1.renderable()
-        ], InteractiveLegend.prototype, "mutedShade", void 0);
         __decorate([
             decorators_1.aliasOf("style.searchExpressions"),
             decorators_1.property()

@@ -50,8 +50,8 @@ import FeatureLayer = require("esri/layers/FeatureLayer");
 // InteractiveClassicViewModel
 import InteractiveStyleViewModel = require("./InteractiveStyle/InteractiveStyleViewModel");
 
-// esri.Grahpic
-import Graphic = require("esri/Graphic");
+// // esri.Grahpic
+// import Graphic = require("esri/Graphic");
 
 // esri.core.Handles
 import Handles = require("esri/core/Handles");
@@ -199,15 +199,10 @@ class InteractiveClassic extends declared(Widget) {
   @property()
   filterMode: FilterMode = null;
 
-  // mutedShade
-  @aliasOf("viewModel.mutedShade")
-  @property()
-  mutedShade: number[] = null;
-
-  // layerGraphics
-  @aliasOf("viewModel.layerGraphics")
-  @property()
-  layerGraphics: Collection<Graphic[]> = null;
+  // // layerGraphics
+  // @aliasOf("viewModel.layerGraphics")
+  // @property()
+  // layerGraphics: Collection<Graphic[]> = null;
 
   // layerListViewModel
   @aliasOf("viewModel.layerListViewModel")
@@ -316,7 +311,7 @@ class InteractiveClassic extends declared(Widget) {
           <div class={this.classes(CSS.preventScroll)}>
             {filteredLayers && filteredLayers.length ? (
               <div class={CSS.legendElements}>
-                {state === "loading" || state === "querying" ? (
+                {state === "loading" ? (
                   <div class={CSS.loader} />
                 ) : (
                   <div> {filteredLayers}</div>
@@ -1018,39 +1013,61 @@ class InteractiveClassic extends declared(Widget) {
     isPredominance: boolean,
     legendElementInfos?: any[]
   ): void {
-    this.filterMode === "featureFilter"
-      ? this._featureFilter(
-          elementInfo,
-          field,
-          operationalItemIndex,
-          legendInfoIndex,
-          legendElement,
-          isPredominance,
-          legendElementInfos
-        )
-      : this.filterMode === "highlight"
-      ? this._featureHighlight(
-          event,
-          elementInfo,
-          field,
-          legendInfoIndex,
-          operationalItemIndex,
-          legendElement,
-          isPredominance,
-          legendElementInfos
-        )
-      : this.filterMode === "mute"
-      ? this._featureMute(
-          event,
-          elementInfo,
-          field,
-          legendInfoIndex,
-          operationalItemIndex,
-          legendElement,
-          legendElementInfos,
-          isPredominance
-        )
-      : null;
+    // this.filterMode === "featureFilter"
+    //   ? this._featureFilter(
+    //       elementInfo,
+    //       field,
+    //       operationalItemIndex,
+    //       legendInfoIndex,
+    //       legendElement,
+    //       isPredominance,
+    //       legendElementInfos
+    //     )
+    //   : this.filterMode === "highlight"
+    //   ? this._featureHighlight(
+    //       event,
+    //       elementInfo,
+    //       field,
+    //       legendInfoIndex,
+    //       operationalItemIndex,
+    //       legendElement,
+    //       isPredominance,
+    //       legendElementInfos
+    //     )
+    //   : this.filterMode === "mute"
+    //   ? this._featureMute(
+    //       event,
+    //       elementInfo,
+    //       field,
+    //       legendInfoIndex,
+    //       operationalItemIndex,
+    //       legendElement,
+    //       legendElementInfos,
+    //       isPredominance
+    //     )
+    //   : null;
+    if (this.filterMode === "featureFilter") {
+      this._featureFilter(
+        elementInfo,
+        field,
+        operationalItemIndex,
+        legendInfoIndex,
+        legendElement,
+        isPredominance,
+        legendElementInfos
+      );
+    } else if (this.filterMode === "mute") {
+      this._featureMute(
+        event,
+        elementInfo,
+        field,
+        legendInfoIndex,
+        operationalItemIndex,
+        legendElement,
+        legendElementInfos,
+        isPredominance
+      );
+    }
   }
 
   //_filterFeatures
@@ -1075,33 +1092,33 @@ class InteractiveClassic extends declared(Widget) {
     );
   }
 
-  // _highlightFeatures
-  private _featureHighlight(
-    event: Event,
-    elementInfo: any,
-    field: string,
-    legendInfoIndex: number,
-    operationalItemIndex: number,
-    legendElement: LegendElement,
-    isPredominance: boolean,
-    legendElementInfos: any[]
-  ): void {
-    const { state } = this.viewModel;
-    if (state === "querying") {
-      return;
-    }
+  // // _highlightFeatures
+  // private _featureHighlight(
+  //   event: Event,
+  //   elementInfo: any,
+  //   field: string,
+  //   legendInfoIndex: number,
+  //   operationalItemIndex: number,
+  //   legendElement: LegendElement,
+  //   isPredominance: boolean,
+  //   legendElementInfos: any[]
+  // ): void {
+  //   const { state } = this.viewModel;
+  //   if (state === "querying") {
+  //     return;
+  //   }
 
-    this.viewModel.applyFeatureHighlight(
-      elementInfo,
-      field,
-      legendInfoIndex,
-      operationalItemIndex,
-      legendElement,
-      isPredominance,
-      legendElementInfos
-    );
-    this._handleSelectedStyles(event, operationalItemIndex, legendInfoIndex);
-  }
+  //   this.viewModel.applyFeatureHighlight(
+  //     elementInfo,
+  //     field,
+  //     legendInfoIndex,
+  //     operationalItemIndex,
+  //     legendElement,
+  //     isPredominance,
+  //     legendElementInfos
+  //   );
+  //   this._handleSelectedStyles(event, operationalItemIndex, legendInfoIndex);
+  // }
 
   // _muteFeatures
   private _featureMute(
@@ -1153,17 +1170,17 @@ class InteractiveClassic extends declared(Widget) {
     const legendElementChildArr =
       featureLayerData.selectedInfoIndex[legendElementIndex];
 
-    if (this.filterMode === "highlight") {
-      const highlightedFeatures = this.viewModel.interactiveStyleData
-        .highlightedFeatures[operationalItemIndex];
-      if (
-        !highlightedFeatures[legendInfoIndex] &&
-        !featureLayerData.selectedInfoIndex[legendElementIndex] &&
-        featureLayerData.selectedInfoIndex.indexOf(legendInfoIndex) === -1
-      ) {
-        return;
-      }
-    }
+    // if (this.filterMode === "highlight") {
+    //   const highlightedFeatures = this.viewModel.interactiveStyleData
+    //     .highlightedFeatures[operationalItemIndex];
+    //   if (
+    //     !highlightedFeatures[legendInfoIndex] &&
+    //     !featureLayerData.selectedInfoIndex[legendElementIndex] &&
+    //     featureLayerData.selectedInfoIndex.indexOf(legendInfoIndex) === -1
+    //   ) {
+    //     return;
+    //   }
+    // }
 
     if (
       Array.isArray(legendElementChildArr) &&

@@ -89,7 +89,9 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 });
                 this.telemetry.logPageView();
             }
-            var homeEnabled = config.homeEnabled, homePosition = config.homePosition, zoomControlsEnabled = config.zoomControlsEnabled, zoomControlsPosition = config.zoomControlsPosition, searchEnabled = config.searchEnabled, searchConfig = config.searchConfig, searchPosition = config.searchPosition, basemapToggleEnabled = config.basemapToggleEnabled, basemapTogglePosition = config.basemapTogglePosition, nextBasemap = config.nextBasemap, layerListEnabled = config.layerListEnabled, layerListPosition = config.layerListPosition, screenshotEnabled = config.screenshotEnabled, screenshotPosition = config.screenshotPosition, popupIncludedInScreenshot = config.popupIncludedInScreenshot, legendIncludedInScreenshot = config.legendIncludedInScreenshot, infoPanelEnabled = config.infoPanelEnabled, infoPanelPosition = config.infoPanelPosition, splashButtonPosition = config.splashButtonPosition, interactiveLegendPosition = config.interactiveLegendPosition, filterMode = config.filterMode, highlightShade = config.highlightShade, mutedShade = config.mutedShade, muteOpacity = config.muteOpacity, muteGrayScale = config.muteGrayScale, searchOpenAtStart = config.searchOpenAtStart;
+            var homeEnabled = config.homeEnabled, homePosition = config.homePosition, zoomControlsEnabled = config.zoomControlsEnabled, zoomControlsPosition = config.zoomControlsPosition, searchEnabled = config.searchEnabled, searchConfig = config.searchConfig, searchPosition = config.searchPosition, basemapToggleEnabled = config.basemapToggleEnabled, basemapTogglePosition = config.basemapTogglePosition, nextBasemap = config.nextBasemap, layerListEnabled = config.layerListEnabled, layerListPosition = config.layerListPosition, screenshotEnabled = config.screenshotEnabled, screenshotPosition = config.screenshotPosition, popupIncludedInScreenshot = config.popupIncludedInScreenshot, legendIncludedInScreenshot = config.legendIncludedInScreenshot, infoPanelEnabled = config.infoPanelEnabled, infoPanelPosition = config.infoPanelPosition, splashButtonPosition = config.splashButtonPosition, interactiveLegendPosition = config.interactiveLegendPosition, filterMode = config.filterMode, 
+            // highlightShade,
+            mutedShade = config.mutedShade, muteOpacity = config.muteOpacity, muteGrayScale = config.muteGrayScale, searchOpenAtStart = config.searchOpenAtStart;
             var webMapItems = results.webMapItems;
             var validWebMapItems = webMapItems.map(function (response) {
                 return response.value;
@@ -145,19 +147,18 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                             }
                             var defaultStyle = "classic";
                             var defaultMode = filterMode ? filterMode : "featureFilter";
-                            if (highlightShade) {
-                                var highlightedShade = new Color(highlightShade);
-                                var r = highlightedShade.r, g = highlightedShade.g, b = highlightedShade.b, a = highlightedShade.a;
-                                view.highlightOptions = {
-                                    color: new Color("rgb(" + r + "," + g + "," + b + ")"),
-                                    fillOpacity: a
-                                };
-                            }
-                            else {
-                                view.highlightOptions = {
-                                    color: new Color("#000000")
-                                };
-                            }
+                            // if (highlightShade) {
+                            //   const highlightedShade = new Color(highlightShade);
+                            //   const { r, g, b, a } = highlightedShade;
+                            //   view.highlightOptions = {
+                            //     color: new Color(`rgb(${r},${g},${b})`),
+                            //     fillOpacity: a
+                            //   };
+                            // } else {
+                            //   view.highlightOptions = {
+                            //     color: new Color("#000000")
+                            //   };
+                            // }
                             _this._handleHomeWidget(view, homeEnabled, homePosition);
                             _this._handleSplash(config, view, splashButtonPosition);
                             _this.layerList = new LayerList({
@@ -355,7 +356,6 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                     if (view.popup.visible) {
                         if (!_this.featureWidget) {
                             _this.featureWidget = new FeatureWidget({
-                                view: view,
                                 graphic: view.popup.selectedFeature,
                                 container: document.querySelector(".offscreen-pop-up-container")
                             });

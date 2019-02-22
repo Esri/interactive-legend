@@ -211,11 +211,11 @@
           "items": [{
               "type": "boolean",
               "fieldName": "legendIncludedInScreenshot",
-              "label": "Include legend in screenshot"
+              "label": "Enable option to include legend in screenshot:"
             }, {
               "type": "boolean",
               "fieldName": "popupIncludedInScreenshot",
-              "label": "Include pop up in screenshot"
+              "label": "Enable option to include pop-up in screenshot:"
             }, {
               "type": "options",
               "fieldName": "screenshotPosition",
@@ -359,10 +359,6 @@
         },
         {
           "type": "paragraph",
-          "value": "The Highlight mode will select features using the default highlight or a custom color that you specify."
-        },
-        {
-          "type": "paragraph",
           "value": "The Mute mode will apply opacity and grayscale to features of legend elements that are not selected."
         },
         {
@@ -376,26 +372,10 @@
               "value": "featureFilter"
             },
             {
-              "label": "Highlight",
-              "value": "highlight"
-            },
-            {
               "label": "Mute",
               "value": "mute"
             }
           ]
-        },
-
-        {
-          "type": "subcategory",
-          "label": "Highlight"
-        },
-        {
-          "type": "color",
-          "label": "Choose a highlight color. Default: Black, rgba(0,0,0,0.25)",
-          "fieldName": "highlightShade",
-          "transparency": true,
-          "noColor": true
         },
         {
           "type": "subcategory",
@@ -520,12 +500,6 @@
     "splashOnStart": true,
     "splashButtonPosition": "top-right",
     "muteOpacity": 30,
-    "muteGrayScale": 100,
-    "highlightShade": {
-      "r": 0,
-      "g": 0,
-      "b": 0,
-      "a": 0.25
-    }
+    "muteGrayScale": 100
   }
 }

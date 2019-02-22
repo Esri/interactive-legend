@@ -125,10 +125,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this.view = null;
             // filterMode
             _this.filterMode = null;
-            // mutedShade
-            _this.mutedShade = null;
-            // layerGraphics
-            _this.layerGraphics = null;
+            // // layerGraphics
+            // @aliasOf("viewModel.layerGraphics")
+            // @property()
+            // layerGraphics: Collection<Graphic[]> = null;
             // layerListViewModel
             _this.layerListViewModel = null;
             // searchExpressions
@@ -187,7 +187,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     legendElements.push(legendElement);
                 });
             });
-            return (widget_1.tsx("div", { class: baseClasses }, this.onboardingPanelEnabled ? (this._renderOnboardingPanel()) : (widget_1.tsx("div", { class: this.classes(CSS.preventScroll) }, filteredLayers && filteredLayers.length ? (widget_1.tsx("div", { class: CSS.legendElements }, state === "loading" || state === "querying" ? (widget_1.tsx("div", { class: CSS.loader })) : (widget_1.tsx("div", null,
+            return (widget_1.tsx("div", { class: baseClasses }, this.onboardingPanelEnabled ? (this._renderOnboardingPanel()) : (widget_1.tsx("div", { class: this.classes(CSS.preventScroll) }, filteredLayers && filteredLayers.length ? (widget_1.tsx("div", { class: CSS.legendElements }, state === "loading" ? (widget_1.tsx("div", { class: CSS.loader })) : (widget_1.tsx("div", null,
                 " ",
                 filteredLayers)))) : (widget_1.tsx("div", { class: CSS.message }, i18n.noLegend))))));
         };
@@ -580,28 +580,77 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         //
         //-------------------------------------------------------------------
         InteractiveClassic.prototype._handleFilterOption = function (event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos) {
-            this.filterMode === "featureFilter"
-                ? this._featureFilter(elementInfo, field, operationalItemIndex, legendInfoIndex, legendElement, isPredominance, legendElementInfos)
-                : this.filterMode === "highlight"
-                    ? this._featureHighlight(event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos)
-                    : this.filterMode === "mute"
-                        ? this._featureMute(event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos, isPredominance)
-                        : null;
+            // this.filterMode === "featureFilter"
+            //   ? this._featureFilter(
+            //       elementInfo,
+            //       field,
+            //       operationalItemIndex,
+            //       legendInfoIndex,
+            //       legendElement,
+            //       isPredominance,
+            //       legendElementInfos
+            //     )
+            //   : this.filterMode === "highlight"
+            //   ? this._featureHighlight(
+            //       event,
+            //       elementInfo,
+            //       field,
+            //       legendInfoIndex,
+            //       operationalItemIndex,
+            //       legendElement,
+            //       isPredominance,
+            //       legendElementInfos
+            //     )
+            //   : this.filterMode === "mute"
+            //   ? this._featureMute(
+            //       event,
+            //       elementInfo,
+            //       field,
+            //       legendInfoIndex,
+            //       operationalItemIndex,
+            //       legendElement,
+            //       legendElementInfos,
+            //       isPredominance
+            //     )
+            //   : null;
+            if (this.filterMode === "featureFilter") {
+                this._featureFilter(elementInfo, field, operationalItemIndex, legendInfoIndex, legendElement, isPredominance, legendElementInfos);
+            }
+            else if (this.filterMode === "mute") {
+                this._featureMute(event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos, isPredominance);
+            }
         };
         //_filterFeatures
         InteractiveClassic.prototype._featureFilter = function (elementInfo, field, operationalItemIndex, legendInfoIndex, legendElement, isPredominance, legendElementInfos) {
             this._handleSelectedStyles(event);
             this.viewModel.applyFeatureFilter(elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, isPredominance, legendElementInfos);
         };
-        // _highlightFeatures
-        InteractiveClassic.prototype._featureHighlight = function (event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos) {
-            var state = this.viewModel.state;
-            if (state === "querying") {
-                return;
-            }
-            this.viewModel.applyFeatureHighlight(elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos);
-            this._handleSelectedStyles(event, operationalItemIndex, legendInfoIndex);
-        };
+        // // _highlightFeatures
+        // private _featureHighlight(
+        //   event: Event,
+        //   elementInfo: any,
+        //   field: string,
+        //   legendInfoIndex: number,
+        //   operationalItemIndex: number,
+        //   legendElement: LegendElement,
+        //   isPredominance: boolean,
+        //   legendElementInfos: any[]
+        // ): void {
+        //   const { state } = this.viewModel;
+        //   if (state === "querying") {
+        //     return;
+        //   }
+        //   this.viewModel.applyFeatureHighlight(
+        //     elementInfo,
+        //     field,
+        //     legendInfoIndex,
+        //     operationalItemIndex,
+        //     legendElement,
+        //     isPredominance,
+        //     legendElementInfos
+        //   );
+        //   this._handleSelectedStyles(event, operationalItemIndex, legendInfoIndex);
+        // }
         // _muteFeatures
         InteractiveClassic.prototype._featureMute = function (event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos, isPredominance) {
             this._handleSelectedStyles(event);
@@ -623,15 +672,17 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 return layerData ? layerData.layerItemId === activeLayerInfoId : null;
             });
             var legendElementChildArr = featureLayerData.selectedInfoIndex[legendElementIndex];
-            if (this.filterMode === "highlight") {
-                var highlightedFeatures = this.viewModel.interactiveStyleData
-                    .highlightedFeatures[operationalItemIndex];
-                if (!highlightedFeatures[legendInfoIndex] &&
-                    !featureLayerData.selectedInfoIndex[legendElementIndex] &&
-                    featureLayerData.selectedInfoIndex.indexOf(legendInfoIndex) === -1) {
-                    return;
-                }
-            }
+            // if (this.filterMode === "highlight") {
+            //   const highlightedFeatures = this.viewModel.interactiveStyleData
+            //     .highlightedFeatures[operationalItemIndex];
+            //   if (
+            //     !highlightedFeatures[legendInfoIndex] &&
+            //     !featureLayerData.selectedInfoIndex[legendElementIndex] &&
+            //     featureLayerData.selectedInfoIndex.indexOf(legendInfoIndex) === -1
+            //   ) {
+            //     return;
+            //   }
+            // }
             if (Array.isArray(legendElementChildArr) &&
                 legendElementChildArr.length >= 1) {
                 legendElementChildArr.indexOf(legendElementInfoIndex) === -1
@@ -721,14 +772,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             decorators_1.aliasOf("viewModel.filterMode"),
             decorators_1.property()
         ], InteractiveClassic.prototype, "filterMode", void 0);
-        __decorate([
-            decorators_1.aliasOf("viewModel.mutedShade"),
-            decorators_1.property()
-        ], InteractiveClassic.prototype, "mutedShade", void 0);
-        __decorate([
-            decorators_1.aliasOf("viewModel.layerGraphics"),
-            decorators_1.property()
-        ], InteractiveClassic.prototype, "layerGraphics", void 0);
         __decorate([
             decorators_1.aliasOf("viewModel.layerListViewModel"),
             decorators_1.property()

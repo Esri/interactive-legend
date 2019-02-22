@@ -122,11 +122,6 @@ class InteractiveLegend extends declared(Widget) {
   @renderable()
   layerInfos: LayerInfo[] = null;
 
-  // mutedShade
-  @aliasOf("style.mutedShade")
-  @renderable()
-  mutedShade: number[] = null;
-
   // searchExpressions
   @aliasOf("style.searchExpressions")
   @property()
@@ -140,7 +135,7 @@ class InteractiveLegend extends declared(Widget) {
   @property()
   layerListViewModel: LayerListViewModel = null;
 
-  // mutedShade
+  // onboardingPanelEnabled
   @aliasOf("style.onboardingPanelEnabled")
   @renderable()
   onboardingPanelEnabled: boolean = null;
@@ -164,7 +159,6 @@ class InteractiveLegend extends declared(Widget) {
     view: this.view,
     activeLayerInfos: this.activeLayerInfos,
     filterMode: this.filterMode,
-    mutedShade: this.mutedShade,
     layerListViewModel: this.layerListViewModel,
     searchViewModel: this.searchViewModel,
     onboardingPanelEnabled: this.onboardingPanelEnabled,
@@ -187,7 +181,6 @@ class InteractiveLegend extends declared(Widget) {
         view: this.view,
         activeLayerInfos: this.activeLayerInfos,
         filterMode: this.filterMode,
-        mutedShade: this.mutedShade,
         layerListViewModel: this.layerListViewModel,
         searchViewModel: this.searchViewModel,
         onboardingPanelEnabled: this.onboardingPanelEnabled,
@@ -210,7 +203,6 @@ class InteractiveLegend extends declared(Widget) {
       view: this.view,
       activeLayerInfos: this.activeLayerInfos,
       filterMode: this.filterMode,
-      mutedShade: this.mutedShade,
       layerListViewModel: this.layerListViewModel,
       searchViewModel: this.searchViewModel,
       onboardingPanelEnabled: this.onboardingPanelEnabled,
