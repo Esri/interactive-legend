@@ -50,8 +50,8 @@ import FeatureLayer = require("esri/layers/FeatureLayer");
 // InteractiveClassicViewModel
 import InteractiveStyleViewModel = require("./InteractiveStyle/InteractiveStyleViewModel");
 
-// esri.Grahpic
-import Graphic = require("esri/Graphic");
+// // esri.Grahpic
+// import Graphic = require("esri/Graphic");
 
 // esri.core.Handles
 import Handles = require("esri/core/Handles");
@@ -199,15 +199,10 @@ class InteractiveClassic extends declared(Widget) {
   @property()
   filterMode: FilterMode = null;
 
-  // mutedShade
-  @aliasOf("viewModel.mutedShade")
-  @property()
-  mutedShade: number[] = null;
-
-  // layerGraphics
-  @aliasOf("viewModel.layerGraphics")
-  @property()
-  layerGraphics: Collection<Graphic[]> = null;
+  // // layerGraphics
+  // @aliasOf("viewModel.layerGraphics")
+  // @property()
+  // layerGraphics: Collection<Graphic[]> = null;
 
   // layerListViewModel
   @aliasOf("viewModel.layerListViewModel")

@@ -125,10 +125,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this.view = null;
             // filterMode
             _this.filterMode = null;
-            // mutedShade
-            _this.mutedShade = null;
-            // layerGraphics
-            _this.layerGraphics = null;
+            // // layerGraphics
+            // @aliasOf("viewModel.layerGraphics")
+            // @property()
+            // layerGraphics: Collection<Graphic[]> = null;
             // layerListViewModel
             _this.layerListViewModel = null;
             // searchExpressions
@@ -772,14 +772,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             decorators_1.aliasOf("viewModel.filterMode"),
             decorators_1.property()
         ], InteractiveClassic.prototype, "filterMode", void 0);
-        __decorate([
-            decorators_1.aliasOf("viewModel.mutedShade"),
-            decorators_1.property()
-        ], InteractiveClassic.prototype, "mutedShade", void 0);
-        __decorate([
-            decorators_1.aliasOf("viewModel.layerGraphics"),
-            decorators_1.property()
-        ], InteractiveClassic.prototype, "layerGraphics", void 0);
         __decorate([
             decorators_1.aliasOf("viewModel.layerListViewModel"),
             decorators_1.property()

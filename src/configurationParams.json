@@ -211,11 +211,11 @@
           "items": [{
               "type": "boolean",
               "fieldName": "legendIncludedInScreenshot",
-              "label": "Include legend in screenshot"
+              "label": "Enable option to include legend in screenshot:"
             }, {
               "type": "boolean",
               "fieldName": "popupIncludedInScreenshot",
-              "label": "Include pop up in screenshot"
+              "label": "Enable option to include pop-up in screenshot:"
             }, {
               "type": "options",
               "fieldName": "screenshotPosition",
