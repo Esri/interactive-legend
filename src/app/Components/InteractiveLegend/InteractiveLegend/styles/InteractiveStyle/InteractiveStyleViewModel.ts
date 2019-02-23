@@ -850,6 +850,36 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       });
     });
   }
+
+  // resetLegendFilter
+  resetLegendFilter(featureLayerData: any, operationalItemIndex: number): void {
+    this.interactiveStyleData.queryExpressions[operationalItemIndex].length = 0;
+    const { filter, effect } = featureLayerData.featureLayerView;
+    if (this.filterMode === "featureFilter" && filter && filter.where) {
+      featureLayerData.featureLayerView.filter = new FeatureFilter({
+        where: ""
+      });
+    } else if (
+      this.filterMode === "mute" &&
+      effect &&
+      effect.filter &&
+      effect.filter.where
+    ) {
+      featureLayerData.featureLayerView.effect = new FeatureEffect({
+        outsideEffect: `opacity(${this.opacity}%) grayscale(${
+          this.grayScale
+        }%)`,
+        filter: {
+          where: ""
+        }
+      });
+    }
+    if (featureLayerData.selectedInfoIndex.length) {
+      featureLayerData.selectedInfoIndex.length = 0;
+    }
+    this._setSearchExpression(null);
+    this.notifyChange("state");
+  }
 }
 
 export = InteractiveStyleViewModel;

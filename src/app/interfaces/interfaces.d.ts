@@ -19,6 +19,9 @@ import Loadable = require("esri/core/Loadable");
 // esri.Graphic
 import Graphic = require("esri/Graphic");
 
+// esri.views.layers.FeatureLayerView
+import FeatureLayerView = require("esri/views/layers/FeatureLayerView");
+
 // esri.widgets.Legend.support.ActiveLayerInfo
 import ActiveLayerInfo = require("esri/widgets/Legend/support/ActiveLayerInfo");
 
@@ -45,6 +48,7 @@ export interface SelectedStyleData {
   selectedInfoIndex: any;
   field: string;
   applyStyles: boolean;
+  featureLayerView: FeatureLayerView;
 }
 
 // export type FilterMode = "featureFilter" | "highlight" | "mute";

@@ -50,6 +50,12 @@ import FeatureLayer = require("esri/layers/FeatureLayer");
 // InteractiveClassicViewModel
 import InteractiveStyleViewModel = require("./InteractiveStyle/InteractiveStyleViewModel");
 
+// esri.views.layers.support.FeatureFilter
+import FeatureFilter = require("esri/views/layers/support/FeatureFilter");
+
+// esri.views.layers.support.FeatureEffect
+import FeatureEffect = require("esri/views/layers/support/FeatureEffect");
+
 // // esri.Grahpic
 // import Graphic = require("esri/Graphic");
 
@@ -151,6 +157,11 @@ const CSS = {
   interactiveLegendNonVisibleIcon: "esri-interactive-legend__non-visible-icon",
   interactiveLegendLayerRow: "esri-interactive-legend__ramp-layer-row",
   interactiveStyles: "esri-interactive-legend__interactive-styles",
+  layerCaptionContainer: "esri-interactive-legend__layer-caption-container",
+  interactiveLegendLayerTable: "esri-interactive-legend__layer-table",
+  interactiveLegendHeaderContainer: "esri-interactive-legend__header-container",
+  interactiveLegendResetButtonContainer:
+    "esri-interactive-legend__reset-button-container",
   onboarding: {
     mainContainer: "esri-interactive-legend__onboarding-main-container",
     contentContainer: "esri-interactive-legend__onboarding-content-container",
@@ -280,7 +291,8 @@ class InteractiveClassic extends declared(Widget) {
                 layerItemId: featureLayer.id,
                 field,
                 selectedInfoIndex: [],
-                applyStyles: null
+                applyStyles: null,
+                featureLayerView
               });
             }
           }
@@ -554,13 +566,60 @@ class InteractiveClassic extends declared(Widget) {
       featureLayerData && featureLayerData.applyStyles
         ? this.classes(CSS.layerCaption, CSS.interactiveLegendLayerCaption)
         : CSS.layerCaption;
+
     const layerTable =
       featureLayerData && featureLayerData.applyStyles
-        ? this.classes(CSS.layerTable, "esri-interactive-legend__layer-table")
+        ? this.classes(CSS.layerTable, CSS.interactiveLegendLayerTable)
         : CSS.layerTable;
-    const tableClass = isChild ? CSS.layerChildTable : layerTable,
-      caption = title ? <div class={layerCaption}>{title}</div> : null;
 
+    const renderResetButton = this._renderResetButton(
+      featureLayerData,
+      legendElementIndex,
+      operationalItemIndex
+    );
+    const featureLayer = activeLayerInfo.layer as FeatureLayer;
+    const isRelationship = legendElement.type === "relationship-ramp";
+    const isPredominance =
+      featureLayer.renderer &&
+      featureLayer.renderer.authoringInfo &&
+      featureLayer.renderer.authoringInfo.type === "predominance";
+    const hasMoreThanOneInfo = legendElement.infos.length > 1;
+
+    const tableClass = isChild ? CSS.layerChildTable : layerTable,
+      caption = title ? (
+        (!isRelationship &&
+          hasMoreThanOneInfo &&
+          !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
+          activeLayerInfo.layer.type === "feature" &&
+          field &&
+          featureLayerData &&
+          !isColorRamp &&
+          !isOpacityRamp &&
+          !isSizeRamp &&
+          !isHeatRamp) ||
+        (isPredominance && !isSizeRamp && !isOpacityRamp) ? (
+          <div class={CSS.interactiveLegendHeaderContainer}>
+            <div class={this.classes(layerCaption, CSS.layerCaptionContainer)}>
+              {title}
+            </div>
+            {(!isRelationship &&
+              hasMoreThanOneInfo &&
+              !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
+              activeLayerInfo.layer.type === "feature" &&
+              field &&
+              featureLayerData &&
+              !isColorRamp &&
+              !isOpacityRamp &&
+              !isSizeRamp &&
+              !isHeatRamp) ||
+            (isPredominance && !isSizeRamp && !isOpacityRamp)
+              ? renderResetButton
+              : null}
+          </div>
+        ) : (
+          <div class={layerCaption}>{title}</div>
+        )
+      ) : null;
     const tableClasses = {
       [CSS.layerTableSizeRamp]: isSizeRamp || !isChild
     };
@@ -572,6 +631,52 @@ class InteractiveClassic extends declared(Widget) {
     );
   }
 
+  // _renderResetButton
+  private _renderResetButton(
+    featureLayerData: any,
+    legendElementIndex: number,
+    operationalItemIndex: number
+  ): any {
+    return (
+      <div class={CSS.interactiveLegendResetButtonContainer}>
+        <button
+          bind={this}
+          class={this.classes(
+            CSS.calciteStyles.btn,
+            CSS.calciteStyles.btnSmall
+          )}
+          tabIndex={0}
+          disabled={
+            (featureLayerData &&
+              featureLayerData.selectedInfoIndex.length > 0 &&
+              featureLayerData.selectedInfoIndex[legendElementIndex] &&
+              featureLayerData.selectedInfoIndex[legendElementIndex].length ===
+                0) ||
+            (featureLayerData &&
+              featureLayerData.selectedInfoIndex.length === 0)
+              ? true
+              : false
+          }
+          onclick={(event: Event) => {
+            this._resetLegendFilter(
+              event,
+              featureLayerData,
+              operationalItemIndex
+            );
+          }}
+          onkeydown={(event: Event) => {
+            this._resetLegendFilter(
+              event,
+              featureLayerData,
+              operationalItemIndex
+            );
+          }}
+        >
+          Show all
+        </button>
+      </div>
+    );
+  }
   // _renderLegendForRamp
   private _renderLegendForRamp(
     legendElement: ColorRampElement | OpacityRampElement | HeatmapRampElement,
@@ -795,13 +900,13 @@ class InteractiveClassic extends declared(Widget) {
         }
       }
     }
-    const isRelationship = legendElement.type === "relationship-ramp";
+
     const featureLayer = activeLayerInfo.layer as FeatureLayer;
+    const isRelationship = legendElement.type === "relationship-ramp";
     const isPredominance =
       featureLayer.renderer &&
       featureLayer.renderer.authoringInfo &&
       featureLayer.renderer.authoringInfo.type === "predominance";
-    const isSizeRampAndMute = isSizeRamp && this.filterMode === "mute";
 
     const hasMoreThanOneInfo = legendElement.infos.length > 1;
 
@@ -813,7 +918,6 @@ class InteractiveClassic extends declared(Widget) {
         : null;
     const applySelect =
       (!isRelationship &&
-        !isSizeRampAndMute &&
         hasMoreThanOneInfo &&
         !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
         activeLayerInfo.layer.type === "feature" &&
@@ -851,7 +955,6 @@ class InteractiveClassic extends declared(Widget) {
         onclick={(event: Event) => {
           if (
             (!isRelationship &&
-              !isSizeRampAndMute &&
               hasMoreThanOneInfo &&
               !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
               activeLayerInfo.layer.type === "feature" &&
@@ -875,7 +978,6 @@ class InteractiveClassic extends declared(Widget) {
         onkeydown={(event: Event) => {
           if (
             (!isRelationship &&
-              !isSizeRampAndMute &&
               hasMoreThanOneInfo &&
               !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
               field &&
@@ -1134,6 +1236,16 @@ class InteractiveClassic extends declared(Widget) {
     );
   }
   // End of filter methods
+
+  // _resetLegendFilter
+  @accessibleHandler()
+  private _resetLegendFilter(
+    event: Event,
+    featureLayerData: any,
+    operationalItemIndex: number
+  ): void {
+    this.viewModel.resetLegendFilter(featureLayerData, operationalItemIndex);
+  }
 
   // _disableOnboarding
   @accessibleHandler()

@@ -87,6 +87,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         interactiveLegendNonVisibleIcon: "esri-interactive-legend__non-visible-icon",
         interactiveLegendLayerRow: "esri-interactive-legend__ramp-layer-row",
         interactiveStyles: "esri-interactive-legend__interactive-styles",
+        layerCaptionContainer: "esri-interactive-legend__layer-caption-container",
+        interactiveLegendLayerTable: "esri-interactive-legend__layer-table",
+        interactiveLegendHeaderContainer: "esri-interactive-legend__header-container",
+        interactiveLegendResetButtonContainer: "esri-interactive-legend__reset-button-container",
         onboarding: {
             mainContainer: "esri-interactive-legend__onboarding-main-container",
             contentContainer: "esri-interactive-legend__onboarding-content-container",
@@ -168,7 +172,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                                 layerItemId: featureLayer.id,
                                 field: field,
                                 selectedInfoIndex: [],
-                                applyStyles: null
+                                applyStyles: null,
+                                featureLayerView: featureLayerView
                             });
                         }
                     });
@@ -340,15 +345,64 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 ? this.classes(CSS.layerCaption, CSS.interactiveLegendLayerCaption)
                 : CSS.layerCaption;
             var layerTable = featureLayerData && featureLayerData.applyStyles
-                ? this.classes(CSS.layerTable, "esri-interactive-legend__layer-table")
+                ? this.classes(CSS.layerTable, CSS.interactiveLegendLayerTable)
                 : CSS.layerTable;
-            var tableClass = isChild ? CSS.layerChildTable : layerTable, caption = title ? widget_1.tsx("div", { class: layerCaption }, title) : null;
+            var renderResetButton = this._renderResetButton(featureLayerData, legendElementIndex, operationalItemIndex);
+            var featureLayer = activeLayerInfo.layer;
+            var isRelationship = legendElement.type === "relationship-ramp";
+            var isPredominance = featureLayer.renderer &&
+                featureLayer.renderer.authoringInfo &&
+                featureLayer.renderer.authoringInfo.type === "predominance";
+            var hasMoreThanOneInfo = legendElement.infos.length > 1;
+            var tableClass = isChild ? CSS.layerChildTable : layerTable, caption = title ? ((!isRelationship &&
+                hasMoreThanOneInfo &&
+                !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
+                activeLayerInfo.layer.type === "feature" &&
+                field &&
+                featureLayerData &&
+                !isColorRamp &&
+                !isOpacityRamp &&
+                !isSizeRamp &&
+                !isHeatRamp) ||
+                (isPredominance && !isSizeRamp && !isOpacityRamp) ? (widget_1.tsx("div", { class: CSS.interactiveLegendHeaderContainer },
+                widget_1.tsx("div", { class: this.classes(layerCaption, CSS.layerCaptionContainer) }, title),
+                (!isRelationship &&
+                    hasMoreThanOneInfo &&
+                    !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
+                    activeLayerInfo.layer.type === "feature" &&
+                    field &&
+                    featureLayerData &&
+                    !isColorRamp &&
+                    !isOpacityRamp &&
+                    !isSizeRamp &&
+                    !isHeatRamp) ||
+                    (isPredominance && !isSizeRamp && !isOpacityRamp)
+                    ? renderResetButton
+                    : null)) : (widget_1.tsx("div", { class: layerCaption }, title))) : null;
             var tableClasses = (_a = {},
                 _a[CSS.layerTableSizeRamp] = isSizeRamp || !isChild,
                 _a);
             return (widget_1.tsx("div", { class: this.classes(tableClass, tableClasses) },
                 caption,
                 content));
+        };
+        // _renderResetButton
+        InteractiveClassic.prototype._renderResetButton = function (featureLayerData, legendElementIndex, operationalItemIndex) {
+            var _this = this;
+            return (widget_1.tsx("div", { class: CSS.interactiveLegendResetButtonContainer },
+                widget_1.tsx("button", { bind: this, class: this.classes(CSS.calciteStyles.btn, CSS.calciteStyles.btnSmall), tabIndex: 0, disabled: (featureLayerData &&
+                        featureLayerData.selectedInfoIndex.length > 0 &&
+                        featureLayerData.selectedInfoIndex[legendElementIndex] &&
+                        featureLayerData.selectedInfoIndex[legendElementIndex].length ===
+                            0) ||
+                        (featureLayerData &&
+                            featureLayerData.selectedInfoIndex.length === 0)
+                        ? true
+                        : false, onclick: function (event) {
+                        _this._resetLegendFilter(event, featureLayerData, operationalItemIndex);
+                    }, onkeydown: function (event) {
+                        _this._resetLegendFilter(event, featureLayerData, operationalItemIndex);
+                    } }, "Show all")));
         };
         // _renderLegendForRamp
         InteractiveClassic.prototype._renderLegendForRamp = function (legendElement, activeLayerInfo) {
@@ -474,12 +528,11 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     }
                 }
             }
-            var isRelationship = legendElement.type === "relationship-ramp";
             var featureLayer = activeLayerInfo.layer;
+            var isRelationship = legendElement.type === "relationship-ramp";
             var isPredominance = featureLayer.renderer &&
                 featureLayer.renderer.authoringInfo &&
                 featureLayer.renderer.authoringInfo.type === "predominance";
-            var isSizeRampAndMute = isSizeRamp && this.filterMode === "mute";
             var hasMoreThanOneInfo = legendElement.infos.length > 1;
             var featureLayerData = this.selectedStyleData.length > 0
                 ? this.selectedStyleData.find(function (data) {
@@ -487,7 +540,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 })
                 : null;
             var applySelect = (!isRelationship &&
-                !isSizeRampAndMute &&
                 hasMoreThanOneInfo &&
                 !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
                 activeLayerInfo.layer.type === "feature" &&
@@ -511,7 +563,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     ? 0
                     : -1, "data-legend-index": "" + legendElementIndex, "data-child-index": "" + legendInfoIndex, "data-layer-id": "" + activeLayerInfo.layer.id, onclick: function (event) {
                     if ((!isRelationship &&
-                        !isSizeRampAndMute &&
                         hasMoreThanOneInfo &&
                         !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
                         activeLayerInfo.layer.type === "feature" &&
@@ -523,7 +574,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     }
                 }, onkeydown: function (event) {
                     if ((!isRelationship &&
-                        !isSizeRampAndMute &&
                         hasMoreThanOneInfo &&
                         !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
                         field &&
@@ -653,6 +703,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             this.viewModel.applyFeatureMute(elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos, isPredominance);
         };
         // End of filter methods
+        // _resetLegendFilter
+        InteractiveClassic.prototype._resetLegendFilter = function (event, featureLayerData, operationalItemIndex) {
+            this.viewModel.resetLegendFilter(featureLayerData, operationalItemIndex);
+        };
         // _disableOnboarding
         InteractiveClassic.prototype._disableOnboarding = function () {
             this.onboardingPanelEnabled = false;
@@ -757,6 +811,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         __decorate([
             widget_1.accessibleHandler()
         ], InteractiveClassic.prototype, "_handleFilterOption", null);
+        __decorate([
+            widget_1.accessibleHandler()
+        ], InteractiveClassic.prototype, "_resetLegendFilter", null);
         __decorate([
             widget_1.accessibleHandler()
         ], InteractiveClassic.prototype, "_disableOnboarding", null);
