@@ -50,6 +50,12 @@ import FeatureLayer = require("esri/layers/FeatureLayer");
 // InteractiveClassicViewModel
 import InteractiveStyleViewModel = require("./InteractiveStyle/InteractiveStyleViewModel");
 
+// esri.views.layers.support.FeatureFilter
+import FeatureFilter = require("esri/views/layers/support/FeatureFilter");
+
+// esri.views.layers.support.FeatureEffect
+import FeatureEffect = require("esri/views/layers/support/FeatureEffect");
+
 // // esri.Grahpic
 // import Graphic = require("esri/Graphic");
 
@@ -138,7 +144,6 @@ const CSS = {
   filterLayerRow: "esri-interactive-legend__filter-layer-row",
   selectedRow: "esri-interactive-legend--selected-row",
   loader: "esri-interactive-legend__loader",
-  preventScroll: "esri-interactive-legend__prevent-scroll",
   hoverStyles: "esri-interactive-legend--layer-row",
   error: "esri-interactive-legend--error",
   legendElements: "esri-interactive-legend__legend-elements",
@@ -151,6 +156,14 @@ const CSS = {
   interactiveLegendNonVisibleIcon: "esri-interactive-legend__non-visible-icon",
   interactiveLegendLayerRow: "esri-interactive-legend__ramp-layer-row",
   interactiveStyles: "esri-interactive-legend__interactive-styles",
+  layerCaptionContainer: "esri-interactive-legend__layer-caption-container",
+  interactiveLegendLayerTable: "esri-interactive-legend__layer-table",
+  interactiveLegendHeaderContainer: "esri-interactive-legend__header-container",
+  interactiveLegendMainContainer: "esri-interactive-legend__main-container",
+  interactiveLegendResetButtonContainer:
+    "esri-interactive-legend__reset-button-container",
+  interactiveLegendLayerRowContainer:
+    "esri-interactive-legend__layer-row-container",
   onboarding: {
     mainContainer: "esri-interactive-legend__onboarding-main-container",
     contentContainer: "esri-interactive-legend__onboarding-content-container",
@@ -280,7 +293,8 @@ class InteractiveClassic extends declared(Widget) {
                 layerItemId: featureLayer.id,
                 field,
                 selectedInfoIndex: [],
-                applyStyles: null
+                applyStyles: null,
+                featureLayerView
               });
             }
           }
@@ -312,13 +326,16 @@ class InteractiveClassic extends declared(Widget) {
         {this.onboardingPanelEnabled ? (
           this._renderOnboardingPanel()
         ) : (
-          <div class={this.classes(CSS.preventScroll)}>
+          <div>
             {filteredLayers && filteredLayers.length ? (
               <div class={CSS.legendElements}>
                 {state === "loading" ? (
                   <div class={CSS.loader} />
                 ) : (
-                  <div> {filteredLayers}</div>
+                  <div class={CSS.interactiveLegendMainContainer}>
+                    {" "}
+                    {filteredLayers}
+                  </div>
                 )}
               </div>
             ) : (
@@ -513,7 +530,7 @@ class InteractiveClassic extends declared(Widget) {
         .filter((row: any) => !!row);
 
       if (rows.length) {
-        content = <div class={CSS.layerBody}>{rows}</div>;
+        content = <div class={this.classes(CSS.layerBody)}>{rows}</div>;
       }
     } else if (
       legendElement.type === "color-ramp" ||
@@ -554,13 +571,60 @@ class InteractiveClassic extends declared(Widget) {
       featureLayerData && featureLayerData.applyStyles
         ? this.classes(CSS.layerCaption, CSS.interactiveLegendLayerCaption)
         : CSS.layerCaption;
+
     const layerTable =
       featureLayerData && featureLayerData.applyStyles
-        ? this.classes(CSS.layerTable, "esri-interactive-legend__layer-table")
+        ? this.classes(CSS.layerTable, CSS.interactiveLegendLayerTable)
         : CSS.layerTable;
-    const tableClass = isChild ? CSS.layerChildTable : layerTable,
-      caption = title ? <div class={layerCaption}>{title}</div> : null;
 
+    const renderResetButton = this._renderResetButton(
+      featureLayerData,
+      legendElementIndex,
+      operationalItemIndex
+    );
+    const featureLayer = activeLayerInfo.layer as FeatureLayer;
+    const isRelationship = legendElement.type === "relationship-ramp";
+    const isPredominance =
+      featureLayer.renderer &&
+      featureLayer.renderer.authoringInfo &&
+      featureLayer.renderer.authoringInfo.type === "predominance";
+    const hasMoreThanOneInfo = legendElement.infos.length > 1;
+
+    const tableClass = isChild ? CSS.layerChildTable : layerTable,
+      caption = title ? (
+        (!isRelationship &&
+          hasMoreThanOneInfo &&
+          !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
+          activeLayerInfo.layer.type === "feature" &&
+          field &&
+          featureLayerData &&
+          !isColorRamp &&
+          !isOpacityRamp &&
+          !isSizeRamp &&
+          !isHeatRamp) ||
+        (isPredominance && !isSizeRamp && !isOpacityRamp) ? (
+          <div class={CSS.interactiveLegendHeaderContainer}>
+            <div class={this.classes(layerCaption, CSS.layerCaptionContainer)}>
+              {title}
+            </div>
+            {(!isRelationship &&
+              hasMoreThanOneInfo &&
+              !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
+              activeLayerInfo.layer.type === "feature" &&
+              field &&
+              featureLayerData &&
+              !isColorRamp &&
+              !isOpacityRamp &&
+              !isSizeRamp &&
+              !isHeatRamp) ||
+            (isPredominance && !isSizeRamp && !isOpacityRamp)
+              ? renderResetButton
+              : null}
+          </div>
+        ) : (
+          <div class={layerCaption}>{title}</div>
+        )
+      ) : null;
     const tableClasses = {
       [CSS.layerTableSizeRamp]: isSizeRamp || !isChild
     };
@@ -572,6 +636,52 @@ class InteractiveClassic extends declared(Widget) {
     );
   }
 
+  // _renderResetButton
+  private _renderResetButton(
+    featureLayerData: any,
+    legendElementIndex: number,
+    operationalItemIndex: number
+  ): any {
+    return (
+      <div class={CSS.interactiveLegendResetButtonContainer}>
+        <button
+          bind={this}
+          class={this.classes(
+            CSS.calciteStyles.btn,
+            CSS.calciteStyles.btnSmall
+          )}
+          tabIndex={0}
+          disabled={
+            (featureLayerData &&
+              featureLayerData.selectedInfoIndex.length > 0 &&
+              featureLayerData.selectedInfoIndex[legendElementIndex] &&
+              featureLayerData.selectedInfoIndex[legendElementIndex].length ===
+                0) ||
+            (featureLayerData &&
+              featureLayerData.selectedInfoIndex.length === 0)
+              ? true
+              : false
+          }
+          onclick={(event: Event) => {
+            this._resetLegendFilter(
+              event,
+              featureLayerData,
+              operationalItemIndex
+            );
+          }}
+          onkeydown={(event: Event) => {
+            this._resetLegendFilter(
+              event,
+              featureLayerData,
+              operationalItemIndex
+            );
+          }}
+        >
+          Show all
+        </button>
+      </div>
+    );
+  }
   // _renderLegendForRamp
   private _renderLegendForRamp(
     legendElement: ColorRampElement | OpacityRampElement | HeatmapRampElement,
@@ -795,13 +905,13 @@ class InteractiveClassic extends declared(Widget) {
         }
       }
     }
-    const isRelationship = legendElement.type === "relationship-ramp";
+
     const featureLayer = activeLayerInfo.layer as FeatureLayer;
+    const isRelationship = legendElement.type === "relationship-ramp";
     const isPredominance =
       featureLayer.renderer &&
       featureLayer.renderer.authoringInfo &&
       featureLayer.renderer.authoringInfo.type === "predominance";
-    const isSizeRampAndMute = isSizeRamp && this.filterMode === "mute";
 
     const hasMoreThanOneInfo = legendElement.infos.length > 1;
 
@@ -813,7 +923,6 @@ class InteractiveClassic extends declared(Widget) {
         : null;
     const applySelect =
       (!isRelationship &&
-        !isSizeRampAndMute &&
         hasMoreThanOneInfo &&
         !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
         activeLayerInfo.layer.type === "feature" &&
@@ -828,89 +937,92 @@ class InteractiveClassic extends declared(Widget) {
     }
 
     return (
-      <div
-        bind={this}
-        class={
-          (activeLayerInfo.layer.type === "feature" &&
-            (hasMoreThanOneInfo && field && featureLayerData && !isSizeRamp)) ||
-          (isPredominance && !isSizeRamp)
-            ? applySelect
-            : null
-        }
-        tabIndex={
-          activeLayerInfo.layer.type === "feature" &&
-          !this.offscreen &&
-          ((hasMoreThanOneInfo && field && featureLayerData && !isSizeRamp) ||
-            (isPredominance && !isSizeRamp))
-            ? 0
-            : -1
-        }
-        data-legend-index={`${legendElementIndex}`}
-        data-child-index={`${legendInfoIndex}`}
-        data-layer-id={`${activeLayerInfo.layer.id}`}
-        onclick={(event: Event) => {
-          if (
-            (!isRelationship &&
-              !isSizeRampAndMute &&
-              hasMoreThanOneInfo &&
-              !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
-              activeLayerInfo.layer.type === "feature" &&
-              field &&
-              featureLayerData &&
-              !isSizeRamp) ||
-            (isPredominance && !isSizeRamp)
-          ) {
-            this._handleFilterOption(
-              event,
-              elementInfo,
-              field,
-              legendInfoIndex,
-              operationalItemIndex,
-              legendElement,
-              isPredominance,
-              legendElementInfos
-            );
-          }
-        }}
-        onkeydown={(event: Event) => {
-          if (
-            (!isRelationship &&
-              !isSizeRampAndMute &&
-              hasMoreThanOneInfo &&
-              !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
-              field &&
-              featureLayerData &&
-              !isSizeRamp) ||
-            (isPredominance && !isSizeRamp)
-          ) {
-            this._handleFilterOption(
-              event,
-              elementInfo,
-              field,
-              legendInfoIndex,
-              operationalItemIndex,
-              legendElement,
-              isPredominance,
-              legendElementInfos
-            );
-          }
-        }}
-      >
+      <div class={CSS.interactiveLegendLayerRowContainer}>
         <div
+          bind={this}
           class={
-            applySelect
-              ? "esri-interactive-legend__legend-info-container"
+            (activeLayerInfo.layer.type === "feature" &&
+              (hasMoreThanOneInfo &&
+                field &&
+                featureLayerData &&
+                !isSizeRamp)) ||
+            (isPredominance && !isSizeRamp)
+              ? applySelect
               : null
           }
+          tabIndex={
+            activeLayerInfo.layer.type === "feature" &&
+            !this.offscreen &&
+            ((hasMoreThanOneInfo && field && featureLayerData && !isSizeRamp) ||
+              (isPredominance && !isSizeRamp))
+              ? 0
+              : -1
+          }
+          data-legend-index={`${legendElementIndex}`}
+          data-child-index={`${legendInfoIndex}`}
+          data-layer-id={`${activeLayerInfo.layer.id}`}
+          onclick={(event: Event) => {
+            if (
+              (!isRelationship &&
+                hasMoreThanOneInfo &&
+                !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
+                activeLayerInfo.layer.type === "feature" &&
+                field &&
+                featureLayerData &&
+                !isSizeRamp) ||
+              (isPredominance && !isSizeRamp)
+            ) {
+              this._handleFilterOption(
+                event,
+                elementInfo,
+                field,
+                legendInfoIndex,
+                operationalItemIndex,
+                legendElement,
+                isPredominance,
+                legendElementInfos
+              );
+            }
+          }}
+          onkeydown={(event: Event) => {
+            if (
+              (!isRelationship &&
+                hasMoreThanOneInfo &&
+                !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
+                field &&
+                featureLayerData &&
+                !isSizeRamp) ||
+              (isPredominance && !isSizeRamp)
+            ) {
+              this._handleFilterOption(
+                event,
+                elementInfo,
+                field,
+                legendInfoIndex,
+                operationalItemIndex,
+                legendElement,
+                isPredominance,
+                legendElementInfos
+              );
+            }
+          }}
         >
-          <div class={this.classes(CSS.symbolContainer, symbolClasses)}>
-            {content}
+          <div
+            class={
+              applySelect
+                ? "esri-interactive-legend__legend-info-container"
+                : null
+            }
+          >
+            <div class={this.classes(CSS.symbolContainer, symbolClasses)}>
+              {content}
+            </div>
+            <div class={this.classes(CSS.layerInfo, labelClasses)}>
+              {getTitle(elementInfo.label, false) || ""}
+            </div>
           </div>
-          <div class={this.classes(CSS.layerInfo, labelClasses)}>
-            {getTitle(elementInfo.label, false) || ""}
-          </div>
+          {applySelect ? <div>{visibleIcon}</div> : null}
         </div>
-        {applySelect ? <div>{visibleIcon}</div> : null}
       </div>
     );
   }
@@ -1039,6 +1151,7 @@ class InteractiveClassic extends declared(Widget) {
     //   : null;
     if (this.filterMode === "featureFilter") {
       this._featureFilter(
+        event,
         elementInfo,
         field,
         operationalItemIndex,
@@ -1063,6 +1176,7 @@ class InteractiveClassic extends declared(Widget) {
 
   //_filterFeatures
   private _featureFilter(
+    event: Event,
     elementInfo: any,
     field: string,
     operationalItemIndex: number,
@@ -1134,6 +1248,16 @@ class InteractiveClassic extends declared(Widget) {
     );
   }
   // End of filter methods
+
+  // _resetLegendFilter
+  @accessibleHandler()
+  private _resetLegendFilter(
+    event: Event,
+    featureLayerData: any,
+    operationalItemIndex: number
+  ): void {
+    this.viewModel.resetLegendFilter(featureLayerData, operationalItemIndex);
+  }
 
   // _disableOnboarding
   @accessibleHandler()

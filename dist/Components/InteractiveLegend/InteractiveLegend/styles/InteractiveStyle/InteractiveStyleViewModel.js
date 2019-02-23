@@ -623,6 +623,32 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 });
             });
         };
+        // resetLegendFilter
+        InteractiveStyleViewModel.prototype.resetLegendFilter = function (featureLayerData, operationalItemIndex) {
+            this.interactiveStyleData.queryExpressions[operationalItemIndex].length = 0;
+            var _a = featureLayerData.featureLayerView, filter = _a.filter, effect = _a.effect;
+            if (this.filterMode === "featureFilter" && filter && filter.where) {
+                featureLayerData.featureLayerView.filter = new FeatureFilter({
+                    where: ""
+                });
+            }
+            else if (this.filterMode === "mute" &&
+                effect &&
+                effect.filter &&
+                effect.filter.where) {
+                featureLayerData.featureLayerView.effect = new FeatureEffect({
+                    outsideEffect: "opacity(" + this.opacity + "%) grayscale(" + this.grayScale + "%)",
+                    filter: {
+                        where: ""
+                    }
+                });
+            }
+            if (featureLayerData.selectedInfoIndex.length) {
+                featureLayerData.selectedInfoIndex.length = 0;
+            }
+            this._setSearchExpression(null);
+            this.notifyChange("state");
+        };
         __decorate([
             decorators_1.property()
         ], InteractiveStyleViewModel.prototype, "interactiveStyleData", void 0);
