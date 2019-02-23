@@ -144,7 +144,6 @@ const CSS = {
   filterLayerRow: "esri-interactive-legend__filter-layer-row",
   selectedRow: "esri-interactive-legend--selected-row",
   loader: "esri-interactive-legend__loader",
-  preventScroll: "esri-interactive-legend__prevent-scroll",
   hoverStyles: "esri-interactive-legend--layer-row",
   error: "esri-interactive-legend--error",
   legendElements: "esri-interactive-legend__legend-elements",
@@ -160,8 +159,11 @@ const CSS = {
   layerCaptionContainer: "esri-interactive-legend__layer-caption-container",
   interactiveLegendLayerTable: "esri-interactive-legend__layer-table",
   interactiveLegendHeaderContainer: "esri-interactive-legend__header-container",
+  interactiveLegendMainContainer: "esri-interactive-legend__main-container",
   interactiveLegendResetButtonContainer:
     "esri-interactive-legend__reset-button-container",
+  interactiveLegendLayerRowContainer:
+    "esri-interactive-legend__layer-row-container",
   onboarding: {
     mainContainer: "esri-interactive-legend__onboarding-main-container",
     contentContainer: "esri-interactive-legend__onboarding-content-container",
@@ -324,13 +326,16 @@ class InteractiveClassic extends declared(Widget) {
         {this.onboardingPanelEnabled ? (
           this._renderOnboardingPanel()
         ) : (
-          <div class={this.classes(CSS.preventScroll)}>
+          <div>
             {filteredLayers && filteredLayers.length ? (
               <div class={CSS.legendElements}>
                 {state === "loading" ? (
                   <div class={CSS.loader} />
                 ) : (
-                  <div> {filteredLayers}</div>
+                  <div class={CSS.interactiveLegendMainContainer}>
+                    {" "}
+                    {filteredLayers}
+                  </div>
                 )}
               </div>
             ) : (
@@ -525,7 +530,7 @@ class InteractiveClassic extends declared(Widget) {
         .filter((row: any) => !!row);
 
       if (rows.length) {
-        content = <div class={CSS.layerBody}>{rows}</div>;
+        content = <div class={this.classes(CSS.layerBody)}>{rows}</div>;
       }
     } else if (
       legendElement.type === "color-ramp" ||
@@ -932,87 +937,92 @@ class InteractiveClassic extends declared(Widget) {
     }
 
     return (
-      <div
-        bind={this}
-        class={
-          (activeLayerInfo.layer.type === "feature" &&
-            (hasMoreThanOneInfo && field && featureLayerData && !isSizeRamp)) ||
-          (isPredominance && !isSizeRamp)
-            ? applySelect
-            : null
-        }
-        tabIndex={
-          activeLayerInfo.layer.type === "feature" &&
-          !this.offscreen &&
-          ((hasMoreThanOneInfo && field && featureLayerData && !isSizeRamp) ||
-            (isPredominance && !isSizeRamp))
-            ? 0
-            : -1
-        }
-        data-legend-index={`${legendElementIndex}`}
-        data-child-index={`${legendInfoIndex}`}
-        data-layer-id={`${activeLayerInfo.layer.id}`}
-        onclick={(event: Event) => {
-          if (
-            (!isRelationship &&
-              hasMoreThanOneInfo &&
-              !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
-              activeLayerInfo.layer.type === "feature" &&
-              field &&
-              featureLayerData &&
-              !isSizeRamp) ||
-            (isPredominance && !isSizeRamp)
-          ) {
-            this._handleFilterOption(
-              event,
-              elementInfo,
-              field,
-              legendInfoIndex,
-              operationalItemIndex,
-              legendElement,
-              isPredominance,
-              legendElementInfos
-            );
-          }
-        }}
-        onkeydown={(event: Event) => {
-          if (
-            (!isRelationship &&
-              hasMoreThanOneInfo &&
-              !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
-              field &&
-              featureLayerData &&
-              !isSizeRamp) ||
-            (isPredominance && !isSizeRamp)
-          ) {
-            this._handleFilterOption(
-              event,
-              elementInfo,
-              field,
-              legendInfoIndex,
-              operationalItemIndex,
-              legendElement,
-              isPredominance,
-              legendElementInfos
-            );
-          }
-        }}
-      >
+      <div class={CSS.interactiveLegendLayerRowContainer}>
         <div
+          bind={this}
           class={
-            applySelect
-              ? "esri-interactive-legend__legend-info-container"
+            (activeLayerInfo.layer.type === "feature" &&
+              (hasMoreThanOneInfo &&
+                field &&
+                featureLayerData &&
+                !isSizeRamp)) ||
+            (isPredominance && !isSizeRamp)
+              ? applySelect
               : null
           }
+          tabIndex={
+            activeLayerInfo.layer.type === "feature" &&
+            !this.offscreen &&
+            ((hasMoreThanOneInfo && field && featureLayerData && !isSizeRamp) ||
+              (isPredominance && !isSizeRamp))
+              ? 0
+              : -1
+          }
+          data-legend-index={`${legendElementIndex}`}
+          data-child-index={`${legendInfoIndex}`}
+          data-layer-id={`${activeLayerInfo.layer.id}`}
+          onclick={(event: Event) => {
+            if (
+              (!isRelationship &&
+                hasMoreThanOneInfo &&
+                !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
+                activeLayerInfo.layer.type === "feature" &&
+                field &&
+                featureLayerData &&
+                !isSizeRamp) ||
+              (isPredominance && !isSizeRamp)
+            ) {
+              this._handleFilterOption(
+                event,
+                elementInfo,
+                field,
+                legendInfoIndex,
+                operationalItemIndex,
+                legendElement,
+                isPredominance,
+                legendElementInfos
+              );
+            }
+          }}
+          onkeydown={(event: Event) => {
+            if (
+              (!isRelationship &&
+                hasMoreThanOneInfo &&
+                !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
+                field &&
+                featureLayerData &&
+                !isSizeRamp) ||
+              (isPredominance && !isSizeRamp)
+            ) {
+              this._handleFilterOption(
+                event,
+                elementInfo,
+                field,
+                legendInfoIndex,
+                operationalItemIndex,
+                legendElement,
+                isPredominance,
+                legendElementInfos
+              );
+            }
+          }}
         >
-          <div class={this.classes(CSS.symbolContainer, symbolClasses)}>
-            {content}
+          <div
+            class={
+              applySelect
+                ? "esri-interactive-legend__legend-info-container"
+                : null
+            }
+          >
+            <div class={this.classes(CSS.symbolContainer, symbolClasses)}>
+              {content}
+            </div>
+            <div class={this.classes(CSS.layerInfo, labelClasses)}>
+              {getTitle(elementInfo.label, false) || ""}
+            </div>
           </div>
-          <div class={this.classes(CSS.layerInfo, labelClasses)}>
-            {getTitle(elementInfo.label, false) || ""}
-          </div>
+          {applySelect ? <div>{visibleIcon}</div> : null}
         </div>
-        {applySelect ? <div>{visibleIcon}</div> : null}
       </div>
     );
   }
@@ -1141,6 +1151,7 @@ class InteractiveClassic extends declared(Widget) {
     //   : null;
     if (this.filterMode === "featureFilter") {
       this._featureFilter(
+        event,
         elementInfo,
         field,
         operationalItemIndex,
@@ -1165,6 +1176,7 @@ class InteractiveClassic extends declared(Widget) {
 
   //_filterFeatures
   private _featureFilter(
+    event: Event,
     elementInfo: any,
     field: string,
     operationalItemIndex: number,
