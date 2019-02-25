@@ -92,8 +92,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         interactiveLegendHeaderContainer: "esri-interactive-legend__header-container",
         interactiveLegendTitleContainer: "esri-interactive-legend__title-container",
         interactiveLegendMainContainer: "esri-interactive-legend__main-container",
+        interactiveLegendInfoContainer: "esri-interactive-legend__legend-info-container",
         interactiveLegendResetButtonContainer: "esri-interactive-legend__reset-button-container",
         interactiveLegendLayerRowContainer: "esri-interactive-legend__layer-row-container",
+        interactiveLegendRemoveOutline: "esri-interactive-legend__remove-outline",
         onboarding: {
             mainContainer: "esri-interactive-legend__onboarding-main-container",
             contentContainer: "esri-interactive-legend__onboarding-content-container",
@@ -575,7 +577,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                             !isSizeRamp)) ||
                         (isPredominance && !isSizeRamp)
                         ? applySelect
-                        : null, tabIndex: activeLayerInfo.layer.type === "feature" &&
+                        : CSS.interactiveLegendRemoveOutline, tabIndex: activeLayerInfo.layer.type === "feature" &&
                         !this.offscreen &&
                         ((hasMoreThanOneInfo && field && featureLayerData && !isSizeRamp) ||
                             (isPredominance && !isSizeRamp))
@@ -602,9 +604,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                             _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos);
                         }
                     } },
-                    widget_1.tsx("div", { class: applySelect
-                            ? "esri-interactive-legend__legend-info-container"
-                            : null },
+                    widget_1.tsx("div", { class: applySelect ? CSS.interactiveLegendInfoContainer : null },
                         widget_1.tsx("div", { class: this.classes(CSS.symbolContainer, symbolClasses) }, content),
                         widget_1.tsx("div", { class: this.classes(CSS.layerInfo, labelClasses) }, styleUtils_1.getTitle(elementInfo.label, false) || "")),
                     applySelect ? widget_1.tsx("div", null, visibleIcon) : null)));

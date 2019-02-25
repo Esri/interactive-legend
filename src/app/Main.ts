@@ -407,6 +407,7 @@ class InteractiveLegendApp {
                     }
                   ];
               const infoWidget = new Info({
+                view,
                 infoContent
               });
               const infoGroup =

@@ -162,10 +162,13 @@ const CSS = {
   interactiveLegendHeaderContainer: "esri-interactive-legend__header-container",
   interactiveLegendTitleContainer: "esri-interactive-legend__title-container",
   interactiveLegendMainContainer: "esri-interactive-legend__main-container",
+  interactiveLegendInfoContainer:
+    "esri-interactive-legend__legend-info-container",
   interactiveLegendResetButtonContainer:
     "esri-interactive-legend__reset-button-container",
   interactiveLegendLayerRowContainer:
     "esri-interactive-legend__layer-row-container",
+  interactiveLegendRemoveOutline: "esri-interactive-legend__remove-outline",
   onboarding: {
     mainContainer: "esri-interactive-legend__onboarding-main-container",
     contentContainer: "esri-interactive-legend__onboarding-content-container",
@@ -961,6 +964,7 @@ class InteractiveClassic extends declared(Widget) {
             data ? activeLayerInfo.layer.id === data.layerItemId : null
           )
         : null;
+
     const applySelect =
       (!isRelationship &&
         hasMoreThanOneInfo &&
@@ -988,7 +992,7 @@ class InteractiveClassic extends declared(Widget) {
                 !isSizeRamp)) ||
             (isPredominance && !isSizeRamp)
               ? applySelect
-              : null
+              : CSS.interactiveLegendRemoveOutline
           }
           tabIndex={
             activeLayerInfo.layer.type === "feature" &&
@@ -1047,13 +1051,7 @@ class InteractiveClassic extends declared(Widget) {
             }
           }}
         >
-          <div
-            class={
-              applySelect
-                ? "esri-interactive-legend__legend-info-container"
-                : null
-            }
-          >
+          <div class={applySelect ? CSS.interactiveLegendInfoContainer : null}>
             <div class={this.classes(CSS.symbolContainer, symbolClasses)}>
               {content}
             </div>
