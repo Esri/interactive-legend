@@ -264,6 +264,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 : viewScreenshotHeight;
             combinedCanvas.width = viewScreenshot.data.width + mapComponent.width;
             combinedCanvas.height = height;
+            viewLegendCanvasContext.fillStyle = "#fff";
+            viewLegendCanvasContext.fillRect(0, 0, combinedCanvas.width, combinedCanvas.height);
             viewLegendCanvasContext.drawImage(mapComponent, 0, 0);
             viewLegendCanvasContext.drawImage(viewCanvas, mapComponent.width, 0);
         };
@@ -278,6 +280,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     firstMapComponent.width +
                     secondMapComponent.width;
             combinedCanvasElements.height = this._setupCombinedScreenshotHeight(viewScreenshotHeight, firstMapComponentHeight, secondMapComponentHeight);
+            combinedCanvasContext.fillStyle = "#fff";
+            combinedCanvasContext.fillRect(0, 0, combinedCanvasElements.width, combinedCanvasElements.height);
             combinedCanvasContext.drawImage(firstMapComponent, 0, 0);
             combinedCanvasContext.drawImage(viewCanvas, firstMapComponent.width, 0);
             combinedCanvasContext.drawImage(secondMapComponent, viewScreenshot.data.width + firstMapComponent.width, 0);

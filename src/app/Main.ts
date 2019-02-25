@@ -96,7 +96,7 @@ import { ApplicationConfig } from "ApplicationBase/interfaces";
 // CSS
 const CSS = {
   loading: "configurable-application--loading",
-  legend: "offscreen-interactive-legend-container",
+  legend: "esri-interactive-legend__offscreen",
   popup: "offscreen-pop-up-container"
 };
 

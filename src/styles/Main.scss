@@ -121,10 +121,16 @@ body {
 
 .offscreen-pop-up-container,
 .offscreen-interactive-legend-container {
-  max-width: 600px;
   position: absolute;
-  top: -999999px;
-  left: -99999px
+  top: -9999999px;
+  left: -9999999px;
+  right: 300px;
+  width: 20%;
+}
+
+.esri-interactive-legend .esri-interactive-legend__offscreen.esri-interactive-legend__offscreen {
+  height: auto;
+  max-height: none;
 }
 
 

@@ -32,7 +32,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
     // CSS
     var CSS = {
         loading: "configurable-application--loading",
-        legend: "offscreen-interactive-legend-container",
+        legend: "esri-interactive-legend__offscreen",
         popup: "offscreen-pop-up-container"
     };
     var InteractiveLegendApp = /** @class */ (function () {
