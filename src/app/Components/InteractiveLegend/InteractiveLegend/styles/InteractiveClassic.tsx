@@ -614,11 +614,13 @@ class InteractiveClassic extends declared(Widget) {
       interactiveLegendLayerTable
     );
 
-    const renderResetButton = this._renderResetButton(
-      featureLayerData,
-      legendElementIndex,
-      operationalItemIndex
-    );
+    const renderResetButton = this.offscreen
+      ? null
+      : this._renderResetButton(
+          featureLayerData,
+          legendElementIndex,
+          operationalItemIndex
+        );
     const featureLayer = activeLayerInfo.layer as FeatureLayer;
     const isRelationship = legendElement.type === "relationship-ramp";
     const isPredominance =
@@ -690,15 +692,13 @@ class InteractiveClassic extends declared(Widget) {
           )}
           tabIndex={this.offscreen ? -1 : 0}
           disabled={
-            this.offscreen
-              ? false
-              : (featureLayerData &&
-                  featureLayerData.selectedInfoIndex.length > 0 &&
-                  featureLayerData.selectedInfoIndex[legendElementIndex] &&
-                  featureLayerData.selectedInfoIndex[legendElementIndex]
-                    .length === 0) ||
-                (featureLayerData &&
-                  featureLayerData.selectedInfoIndex.length === 0)
+            (featureLayerData &&
+              featureLayerData.selectedInfoIndex.length > 0 &&
+              featureLayerData.selectedInfoIndex[legendElementIndex] &&
+              featureLayerData.selectedInfoIndex[legendElementIndex].length ===
+                0) ||
+            (featureLayerData &&
+              featureLayerData.selectedInfoIndex.length === 0)
               ? true
               : false
           }

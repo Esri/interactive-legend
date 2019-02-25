@@ -360,7 +360,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 _b[CSS.interactiveLegendLayerTable] = featureLayerData && featureLayerData.applyStyles,
                 _b);
             var layerTable = this.classes(CSS.layerTable, interactiveLegendLayerTable);
-            var renderResetButton = this._renderResetButton(featureLayerData, legendElementIndex, operationalItemIndex);
+            var renderResetButton = this.offscreen
+                ? null
+                : this._renderResetButton(featureLayerData, legendElementIndex, operationalItemIndex);
             var featureLayer = activeLayerInfo.layer;
             var isRelationship = legendElement.type === "relationship-ramp";
             var isPredominance = featureLayer.renderer &&
@@ -403,17 +405,15 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         InteractiveClassic.prototype._renderResetButton = function (featureLayerData, legendElementIndex, operationalItemIndex) {
             var _this = this;
             return (widget_1.tsx("div", { class: CSS.interactiveLegendResetButtonContainer },
-                widget_1.tsx("button", { bind: this, class: this.classes(CSS.calciteStyles.btn, CSS.calciteStyles.btnSmall), tabIndex: this.offscreen ? -1 : 0, disabled: this.offscreen
-                        ? false
-                        : (featureLayerData &&
-                            featureLayerData.selectedInfoIndex.length > 0 &&
-                            featureLayerData.selectedInfoIndex[legendElementIndex] &&
-                            featureLayerData.selectedInfoIndex[legendElementIndex]
-                                .length === 0) ||
-                            (featureLayerData &&
-                                featureLayerData.selectedInfoIndex.length === 0)
-                            ? true
-                            : false, onclick: function (event) {
+                widget_1.tsx("button", { bind: this, class: this.classes(CSS.calciteStyles.btn, CSS.calciteStyles.btnSmall), tabIndex: this.offscreen ? -1 : 0, disabled: (featureLayerData &&
+                        featureLayerData.selectedInfoIndex.length > 0 &&
+                        featureLayerData.selectedInfoIndex[legendElementIndex] &&
+                        featureLayerData.selectedInfoIndex[legendElementIndex].length ===
+                            0) ||
+                        (featureLayerData &&
+                            featureLayerData.selectedInfoIndex.length === 0)
+                        ? true
+                        : false, onclick: function (event) {
                         _this._resetLegendFilter(event, featureLayerData, operationalItemIndex);
                     }, onkeydown: function (event) {
                         _this._resetLegendFilter(event, featureLayerData, operationalItemIndex);
