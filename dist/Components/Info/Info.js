@@ -70,6 +70,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             //  Properties
             //
             //----------------------------------
+            // view
+            _this.view = null;
             // infoContent
             _this.infoContent = null;
             // expandWidget
@@ -103,24 +105,16 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             ]);
         };
         Info.prototype.render = function () {
-            var back = i18n.back;
             var content = this._renderContent();
             var paginationNodes = this.infoContent.length > 1 ? this._generatePaginationNodes() : null;
+            var pageNavButtons = this._renderPageNavButtons();
             return (widget_1.tsx("div", { class: this.classes(CSS.widget, CSS.base) },
                 paginationNodes ? (widget_1.tsx("div", { class: CSS.paginationContainer }, paginationNodes)) : null,
                 widget_1.tsx("div", { class: CSS.contentContainer },
                     widget_1.tsx("div", { class: CSS.titleContainer },
                         widget_1.tsx("h1", null, this.infoContent[this.selectedItemIndex].title)),
                     widget_1.tsx("div", { class: CSS.infoContent }, content)),
-                widget_1.tsx("div", { class: CSS.buttonContainer }, this.selectedItemIndex !== this.infoContent.length - 1 ? (widget_1.tsx("button", { bind: this, onclick: this._nextPage, onkeydown: this._nextPage, tabIndex: 0, class: this.classes(CSS.nextButton, CSS.calciteStyles.btn), title: i18n.next }, i18n.next)) : this.infoContent.length > 1 ? (widget_1.tsx("div", { class: CSS.lastPageButtons },
-                    " ",
-                    widget_1.tsx("div", { class: CSS.backButtonContainer },
-                        widget_1.tsx("button", { bind: this, onclick: this._previousPage, onkeydown: this._previousPage, tabIndex: 0, class: this.classes(CSS.calciteStyles.btn, CSS.calciteStyles.btnClear), title: i18n.back },
-                            back.charAt(0).toUpperCase(),
-                            back.substring(1, i18n.back.length))),
-                    widget_1.tsx("div", { class: CSS.closeButtonContainer },
-                        widget_1.tsx("button", { bind: this, onclick: this._closeInfoPanel, onkeydown: this._closeInfoPanel, tabIndex: 0, class: CSS.calciteStyles.btn, title: i18n.close }, i18n.close)))) : (widget_1.tsx("div", { class: CSS.lastPageButtons },
-                    widget_1.tsx("button", { bind: this, onclick: this._closeInfoPanel, onkeydown: this._closeInfoPanel, tabIndex: 0, class: this.classes(CSS.calciteStyles.btn, CSS.singlePageButton), title: i18n.close }, i18n.close))))));
+                widget_1.tsx("div", { class: CSS.buttonContainer }, pageNavButtons)));
         };
         //   _renderContent
         Info.prototype._renderContent = function () {
@@ -179,33 +173,58 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 return paginationNode;
             });
         };
+        // _renderPageNavButtons
+        Info.prototype._renderPageNavButtons = function () {
+            var lastPageButtons = this._renderLastPageButtons();
+            var closeButton = this._renderCloseButton();
+            var nextButton = this._renderNextButton();
+            return (widget_1.tsx("div", null, this.selectedItemIndex !== this.infoContent.length - 1
+                ? nextButton
+                : this.infoContent.length > 1
+                    ? lastPageButtons
+                    : closeButton));
+        };
+        // _renderNextButton
+        Info.prototype._renderNextButton = function () {
+            return (widget_1.tsx("button", { bind: this, onclick: this._nextPage, onkeydown: this._nextPage, tabIndex: 0, class: this.classes(CSS.nextButton, CSS.calciteStyles.btn), title: i18n.next }, i18n.next));
+        };
+        // _closeButton
+        Info.prototype._renderCloseButton = function () {
+            return (widget_1.tsx("div", { class: CSS.lastPageButtons },
+                widget_1.tsx("button", { bind: this, onclick: this._closeInfoPanel, onkeydown: this._closeInfoPanel, tabIndex: 0, class: this.classes(CSS.calciteStyles.btn, CSS.singlePageButton), title: i18n.close }, i18n.close)));
+        };
+        // _renderNextBackButtons
+        Info.prototype._renderLastPageButtons = function () {
+            var back = i18n.back;
+            return (widget_1.tsx("div", { class: CSS.lastPageButtons },
+                " ",
+                widget_1.tsx("div", { class: CSS.backButtonContainer },
+                    widget_1.tsx("button", { bind: this, onclick: this._previousPage, onkeydown: this._previousPage, tabIndex: 0, class: this.classes(CSS.calciteStyles.btn, CSS.calciteStyles.btnClear), title: i18n.back },
+                        back.charAt(0).toUpperCase(),
+                        back.substring(1, i18n.back.length))),
+                widget_1.tsx("div", { class: CSS.closeButtonContainer },
+                    widget_1.tsx("button", { bind: this, onclick: this._closeInfoPanel, onkeydown: this._closeInfoPanel, tabIndex: 0, class: CSS.calciteStyles.btn, title: i18n.close }, i18n.close))));
+        };
         // _goToPage
         Info.prototype._goToPage = function (event) {
-            var node = event.currentTarget;
-            var itemIndex = node.getAttribute("data-pagination-index");
-            this.viewModel.selectedItemIndex = parseInt(itemIndex);
-            this._paginationNodes[this.selectedItemIndex].domNode.focus();
-            this.scheduleRender();
+            this.viewModel.goToPage(event, this._paginationNodes);
         };
         // _nextPage
         Info.prototype._nextPage = function () {
-            if (this.selectedItemIndex !== this.infoContent.length - 1) {
-                this.selectedItemIndex += 1;
-                this._paginationNodes[this.selectedItemIndex].domNode.focus();
-            }
+            this.viewModel.nextPage(this._paginationNodes);
         };
         // _previousPage
         Info.prototype._previousPage = function () {
-            if (this.selectedItemIndex !== 0) {
-                this.selectedItemIndex -= 1;
-                this._paginationNodes[this.selectedItemIndex].domNode.focus();
-            }
+            this.viewModel.previousPage(this._paginationNodes);
         };
         // _closeInfoPanel
         Info.prototype._closeInfoPanel = function () {
-            this.selectedItemIndex = 0;
-            this.expandWidget.expanded = false;
+            this.viewModel.closeInfoPanel();
         };
+        __decorate([
+            decorators_1.aliasOf("viewModel.view"),
+            decorators_1.property()
+        ], Info.prototype, "view", void 0);
         __decorate([
             decorators_1.aliasOf("viewModel.infoContent"),
             decorators_1.property(),

@@ -31,6 +31,12 @@ import {
 // InfoContentItem
 import { InfoContentItem } from "./interfaces/interfaces";
 
+// esri.views.MapView
+import MapView = require("esri/views/MapView");
+
+// esri.views.SceneView
+import SceneView = require("esri/views/SceneView");
+
 // InfoViewModel
 import InfoViewModel = require("./Info/InfoViewModel");
 
@@ -90,6 +96,11 @@ class Info extends declared(Widget) {
   //
   //----------------------------------
 
+  // view
+  @aliasOf("viewModel.view")
+  @property()
+  view: MapView | SceneView = null;
+
   // infoContent
   @aliasOf("viewModel.infoContent")
   @property()
@@ -142,12 +153,12 @@ class Info extends declared(Widget) {
       })
     ]);
   }
-  render() {
-    const back = i18n.back;
 
+  render() {
     const content = this._renderContent();
     const paginationNodes =
       this.infoContent.length > 1 ? this._generatePaginationNodes() : null;
+    const pageNavButtons = this._renderPageNavButtons();
     return (
       <div class={this.classes(CSS.widget, CSS.base)}>
         {paginationNodes ? (
@@ -159,85 +170,7 @@ class Info extends declared(Widget) {
           </div>
           <div class={CSS.infoContent}>{content}</div>
         </div>
-
-        {/* {paginationNodes && this.selectedItemIndex !== 0 ? (
-          <div key="previous-page" class={CSS.back}>
-            <span
-              bind={this}
-              onclick={this._previousPage}
-              onkeydown={this._previousPage}
-              tabIndex={0}
-              class={CSS.backText}
-              title={i18n.back}
-            >
-              {i18n.back}
-            </span>
-
-          </div>
-        ) : null} */}
-
-        <div class={CSS.buttonContainer}>
-          {this.selectedItemIndex !== this.infoContent.length - 1 ? (
-            <button
-              bind={this}
-              onclick={this._nextPage}
-              onkeydown={this._nextPage}
-              tabIndex={0}
-              class={this.classes(CSS.nextButton, CSS.calciteStyles.btn)}
-              title={i18n.next}
-            >
-              {i18n.next}
-            </button>
-          ) : this.infoContent.length > 1 ? (
-            <div class={CSS.lastPageButtons}>
-              {" "}
-              <div class={CSS.backButtonContainer}>
-                <button
-                  bind={this}
-                  onclick={this._previousPage}
-                  onkeydown={this._previousPage}
-                  tabIndex={0}
-                  class={this.classes(
-                    CSS.calciteStyles.btn,
-                    CSS.calciteStyles.btnClear
-                  )}
-                  title={i18n.back}
-                >
-                  {back.charAt(0).toUpperCase()}
-                  {back.substring(1, i18n.back.length)}
-                </button>
-              </div>
-              <div class={CSS.closeButtonContainer}>
-                <button
-                  bind={this}
-                  onclick={this._closeInfoPanel}
-                  onkeydown={this._closeInfoPanel}
-                  tabIndex={0}
-                  class={CSS.calciteStyles.btn}
-                  title={i18n.close}
-                >
-                  {i18n.close}
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div class={CSS.lastPageButtons}>
-              <button
-                bind={this}
-                onclick={this._closeInfoPanel}
-                onkeydown={this._closeInfoPanel}
-                tabIndex={0}
-                class={this.classes(
-                  CSS.calciteStyles.btn,
-                  CSS.singlePageButton
-                )}
-                title={i18n.close}
-              >
-                {i18n.close}
-              </button>
-            </div>
-          )}
-        </div>
+        <div class={CSS.buttonContainer}>{pageNavButtons}</div>
       </div>
     );
   }
@@ -329,39 +262,117 @@ class Info extends declared(Widget) {
     });
   }
 
+  // _renderPageNavButtons
+  private _renderPageNavButtons(): any {
+    const lastPageButtons = this._renderLastPageButtons();
+    const closeButton = this._renderCloseButton();
+    const nextButton = this._renderNextButton();
+    return (
+      <div>
+        {this.selectedItemIndex !== this.infoContent.length - 1
+          ? nextButton
+          : this.infoContent.length > 1
+          ? lastPageButtons
+          : closeButton}
+      </div>
+    );
+  }
+
+  // _renderNextButton
+  private _renderNextButton(): any {
+    return (
+      <button
+        bind={this}
+        onclick={this._nextPage}
+        onkeydown={this._nextPage}
+        tabIndex={0}
+        class={this.classes(CSS.nextButton, CSS.calciteStyles.btn)}
+        title={i18n.next}
+      >
+        {i18n.next}
+      </button>
+    );
+  }
+
+  // _closeButton
+  private _renderCloseButton(): any {
+    return (
+      <div class={CSS.lastPageButtons}>
+        <button
+          bind={this}
+          onclick={this._closeInfoPanel}
+          onkeydown={this._closeInfoPanel}
+          tabIndex={0}
+          class={this.classes(CSS.calciteStyles.btn, CSS.singlePageButton)}
+          title={i18n.close}
+        >
+          {i18n.close}
+        </button>
+      </div>
+    );
+  }
+
+  // _renderNextBackButtons
+  private _renderLastPageButtons(): any {
+    const back = i18n.back;
+
+    return (
+      <div class={CSS.lastPageButtons}>
+        {" "}
+        <div class={CSS.backButtonContainer}>
+          <button
+            bind={this}
+            onclick={this._previousPage}
+            onkeydown={this._previousPage}
+            tabIndex={0}
+            class={this.classes(
+              CSS.calciteStyles.btn,
+              CSS.calciteStyles.btnClear
+            )}
+            title={i18n.back}
+          >
+            {back.charAt(0).toUpperCase()}
+            {back.substring(1, i18n.back.length)}
+          </button>
+        </div>
+        <div class={CSS.closeButtonContainer}>
+          <button
+            bind={this}
+            onclick={this._closeInfoPanel}
+            onkeydown={this._closeInfoPanel}
+            tabIndex={0}
+            class={CSS.calciteStyles.btn}
+            title={i18n.close}
+          >
+            {i18n.close}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // _goToPage
   @accessibleHandler()
   private _goToPage(event: Event): void {
-    const node = event.currentTarget as HTMLElement;
-    const itemIndex = node.getAttribute("data-pagination-index");
-    this.viewModel.selectedItemIndex = parseInt(itemIndex);
-    this._paginationNodes[this.selectedItemIndex].domNode.focus();
-    this.scheduleRender();
+    this.viewModel.goToPage(event, this._paginationNodes);
   }
 
   // _nextPage
   @accessibleHandler()
   private _nextPage(): void {
-    if (this.selectedItemIndex !== this.infoContent.length - 1) {
-      this.selectedItemIndex += 1;
-      this._paginationNodes[this.selectedItemIndex].domNode.focus();
-    }
+    this.viewModel.nextPage(this._paginationNodes);
   }
 
   // _previousPage
   @accessibleHandler()
   private _previousPage(): void {
-    if (this.selectedItemIndex !== 0) {
-      this.selectedItemIndex -= 1;
-      this._paginationNodes[this.selectedItemIndex].domNode.focus();
-    }
+    this.viewModel.previousPage(this._paginationNodes);
   }
 
   // _closeInfoPanel
   @accessibleHandler()
   private _closeInfoPanel(): void {
-    this.selectedItemIndex = 0;
-    this.expandWidget.expanded = false;
+    this.viewModel.closeInfoPanel();
   }
 }
 

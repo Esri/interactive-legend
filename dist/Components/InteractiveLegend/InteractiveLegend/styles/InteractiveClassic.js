@@ -77,6 +77,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         hoverStyles: "esri-interactive-legend--layer-row",
         error: "esri-interactive-legend--error",
         legendElements: "esri-interactive-legend__legend-elements",
+        offScreenScreenshot: "esri-interactive-legend__offscreen",
         interactiveLegendLayerCaption: "esri-interactive-legend__layer-caption",
         interactiveLegendLabel: "esri-interactive-legend__label",
         interactiveLegendLayer: "esri-interactive-legend__layer",
@@ -89,9 +90,12 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         layerCaptionContainer: "esri-interactive-legend__layer-caption-container",
         interactiveLegendLayerTable: "esri-interactive-legend__layer-table",
         interactiveLegendHeaderContainer: "esri-interactive-legend__header-container",
+        interactiveLegendTitleContainer: "esri-interactive-legend__title-container",
         interactiveLegendMainContainer: "esri-interactive-legend__main-container",
+        interactiveLegendInfoContainer: "esri-interactive-legend__legend-info-container",
         interactiveLegendResetButtonContainer: "esri-interactive-legend__reset-button-container",
         interactiveLegendLayerRowContainer: "esri-interactive-legend__layer-row-container",
+        interactiveLegendRemoveOutline: "esri-interactive-legend__remove-outline",
         onboarding: {
             mainContainer: "esri-interactive-legend__onboarding-main-container",
             contentContainer: "esri-interactive-legend__onboarding-content-container",
@@ -183,6 +187,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         };
         InteractiveClassic.prototype.render = function () {
             var _this = this;
+            var _a;
             var state = this.viewModel.state;
             var activeLayerInfos = this.activeLayerInfos, baseClasses = this.classes(CSS.base, CSS.interactiveLegend, CSS.widget), filteredLayers = activeLayerInfos &&
                 activeLayerInfos
@@ -197,7 +202,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     legendElements.push(legendElement);
                 });
             });
-            return (widget_1.tsx("div", { class: baseClasses }, this.onboardingPanelEnabled ? (this._renderOnboardingPanel()) : (widget_1.tsx("div", null, filteredLayers && filteredLayers.length ? (widget_1.tsx("div", { class: CSS.legendElements }, state === "loading" ? (widget_1.tsx("div", { class: CSS.loader })) : (widget_1.tsx("div", { class: CSS.interactiveLegendMainContainer },
+            var offScreenScreenshot = (_a = {},
+                _a[CSS.offScreenScreenshot] = this.offscreen,
+                _a);
+            return (widget_1.tsx("div", { class: baseClasses }, this.onboardingPanelEnabled ? (this._renderOnboardingPanel()) : (widget_1.tsx("div", null, filteredLayers && filteredLayers.length ? (widget_1.tsx("div", { class: CSS.legendElements }, state === "loading" ? (widget_1.tsx("div", { class: CSS.loader })) : (widget_1.tsx("div", { class: this.classes(CSS.interactiveLegendMainContainer, offScreenScreenshot) },
                 " ",
                 filteredLayers)))) : (widget_1.tsx("div", { class: CSS.message }, i18n.noLegend))))));
         };
@@ -218,7 +226,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         //--------------------------------------------------------------------------
         InteractiveClassic.prototype._renderLegendForLayer = function (activeLayerInfo, activeLayerInfoIndex) {
             var _this = this;
-            var _a;
+            var _a, _b, _c, _d, _e, _f, _g;
             var title = activeLayerInfo.title;
             var titleIsString = typeof title === "string"
                 ? title.indexOf("Description") !== -1 ||
@@ -234,13 +242,14 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     return data ? activeLayerInfo.layer.id === data.layerItemId : null;
                 })
                 : null;
-            var labelClasses = featureLayerData && featureLayerData.applyStyles
-                ? this.classes(CSS.header, CSS.label, CSS.interactiveLegendLabel)
-                : this.classes(CSS.header, CSS.label);
-            var titleContainer = featureLayerData && featureLayerData.applyStyles
-                ? "esri-interactive-legend__title-container"
-                : null;
-            var labelNode = activeLayerInfo.title ? (widget_1.tsx("div", { class: titleContainer },
+            var interactiveLegendLabel = (_a = {},
+                _a[CSS.interactiveLegendLabel] = featureLayerData && featureLayerData.applyStyles,
+                _a);
+            var labelClasses = this.classes(CSS.header, CSS.label, interactiveLegendLabel);
+            var titleContainer = (_b = {},
+                _b[CSS.interactiveLegendTitleContainer] = featureLayerData && featureLayerData.applyStyles,
+                _b);
+            var labelNode = activeLayerInfo.title ? (widget_1.tsx("div", { class: this.classes(titleContainer) },
                 widget_1.tsx("h3", { class: labelClasses }, activeLayerInfo.title))) : null;
             if (hasChildren) {
                 var layers = activeLayerInfo.children
@@ -248,9 +257,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     return _this._renderLegendForLayer(childActiveLayerInfo, activeLayerInfoIndex);
                 })
                     .toArray();
-                var service = featureLayerData && featureLayerData.applyStyles
-                    ? this.classes(CSS.service, CSS.interactiveLegendService, CSS.groupLayer)
-                    : this.classes(CSS.service, CSS.groupLayer);
+                var interactiveLegendService = (_c = {},
+                    _c[CSS.interactiveLegendService] = featureLayerData && featureLayerData.applyStyles,
+                    _c);
+                var service = this.classes(CSS.service, CSS.groupLayer, interactiveLegendService);
                 return (widget_1.tsx("div", { key: key, class: service },
                     labelNode,
                     layers));
@@ -269,20 +279,22 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 if (!filteredElements.length) {
                     return null;
                 }
-                var layerClasses = (_a = {},
-                    _a[CSS.groupLayerChild] = !!activeLayerInfo.parent,
-                    _a);
-                var service = featureLayerData && featureLayerData.applyStyles
-                    ? this.classes(CSS.service, CSS.interactiveLegendService, layerClasses)
-                    : this.classes(CSS.service, layerClasses);
-                var layer = featureLayerData && featureLayerData.applyStyles
-                    ? this.classes(CSS.layer, CSS.interactiveLegendLayer)
-                    : CSS.layer;
-                var interactiveStyles = featureLayerData && featureLayerData.applyStyles
-                    ? CSS.interactiveStyles
-                    : null;
+                var layerClasses = (_d = {},
+                    _d[CSS.groupLayerChild] = !!activeLayerInfo.parent,
+                    _d);
+                var interactiveLegendService = (_e = {},
+                    _e[CSS.interactiveLegendService] = featureLayerData && featureLayerData.applyStyles,
+                    _e);
+                var service = this.classes(CSS.service, layerClasses, interactiveLegendService);
+                var interactiveLegendLayer = (_f = {},
+                    _f[CSS.interactiveLegendLayer] = featureLayerData && featureLayerData.applyStyles,
+                    _f);
+                var layer = this.classes(CSS.layer, interactiveLegendLayer);
+                var interactiveStyles = (_g = {},
+                    _g[CSS.interactiveStyles] = featureLayerData && featureLayerData.applyStyles,
+                    _g);
                 return (widget_1.tsx("div", { key: key, class: service },
-                    widget_1.tsx("div", { class: interactiveStyles },
+                    widget_1.tsx("div", { class: this.classes(interactiveStyles) },
                         labelNode,
                         widget_1.tsx("div", { class: layer }, filteredElements))));
             }
@@ -290,7 +302,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         // _renderLegendForElement
         InteractiveClassic.prototype._renderLegendForElement = function (legendElement, layer, legendElementIndex, activeLayerInfo, activeLayerInfoIndex, operationalItemIndex, legendElementInfos, isChild) {
             var _this = this;
-            var _a;
+            var _a, _b, _c;
             var type = legendElement.type;
             var isColorRamp = type === "color-ramp", isOpacityRamp = type === "opacity-ramp", isSizeRamp = type === "size-ramp", isHeatRamp = type === "heatmap-ramp";
             var content = null;
@@ -342,19 +354,23 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     return data ? activeLayerInfo.layer.id === data.layerItemId : null;
                 })
                 : null;
-            var layerCaption = featureLayerData && featureLayerData.applyStyles
-                ? this.classes(CSS.layerCaption, CSS.interactiveLegendLayerCaption)
-                : CSS.layerCaption;
-            var layerTable = featureLayerData && featureLayerData.applyStyles
-                ? this.classes(CSS.layerTable, CSS.interactiveLegendLayerTable)
-                : CSS.layerTable;
-            var renderResetButton = this._renderResetButton(featureLayerData, legendElementIndex, operationalItemIndex);
+            var interactiveLegendLayerCaption = (_a = {},
+                _a[CSS.interactiveLegendLayerCaption] = featureLayerData && featureLayerData.applyStyles,
+                _a);
+            var layerCaption = this.classes(CSS.layerCaption, interactiveLegendLayerCaption);
+            var interactiveLegendLayerTable = (_b = {},
+                _b[CSS.interactiveLegendLayerTable] = featureLayerData && featureLayerData.applyStyles,
+                _b);
+            var layerTable = this.classes(CSS.layerTable, interactiveLegendLayerTable);
+            var renderResetButton = this.offscreen
+                ? null
+                : this._renderResetButton(featureLayerData, legendElementIndex, operationalItemIndex);
             var featureLayer = activeLayerInfo.layer;
             var isRelationship = legendElement.type === "relationship-ramp";
             var isPredominance = featureLayer.renderer &&
                 featureLayer.renderer.authoringInfo &&
                 featureLayer.renderer.authoringInfo.type === "predominance";
-            var hasMoreThanOneInfo = legendElement.infos.length > 1;
+            var hasMoreThanOneInfo = legendElement && legendElement.infos && legendElement.infos.length > 1;
             var tableClass = isChild ? CSS.layerChildTable : layerTable, caption = title ? ((!isRelationship &&
                 hasMoreThanOneInfo &&
                 !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
@@ -380,9 +396,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     (isPredominance && !isSizeRamp && !isOpacityRamp)
                     ? renderResetButton
                     : null)) : (widget_1.tsx("div", { class: layerCaption }, title))) : null;
-            var tableClasses = (_a = {},
-                _a[CSS.layerTableSizeRamp] = isSizeRamp || !isChild,
-                _a);
+            var tableClasses = (_c = {},
+                _c[CSS.layerTableSizeRamp] = isSizeRamp || !isChild,
+                _c);
             return (widget_1.tsx("div", { class: this.classes(tableClass, tableClasses) },
                 caption,
                 content));
@@ -391,7 +407,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         InteractiveClassic.prototype._renderResetButton = function (featureLayerData, legendElementIndex, operationalItemIndex) {
             var _this = this;
             return (widget_1.tsx("div", { class: CSS.interactiveLegendResetButtonContainer },
-                widget_1.tsx("button", { bind: this, class: this.classes(CSS.calciteStyles.btn, CSS.calciteStyles.btnSmall), tabIndex: 0, disabled: (featureLayerData &&
+                widget_1.tsx("button", { bind: this, class: this.classes(CSS.calciteStyles.btn, CSS.calciteStyles.btnSmall), tabIndex: this.offscreen ? -1 : 0, disabled: (featureLayerData &&
                         featureLayerData.selectedInfoIndex.length > 0 &&
                         featureLayerData.selectedInfoIndex[legendElementIndex] &&
                         featureLayerData.selectedInfoIndex[legendElementIndex].length ===
@@ -561,7 +577,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                             !isSizeRamp)) ||
                         (isPredominance && !isSizeRamp)
                         ? applySelect
-                        : null, tabIndex: activeLayerInfo.layer.type === "feature" &&
+                        : CSS.interactiveLegendRemoveOutline, tabIndex: activeLayerInfo.layer.type === "feature" &&
                         !this.offscreen &&
                         ((hasMoreThanOneInfo && field && featureLayerData && !isSizeRamp) ||
                             (isPredominance && !isSizeRamp))
@@ -588,9 +604,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                             _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos);
                         }
                     } },
-                    widget_1.tsx("div", { class: applySelect
-                            ? "esri-interactive-legend__legend-info-container"
-                            : null },
+                    widget_1.tsx("div", { class: applySelect ? CSS.interactiveLegendInfoContainer : null },
                         widget_1.tsx("div", { class: this.classes(CSS.symbolContainer, symbolClasses) }, content),
                         widget_1.tsx("div", { class: this.classes(CSS.layerInfo, labelClasses) }, styleUtils_1.getTitle(elementInfo.label, false) || "")),
                     applySelect ? widget_1.tsx("div", null, visibleIcon) : null)));
@@ -610,7 +624,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         };
         // _renderOnboardingPanel
         InteractiveClassic.prototype._renderOnboardingPanel = function () {
-            return (widget_1.tsx("div", { class: this.classes(CSS.onboarding.mainContainer) },
+            return (widget_1.tsx("div", { class: CSS.onboarding.mainContainer },
                 widget_1.tsx("div", { key: "onboarding-panel", class: CSS.onboarding.contentContainer },
                     widget_1.tsx("div", { class: CSS.onboarding.closeContainer },
                         widget_1.tsx("span", { bind: this, onclick: this._disableOnboarding, onkeydown: this._disableOnboarding, tabIndex: 0, class: CSS.calciteStyles.close, title: i18nInteractiveLegend.close })),
@@ -623,7 +637,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         widget_1.tsx("p", null, i18nInteractiveLegend.thirdOnboardingWelcomeMessage)),
                     widget_1.tsx("div", { class: CSS.onboarding.imgPreviewContainer })),
                 widget_1.tsx("div", { class: CSS.onboarding.onboardingButtonContainer },
-                    widget_1.tsx("button", { bind: this, onclick: this._disableOnboarding, onkeydown: this._disableOnboarding, tabIndex: 0, class: this.classes(CSS.calciteStyles.btn), title: i18nInteractiveLegend.onboardingConfirmation }, i18nInteractiveLegend.onboardingConfirmation))));
+                    widget_1.tsx("button", { bind: this, onclick: this._disableOnboarding, onkeydown: this._disableOnboarding, tabIndex: 0, class: CSS.calciteStyles.btn, title: i18nInteractiveLegend.onboardingConfirmation }, i18nInteractiveLegend.onboardingConfirmation))));
         };
         //-------------------------------------------------------------------
         //

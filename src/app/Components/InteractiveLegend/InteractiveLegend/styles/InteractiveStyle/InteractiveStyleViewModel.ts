@@ -525,6 +525,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
           elementInfoHasValue.indexOf("'") !== -1
             ? elementInfoHasValue.split("'").join("''")
             : null;
+
         const expression = Array.isArray(elementInfo.value)
           ? legendElementInfos.length - 1 === legendInfoIndex
             ? `${field} >= ${elementInfoHasValue[0]} AND ${field} <= ${
@@ -535,7 +536,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
               }`
           : singleQuote
           ? `${field} = '${singleQuote}'`
-          : isNaN(elementInfoHasValue)
+          : isNaN(elementInfoHasValue) || !elementInfoHasValue.trim().length
           ? `${field} = '${elementInfoHasValue}'`
           : `${field} = ${elementInfoHasValue} OR ${field} = '${elementInfoHasValue}'`;
         return expression;
@@ -854,25 +855,10 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   // resetLegendFilter
   resetLegendFilter(featureLayerData: any, operationalItemIndex: number): void {
     this.interactiveStyleData.queryExpressions[operationalItemIndex].length = 0;
-    const { filter, effect } = featureLayerData.featureLayerView;
-    if (this.filterMode === "featureFilter" && filter && filter.where) {
-      featureLayerData.featureLayerView.filter = new FeatureFilter({
-        where: ""
-      });
-    } else if (
-      this.filterMode === "mute" &&
-      effect &&
-      effect.filter &&
-      effect.filter.where
-    ) {
-      featureLayerData.featureLayerView.effect = new FeatureEffect({
-        outsideEffect: `opacity(${this.opacity}%) grayscale(${
-          this.grayScale
-        }%)`,
-        filter: {
-          where: ""
-        }
-      });
+    if (this.filterMode === "featureFilter") {
+      featureLayerData.featureLayerView.filter = null;
+    } else if (this.filterMode === "mute") {
+      featureLayerData.featureLayerView.effect = null;
     }
     if (featureLayerData.selectedInfoIndex.length) {
       featureLayerData.selectedInfoIndex.length = 0;

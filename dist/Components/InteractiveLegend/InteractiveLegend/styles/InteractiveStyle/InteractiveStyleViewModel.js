@@ -370,7 +370,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                             : field + " > " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfoHasValue[1]
                         : singleQuote
                             ? field + " = '" + singleQuote + "'"
-                            : isNaN(elementInfoHasValue)
+                            : isNaN(elementInfoHasValue) || !elementInfoHasValue.trim().length
                                 ? field + " = '" + elementInfoHasValue + "'"
                                 : field + " = " + elementInfoHasValue + " OR " + field + " = '" + elementInfoHasValue + "'";
                     return expression;
@@ -626,22 +626,11 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         // resetLegendFilter
         InteractiveStyleViewModel.prototype.resetLegendFilter = function (featureLayerData, operationalItemIndex) {
             this.interactiveStyleData.queryExpressions[operationalItemIndex].length = 0;
-            var _a = featureLayerData.featureLayerView, filter = _a.filter, effect = _a.effect;
-            if (this.filterMode === "featureFilter" && filter && filter.where) {
-                featureLayerData.featureLayerView.filter = new FeatureFilter({
-                    where: ""
-                });
+            if (this.filterMode === "featureFilter") {
+                featureLayerData.featureLayerView.filter = null;
             }
-            else if (this.filterMode === "mute" &&
-                effect &&
-                effect.filter &&
-                effect.filter.where) {
-                featureLayerData.featureLayerView.effect = new FeatureEffect({
-                    outsideEffect: "opacity(" + this.opacity + "%) grayscale(" + this.grayScale + "%)",
-                    filter: {
-                        where: ""
-                    }
-                });
+            else if (this.filterMode === "mute") {
+                featureLayerData.featureLayerView.effect = null;
             }
             if (featureLayerData.selectedInfoIndex.length) {
                 featureLayerData.selectedInfoIndex.length = 0;

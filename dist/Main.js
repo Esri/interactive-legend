@@ -32,7 +32,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
     // CSS
     var CSS = {
         loading: "configurable-application--loading",
-        legend: "offscreen-interactive-legend-container",
+        legend: "esri-interactive-legend__offscreen",
         popup: "offscreen-pop-up-container"
     };
     var InteractiveLegendApp = /** @class */ (function () {
@@ -256,6 +256,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                         }
                                     ];
                                 var infoWidget = new Info({
+                                    view: view,
                                     infoContent: infoContent
                                 });
                                 var infoGroup = infoPanelPosition.indexOf("left") !== -1 ? "left" : "right";

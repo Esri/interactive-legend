@@ -147,6 +147,7 @@ const CSS = {
   hoverStyles: "esri-interactive-legend--layer-row",
   error: "esri-interactive-legend--error",
   legendElements: "esri-interactive-legend__legend-elements",
+  offScreenScreenshot: "esri-interactive-legend__offscreen",
   interactiveLegendLayerCaption: "esri-interactive-legend__layer-caption",
   interactiveLegendLabel: "esri-interactive-legend__label",
   interactiveLegendLayer: "esri-interactive-legend__layer",
@@ -159,11 +160,15 @@ const CSS = {
   layerCaptionContainer: "esri-interactive-legend__layer-caption-container",
   interactiveLegendLayerTable: "esri-interactive-legend__layer-table",
   interactiveLegendHeaderContainer: "esri-interactive-legend__header-container",
+  interactiveLegendTitleContainer: "esri-interactive-legend__title-container",
   interactiveLegendMainContainer: "esri-interactive-legend__main-container",
+  interactiveLegendInfoContainer:
+    "esri-interactive-legend__legend-info-container",
   interactiveLegendResetButtonContainer:
     "esri-interactive-legend__reset-button-container",
   interactiveLegendLayerRowContainer:
     "esri-interactive-legend__layer-row-container",
+  interactiveLegendRemoveOutline: "esri-interactive-legend__remove-outline",
   onboarding: {
     mainContainer: "esri-interactive-legend__onboarding-main-container",
     contentContainer: "esri-interactive-legend__onboarding-content-container",
@@ -321,6 +326,9 @@ class InteractiveClassic extends declared(Widget) {
         legendElements.push(legendElement);
       });
     });
+    const offScreenScreenshot = {
+      [CSS.offScreenScreenshot]: this.offscreen
+    };
     return (
       <div class={baseClasses}>
         {this.onboardingPanelEnabled ? (
@@ -332,7 +340,12 @@ class InteractiveClassic extends declared(Widget) {
                 {state === "loading" ? (
                   <div class={CSS.loader} />
                 ) : (
-                  <div class={CSS.interactiveLegendMainContainer}>
+                  <div
+                    class={this.classes(
+                      CSS.interactiveLegendMainContainer,
+                      offScreenScreenshot
+                    )}
+                  >
                     {" "}
                     {filteredLayers}
                   </div>
@@ -389,17 +402,23 @@ class InteractiveClassic extends declared(Widget) {
             data ? activeLayerInfo.layer.id === data.layerItemId : null
           )
         : null;
-    const labelClasses =
-      featureLayerData && featureLayerData.applyStyles
-        ? this.classes(CSS.header, CSS.label, CSS.interactiveLegendLabel)
-        : this.classes(CSS.header, CSS.label);
-    const titleContainer =
-      featureLayerData && featureLayerData.applyStyles
-        ? "esri-interactive-legend__title-container"
-        : null;
+    const interactiveLegendLabel = {
+      [CSS.interactiveLegendLabel]:
+        featureLayerData && featureLayerData.applyStyles
+    };
+    const labelClasses = this.classes(
+      CSS.header,
+      CSS.label,
+      interactiveLegendLabel
+    );
+
+    const titleContainer = {
+      [CSS.interactiveLegendTitleContainer]:
+        featureLayerData && featureLayerData.applyStyles
+    };
 
     const labelNode = activeLayerInfo.title ? (
-      <div class={titleContainer}>
+      <div class={this.classes(titleContainer)}>
         <h3 class={labelClasses}>{activeLayerInfo.title}</h3>
       </div>
     ) : null;
@@ -410,14 +429,17 @@ class InteractiveClassic extends declared(Widget) {
           this._renderLegendForLayer(childActiveLayerInfo, activeLayerInfoIndex)
         )
         .toArray();
-      const service =
-        featureLayerData && featureLayerData.applyStyles
-          ? this.classes(
-              CSS.service,
-              CSS.interactiveLegendService,
-              CSS.groupLayer
-            )
-          : this.classes(CSS.service, CSS.groupLayer);
+
+      const interactiveLegendService = {
+        [CSS.interactiveLegendService]:
+          featureLayerData && featureLayerData.applyStyles
+      };
+
+      const service = this.classes(
+        CSS.service,
+        CSS.groupLayer,
+        interactiveLegendService
+      );
       return (
         <div key={key} class={service}>
           {labelNode}
@@ -454,26 +476,33 @@ class InteractiveClassic extends declared(Widget) {
       const layerClasses = {
         [CSS.groupLayerChild]: !!activeLayerInfo.parent
       };
-      const service =
-        featureLayerData && featureLayerData.applyStyles
-          ? this.classes(
-              CSS.service,
-              CSS.interactiveLegendService,
-              layerClasses
-            )
-          : this.classes(CSS.service, layerClasses);
 
-      const layer =
-        featureLayerData && featureLayerData.applyStyles
-          ? this.classes(CSS.layer, CSS.interactiveLegendLayer)
-          : CSS.layer;
-      const interactiveStyles =
-        featureLayerData && featureLayerData.applyStyles
-          ? CSS.interactiveStyles
-          : null;
+      const interactiveLegendService = {
+        [CSS.interactiveLegendService]:
+          featureLayerData && featureLayerData.applyStyles
+      };
+
+      const service = this.classes(
+        CSS.service,
+        layerClasses,
+        interactiveLegendService
+      );
+
+      const interactiveLegendLayer = {
+        [CSS.interactiveLegendLayer]:
+          featureLayerData && featureLayerData.applyStyles
+      };
+
+      const layer = this.classes(CSS.layer, interactiveLegendLayer);
+
+      const interactiveStyles = {
+        [CSS.interactiveStyles]:
+          featureLayerData && featureLayerData.applyStyles
+      };
+
       return (
         <div key={key} class={service}>
-          <div class={interactiveStyles}>
+          <div class={this.classes(interactiveStyles)}>
             {labelNode}
             <div class={layer}>{filteredElements}</div>
           </div>
@@ -567,28 +596,42 @@ class InteractiveClassic extends declared(Widget) {
             data ? activeLayerInfo.layer.id === data.layerItemId : null
           )
         : null;
-    const layerCaption =
-      featureLayerData && featureLayerData.applyStyles
-        ? this.classes(CSS.layerCaption, CSS.interactiveLegendLayerCaption)
-        : CSS.layerCaption;
 
-    const layerTable =
-      featureLayerData && featureLayerData.applyStyles
-        ? this.classes(CSS.layerTable, CSS.interactiveLegendLayerTable)
-        : CSS.layerTable;
+    const interactiveLegendLayerCaption = {
+      [CSS.interactiveLegendLayerCaption]:
+        featureLayerData && featureLayerData.applyStyles
+    };
 
-    const renderResetButton = this._renderResetButton(
-      featureLayerData,
-      legendElementIndex,
-      operationalItemIndex
+    const layerCaption = this.classes(
+      CSS.layerCaption,
+      interactiveLegendLayerCaption
     );
+
+    const interactiveLegendLayerTable = {
+      [CSS.interactiveLegendLayerTable]:
+        featureLayerData && featureLayerData.applyStyles
+    };
+
+    const layerTable = this.classes(
+      CSS.layerTable,
+      interactiveLegendLayerTable
+    );
+
+    const renderResetButton = this.offscreen
+      ? null
+      : this._renderResetButton(
+          featureLayerData,
+          legendElementIndex,
+          operationalItemIndex
+        );
     const featureLayer = activeLayerInfo.layer as FeatureLayer;
     const isRelationship = legendElement.type === "relationship-ramp";
     const isPredominance =
       featureLayer.renderer &&
       featureLayer.renderer.authoringInfo &&
       featureLayer.renderer.authoringInfo.type === "predominance";
-    const hasMoreThanOneInfo = legendElement.infos.length > 1;
+    const hasMoreThanOneInfo =
+      legendElement && legendElement.infos && legendElement.infos.length > 1;
 
     const tableClass = isChild ? CSS.layerChildTable : layerTable,
       caption = title ? (
@@ -650,7 +693,7 @@ class InteractiveClassic extends declared(Widget) {
             CSS.calciteStyles.btn,
             CSS.calciteStyles.btnSmall
           )}
-          tabIndex={0}
+          tabIndex={this.offscreen ? -1 : 0}
           disabled={
             (featureLayerData &&
               featureLayerData.selectedInfoIndex.length > 0 &&
@@ -921,6 +964,7 @@ class InteractiveClassic extends declared(Widget) {
             data ? activeLayerInfo.layer.id === data.layerItemId : null
           )
         : null;
+
     const applySelect =
       (!isRelationship &&
         hasMoreThanOneInfo &&
@@ -948,7 +992,7 @@ class InteractiveClassic extends declared(Widget) {
                 !isSizeRamp)) ||
             (isPredominance && !isSizeRamp)
               ? applySelect
-              : null
+              : CSS.interactiveLegendRemoveOutline
           }
           tabIndex={
             activeLayerInfo.layer.type === "feature" &&
@@ -1007,13 +1051,7 @@ class InteractiveClassic extends declared(Widget) {
             }
           }}
         >
-          <div
-            class={
-              applySelect
-                ? "esri-interactive-legend__legend-info-container"
-                : null
-            }
-          >
+          <div class={applySelect ? CSS.interactiveLegendInfoContainer : null}>
             <div class={this.classes(CSS.symbolContainer, symbolClasses)}>
               {content}
             </div>
@@ -1060,7 +1098,7 @@ class InteractiveClassic extends declared(Widget) {
   // _renderOnboardingPanel
   private _renderOnboardingPanel(): any {
     return (
-      <div class={this.classes(CSS.onboarding.mainContainer)}>
+      <div class={CSS.onboarding.mainContainer}>
         <div key="onboarding-panel" class={CSS.onboarding.contentContainer}>
           <div class={CSS.onboarding.closeContainer}>
             <span
@@ -1089,7 +1127,7 @@ class InteractiveClassic extends declared(Widget) {
             onclick={this._disableOnboarding}
             onkeydown={this._disableOnboarding}
             tabIndex={0}
-            class={this.classes(CSS.calciteStyles.btn)}
+            class={CSS.calciteStyles.btn}
             title={i18nInteractiveLegend.onboardingConfirmation}
           >
             {i18nInteractiveLegend.onboardingConfirmation}
