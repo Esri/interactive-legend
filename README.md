@@ -1,19 +1,28 @@
 # Interactive Legend
 
-Interactive Legend is a configurable app template written in TypeScript which includes an interactive legend to filter features on a web map by selecting legend elements. The web app allows the opportunity to explore data; and, provides the user with a better understanding of spatial relationships between data features of interest.
+Interactive Legend is a configurable app template where the core functionality revolves around an interactive filter tool. This configurable app template provides end-users with an experience to filter features on a web map via selectable legend elements. 
 
 ![Interactive Legend Preview](https://github.com/ArcGIS/interactive-legend/blob/master/images/interactive-legend.png)
 
 ## Features
 
-Select from three different filter modes:
+Select from two different filter modes:
 
-1. Feature Filter: Only features that fall within the criteria of the selected legend elements will display on the feature layer view.
-2. Highlight: Features that fall within the criteria of the selected legend elements will be highlighted on the feature layer view.
-3. Mute: A muted shade and/or muted opacity will be applied to features that do not fall within the criteria of the selected legend items.
-   
-       a. Both the muted shade and muted opacity are configurable.
-4. Select from a set of map tools which include: Home, Search, Basemap Toggle, Layer List, and Screenshot
+1. Feature Filter: Layer data features that fall within the criteria of the selected legend elements will display on the map view.
+2. Mute: Opacity and gray scale will be applied to layer data features that do not fall within the criteria of the selected legend elements.
+
+       a. Both opacity and gray scale values are configurable
+
+Select from a set of map tools: 
+- Home
+- Zoom
+- Layer List
+- Screenshot
+- Basemap Toggle
+- Search
+- Help - panel consisting of preset introductory information
+- Splash
+- Custom Header
 
 ## Instructions
 
