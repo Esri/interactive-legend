@@ -2,7 +2,7 @@
 
 Interactive Legend is a configurable app template where the core functionality revolves around an interactive filter tool. This configurable app template provides end-users with an experience to filter features on a web map via selectable legend elements. 
 
-![Interactive Legend Preview](https://github.com/ArcGIS/interactive-legend/blob/master/images/interactive-legend.png)
+![Interactive Legend Preview](images/interactive-legend.png)
 
 ## Features
 
@@ -68,6 +68,4 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-A copy of the license is available in the repository's [license.txt](https://github.com/ArcGIS/interactive-legend/blob/master/License.txt) file.
-
-[](Esri Language: JavaScript)​
+A copy of the license is available in the repository's [license.txt](License.txt) file.
