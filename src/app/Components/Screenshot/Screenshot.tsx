@@ -44,6 +44,10 @@ import {
 // ScreenshotViewModel
 import ScreenshotViewModel = require("./Screenshot/ScreenshotViewModel");
 
+// FeatureWidget
+import FeatureWidget = require("esri/widgets/Feature");
+import InteractiveLegend = require("../InteractiveLegend/InteractiveLegend");
+
 //----------------------------------
 //
 //  CSS Classes
@@ -100,10 +104,13 @@ class Screenshot extends declared(Widget) {
   private _downloadBtnNode: HTMLButtonElement = null;
   private _activeScreenshotBtnNode: HTMLButtonElement = null;
   private _selectFeatureAlertIsVisible: boolean = null;
+  private _offscreenPopupContainer: HTMLElement = null;
+  private _offscreenLegendContainer: HTMLElement = null;
 
   // _popupIsIncluded
   private _popupIsIncluded: boolean = null;
 
+  // _handles
   private _handles: Handles = new Handles();
 
   //----------------------------------
@@ -141,19 +148,25 @@ class Screenshot extends declared(Widget) {
   popupScreenshotEnabled: boolean = null;
 
   // legendIncludedInScreenshot
+  @aliasOf("viewModel.legendIncludedInScreenshot")
   @property()
   legendIncludedInScreenshot: boolean = null;
 
   // popupIncludedInScreenshot
+  @aliasOf("viewModel.popupIncludedInScreenshot")
   @property()
   popupIncludedInScreenshot: boolean = null;
 
   @property()
-  featureWidget = new Feature();
+  featureWidget = new FeatureWidget();
 
   @aliasOf("viewModel.expandWidget")
   @property()
   expandWidget: Expand = null;
+
+  @aliasOf("viewModel.legendWidget")
+  @property()
+  legendWidget: InteractiveLegend = null;
 
   // viewModel
   @property()
@@ -176,7 +189,7 @@ class Screenshot extends declared(Widget) {
       this._watchPopups(),
       watchUtils.when(this, "featureWidget", () => {
         this.own([
-          watchUtils.watch(this, "popupScreenshotEnabled", () => {
+          watchUtils.whenTrue(this, "popupScreenshotEnabled", () => {
             if (this.popupScreenshotEnabled && this.popupIncludedInScreenshot) {
               this.own([
                 watchUtils.init(this, "featureWidget.graphic", () => {
@@ -193,7 +206,22 @@ class Screenshot extends declared(Widget) {
             this.scheduleRender();
           })
         ]);
+      }),
+      watchUtils.whenTrueOnce(this, "popupScreenshotEnabled", () => {
+        this._selectFeatureAlertIsVisible = true;
+      }),
+      watchUtils.watch(this, "view.popup.visible", () => {
+        if (!this.view) {
+          return;
+        }
+        if (this.view.popup.visible && this._offscreenPopupContainer) {
+          if (!this.featureWidget.container) {
+            this.featureWidget.container = this._offscreenPopupContainer;
+          }
+          this.featureWidget.graphic = this.view.popup.selectedFeature;
+        }
       })
+      // watchUtils.init(this, "legendWidget", () => {})
     ]);
     this._handleExpandWidget();
   }
@@ -202,7 +230,9 @@ class Screenshot extends declared(Widget) {
     const { screenshotModeIsActive } = this.viewModel;
     const screenshotPreviewOverlay = this._renderScreenshotPreviewOverlay();
     const maskNode = this._renderMaskNode(screenshotModeIsActive);
-
+    if (this.legendWidget && !this.legendWidget.container) {
+      this.legendWidget.container = this._offscreenLegendContainer;
+    }
     return (
       <div class={this.classes(CSS.widget, CSS.base)}>
         {screenshotModeIsActive ? (
@@ -227,6 +257,18 @@ class Screenshot extends declared(Widget) {
 
         {screenshotPreviewOverlay}
         {maskNode}
+        <div
+          bind={this}
+          afterCreate={storeNode}
+          data-node-ref="_offscreenPopupContainer"
+          class="esri-screenshot__offscreen-pop-up-container"
+        />
+        <div
+          bind={this}
+          afterCreate={storeNode}
+          data-node-ref="_offscreenLegendContainer"
+          class="esri-screenshot__offscreen-legend-container"
+        />
       </div>
     );
   }

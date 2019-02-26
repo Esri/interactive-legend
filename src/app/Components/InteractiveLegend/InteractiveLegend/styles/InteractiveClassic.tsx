@@ -978,6 +978,7 @@ class InteractiveClassic extends declared(Widget) {
         : null;
     if (featureLayerData && featureLayerData.applyStyles === null) {
       featureLayerData.applyStyles = applySelect ? true : false;
+      this.scheduleRender();
     }
 
     return (

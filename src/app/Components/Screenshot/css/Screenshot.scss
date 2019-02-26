@@ -198,3 +198,17 @@ html[dir="rtl"] {
     left: -6px;
   }
 }
+
+.esri-screenshot__offscreen-pop-up-container {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  width: 350px;
+}
+
+.esri-screenshot__offscreen-legend-container {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  width: 350px;
+}

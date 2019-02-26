@@ -14,7 +14,7 @@
   "nextBasemap": "topo",
   "layerListEnabled": false,
   "layerListPosition": "bottom-right",
-  "screenshotEnabled": false,
+  "screenshotEnabled": true,
   "screenshotPosition": "top-left",
   "popupIncludedInScreenshot": true,
   "legendIncludedInScreenshot": true,

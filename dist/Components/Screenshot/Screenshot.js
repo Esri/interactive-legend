@@ -16,7 +16,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "dojo/i18n!./Screenshot/nls/resources", "esri/widgets/Widget", "esri/core/accessorSupport/decorators", "esri/core/watchUtils", "esri/widgets/Feature", "esri/core/Handles", "esri/widgets/support/widget", "./Screenshot/ScreenshotViewModel"], function (require, exports, __extends, __decorate, i18n, Widget, decorators_1, watchUtils, Feature, Handles, widget_1, ScreenshotViewModel) {
+define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "dojo/i18n!./Screenshot/nls/resources", "esri/widgets/Widget", "esri/core/accessorSupport/decorators", "esri/core/watchUtils", "esri/core/Handles", "esri/widgets/support/widget", "./Screenshot/ScreenshotViewModel", "esri/widgets/Feature"], function (require, exports, __extends, __decorate, i18n, Widget, decorators_1, watchUtils, Handles, widget_1, ScreenshotViewModel, FeatureWidget) {
     "use strict";
     //----------------------------------
     //
@@ -79,8 +79,11 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this._downloadBtnNode = null;
             _this._activeScreenshotBtnNode = null;
             _this._selectFeatureAlertIsVisible = null;
+            _this._offscreenPopupContainer = null;
+            _this._offscreenLegendContainer = null;
             // _popupIsIncluded
             _this._popupIsIncluded = null;
+            // _handles
             _this._handles = new Handles();
             //----------------------------------
             //
@@ -103,8 +106,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this.legendIncludedInScreenshot = null;
             // popupIncludedInScreenshot
             _this.popupIncludedInScreenshot = null;
-            _this.featureWidget = new Feature();
+            _this.featureWidget = new FeatureWidget();
             _this.expandWidget = null;
+            _this.legendWidget = null;
             // viewModel
             _this.viewModel = new ScreenshotViewModel();
             return _this;
@@ -116,7 +120,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 this._watchPopups(),
                 watchUtils.when(this, "featureWidget", function () {
                     _this.own([
-                        watchUtils.watch(_this, "popupScreenshotEnabled", function () {
+                        watchUtils.whenTrue(_this, "popupScreenshotEnabled", function () {
                             if (_this.popupScreenshotEnabled && _this.popupIncludedInScreenshot) {
                                 _this.own([
                                     watchUtils.init(_this, "featureWidget.graphic", function () {
@@ -135,7 +139,22 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                             _this.scheduleRender();
                         })
                     ]);
+                }),
+                watchUtils.whenTrueOnce(this, "popupScreenshotEnabled", function () {
+                    _this._selectFeatureAlertIsVisible = true;
+                }),
+                watchUtils.watch(this, "view.popup.visible", function () {
+                    if (!_this.view) {
+                        return;
+                    }
+                    if (_this.view.popup.visible && _this._offscreenPopupContainer) {
+                        if (!_this.featureWidget.container) {
+                            _this.featureWidget.container = _this._offscreenPopupContainer;
+                        }
+                        _this.featureWidget.graphic = _this.view.popup.selectedFeature;
+                    }
                 })
+                // watchUtils.init(this, "legendWidget", () => {})
             ]);
             this._handleExpandWidget();
         };
@@ -143,11 +162,16 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var screenshotModeIsActive = this.viewModel.screenshotModeIsActive;
             var screenshotPreviewOverlay = this._renderScreenshotPreviewOverlay();
             var maskNode = this._renderMaskNode(screenshotModeIsActive);
+            if (this.legendWidget && !this.legendWidget.container) {
+                this.legendWidget.container = this._offscreenLegendContainer;
+            }
             return (widget_1.tsx("div", { class: this.classes(CSS.widget, CSS.base) },
                 screenshotModeIsActive ? (widget_1.tsx("button", { bind: this, tabIndex: 0, class: this.classes(CSS.screenshotBtn, CSS.pointerCursor, CSS.button, CSS.buttonRed), onclick: this._deactivateScreenshot, onkeydown: this._deactivateScreenshot, title: i18n.deactivateScreenshot },
                     widget_1.tsx("span", { class: CSS.closeIcon }))) : (this._renderScreenshotPanel()),
                 screenshotPreviewOverlay,
-                maskNode));
+                maskNode,
+                widget_1.tsx("div", { bind: this, afterCreate: widget_1.storeNode, "data-node-ref": "_offscreenPopupContainer", class: "esri-screenshot__offscreen-pop-up-container" }),
+                widget_1.tsx("div", { bind: this, afterCreate: widget_1.storeNode, "data-node-ref": "_offscreenLegendContainer", class: "esri-screenshot__offscreen-legend-container" })));
         };
         Screenshot.prototype.destroy = function () {
             this._handles.removeAll();
@@ -381,9 +405,11 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             decorators_1.property()
         ], Screenshot.prototype, "popupScreenshotEnabled", void 0);
         __decorate([
+            decorators_1.aliasOf("viewModel.legendIncludedInScreenshot"),
             decorators_1.property()
         ], Screenshot.prototype, "legendIncludedInScreenshot", void 0);
         __decorate([
+            decorators_1.aliasOf("viewModel.popupIncludedInScreenshot"),
             decorators_1.property()
         ], Screenshot.prototype, "popupIncludedInScreenshot", void 0);
         __decorate([
@@ -393,6 +419,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             decorators_1.aliasOf("viewModel.expandWidget"),
             decorators_1.property()
         ], Screenshot.prototype, "expandWidget", void 0);
+        __decorate([
+            decorators_1.aliasOf("viewModel.legendWidget"),
+            decorators_1.property()
+        ], Screenshot.prototype, "legendWidget", void 0);
         __decorate([
             decorators_1.property(),
             widget_1.renderable(["viewModel.state"])

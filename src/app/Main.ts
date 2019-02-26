@@ -79,8 +79,8 @@ import Info = require("./Components/Info/Info");
 // Telemetry
 import Telemetry = require("telemetry/telemetry.dojo");
 
-// FeatureWidget
-import FeatureWidget = require("esri/widgets/Feature");
+// // FeatureWidget
+// import FeatureWidget = require("esri/widgets/Feature");
 
 // InteractiveLegend
 import InteractiveLegend = require("./Components/InteractiveLegend/InteractiveLegend");
@@ -115,8 +115,8 @@ class InteractiveLegendApp {
   screenshot: Screenshot = null;
   interactiveLegendExpand: Expand = null;
   searchExpand: Expand = null;
-  featureWidget: FeatureWidget = null;
-  highlightedFeature: any = null;
+  // featureWidget: FeatureWidget = null;
+  // highlightedFeature: any = null;
   infoExpand: Expand = null;
 
   //--------------------------------------------------------------------------
@@ -304,20 +304,20 @@ class InteractiveLegendApp {
               opacity: muteOpacity,
               grayScale: muteGrayScale
             });
-            const offScreenInteractiveLegend = new InteractiveLegend({
-              view,
-              container: document.querySelector(
-                ".offscreen-interactive-legend-container"
-              ),
-              mutedShade: defaultShade,
-              style: defaultStyle,
-              filterMode: defaultMode,
-              layerListViewModel,
-              offscreen: true
-            });
+            // const offScreenInteractiveLegend = new InteractiveLegend({
+            //   view,
+            //   container: document.querySelector(
+            //     ".offscreen-interactive-legend-container"
+            //   ),
+            //   mutedShade: defaultShade,
+            //   style: defaultStyle,
+            //   filterMode: defaultMode,
+            //   layerListViewModel,
+            //   offscreen: true
+            // });
 
-            offScreenInteractiveLegend.style.selectedStyleData =
-              interactiveLegend.style.selectedStyleData;
+            // offScreenInteractiveLegend.style.selectedStyleData =
+            //   interactiveLegend.style.selectedStyleData;
 
             this._handleSearchWidget(
               searchEnabled,
@@ -532,7 +532,7 @@ class InteractiveLegendApp {
 
       this.screenshot = new Screenshot({
         view,
-        mapComponentSelectors,
+        // mapComponentSelectors,
         legendIncludedInScreenshot,
         popupIncludedInScreenshot
       });
@@ -548,62 +548,62 @@ class InteractiveLegendApp {
 
       this.screenshot.expandWidget = screenshotExpand;
 
-      watchUtils.watch(view, "popup.visible", () => {
-        if (view.popup.visible) {
-          if (!this.featureWidget) {
-            this.featureWidget = new FeatureWidget({
-              graphic: view.popup.selectedFeature,
-              container: document.querySelector(
-                ".offscreen-pop-up-container"
-              ) as HTMLElement
-            });
-            this.screenshot.featureWidget = this.featureWidget;
-          } else {
-            this.featureWidget.graphic = view.popup.selectedFeature;
-          }
-        }
-      });
+      // watchUtils.watch(view, "popup.visible", () => {
+      //   if (view.popup.visible) {
+      //     if (!this.featureWidget) {
+      //       this.featureWidget = new FeatureWidget({
+      //         graphic: view.popup.selectedFeature,
+      //         container: document.querySelector(
+      //           ".offscreen-pop-up-container"
+      //         ) as HTMLElement
+      //       });
+      //       this.screenshot.featureWidget = this.featureWidget;
+      //     } else {
+      //       this.featureWidget.graphic = view.popup.selectedFeature;
+      //     }
+      //   }
+      // });
 
-      watchUtils.watch(
-        this.screenshot.viewModel,
-        "screenshotModeIsActive",
-        () => {
-          view.popup.visible = false;
-        }
-      );
+      // watchUtils.watch(
+      //   this.screenshot.viewModel,
+      //   "screenshotModeIsActive",
+      //   () => {
+      //     view.popup.visible = false;
+      //   }
+      // );
 
-      watchUtils.watch(view, "popup.visible", () => {
-        if (
-          !view.popup.visible &&
-          this.screenshot.viewModel.screenshotModeIsActive &&
-          popupIncludedInScreenshot &&
-          view.popup.selectedFeature
-        ) {
-          const layerView = view.layerViews.find(
-            layerView =>
-              layerView.layer.id === view.popup.selectedFeature.layer.id
-          ) as __esri.FeatureLayerView;
-          this.highlightedFeature = layerView.highlight(
-            view.popup.selectedFeature
-          );
-        }
-      });
+      // watchUtils.watch(view, "popup.visible", () => {
+      //   if (
+      //     !view.popup.visible &&
+      //     this.screenshot.viewModel.screenshotModeIsActive &&
+      //     popupIncludedInScreenshot &&
+      //     view.popup.selectedFeature
+      //   ) {
+      //     const layerView = view.layerViews.find(
+      //       layerView =>
+      //         layerView.layer.id === view.popup.selectedFeature.layer.id
+      //     ) as __esri.FeatureLayerView;
+      //     this.highlightedFeature = layerView.highlight(
+      //       view.popup.selectedFeature
+      //     );
+      //   }
+      // });
 
-      watchUtils.watch(
-        this.screenshot,
-        "viewModel.screenshotModeIsActive",
-        () => {
-          if (!this.screenshot.viewModel.screenshotModeIsActive) {
-            if (this.featureWidget) {
-              this.featureWidget.graphic = null;
-            }
-            if (this.highlightedFeature) {
-              this.highlightedFeature.remove();
-              this.highlightedFeature = null;
-            }
-          }
-        }
-      );
+      // watchUtils.watch(
+      //   this.screenshot,
+      //   "viewModel.screenshotModeIsActive",
+      //   () => {
+      //     if (!this.screenshot.viewModel.screenshotModeIsActive) {
+      //       if (this.featureWidget) {
+      //         this.featureWidget.graphic = null;
+      //       }
+      //       if (this.highlightedFeature) {
+      //         this.highlightedFeature.remove();
+      //         this.highlightedFeature = null;
+      //       }
+      //     }
+      //   }
+      // );
 
       view.ui.add(screenshotExpand, screenshotPosition);
     }

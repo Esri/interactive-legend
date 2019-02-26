@@ -25,7 +25,15 @@ import Handles = require("esri/core/Handles");
 // esri.core.watchUtils
 import watchUtils = require("esri/core/watchUtils");
 
+// esri.widgets.Expand
 import Expand = require("esri/widgets/Expand");
+
+// FeatureWidget
+import FeatureWidget = require("esri/widgets/Feature");
+
+import InteractiveLegend = require("../../InteractiveLegend/InteractiveLegend");
+
+import LayerList = require("esri/widgets/LayerList");
 
 // esri.core.accessorSupport
 import {
@@ -89,7 +97,10 @@ class ScreenshotViewModel extends declared(Accessor) {
 
   // mapComponentSelectors
   @property()
-  mapComponentSelectors: string[] = [];
+  mapComponentSelectors = [
+    ".esri-screenshot__offscreen-legend-container",
+    ".esri-screenshot__offscreen-pop-up-container"
+  ];
 
   // firstMapComponent
   @property()
@@ -105,7 +116,13 @@ class ScreenshotViewModel extends declared(Accessor) {
 
   // popupScreenshotEnabled
   @property()
-  popupScreenshotEnabled: boolean = null;
+  popupScreenshotEnabled = false;
+
+  @property()
+  legendIncludedInScreenshot: boolean = null;
+
+  @property()
+  popupIncludedInScreenshot: boolean = null;
 
   // expandWidget
   @property()
@@ -115,6 +132,18 @@ class ScreenshotViewModel extends declared(Accessor) {
   @property()
   dragHandler: any = null;
 
+  @property()
+  highlightedFeature: any = null;
+
+  @property()
+  featureWidget: FeatureWidget = null;
+
+  @property()
+  layerListWidget: LayerList = null;
+
+  @property()
+  legendWidget: InteractiveLegend = null;
+
   //----------------------------------
   //
   //  Public Methods
@@ -122,11 +151,68 @@ class ScreenshotViewModel extends declared(Accessor) {
   //----------------------------------
 
   initialize() {
-    watchUtils.init(this, "expandWidget", () => {
-      const widgetGroupKey = "widget-group-key";
-      this._handles.remove(widgetGroupKey);
-      this._handles.add(this._handleExpandWidgetGroup(), widgetGroupKey);
-    });
+    this._handles.add([
+      watchUtils.init(this, "expandWidget", () => {
+        const widgetGroupKey = "widget-group-key";
+        this._handles.remove(widgetGroupKey);
+        this._handles.add(this._handleExpandWidgetGroup(), widgetGroupKey);
+      }),
+      watchUtils.watch(this, "screenshotModeIsActive", () => {
+        if (!this.featureWidget) {
+          return;
+        }
+        if (!this.screenshotModeIsActive) {
+          if (this.featureWidget) {
+            this.featureWidget.graphic = null;
+          }
+          if (this.highlightedFeature) {
+            this.highlightedFeature.remove();
+            this.highlightedFeature = null;
+          }
+        }
+      }),
+      watchUtils.watch(this, "view.popup.visible", () => {
+        if (!this.view) {
+          return;
+        }
+        if (
+          !this.view.popup.visible &&
+          this.screenshotModeIsActive &&
+          this.popupIncludedInScreenshot &&
+          this.view.popup.selectedFeature
+        ) {
+          const layerView = this.view.layerViews.find(
+            layerView =>
+              layerView.layer.id === this.view.popup.selectedFeature.layer.id
+          ) as __esri.FeatureLayerView;
+          this.highlightedFeature = layerView.highlight(
+            this.view.popup.selectedFeature
+          );
+        }
+      }),
+      watchUtils.watch(this, "screenshotModeIsActive", () => {
+        if (!this.view) {
+          return;
+        }
+        if (this.view.popup) {
+          this.view.popup.visible = false;
+        }
+      }),
+      watchUtils.init(this, ["legendWidget", "view"], () => {
+        if (this.view && !this.legendWidget) {
+          this.legendWidget = new InteractiveLegend({
+            view: this.view,
+            style: "classic",
+            filterMode: "featureFilter",
+            layerListViewModel: new LayerList({ view: this.view }).viewModel,
+            onboardingPanelEnabled: false,
+            opacity: 30,
+            grayScale: 100,
+            offscreen: true
+          });
+        }
+      })
+    ]);
   }
 
   destroy() {
@@ -584,6 +670,7 @@ class ScreenshotViewModel extends declared(Accessor) {
     maskDiv: HTMLElement,
     downloadBtnNode: HTMLButtonElement
   ): void {
+    // debugger;
     const viewCanvas = document.createElement("canvas") as HTMLCanvasElement;
     const img = document.createElement("img") as HTMLImageElement;
     const firstComponent = document.querySelector(
