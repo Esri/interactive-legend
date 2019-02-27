@@ -1,6 +1,6 @@
 define({
-  "next": "Š_Next_________č",
-  "back": "Š_back_________č",
-  "close": "Š_Close___________č",
-  "widgetLabel": "Š_Info_________č"
+  "next": "Naslednji",
+  "back": "nazaj",
+  "close": "Zapri",
+  "widgetLabel": "Informacije"
 });

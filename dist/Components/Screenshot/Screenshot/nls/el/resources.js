@@ -1,13 +1,13 @@
 define({
-  "takeAScreenshot": "π_Take a screenshot__________________Ω",
-  "downloadImage": "π_Download Image_______________Ω",
-  "backButton": "π_Return to the map__________________Ω",
-  "widgetLabel": "π_Screenshot_____________________Ω",
-  "deactivateScreenshot": "π_Deactivate screenshot mode___________________________Ω",
-  "setScreenshotArea": "π_Set the map area_________________Ω",
-  "selectAFeature": "π_Select a feature on the map____________________________Ω",
-  "screenshotTitle": "π_Capture an image_________________Ω",
-  "screenshotSubtitle": "π_Select additional elements to include with the map___________________________Ω.",
-  "legend": "π_Legend_____________Ω",
-  "popup": "π_Pop-up_____________Ω"
+  "takeAScreenshot": "Λήψη στιγμιότυπου οθόνης",
+  "downloadImage": "Λήψη εικόνας",
+  "backButton": "Επιστροφή στον χάρτη",
+  "widgetLabel": "Στιγμιότυπο οθόνης",
+  "deactivateScreenshot": "Απενεργοποίηση λειτουργίας λήψης στιγμιότυπου οθόνης",
+  "setScreenshotArea": "Καθορισμός της περιοχής του χάρτη",
+  "selectAFeature": "Επιλέξτε ένα στοιχείο στον χάρτη.",
+  "screenshotTitle": "Καταγραφή εικόνας",
+  "screenshotSubtitle": "Επιλέξτε πρόσθετα στοιχεία για να συμπεριληφθούν στον χάρτη.",
+  "legend": "Υπόμνημα",
+  "popup": "Αναδυόμενο παράθυρο"
 });

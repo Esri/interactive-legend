@@ -1,6 +1,6 @@
 define({
-  "next": "한_Next_________빠",
-  "back": "한_back_________빠",
-  "close": "한_Close___________빠",
-  "widgetLabel": "한_Info_________빠"
+  "next": "다음",
+  "back": "뒤로",
+  "close": "닫기",
+  "widgetLabel": "정보"
 });

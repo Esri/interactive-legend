@@ -1,13 +1,13 @@
 define({
-  "takeAScreenshot": "试_Take a screenshot__________________验",
-  "downloadImage": "试_Download Image_______________验",
-  "backButton": "试_Return to the map__________________验",
-  "widgetLabel": "试_Screenshot_____________________验",
-  "deactivateScreenshot": "试_Deactivate screenshot mode___________________________验",
-  "setScreenshotArea": "试_Set the map area_________________验",
-  "selectAFeature": "试_Select a feature on the map____________________________验",
-  "screenshotTitle": "试_Capture an image_________________验",
-  "screenshotSubtitle": "试_Select additional elements to include with the map___________________________验.",
-  "legend": "试_Legend_____________验",
-  "popup": "试_Pop-up_____________验"
+  "takeAScreenshot": "获取截图",
+  "downloadImage": "下载图像",
+  "backButton": "返回到地图",
+  "widgetLabel": "屏幕截图",
+  "deactivateScreenshot": "禁用截图模式",
+  "setScreenshotArea": "设置地图区域",
+  "selectAFeature": "选择地图上的要素",
+  "screenshotTitle": "捕获图像",
+  "screenshotSubtitle": "选择要包含在地图中的其他元素。",
+  "legend": "图例",
+  "popup": "弹出窗口"
 });

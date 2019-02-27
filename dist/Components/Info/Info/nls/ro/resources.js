@@ -1,6 +1,6 @@
 define({
-  "next": "Ă_Next_________ș",
-  "back": "Ă_back_________ș",
-  "close": "Ă_Close___________ș",
-  "widgetLabel": "Ă_Info_________ș"
+  "next": "Următorul",
+  "back": "înapoi",
+  "close": "Închidere",
+  "widgetLabel": "Informații"
 });
