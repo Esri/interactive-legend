@@ -115,9 +115,8 @@ class InteractiveLegendApp {
   screenshot: Screenshot = null;
   interactiveLegendExpand: Expand = null;
   searchExpand: Expand = null;
-  // featureWidget: FeatureWidget = null;
-  // highlightedFeature: any = null;
   infoExpand: Expand = null;
+  interactiveLegend: InteractiveLegend = null;
 
   //--------------------------------------------------------------------------
   //
@@ -294,7 +293,7 @@ class InteractiveLegendApp {
               onboardingPanelEnabled = true;
             }
 
-            const interactiveLegend = new InteractiveLegend({
+            this.interactiveLegend = new InteractiveLegend({
               view,
               mutedShade: defaultShade,
               style: defaultStyle,
@@ -304,24 +303,10 @@ class InteractiveLegendApp {
               opacity: muteOpacity,
               grayScale: muteGrayScale
             });
-            // const offScreenInteractiveLegend = new InteractiveLegend({
-            //   view,
-            //   container: document.querySelector(
-            //     ".offscreen-interactive-legend-container"
-            //   ),
-            //   mutedShade: defaultShade,
-            //   style: defaultStyle,
-            //   filterMode: defaultMode,
-            //   layerListViewModel,
-            //   offscreen: true
-            // });
-
-            // offScreenInteractiveLegend.style.selectedStyleData =
-            //   interactiveLegend.style.selectedStyleData;
 
             this._handleSearchWidget(
               searchEnabled,
-              interactiveLegend,
+              this.interactiveLegend,
               view,
               searchConfig,
               searchPosition,
@@ -334,10 +319,10 @@ class InteractiveLegendApp {
             this.interactiveLegendExpand = new Expand({
               view,
               group: interactiveLegendGroup,
-              content: interactiveLegend,
+              content: this.interactiveLegend,
               mode: "floating",
               expanded: true,
-              expandTooltip: interactiveLegend.label
+              expandTooltip: this.interactiveLegend.label
             });
 
             watchUtils.whenOnce(
@@ -528,14 +513,13 @@ class InteractiveLegendApp {
     screenshotPosition: string
   ): void {
     if (screenshotEnabled) {
-      const mapComponentSelectors = [`.${CSS.legend}`, `.${CSS.popup}`];
-
       this.screenshot = new Screenshot({
         view,
-        // mapComponentSelectors,
         legendIncludedInScreenshot,
-        popupIncludedInScreenshot
+        popupIncludedInScreenshot,
+        selectedStyleData: this.interactiveLegend.style.selectedStyleData
       });
+
       const screenshotGroup =
         screenshotPosition.indexOf("left") !== -1 ? "left" : "right";
       const screenshotExpand = new Expand({
@@ -547,63 +531,6 @@ class InteractiveLegendApp {
       });
 
       this.screenshot.expandWidget = screenshotExpand;
-
-      // watchUtils.watch(view, "popup.visible", () => {
-      //   if (view.popup.visible) {
-      //     if (!this.featureWidget) {
-      //       this.featureWidget = new FeatureWidget({
-      //         graphic: view.popup.selectedFeature,
-      //         container: document.querySelector(
-      //           ".offscreen-pop-up-container"
-      //         ) as HTMLElement
-      //       });
-      //       this.screenshot.featureWidget = this.featureWidget;
-      //     } else {
-      //       this.featureWidget.graphic = view.popup.selectedFeature;
-      //     }
-      //   }
-      // });
-
-      // watchUtils.watch(
-      //   this.screenshot.viewModel,
-      //   "screenshotModeIsActive",
-      //   () => {
-      //     view.popup.visible = false;
-      //   }
-      // );
-
-      // watchUtils.watch(view, "popup.visible", () => {
-      //   if (
-      //     !view.popup.visible &&
-      //     this.screenshot.viewModel.screenshotModeIsActive &&
-      //     popupIncludedInScreenshot &&
-      //     view.popup.selectedFeature
-      //   ) {
-      //     const layerView = view.layerViews.find(
-      //       layerView =>
-      //         layerView.layer.id === view.popup.selectedFeature.layer.id
-      //     ) as __esri.FeatureLayerView;
-      //     this.highlightedFeature = layerView.highlight(
-      //       view.popup.selectedFeature
-      //     );
-      //   }
-      // });
-
-      // watchUtils.watch(
-      //   this.screenshot,
-      //   "viewModel.screenshotModeIsActive",
-      //   () => {
-      //     if (!this.screenshot.viewModel.screenshotModeIsActive) {
-      //       if (this.featureWidget) {
-      //         this.featureWidget.graphic = null;
-      //       }
-      //       if (this.highlightedFeature) {
-      //         this.highlightedFeature.remove();
-      //         this.highlightedFeature = null;
-      //       }
-      //     }
-      //   }
-      // );
 
       view.ui.add(screenshotExpand, screenshotPosition);
     }

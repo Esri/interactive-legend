@@ -50,9 +50,8 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
             this.screenshot = null;
             this.interactiveLegendExpand = null;
             this.searchExpand = null;
-            // featureWidget: FeatureWidget = null;
-            // highlightedFeature: any = null;
             this.infoExpand = null;
+            this.interactiveLegend = null;
         }
         //--------------------------------------------------------------------------
         //
@@ -176,7 +175,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 localStorage.setItem("firstTimeUseApp", "" + Date.now());
                                 onboardingPanelEnabled = true;
                             }
-                            var interactiveLegend = new InteractiveLegend({
+                            _this.interactiveLegend = new InteractiveLegend({
                                 view: view,
                                 mutedShade: defaultShade,
                                 style: defaultStyle,
@@ -186,30 +185,17 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 opacity: muteOpacity,
                                 grayScale: muteGrayScale
                             });
-                            // const offScreenInteractiveLegend = new InteractiveLegend({
-                            //   view,
-                            //   container: document.querySelector(
-                            //     ".offscreen-interactive-legend-container"
-                            //   ),
-                            //   mutedShade: defaultShade,
-                            //   style: defaultStyle,
-                            //   filterMode: defaultMode,
-                            //   layerListViewModel,
-                            //   offscreen: true
-                            // });
-                            // offScreenInteractiveLegend.style.selectedStyleData =
-                            //   interactiveLegend.style.selectedStyleData;
-                            _this._handleSearchWidget(searchEnabled, interactiveLegend, view, searchConfig, searchPosition, searchOpenAtStart);
+                            _this._handleSearchWidget(searchEnabled, _this.interactiveLegend, view, searchConfig, searchPosition, searchOpenAtStart);
                             var interactiveLegendGroup = interactiveLegendPosition.indexOf("left") !== -1
                                 ? "left"
                                 : "right";
                             _this.interactiveLegendExpand = new Expand({
                                 view: view,
                                 group: interactiveLegendGroup,
-                                content: interactiveLegend,
+                                content: _this.interactiveLegend,
                                 mode: "floating",
                                 expanded: true,
-                                expandTooltip: interactiveLegend.label
+                                expandTooltip: _this.interactiveLegend.label
                             });
                             watchUtils.whenOnce(_this.interactiveLegendExpand, "container", function () {
                                 if (_this.interactiveLegendExpand.container) {
@@ -338,12 +324,11 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
         // _handleScreenshotWidget
         InteractiveLegendApp.prototype._handleScreenshotWidget = function (screenshotEnabled, legendIncludedInScreenshot, popupIncludedInScreenshot, view, screenshotPosition) {
             if (screenshotEnabled) {
-                var mapComponentSelectors = ["." + CSS.legend, "." + CSS.popup];
                 this.screenshot = new Screenshot({
                     view: view,
-                    // mapComponentSelectors,
                     legendIncludedInScreenshot: legendIncludedInScreenshot,
-                    popupIncludedInScreenshot: popupIncludedInScreenshot
+                    popupIncludedInScreenshot: popupIncludedInScreenshot,
+                    selectedStyleData: this.interactiveLegend.style.selectedStyleData
                 });
                 var screenshotGroup = screenshotPosition.indexOf("left") !== -1 ? "left" : "right";
                 var screenshotExpand = new Expand({
@@ -354,59 +339,6 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                     expandTooltip: this.screenshot.label
                 });
                 this.screenshot.expandWidget = screenshotExpand;
-                // watchUtils.watch(view, "popup.visible", () => {
-                //   if (view.popup.visible) {
-                //     if (!this.featureWidget) {
-                //       this.featureWidget = new FeatureWidget({
-                //         graphic: view.popup.selectedFeature,
-                //         container: document.querySelector(
-                //           ".offscreen-pop-up-container"
-                //         ) as HTMLElement
-                //       });
-                //       this.screenshot.featureWidget = this.featureWidget;
-                //     } else {
-                //       this.featureWidget.graphic = view.popup.selectedFeature;
-                //     }
-                //   }
-                // });
-                // watchUtils.watch(
-                //   this.screenshot.viewModel,
-                //   "screenshotModeIsActive",
-                //   () => {
-                //     view.popup.visible = false;
-                //   }
-                // );
-                // watchUtils.watch(view, "popup.visible", () => {
-                //   if (
-                //     !view.popup.visible &&
-                //     this.screenshot.viewModel.screenshotModeIsActive &&
-                //     popupIncludedInScreenshot &&
-                //     view.popup.selectedFeature
-                //   ) {
-                //     const layerView = view.layerViews.find(
-                //       layerView =>
-                //         layerView.layer.id === view.popup.selectedFeature.layer.id
-                //     ) as __esri.FeatureLayerView;
-                //     this.highlightedFeature = layerView.highlight(
-                //       view.popup.selectedFeature
-                //     );
-                //   }
-                // });
-                // watchUtils.watch(
-                //   this.screenshot,
-                //   "viewModel.screenshotModeIsActive",
-                //   () => {
-                //     if (!this.screenshot.viewModel.screenshotModeIsActive) {
-                //       if (this.featureWidget) {
-                //         this.featureWidget.graphic = null;
-                //       }
-                //       if (this.highlightedFeature) {
-                //         this.highlightedFeature.remove();
-                //         this.highlightedFeature = null;
-                //       }
-                //     }
-                //   }
-                // );
                 view.ui.add(screenshotExpand, screenshotPosition);
             }
         };
