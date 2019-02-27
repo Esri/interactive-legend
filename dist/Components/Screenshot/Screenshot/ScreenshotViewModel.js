@@ -71,6 +71,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this.legendWidget = null;
             // selectedStyleData
             _this.selectedStyleData = null;
+            // expandWidgetEnabled
+            _this.expandWidgetEnabled = true;
             return _this;
         }
         Object.defineProperty(ScreenshotViewModel.prototype, "state", {
@@ -96,15 +98,23 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         ScreenshotViewModel.prototype.initialize = function () {
             var _this = this;
             this._handles.add([
-                watchUtils.init(this, "expandWidget", function () {
-                    var widgetGroupKey = "widget-group-key";
-                    _this._handles.remove(widgetGroupKey);
-                    _this._handles.add(_this._handleExpandWidgetGroup(), widgetGroupKey);
-                }),
                 this._watchPopup(),
                 this._watchScreenshotMode(),
                 this._watchLegendWidgetAndView()
             ]);
+            if (this.expandWidgetEnabled) {
+                this._handles.add([
+                    watchUtils.watch(this, "expandWidgetEnabled", function () {
+                        _this._handles.add([
+                            watchUtils.init(_this, "expandWidget", function () {
+                                var widgetGroupKey = "widget-group-key";
+                                _this._handles.remove(widgetGroupKey);
+                                _this._handles.add(_this._handleExpandWidgetGroup(), widgetGroupKey);
+                            })
+                        ]);
+                    })
+                ]);
+            }
         };
         ScreenshotViewModel.prototype.destroy = function () {
             this._handles.removeAll();
@@ -571,6 +581,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         __decorate([
             decorators_1.property()
         ], ScreenshotViewModel.prototype, "selectedStyleData", void 0);
+        __decorate([
+            decorators_1.property()
+        ], ScreenshotViewModel.prototype, "expandWidgetEnabled", void 0);
         ScreenshotViewModel = __decorate([
             decorators_1.subclass("ScreenshotViewModel")
         ], ScreenshotViewModel);

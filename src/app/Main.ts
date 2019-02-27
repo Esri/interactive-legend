@@ -518,21 +518,17 @@ class InteractiveLegendApp {
         legendIncludedInScreenshot,
         popupIncludedInScreenshot,
         selectedStyleData: this.interactiveLegend.style.selectedStyleData
+        // expandWidgetEnabled: false
       });
 
-      const screenshotGroup =
-        screenshotPosition.indexOf("left") !== -1 ? "left" : "right";
-      const screenshotExpand = new Expand({
-        view,
-        group: screenshotGroup,
-        content: this.screenshot,
-        mode: "floating",
-        expandTooltip: this.screenshot.label
-      });
+      if (this.screenshot.expandWidgetEnabled) {
+        const screenshotGroup =
+          screenshotPosition.indexOf("left") !== -1 ? "left" : "right";
 
-      this.screenshot.expandWidget = screenshotExpand;
+        this.screenshot.expandWidget.group = screenshotGroup;
+      }
 
-      view.ui.add(screenshotExpand, screenshotPosition);
+      view.ui.add(this.screenshot, screenshotPosition);
     }
   }
 

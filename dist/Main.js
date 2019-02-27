@@ -329,17 +329,13 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                     legendIncludedInScreenshot: legendIncludedInScreenshot,
                     popupIncludedInScreenshot: popupIncludedInScreenshot,
                     selectedStyleData: this.interactiveLegend.style.selectedStyleData
+                    // expandWidgetEnabled: false
                 });
-                var screenshotGroup = screenshotPosition.indexOf("left") !== -1 ? "left" : "right";
-                var screenshotExpand = new Expand({
-                    view: view,
-                    group: screenshotGroup,
-                    content: this.screenshot,
-                    mode: "floating",
-                    expandTooltip: this.screenshot.label
-                });
-                this.screenshot.expandWidget = screenshotExpand;
-                view.ui.add(screenshotExpand, screenshotPosition);
+                if (this.screenshot.expandWidgetEnabled) {
+                    var screenshotGroup = screenshotPosition.indexOf("left") !== -1 ? "left" : "right";
+                    this.screenshot.expandWidget.group = screenshotGroup;
+                }
+                view.ui.add(this.screenshot, screenshotPosition);
             }
         };
         // _handleLayerListWidget

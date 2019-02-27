@@ -153,6 +153,10 @@ class ScreenshotViewModel extends declared(Accessor) {
   @property()
   selectedStyleData: Collection<SelectedStyleData> = null;
 
+  // expandWidgetEnabled
+  @property()
+  expandWidgetEnabled = true;
+
   //----------------------------------
   //
   //  Public Methods
@@ -161,16 +165,26 @@ class ScreenshotViewModel extends declared(Accessor) {
 
   initialize() {
     this._handles.add([
-      watchUtils.init(this, "expandWidget", () => {
-        const widgetGroupKey = "widget-group-key";
-        this._handles.remove(widgetGroupKey);
-        this._handles.add(this._handleExpandWidgetGroup(), widgetGroupKey);
-      }),
-
       this._watchPopup(),
       this._watchScreenshotMode(),
       this._watchLegendWidgetAndView()
     ]);
+    if (this.expandWidgetEnabled) {
+      this._handles.add([
+        watchUtils.watch(this, "expandWidgetEnabled", () => {
+          this._handles.add([
+            watchUtils.init(this, "expandWidget", () => {
+              const widgetGroupKey = "widget-group-key";
+              this._handles.remove(widgetGroupKey);
+              this._handles.add(
+                this._handleExpandWidgetGroup(),
+                widgetGroupKey
+              );
+            })
+          ]);
+        })
+      ]);
+    }
   }
 
   destroy() {
