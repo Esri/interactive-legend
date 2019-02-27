@@ -1,13 +1,13 @@
 define({
-  "takeAScreenshot": "ґ_Take a screenshot__________________Ї",
-  "downloadImage": "ґ_Download Image_______________Ї",
-  "backButton": "ґ_Return to the map__________________Ї",
-  "widgetLabel": "ґ_Screenshot_____________________Ї",
-  "deactivateScreenshot": "ґ_Deactivate screenshot mode___________________________Ї",
-  "setScreenshotArea": "ґ_Set the map area_________________Ї",
-  "selectAFeature": "ґ_Select a feature on the map____________________________Ї",
-  "screenshotTitle": "ґ_Capture an image_________________Ї",
-  "screenshotSubtitle": "ґ_Select additional elements to include with the map___________________________Ї.",
-  "legend": "ґ_Legend_____________Ї",
-  "popup": "ґ_Pop-up_____________Ї"
+  "takeAScreenshot": "Зробити знімок екрану",
+  "downloadImage": "Завантажити зображення",
+  "backButton": "Повернутися до карти",
+  "widgetLabel": "Знімок екрану",
+  "deactivateScreenshot": "Деактивувати режим знімку екрану",
+  "setScreenshotArea": "Задати область карти",
+  "selectAFeature": "Вибрати об'єкт на карті",
+  "screenshotTitle": "Захопити зображення",
+  "screenshotSubtitle": "Вибрати додаткові елементи для включення в карту",
+  "legend": "Легенда",
+  "popup": "Спливаюче вікно"
 });

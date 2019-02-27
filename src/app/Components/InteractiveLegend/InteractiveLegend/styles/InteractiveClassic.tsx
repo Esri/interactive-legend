@@ -130,14 +130,12 @@ const CSS = {
   header: "esri-widget__heading",
   hidden: "esri-hidden",
   calciteStyles: {
-    refreshIcon: "icon-ui-refresh",
     btn: "btn",
     btnSmall: "btn-small",
-    btnPrimary: "btn-primary",
+    btnClear: "btn-clear",
     error: "icon-ui-error",
     close: "icon-ui-close",
-    nonVisibleIcon: "esri-icon-non-visible",
-    visibleIcon: "esri-icon-visible"
+    checkMark: "icon-ui-check-mark"
   },
   // interactive-legend
   loaderContainer: "esri-interactive-legend__loader-container",
@@ -153,8 +151,6 @@ const CSS = {
   interactiveLegendLayer: "esri-interactive-legend__layer",
   interactiveLegendService: "esri-interactive-legend__service",
   interactiveLegendlayerBody: "esri-interactive-legend__layer-body",
-  interactiveLegendVisibleIcon: "esri-interactive-legend__visible-icon",
-  interactiveLegendNonVisibleIcon: "esri-interactive-legend__non-visible-icon",
   interactiveLegendLayerRow: "esri-interactive-legend__ramp-layer-row",
   interactiveStyles: "esri-interactive-legend__interactive-styles",
   layerCaptionContainer: "esri-interactive-legend__layer-caption-container",
@@ -164,11 +160,19 @@ const CSS = {
   interactiveLegendMainContainer: "esri-interactive-legend__main-container",
   interactiveLegendInfoContainer:
     "esri-interactive-legend__legend-info-container",
+  interactiveLegendGrayButtonStyles:
+    "esri-interactive-legend__gray-button-styles",
   interactiveLegendResetButtonContainer:
     "esri-interactive-legend__reset-button-container",
   interactiveLegendLayerRowContainer:
     "esri-interactive-legend__layer-row-container",
   interactiveLegendRemoveOutline: "esri-interactive-legend__remove-outline",
+  interactiveLegendCheckMarkIconStyles:
+    "esri-interactive-legend__checkmark-icon",
+  interactiveLegendCheckMarkIconSelected:
+    "esri-interactive-legend__checkmark-icon--selected",
+  interactiveLegendCheckMarkIconNotSelected:
+    "esri-interactive-legend__checkmark-icon--not-selected",
   onboarding: {
     mainContainer: "esri-interactive-legend__onboarding-main-container",
     contentContainer: "esri-interactive-legend__onboarding-content-container",
@@ -685,26 +689,27 @@ class InteractiveClassic extends declared(Widget) {
     legendElementIndex: number,
     operationalItemIndex: number
   ): any {
+    const disabled =
+      (featureLayerData &&
+        featureLayerData.selectedInfoIndex.length > 0 &&
+        featureLayerData.selectedInfoIndex[legendElementIndex] &&
+        featureLayerData.selectedInfoIndex[legendElementIndex].length === 0) ||
+      (featureLayerData && featureLayerData.selectedInfoIndex.length === 0);
+    const grayStyles = {
+      [CSS.interactiveLegendGrayButtonStyles]: disabled
+    };
     return (
       <div class={CSS.interactiveLegendResetButtonContainer}>
         <button
           bind={this}
           class={this.classes(
             CSS.calciteStyles.btn,
-            CSS.calciteStyles.btnSmall
+            CSS.calciteStyles.btnClear,
+            CSS.calciteStyles.btnSmall,
+            grayStyles
           )}
           tabIndex={this.offscreen ? -1 : 0}
-          disabled={
-            (featureLayerData &&
-              featureLayerData.selectedInfoIndex.length > 0 &&
-              featureLayerData.selectedInfoIndex[legendElementIndex] &&
-              featureLayerData.selectedInfoIndex[legendElementIndex].length ===
-                0) ||
-            (featureLayerData &&
-              featureLayerData.selectedInfoIndex.length === 0)
-              ? true
-              : false
-          }
+          disabled={disabled ? true : false}
           onclick={(event: Event) => {
             this._resetLegendFilter(
               event,
@@ -720,7 +725,7 @@ class InteractiveClassic extends declared(Widget) {
             );
           }}
         >
-          Show all
+          Show All
         </button>
       </div>
     );
@@ -890,35 +895,14 @@ class InteractiveClassic extends declared(Widget) {
     };
 
     let selectedRow = null;
-    let visibleIcon = null;
+    let selectedInfoIndex = null;
     if (this.selectedStyleData.length > 0) {
       const featureLayerData = this.selectedStyleData.find(data =>
         data ? activeLayerInfo.layer.id === data.layerItemId : null
       );
       if (featureLayerData) {
-        const selectedInfoIndex =
+        selectedInfoIndex =
           featureLayerData.selectedInfoIndex[legendElementIndex];
-
-        visibleIcon = selectedInfoIndex ? (
-          selectedInfoIndex.indexOf(legendInfoIndex) === -1 &&
-          selectedInfoIndex.length > 0 ? (
-            <span
-              class={this.classes(
-                CSS.calciteStyles.nonVisibleIcon,
-                CSS.interactiveLegendNonVisibleIcon
-              )}
-            />
-          ) : (
-            <span
-              class={this.classes(
-                CSS.calciteStyles.visibleIcon,
-                CSS.interactiveLegendVisibleIcon
-              )}
-            />
-          )
-        ) : (
-          <span class={CSS.calciteStyles.visibleIcon} />
-        );
         if (activeLayerInfo.legendElements.length > 1) {
           selectedRow = selectedInfoIndex
             ? featureLayerData.selectedInfoIndex &&
@@ -1060,7 +1044,38 @@ class InteractiveClassic extends declared(Widget) {
               {getTitle(elementInfo.label, false) || ""}
             </div>
           </div>
-          {applySelect ? <div>{visibleIcon}</div> : null}
+          {selectedInfoIndex ? (
+            featureLayerData.selectedInfoIndex &&
+            selectedInfoIndex.indexOf(legendInfoIndex) === -1 &&
+            selectedInfoIndex.length > 0 ? (
+              <div>
+                <span
+                  class={this.classes(
+                    CSS.calciteStyles.checkMark,
+                    CSS.interactiveLegendCheckMarkIconNotSelected
+                  )}
+                />
+              </div>
+            ) : (
+              <div>
+                <span
+                  class={this.classes(
+                    CSS.interactiveLegendCheckMarkIconSelected,
+                    CSS.calciteStyles.checkMark
+                  )}
+                />
+              </div>
+            )
+          ) : (
+            <div>
+              <span
+                class={this.classes(
+                  CSS.interactiveLegendCheckMarkIconStyles,
+                  CSS.calciteStyles.checkMark
+                )}
+              />
+            </div>
+          )}
         </div>
       </div>
     );

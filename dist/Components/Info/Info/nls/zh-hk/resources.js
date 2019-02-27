@@ -1,6 +1,6 @@
 define({
-  "next": "試_Next_________驗",
-  "back": "試_back_________驗",
-  "close": "試_Close___________驗",
-  "widgetLabel": "試_Info_________驗"
+  "next": "下一步",
+  "back": "後退",
+  "close": "關閉",
+  "widgetLabel": "資訊"
 });
