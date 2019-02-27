@@ -63,6 +63,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             refreshIcon: "icon-ui-refresh",
             btn: "btn",
             btnSmall: "btn-small",
+            btnClear: "btn-clear",
             btnPrimary: "btn-primary",
             error: "icon-ui-error",
             close: "icon-ui-close",
@@ -93,6 +94,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         interactiveLegendTitleContainer: "esri-interactive-legend__title-container",
         interactiveLegendMainContainer: "esri-interactive-legend__main-container",
         interactiveLegendInfoContainer: "esri-interactive-legend__legend-info-container",
+        interactiveLegendGrayButtonStyles: "esri-interactive-legend__gray-button-styles",
         interactiveLegendResetButtonContainer: "esri-interactive-legend__reset-button-container",
         interactiveLegendLayerRowContainer: "esri-interactive-legend__layer-row-container",
         interactiveLegendRemoveOutline: "esri-interactive-legend__remove-outline",
@@ -406,20 +408,21 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         // _renderResetButton
         InteractiveClassic.prototype._renderResetButton = function (featureLayerData, legendElementIndex, operationalItemIndex) {
             var _this = this;
+            var _a;
+            var disabled = (featureLayerData &&
+                featureLayerData.selectedInfoIndex.length > 0 &&
+                featureLayerData.selectedInfoIndex[legendElementIndex] &&
+                featureLayerData.selectedInfoIndex[legendElementIndex].length === 0) ||
+                (featureLayerData && featureLayerData.selectedInfoIndex.length === 0);
+            var grayStyles = (_a = {},
+                _a[CSS.interactiveLegendGrayButtonStyles] = disabled,
+                _a);
             return (widget_1.tsx("div", { class: CSS.interactiveLegendResetButtonContainer },
-                widget_1.tsx("button", { bind: this, class: this.classes(CSS.calciteStyles.btn, CSS.calciteStyles.btnSmall), tabIndex: this.offscreen ? -1 : 0, disabled: (featureLayerData &&
-                        featureLayerData.selectedInfoIndex.length > 0 &&
-                        featureLayerData.selectedInfoIndex[legendElementIndex] &&
-                        featureLayerData.selectedInfoIndex[legendElementIndex].length ===
-                            0) ||
-                        (featureLayerData &&
-                            featureLayerData.selectedInfoIndex.length === 0)
-                        ? true
-                        : false, onclick: function (event) {
+                widget_1.tsx("button", { bind: this, class: this.classes(CSS.calciteStyles.btn, CSS.calciteStyles.btnClear, CSS.calciteStyles.btnSmall, grayStyles), tabIndex: this.offscreen ? -1 : 0, disabled: disabled ? true : false, onclick: function (event) {
                         _this._resetLegendFilter(event, featureLayerData, operationalItemIndex);
                     }, onkeydown: function (event) {
                         _this._resetLegendFilter(event, featureLayerData, operationalItemIndex);
-                    } }, "Show all")));
+                    } }, "Show All")));
         };
         // _renderLegendForRamp
         InteractiveClassic.prototype._renderLegendForRamp = function (legendElement, activeLayerInfo) {
@@ -517,12 +520,14 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 _b);
             var selectedRow = null;
             var visibleIcon = null;
+            var selectedInfoIndex = null;
             if (this.selectedStyleData.length > 0) {
                 var featureLayerData_1 = this.selectedStyleData.find(function (data) {
                     return data ? activeLayerInfo.layer.id === data.layerItemId : null;
                 });
                 if (featureLayerData_1) {
-                    var selectedInfoIndex = featureLayerData_1.selectedInfoIndex[legendElementIndex];
+                    selectedInfoIndex =
+                        featureLayerData_1.selectedInfoIndex[legendElementIndex];
                     visibleIcon = selectedInfoIndex ? (selectedInfoIndex.indexOf(legendInfoIndex) === -1 &&
                         selectedInfoIndex.length > 0 ? (widget_1.tsx("span", { class: this.classes(CSS.calciteStyles.nonVisibleIcon, CSS.interactiveLegendNonVisibleIcon) })) : (widget_1.tsx("span", { class: this.classes(CSS.calciteStyles.visibleIcon, CSS.interactiveLegendVisibleIcon) }))) : (widget_1.tsx("span", { class: CSS.calciteStyles.visibleIcon }));
                     if (activeLayerInfo.legendElements.length > 1) {
@@ -607,7 +612,12 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     widget_1.tsx("div", { class: applySelect ? CSS.interactiveLegendInfoContainer : null },
                         widget_1.tsx("div", { class: this.classes(CSS.symbolContainer, symbolClasses) }, content),
                         widget_1.tsx("div", { class: this.classes(CSS.layerInfo, labelClasses) }, styleUtils_1.getTitle(elementInfo.label, false) || "")),
-                    applySelect ? widget_1.tsx("div", null, visibleIcon) : null)));
+                    selectedInfoIndex ? (featureLayerData.selectedInfoIndex &&
+                        selectedInfoIndex.indexOf(legendInfoIndex) === -1 &&
+                        selectedInfoIndex.length > 0 ? (widget_1.tsx("div", null,
+                        widget_1.tsx("span", { class: "esri-interactive-legend__checkmark-icon--not-selected icon-ui-check-mark" }))) : (widget_1.tsx("div", null,
+                        widget_1.tsx("span", { class: "esri-interactive-legend__checkmark-icon--selected icon-ui-check-mark" })))) : (widget_1.tsx("div", null,
+                        widget_1.tsx("span", { class: "esri-interactive-legend__checkmark-icon icon-ui-check-mark" }))))));
         };
         // _renderImage
         InteractiveClassic.prototype._renderImage = function (elementInfo, layer, isStretched) {
