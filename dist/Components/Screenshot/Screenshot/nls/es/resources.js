@@ -1,13 +1,13 @@
 define({
-  "takeAScreenshot": "á_Take a screenshot__________________Ó",
-  "downloadImage": "á_Download Image_______________Ó",
-  "backButton": "á_Return to the map__________________Ó",
-  "widgetLabel": "á_Screenshot_____________________Ó",
-  "deactivateScreenshot": "á_Deactivate screenshot mode___________________________Ó",
-  "setScreenshotArea": "á_Set the map area_________________Ó",
-  "selectAFeature": "á_Select a feature on the map____________________________Ó",
-  "screenshotTitle": "á_Capture an image_________________Ó",
-  "screenshotSubtitle": "á_Select additional elements to include with the map___________________________Ó.",
-  "legend": "á_Legend_____________Ó",
-  "popup": "á_Pop-up_____________Ó"
+  "takeAScreenshot": "Hacer una captura de pantalla",
+  "downloadImage": "Descargar imagen",
+  "backButton": "Volver al mapa",
+  "widgetLabel": "Captura de pantalla",
+  "deactivateScreenshot": "Desactivar modo Captura de pantalla",
+  "setScreenshotArea": "Definir área de mapa",
+  "selectAFeature": "Seleccionar una entidad en el mapa",
+  "screenshotTitle": "Capturar una imagen",
+  "screenshotSubtitle": "Seleccione elementos adicionales para incluirlos en el mapa.",
+  "legend": "Leyenda",
+  "popup": "Elemento emergente"
 });

@@ -1,13 +1,13 @@
 define({
-  "takeAScreenshot": "ã_Take a screenshot__________________Ç",
-  "downloadImage": "ã_Download Image_______________Ç",
-  "backButton": "ã_Return to the map__________________Ç",
-  "widgetLabel": "ã_Screenshot_____________________Ç",
-  "deactivateScreenshot": "ã_Deactivate screenshot mode___________________________Ç",
-  "setScreenshotArea": "ã_Set the map area_________________Ç",
-  "selectAFeature": "ã_Select a feature on the map____________________________Ç",
-  "screenshotTitle": "ã_Capture an image_________________Ç",
-  "screenshotSubtitle": "ã_Select additional elements to include with the map___________________________Ç.",
-  "legend": "ã_Legend_____________Ç",
-  "popup": "ã_Pop-up_____________Ç"
+  "takeAScreenshot": "Obter uma captura de tela",
+  "downloadImage": "Download da Imagem",
+  "backButton": "Retornar ao mapa",
+  "widgetLabel": "Captura de tela",
+  "deactivateScreenshot": "Desativar modo de captura de tela",
+  "setScreenshotArea": "Definir a área do mapa",
+  "selectAFeature": "Selecionar uma feição no mapa",
+  "screenshotTitle": "Capturar uma imagem",
+  "screenshotSubtitle": "Selecione elementos adicionais para incluir no mapa.",
+  "legend": "Legenda",
+  "popup": "Pop-up"
 });

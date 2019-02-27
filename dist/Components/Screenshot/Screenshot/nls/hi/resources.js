@@ -1,13 +1,13 @@
 define({
-  "takeAScreenshot": "आ_Take a screenshot__________________ज",
-  "downloadImage": "आ_Download Image_______________ज",
-  "backButton": "आ_Return to the map__________________ज",
-  "widgetLabel": "आ_Screenshot_____________________ज",
-  "deactivateScreenshot": "आ_Deactivate screenshot mode___________________________ज",
-  "setScreenshotArea": "आ_Set the map area_________________ज",
-  "selectAFeature": "आ_Select a feature on the map____________________________ज",
-  "screenshotTitle": "आ_Capture an image_________________ज",
-  "screenshotSubtitle": "आ_Select additional elements to include with the map___________________________ज.",
-  "legend": "आ_Legend_____________ज",
-  "popup": "आ_Pop-up_____________ज"
+  "takeAScreenshot": "स्क्रीनशॉट लें",
+  "downloadImage": "छवि डाउनलोड करें",
+  "backButton": "मानचित्र पर वापस जाएँ",
+  "widgetLabel": "स्क्रीनशॉट",
+  "deactivateScreenshot": "स्क्रीनशॉट मोड निष्क्रिय करें",
+  "setScreenshotArea": "मानचित्र क्षेत्र सेट करें",
+  "selectAFeature": "मानचित्र पर कोई सुविधा चुनें",
+  "screenshotTitle": "छवि को कैप्चर करें",
+  "screenshotSubtitle": "मानचित्र के साथ शामिल करने के लिए अतिरिक्त तत्वों का चयन करें।",
+  "legend": "लिजेंड",
+  "popup": "पॉप-अप"
 });

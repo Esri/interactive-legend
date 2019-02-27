@@ -1,13 +1,13 @@
 define({
-  "takeAScreenshot": "ø_Take a screenshot__________________å",
-  "downloadImage": "ø_Download Image_______________å",
-  "backButton": "ø_Return to the map__________________å",
-  "widgetLabel": "ø_Screenshot_____________________å",
-  "deactivateScreenshot": "ø_Deactivate screenshot mode___________________________å",
-  "setScreenshotArea": "ø_Set the map area_________________å",
-  "selectAFeature": "ø_Select a feature on the map____________________________å",
-  "screenshotTitle": "ø_Capture an image_________________å",
-  "screenshotSubtitle": "ø_Select additional elements to include with the map___________________________å.",
-  "legend": "ø_Legend_____________å",
-  "popup": "ø_Pop-up_____________å"
+  "takeAScreenshot": "Tag et screenshot",
+  "downloadImage": "Hent billede",
+  "backButton": "Vend tilbage til kort",
+  "widgetLabel": "Screenshot",
+  "deactivateScreenshot": "Deaktivér screenshot-tilstand",
+  "setScreenshotArea": "Indstil kortområde",
+  "selectAFeature": "Vælg et objekt på kortet",
+  "screenshotTitle": "Tag et billede",
+  "screenshotSubtitle": "Vælg flere elementer, der skal medtages på kortet.",
+  "legend": "Signaturforklaring",
+  "popup": "Pop-up-vindue"
 });

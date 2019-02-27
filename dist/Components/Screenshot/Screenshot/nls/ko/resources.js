@@ -1,13 +1,13 @@
 define({
-  "takeAScreenshot": "한_Take a screenshot__________________빠",
-  "downloadImage": "한_Download Image_______________빠",
-  "backButton": "한_Return to the map__________________빠",
-  "widgetLabel": "한_Screenshot_____________________빠",
-  "deactivateScreenshot": "한_Deactivate screenshot mode___________________________빠",
-  "setScreenshotArea": "한_Set the map area_________________빠",
-  "selectAFeature": "한_Select a feature on the map____________________________빠",
-  "screenshotTitle": "한_Capture an image_________________빠",
-  "screenshotSubtitle": "한_Select additional elements to include with the map___________________________빠.",
-  "legend": "한_Legend_____________빠",
-  "popup": "한_Pop-up_____________빠"
+  "takeAScreenshot": "스크린샷 찍기",
+  "downloadImage": "이미지 다운로드",
+  "backButton": "맵으로 돌아가기",
+  "widgetLabel": "스크린샷",
+  "deactivateScreenshot": "스크린샷 모드 비활성화",
+  "setScreenshotArea": "맵 영역 설정",
+  "selectAFeature": "맵에서 피처를 선택합니다.",
+  "screenshotTitle": "이미지 캡처",
+  "screenshotSubtitle": "맵에 포함할 추가 요소를 선택합니다.",
+  "legend": "범례",
+  "popup": "팝업"
 });
