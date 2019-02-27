@@ -233,10 +233,40 @@
 
   }
 
+
+  .esri-interactive-legend__gray-button-styles:disabled {
+    opacity: 1;
+    color: #CCCCCC;
+    border-color: #CCCCCC;
+    background-color: transparent;
+  }
+
   .esri-interactive-legend--layer-row:hover {
     cursor: pointer;
     background-color: #e2e2e2;
     border: 1px solid #323232;
   }
+
+  .esri-interactive-legend--layer-row:hover .esri-interactive-legend__checkmark-icon {
+    color: #323232;
+  }
+
+  .esri-interactive-legend__checkmark-icon {
+    color: transparent;
+  }
+
+
+  .esri-interactive-legend__checkmark-icon--not-selected {
+    color: transparent;
+  }
+
+  .esri-interactive-legend--layer-row:hover .esri-interactive-legend__checkmark-icon--not-selected {
+    color: #323232;
+  }
+
+  .esri-interactive-legend__checkmark-icon--selected {
+    color: #0079c1;
+  }
+
 
 }
