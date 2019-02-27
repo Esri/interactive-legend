@@ -130,15 +130,11 @@ const CSS = {
   header: "esri-widget__heading",
   hidden: "esri-hidden",
   calciteStyles: {
-    refreshIcon: "icon-ui-refresh",
     btn: "btn",
     btnSmall: "btn-small",
     btnClear: "btn-clear",
-    btnPrimary: "btn-primary",
     error: "icon-ui-error",
     close: "icon-ui-close",
-    nonVisibleIcon: "esri-icon-non-visible",
-    visibleIcon: "esri-icon-visible",
     checkMark: "icon-ui-check-mark"
   },
   // interactive-legend
@@ -155,8 +151,6 @@ const CSS = {
   interactiveLegendLayer: "esri-interactive-legend__layer",
   interactiveLegendService: "esri-interactive-legend__service",
   interactiveLegendlayerBody: "esri-interactive-legend__layer-body",
-  interactiveLegendVisibleIcon: "esri-interactive-legend__visible-icon",
-  interactiveLegendNonVisibleIcon: "esri-interactive-legend__non-visible-icon",
   interactiveLegendLayerRow: "esri-interactive-legend__ramp-layer-row",
   interactiveStyles: "esri-interactive-legend__interactive-styles",
   layerCaptionContainer: "esri-interactive-legend__layer-caption-container",
