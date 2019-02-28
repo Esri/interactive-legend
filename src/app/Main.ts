@@ -79,9 +79,6 @@ import Info = require("./Components/Info/Info");
 // Telemetry
 import Telemetry = require("telemetry/telemetry.dojo");
 
-// // FeatureWidget
-// import FeatureWidget = require("esri/widgets/Feature");
-
 // InteractiveLegend
 import InteractiveLegend = require("./Components/InteractiveLegend/InteractiveLegend");
 
@@ -518,7 +515,6 @@ class InteractiveLegendApp {
         legendIncludedInScreenshot,
         popupIncludedInScreenshot,
         selectedStyleData: this.interactiveLegend.style.selectedStyleData
-        // expandWidgetEnabled: false
       });
 
       if (this.screenshot.expandWidgetEnabled) {

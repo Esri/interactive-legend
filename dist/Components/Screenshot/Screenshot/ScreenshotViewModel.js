@@ -388,7 +388,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         };
         // _processScreenshot
         ScreenshotViewModel.prototype._processScreenshot = function (viewScreenshot, screenshotImageElement, maskDiv, downloadBtnNode) {
-            // debugger;
             var viewCanvas = document.createElement("canvas");
             var img = document.createElement("img");
             var firstComponent = document.querySelector(this.mapComponentSelectors[0]);

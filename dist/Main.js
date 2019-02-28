@@ -329,7 +329,6 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                     legendIncludedInScreenshot: legendIncludedInScreenshot,
                     popupIncludedInScreenshot: popupIncludedInScreenshot,
                     selectedStyleData: this.interactiveLegend.style.selectedStyleData
-                    // expandWidgetEnabled: false
                 });
                 if (this.screenshot.expandWidgetEnabled) {
                     var screenshotGroup = screenshotPosition.indexOf("left") !== -1 ? "left" : "right";

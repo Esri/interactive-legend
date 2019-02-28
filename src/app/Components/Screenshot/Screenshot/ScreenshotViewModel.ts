@@ -643,7 +643,6 @@ class ScreenshotViewModel extends declared(Accessor) {
     maskDiv: HTMLElement,
     downloadBtnNode: HTMLButtonElement
   ): void {
-    // debugger;
     const viewCanvas = document.createElement("canvas") as HTMLCanvasElement;
     const img = document.createElement("img") as HTMLImageElement;
     const firstComponent = document.querySelector(
