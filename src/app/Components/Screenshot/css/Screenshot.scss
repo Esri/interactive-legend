@@ -201,14 +201,18 @@ html[dir="rtl"] {
 
 .esri-screenshot__offscreen-pop-up-container {
   position: absolute;
-  top: -9999px;
-  left: -9999px;
-  width: 350px;
+  top: -99999px;
+  left: -99999px;
+  width: 400px;
 }
 
 .esri-screenshot__offscreen-legend-container {
   position: absolute;
-  top: -9999px;
-  left: -9999px;
-  width: 350px;
+  top: -99999px;
+  left: -99999px;
+  width: 400px;
+}
+
+.esri-widget.esri-legend.esri-screenshot__offscreen-legend-container {
+  max-height: none;
 }

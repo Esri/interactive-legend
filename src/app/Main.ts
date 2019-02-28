@@ -167,8 +167,8 @@ class InteractiveLegendApp {
       layerListPosition,
       screenshotEnabled,
       screenshotPosition,
-      popupIncludedInScreenshot,
-      legendIncludedInScreenshot,
+      enablePopupOption,
+      enableLegendOption,
       infoPanelEnabled,
       infoPanelPosition,
       splashButtonPosition,
@@ -416,8 +416,8 @@ class InteractiveLegendApp {
 
             this._handleScreenshotWidget(
               screenshotEnabled,
-              legendIncludedInScreenshot,
-              popupIncludedInScreenshot,
+              enableLegendOption,
+              enablePopupOption,
               view,
               screenshotPosition
             );
@@ -504,27 +504,44 @@ class InteractiveLegendApp {
   // _handleScreenshotWidget
   private _handleScreenshotWidget(
     screenshotEnabled: boolean,
-    legendIncludedInScreenshot: boolean,
-    popupIncludedInScreenshot: boolean,
+    enableLegendOption: boolean,
+    enablePopupOption: boolean,
     view: MapView,
     screenshotPosition: string
   ): void {
     if (screenshotEnabled) {
       this.screenshot = new Screenshot({
         view,
-        legendIncludedInScreenshot,
-        popupIncludedInScreenshot,
-        selectedStyleData: this.interactiveLegend.style.selectedStyleData
+        enableLegendOption,
+        enablePopupOption,
+        includeLegendInScreenshot: true,
+        selectedStyleData: this.interactiveLegend.style.selectedStyleData,
+        layerListViewModel: this.layerList.viewModel
       });
 
-      if (this.screenshot.expandWidgetEnabled) {
-        const screenshotGroup =
-          screenshotPosition.indexOf("left") !== -1 ? "left" : "right";
-
-        this.screenshot.expandWidget.group = screenshotGroup;
+      if (!enableLegendOption) {
+        this.screenshot.includeLegendInScreenshot = false;
       }
+      if (!enablePopupOption) {
+        this.screenshot.includePopupInScreenshot = false;
+      }
+      const screenshotExpand = new Expand({
+        view,
+        content: this.screenshot
+      });
 
-      view.ui.add(this.screenshot, screenshotPosition);
+      watchUtils.whenFalse(screenshotExpand, "expanded", () => {
+        if (this.screenshot.screenshotModeIsActive) {
+          this.screenshot.screenshotModeIsActive = false;
+        }
+      });
+
+      const screenshotGroup =
+        screenshotPosition.indexOf("left") !== -1 ? "left" : "right";
+
+      screenshotExpand.group = screenshotGroup;
+
+      view.ui.add(screenshotExpand, screenshotPosition);
     }
   }
 
