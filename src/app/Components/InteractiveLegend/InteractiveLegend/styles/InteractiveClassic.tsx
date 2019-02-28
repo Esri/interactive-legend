@@ -725,7 +725,7 @@ class InteractiveClassic extends declared(Widget) {
             );
           }}
         >
-          Show All
+          {i18nInteractiveLegend.showAll}
         </button>
       </div>
     );

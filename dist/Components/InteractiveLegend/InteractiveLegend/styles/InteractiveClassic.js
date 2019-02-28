@@ -420,7 +420,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         _this._resetLegendFilter(event, featureLayerData, operationalItemIndex);
                     }, onkeydown: function (event) {
                         _this._resetLegendFilter(event, featureLayerData, operationalItemIndex);
-                    } }, "Show All")));
+                    } }, i18nInteractiveLegend.showAll)));
         };
         // _renderLegendForRamp
         InteractiveClassic.prototype._renderLegendForRamp = function (legendElement, activeLayerInfo) {
