@@ -23,7 +23,8 @@ define({
     onboardingPanelScreenshotStepTwo: "If applicable, opt to include the map legend and pop-up in the image.",
     onboardingPanelScreenshotStepThree: "To include a pop-up, select a feature on the map.",
     onboardingPanelScreenshotStepFour: "Click Set the map area. Draw a rectangle to select a region for your image.",
-    onboardingPanelScreenshotStepFive: "Click Download Image."
+    onboardingPanelScreenshotStepFive: "Click Download Image.",
+    showAll: "Show All",
   }),
   "ar": 1,
   "bs": 1,
