@@ -88,7 +88,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 });
                 this.telemetry.logPageView();
             }
-            var homeEnabled = config.homeEnabled, homePosition = config.homePosition, zoomControlsEnabled = config.zoomControlsEnabled, zoomControlsPosition = config.zoomControlsPosition, searchEnabled = config.searchEnabled, searchConfig = config.searchConfig, searchPosition = config.searchPosition, basemapToggleEnabled = config.basemapToggleEnabled, basemapTogglePosition = config.basemapTogglePosition, nextBasemap = config.nextBasemap, layerListEnabled = config.layerListEnabled, layerListPosition = config.layerListPosition, screenshotEnabled = config.screenshotEnabled, screenshotPosition = config.screenshotPosition, popupIncludedInScreenshot = config.popupIncludedInScreenshot, legendIncludedInScreenshot = config.legendIncludedInScreenshot, infoPanelEnabled = config.infoPanelEnabled, infoPanelPosition = config.infoPanelPosition, splashButtonPosition = config.splashButtonPosition, interactiveLegendPosition = config.interactiveLegendPosition, filterMode = config.filterMode, 
+            var homeEnabled = config.homeEnabled, homePosition = config.homePosition, zoomControlsEnabled = config.zoomControlsEnabled, zoomControlsPosition = config.zoomControlsPosition, searchEnabled = config.searchEnabled, searchConfig = config.searchConfig, searchPosition = config.searchPosition, basemapToggleEnabled = config.basemapToggleEnabled, basemapTogglePosition = config.basemapTogglePosition, nextBasemap = config.nextBasemap, layerListEnabled = config.layerListEnabled, layerListPosition = config.layerListPosition, screenshotEnabled = config.screenshotEnabled, screenshotPosition = config.screenshotPosition, enablePopupOption = config.enablePopupOption, enableLegendOption = config.enableLegendOption, infoPanelEnabled = config.infoPanelEnabled, infoPanelPosition = config.infoPanelPosition, splashButtonPosition = config.splashButtonPosition, interactiveLegendPosition = config.interactiveLegendPosition, filterMode = config.filterMode, 
             // highlightShade,
             mutedShade = config.mutedShade, muteOpacity = config.muteOpacity, muteGrayScale = config.muteGrayScale, searchOpenAtStart = config.searchOpenAtStart;
             var webMapItems = results.webMapItems;
@@ -264,7 +264,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                                 });
                                 view.ui.add(_this.infoExpand, infoPanelPosition);
                             }
-                            _this._handleScreenshotWidget(screenshotEnabled, legendIncludedInScreenshot, popupIncludedInScreenshot, view, screenshotPosition);
+                            _this._handleScreenshotWidget(screenshotEnabled, enableLegendOption, enablePopupOption, view, screenshotPosition);
                             itemUtils_1.goToMarker(marker, view);
                             _this._handleHeader(config);
                             if (config.customCSS) {
@@ -322,19 +322,35 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
             document.head.appendChild(styles);
         };
         // _handleScreenshotWidget
-        InteractiveLegendApp.prototype._handleScreenshotWidget = function (screenshotEnabled, legendIncludedInScreenshot, popupIncludedInScreenshot, view, screenshotPosition) {
+        InteractiveLegendApp.prototype._handleScreenshotWidget = function (screenshotEnabled, enableLegendOption, enablePopupOption, view, screenshotPosition) {
+            var _this = this;
             if (screenshotEnabled) {
                 this.screenshot = new Screenshot({
                     view: view,
-                    legendIncludedInScreenshot: legendIncludedInScreenshot,
-                    popupIncludedInScreenshot: popupIncludedInScreenshot,
-                    selectedStyleData: this.interactiveLegend.style.selectedStyleData
+                    enableLegendOption: enableLegendOption,
+                    enablePopupOption: enablePopupOption,
+                    includeLegendInScreenshot: true,
+                    selectedStyleData: this.interactiveLegend.style.selectedStyleData,
+                    layerListViewModel: this.layerList.viewModel
                 });
-                if (this.screenshot.expandWidgetEnabled) {
-                    var screenshotGroup = screenshotPosition.indexOf("left") !== -1 ? "left" : "right";
-                    this.screenshot.expandWidget.group = screenshotGroup;
+                if (!enableLegendOption) {
+                    this.screenshot.includeLegendInScreenshot = false;
                 }
-                view.ui.add(this.screenshot, screenshotPosition);
+                if (!enablePopupOption) {
+                    this.screenshot.includePopupInScreenshot = false;
+                }
+                var screenshotExpand = new Expand({
+                    view: view,
+                    content: this.screenshot
+                });
+                watchUtils.whenFalse(screenshotExpand, "expanded", function () {
+                    if (_this.screenshot.screenshotModeIsActive) {
+                        _this.screenshot.screenshotModeIsActive = false;
+                    }
+                });
+                var screenshotGroup = screenshotPosition.indexOf("left") !== -1 ? "left" : "right";
+                screenshotExpand.group = screenshotGroup;
+                view.ui.add(screenshotExpand, screenshotPosition);
             }
         };
         // _handleLayerListWidget

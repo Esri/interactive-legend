@@ -16,7 +16,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "./html2canvas/html2canvas", "esri/core/Handles", "esri/core/watchUtils", "esri/widgets/LayerList", "../../InteractiveLegend/InteractiveLegend", "esri/core/accessorSupport/decorators"], function (require, exports, __extends, __decorate, Accessor, html2canvas, Handles, watchUtils, LayerList, InteractiveLegend, decorators_1) {
+define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "./html2canvas/html2canvas", "esri/core/Handles", "esri/core/watchUtils", "../../InteractiveLegend/InteractiveLegend", "esri/core/accessorSupport/decorators"], function (require, exports, __extends, __decorate, Accessor, html2canvas, Handles, watchUtils, InteractiveLegend, decorators_1) {
     "use strict";
     var ScreenshotViewModel = /** @class */ (function (_super) {
         __extends(ScreenshotViewModel, _super);
@@ -31,8 +31,13 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this._canvasElement = null;
             _this._handles = new Handles();
             _this._screenshotPromise = null;
-            _this._expandWidgetGroup = null;
             _this._highlightedFeature = null;
+            _this._firstMapComponent = null;
+            _this._secondMapComponent = null;
+            _this._mapComponentSelectors = [
+                ".esri-screenshot__offscreen-legend-container",
+                ".esri-screenshot__offscreen-pop-up-container"
+            ];
             //----------------------------------
             //
             //  Properties
@@ -44,25 +49,14 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this.previewIsVisible = null;
             // screenshotModeIsActive
             _this.screenshotModeIsActive = null;
-            // mapComponentSelectors
-            _this.mapComponentSelectors = [
-                ".esri-screenshot__offscreen-legend-container",
-                ".esri-screenshot__offscreen-pop-up-container"
-            ];
-            // firstMapComponent
-            _this.firstMapComponent = null;
-            // secondMapComponent
-            _this.secondMapComponent = null;
-            // legendScreenshotEnabled
-            _this.legendScreenshotEnabled = true;
-            // popupScreenshotEnabled
-            _this.popupScreenshotEnabled = false;
-            // legendIncludedInScreenshot
-            _this.legendIncludedInScreenshot = null;
-            // popupIncludedInScreenshot
-            _this.popupIncludedInScreenshot = null;
-            // expandWidget
-            _this.expandWidget = null;
+            // includeLegendInScreenshot
+            _this.includeLegendInScreenshot = null;
+            // includePopupInScreenshot
+            _this.includePopupInScreenshot = null;
+            // enableLegendOption
+            _this.enableLegendOption = null;
+            // enablePopupOption
+            _this.enablePopupOption = null;
             // dragHandler
             _this.dragHandler = null;
             // featureWidget
@@ -71,8 +65,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this.legendWidget = null;
             // selectedStyleData
             _this.selectedStyleData = null;
-            // expandWidgetEnabled
-            _this.expandWidgetEnabled = true;
+            // layerListViewModel
+            _this.layerListViewModel = null;
             return _this;
         }
         Object.defineProperty(ScreenshotViewModel.prototype, "state", {
@@ -96,26 +90,13 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         //
         //----------------------------------
         ScreenshotViewModel.prototype.initialize = function () {
-            var _this = this;
             this._handles.add([
-                this._watchPopup(),
+                this._removeHighlight(),
                 this._watchScreenshotMode(),
                 this._watchLegendWidgetAndView(),
-                this._watchIncludedProperties()
+                this._resetOffScreenPopup(),
+                this._checkScreenshotModeFalse()
             ]);
-            if (this.expandWidgetEnabled) {
-                this._handles.add([
-                    watchUtils.watch(this, "expandWidgetEnabled", function () {
-                        _this._handles.add([
-                            watchUtils.init(_this, "expandWidget", function () {
-                                var widgetGroupKey = "widget-group-key";
-                                _this._handles.remove(widgetGroupKey);
-                                _this._handles.add(_this._handleExpandWidgetGroup(), widgetGroupKey);
-                            })
-                        ]);
-                    })
-                ]);
-            }
         };
         ScreenshotViewModel.prototype.destroy = function () {
             this._handles.removeAll();
@@ -204,9 +185,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var _this = this;
             var context = viewCanvas.getContext("2d");
             var combinedCanvas = document.createElement("canvas");
-            var firstComponent = document.querySelector(this.mapComponentSelectors[0]);
-            var secondMapComponent = document.querySelector(this.mapComponentSelectors[1]);
-            var mapComponent = this.legendScreenshotEnabled
+            var firstComponent = document.querySelector(this._mapComponentSelectors[0]);
+            var secondMapComponent = document.querySelector(this._mapComponentSelectors[1]);
+            var mapComponent = this.includeLegendInScreenshot
                 ? firstComponent
                 : secondMapComponent;
             this._screenshotPromise = html2canvas(mapComponent, {
@@ -236,7 +217,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var screenshotKey = "screenshot-key";
             var viewCanvasContext = viewCanvas.getContext("2d");
             var combinedCanvasElements = document.createElement("canvas");
-            this._screenshotPromise = html2canvas(document.querySelector(this.mapComponentSelectors[0]), {
+            this._screenshotPromise = html2canvas(document.querySelector(this._mapComponentSelectors[0]), {
                 removeContainer: true,
                 logging: false
             })
@@ -244,10 +225,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 console.error("ERROR: ", err);
             })
                 .then(function (firstMapComponent) {
-                _this.firstMapComponent = firstMapComponent;
+                _this._firstMapComponent = firstMapComponent;
                 _this.notifyChange("state");
-                html2canvas(document.querySelector(_this.mapComponentSelectors[1]), {
-                    height: document.querySelector(_this.mapComponentSelectors[1]).offsetHeight,
+                html2canvas(document.querySelector(_this._mapComponentSelectors[1]), {
+                    height: document.querySelector(_this._mapComponentSelectors[1]).offsetHeight,
                     removeContainer: true,
                     logging: false
                 })
@@ -255,7 +236,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     console.error("ERROR: ", err);
                 })
                     .then(function (secondMapComponent) {
-                    _this.secondMapComponent = secondMapComponent;
+                    _this._secondMapComponent = secondMapComponent;
                     _this._screenshotPromise = null;
                     _this.notifyChange("state");
                 });
@@ -266,18 +247,20 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         // _watchMapComponents
         ScreenshotViewModel.prototype._watchMapComponents = function (viewCanvas, viewScreenshot, img, viewCanvasContext, combinedCanvasElements, screenshotImageElement, maskDiv, screenshotKey, downloadBtnNode) {
             var _this = this;
-            return watchUtils.init(this, "firstMapComponent, secondMapComponent", function () {
-                if (_this.firstMapComponent && _this.secondMapComponent) {
+            return watchUtils.init(this, "state", function () {
+                if (_this.state === "complete" &&
+                    _this._firstMapComponent &&
+                    _this._secondMapComponent) {
                     viewCanvas.height = viewScreenshot.data.height;
                     viewCanvas.width = viewScreenshot.data.width;
                     img.src = viewScreenshot.dataUrl;
                     img.onload = function () {
                         viewCanvasContext.drawImage(img, 0, 0);
-                        _this._generateImageForTwoComponents(viewCanvas, combinedCanvasElements, viewScreenshot, _this.firstMapComponent, _this.secondMapComponent);
+                        _this._generateImageForTwoComponents(viewCanvas, combinedCanvasElements, viewScreenshot, _this._firstMapComponent, _this._secondMapComponent);
                         _this._canvasElement = combinedCanvasElements;
                         _this._showPreview(combinedCanvasElements, screenshotImageElement, maskDiv, downloadBtnNode);
-                        _this.firstMapComponent = null;
-                        _this.secondMapComponent = null;
+                        _this._firstMapComponent = null;
+                        _this._secondMapComponent = null;
                         _this._handles.remove(screenshotKey);
                         _this.notifyChange("state");
                     };
@@ -337,6 +320,11 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             this._area = null;
             this._setMaskPosition(maskDiv, null);
             this.previewIsVisible = true;
+            if (this.enablePopupOption &&
+                this.includePopupInScreenshot &&
+                this.featureWidget) {
+                this.featureWidget.graphic = null;
+            }
             window.setTimeout(function () {
                 downloadBtnNode.focus();
             }, 750);
@@ -390,13 +378,13 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         ScreenshotViewModel.prototype._processScreenshot = function (viewScreenshot, screenshotImageElement, maskDiv, downloadBtnNode) {
             var viewCanvas = document.createElement("canvas");
             var img = document.createElement("img");
-            var firstComponent = document.querySelector(this.mapComponentSelectors[0]);
-            var secondMapComponent = document.querySelector(this.mapComponentSelectors[1]);
-            if (!this.legendScreenshotEnabled && !this.popupScreenshotEnabled) {
+            var firstComponent = document.querySelector(this._mapComponentSelectors[0]);
+            var secondMapComponent = document.querySelector(this._mapComponentSelectors[1]);
+            if (!this.includeLegendInScreenshot && !this.includePopupInScreenshot) {
                 this._onlyTakeScreenshotOfView(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv, downloadBtnNode);
             }
             else {
-                if (this.legendScreenshotEnabled && !this.popupScreenshotEnabled) {
+                if (this.includeLegendInScreenshot && !this.includePopupInScreenshot) {
                     if (firstComponent.offsetWidth && firstComponent.offsetHeight) {
                         this._includeOneMapComponent(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv, downloadBtnNode);
                     }
@@ -404,7 +392,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         this._onlyTakeScreenshotOfView(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv, downloadBtnNode);
                     }
                 }
-                else if (this.popupScreenshotEnabled && !this.legendScreenshotEnabled) {
+                else if (this.includePopupInScreenshot &&
+                    !this.includeLegendInScreenshot) {
                     if (secondMapComponent.offsetWidth && secondMapComponent.offsetHeight) {
                         this._includeOneMapComponent(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv, downloadBtnNode);
                     }
@@ -412,7 +401,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         this._onlyTakeScreenshotOfView(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv, downloadBtnNode);
                     }
                 }
-                else if (this.legendScreenshotEnabled && this.popupScreenshotEnabled) {
+                else if (this.includeLegendInScreenshot &&
+                    this.includePopupInScreenshot) {
                     if (firstComponent.offsetWidth &&
                         firstComponent.offsetHeight &&
                         secondMapComponent.offsetWidth &&
@@ -452,23 +442,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             }
             this.notifyChange("state");
         };
-        // _handleExpandWidgetGroup
-        ScreenshotViewModel.prototype._handleExpandWidgetGroup = function () {
-            var _this = this;
-            return watchUtils.whenTrue(this, "screenshotModeIsActive", function () {
-                if (_this.expandWidget && _this.expandWidget.group) {
-                    var activeModeKey = "active-mode";
-                    _this._handles.remove(activeModeKey);
-                    _this._handles.add(watchUtils.whenFalse(_this, "screenshotModeIsActive", function () {
-                        if (_this._expandWidgetGroup) {
-                            _this.expandWidget.expanded = true;
-                        }
-                    }), activeModeKey);
-                }
-            });
-        };
         // _watchPopup
-        ScreenshotViewModel.prototype._watchPopup = function () {
+        ScreenshotViewModel.prototype._removeHighlight = function () {
             var _this = this;
             return watchUtils.watch(this, "view.popup.visible", function () {
                 if (!_this.view) {
@@ -476,7 +451,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 }
                 if (!_this.view.popup.visible &&
                     _this.screenshotModeIsActive &&
-                    _this.popupIncludedInScreenshot &&
+                    _this.enablePopupOption &&
                     _this.view.popup.selectedFeature) {
                     var layerView = _this.view.layerViews.find(function (layerView) {
                         return layerView.layer.id === _this.view.popup.selectedFeature.layer.id;
@@ -487,7 +462,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 _this._handles.add(watchUtils.whenFalse(_this, "screenshotModeIsActive", function () {
                     if (!_this.screenshotModeIsActive) {
                         if (_this.featureWidget) {
-                            _this.featureWidget = null;
+                            _this._set("featureWidget", null);
                         }
                         if (_this._highlightedFeature) {
                             _this._highlightedFeature.remove();
@@ -516,32 +491,41 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var _this = this;
             return watchUtils.init(this, ["legendWidget", "view"], function () {
                 if (_this.view && !_this.legendWidget) {
-                    _this.legendWidget = new InteractiveLegend({
+                    _this._set("legendWidget", new InteractiveLegend({
                         view: _this.view,
-                        style: "classic",
-                        filterMode: "featureFilter",
-                        layerListViewModel: new LayerList({ view: _this.view }).viewModel,
+                        layerListViewModel: _this.layerListViewModel,
                         onboardingPanelEnabled: false,
-                        opacity: 30,
-                        grayScale: 100,
                         offscreen: true
-                    });
+                    }));
+                }
+                if (_this.legendWidget) {
                     _this.legendWidget.style.selectedStyleData = _this.selectedStyleData;
                 }
             });
         };
-        // _watchIncludedProperties
-        ScreenshotViewModel.prototype._watchIncludedProperties = function () {
+        // _resetOffScreenPopup
+        ScreenshotViewModel.prototype._resetOffScreenPopup = function () {
             var _this = this;
-            return watchUtils.init(this, ["legendIncludedInScreenshot", "popupIncludedInScreenshot"], function () {
-                if (_this.legendIncludedInScreenshot) {
-                    _this.legendScreenshotEnabled = true;
+            return watchUtils.whenFalse(this, "viewModel.screenshotModeIsActive", function () {
+                if (_this.featureWidget) {
+                    _this.featureWidget.graphic = null;
+                    _this._set("featureWidget", null);
+                    _this.notifyChange("state");
                 }
-                else {
-                    _this.legendScreenshotEnabled = false;
+            });
+        };
+        // _checkScreenshotModeFalse
+        ScreenshotViewModel.prototype._checkScreenshotModeFalse = function () {
+            var _this = this;
+            return watchUtils.whenFalse(this, "screenshotModeIsActive", function () {
+                _this.screenshotModeIsActive = false;
+                _this.view.container.classList.remove("esri-screenshot__cursor");
+                if (_this.featureWidget && _this.featureWidget.graphic) {
+                    _this.featureWidget.graphic = null;
                 }
-                if (_this.popupIncludedInScreenshot) {
-                    _this.popupScreenshotEnabled = false;
+                if (_this.dragHandler) {
+                    _this.dragHandler.remove();
+                    _this.dragHandler = null;
                 }
                 _this.notifyChange("state");
             });
@@ -563,43 +547,35 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         ], ScreenshotViewModel.prototype, "screenshotModeIsActive", void 0);
         __decorate([
             decorators_1.property()
-        ], ScreenshotViewModel.prototype, "mapComponentSelectors", void 0);
+        ], ScreenshotViewModel.prototype, "includeLegendInScreenshot", void 0);
         __decorate([
             decorators_1.property()
-        ], ScreenshotViewModel.prototype, "firstMapComponent", void 0);
+        ], ScreenshotViewModel.prototype, "includePopupInScreenshot", void 0);
         __decorate([
             decorators_1.property()
-        ], ScreenshotViewModel.prototype, "secondMapComponent", void 0);
+        ], ScreenshotViewModel.prototype, "enableLegendOption", void 0);
         __decorate([
             decorators_1.property()
-        ], ScreenshotViewModel.prototype, "legendScreenshotEnabled", void 0);
-        __decorate([
-            decorators_1.property()
-        ], ScreenshotViewModel.prototype, "popupScreenshotEnabled", void 0);
-        __decorate([
-            decorators_1.property()
-        ], ScreenshotViewModel.prototype, "legendIncludedInScreenshot", void 0);
-        __decorate([
-            decorators_1.property()
-        ], ScreenshotViewModel.prototype, "popupIncludedInScreenshot", void 0);
-        __decorate([
-            decorators_1.property()
-        ], ScreenshotViewModel.prototype, "expandWidget", void 0);
+        ], ScreenshotViewModel.prototype, "enablePopupOption", void 0);
         __decorate([
             decorators_1.property()
         ], ScreenshotViewModel.prototype, "dragHandler", void 0);
         __decorate([
-            decorators_1.property()
+            decorators_1.property({
+                readOnly: true
+            })
         ], ScreenshotViewModel.prototype, "featureWidget", void 0);
         __decorate([
-            decorators_1.property()
+            decorators_1.property({
+                readOnly: true
+            })
         ], ScreenshotViewModel.prototype, "legendWidget", void 0);
         __decorate([
             decorators_1.property()
         ], ScreenshotViewModel.prototype, "selectedStyleData", void 0);
         __decorate([
             decorators_1.property()
-        ], ScreenshotViewModel.prototype, "expandWidgetEnabled", void 0);
+        ], ScreenshotViewModel.prototype, "layerListViewModel", void 0);
         ScreenshotViewModel = __decorate([
             decorators_1.subclass("ScreenshotViewModel")
         ], ScreenshotViewModel);
