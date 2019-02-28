@@ -25,7 +25,20 @@ import Handles = require("esri/core/Handles");
 // esri.core.watchUtils
 import watchUtils = require("esri/core/watchUtils");
 
+// esri.widgets.Expand
 import Expand = require("esri/widgets/Expand");
+
+// FeatureWidget
+import FeatureWidget = require("esri/widgets/Feature");
+
+// esri.widgets.LayerList
+import LayerList = require("esri/widgets/LayerList");
+
+// InteractiveLegend
+import InteractiveLegend = require("../../InteractiveLegend/InteractiveLegend");
+
+// esri.core.Collection
+import Collection = require("esri/core/Collection");
 
 // esri.core.accessorSupport
 import {
@@ -39,6 +52,7 @@ type State = "ready" | "takingScreenshot" | "complete" | "disabled";
 
 // interfaces
 import { Area, Screenshot } from "./interfaces/interfaces";
+import { SelectedStyleData } from "../../../interfaces/interfaces";
 
 @subclass("ScreenshotViewModel")
 class ScreenshotViewModel extends declared(Accessor) {
@@ -52,6 +66,7 @@ class ScreenshotViewModel extends declared(Accessor) {
   private _handles: Handles = new Handles();
   private _screenshotPromise: IPromise<any> = null;
   private _expandWidgetGroup: string = null;
+  private _highlightedFeature: any = null;
 
   // state
   @property({
@@ -89,15 +104,18 @@ class ScreenshotViewModel extends declared(Accessor) {
 
   // mapComponentSelectors
   @property()
-  mapComponentSelectors: string[] = [];
+  mapComponentSelectors = [
+    ".esri-screenshot__offscreen-legend-container",
+    ".esri-screenshot__offscreen-pop-up-container"
+  ];
 
   // firstMapComponent
   @property()
-  firstMapComponent = null;
+  firstMapComponent: HTMLCanvasElement = null;
 
   // secondMapComponent
   @property()
-  secondMapComponent = null;
+  secondMapComponent: HTMLCanvasElement = null;
 
   // legendScreenshotEnabled
   @property()
@@ -105,7 +123,15 @@ class ScreenshotViewModel extends declared(Accessor) {
 
   // popupScreenshotEnabled
   @property()
-  popupScreenshotEnabled: boolean = null;
+  popupScreenshotEnabled = false;
+
+  // legendIncludedInScreenshot
+  @property()
+  legendIncludedInScreenshot: boolean = null;
+
+  // popupIncludedInScreenshot
+  @property()
+  popupIncludedInScreenshot: boolean = null;
 
   // expandWidget
   @property()
@@ -115,6 +141,22 @@ class ScreenshotViewModel extends declared(Accessor) {
   @property()
   dragHandler: any = null;
 
+  // featureWidget
+  @property()
+  featureWidget: FeatureWidget = null;
+
+  // legendWidget
+  @property()
+  legendWidget: InteractiveLegend = null;
+
+  // selectedStyleData
+  @property()
+  selectedStyleData: Collection<SelectedStyleData> = null;
+
+  // expandWidgetEnabled
+  @property()
+  expandWidgetEnabled = true;
+
   //----------------------------------
   //
   //  Public Methods
@@ -122,11 +164,28 @@ class ScreenshotViewModel extends declared(Accessor) {
   //----------------------------------
 
   initialize() {
-    watchUtils.init(this, "expandWidget", () => {
-      const widgetGroupKey = "widget-group-key";
-      this._handles.remove(widgetGroupKey);
-      this._handles.add(this._handleExpandWidgetGroup(), widgetGroupKey);
-    });
+    this._handles.add([
+      this._watchPopup(),
+      this._watchScreenshotMode(),
+      this._watchLegendWidgetAndView(),
+      this._watchIncludedProperties()
+    ]);
+    if (this.expandWidgetEnabled) {
+      this._handles.add([
+        watchUtils.watch(this, "expandWidgetEnabled", () => {
+          this._handles.add([
+            watchUtils.init(this, "expandWidget", () => {
+              const widgetGroupKey = "widget-group-key";
+              this._handles.remove(widgetGroupKey);
+              this._handles.add(
+                this._handleExpandWidgetGroup(),
+                widgetGroupKey
+              );
+            })
+          ]);
+        })
+      ]);
+    }
   }
 
   destroy() {
@@ -723,6 +782,96 @@ class ScreenshotViewModel extends declared(Accessor) {
         );
       }
     });
+  }
+
+  // _watchPopup
+  private _watchPopup(): __esri.WatchHandle {
+    return watchUtils.watch(this, "view.popup.visible", () => {
+      if (!this.view) {
+        return;
+      }
+      if (
+        !this.view.popup.visible &&
+        this.screenshotModeIsActive &&
+        this.popupIncludedInScreenshot &&
+        this.view.popup.selectedFeature
+      ) {
+        const layerView = this.view.layerViews.find(
+          layerView =>
+            layerView.layer.id === this.view.popup.selectedFeature.layer.id
+        ) as __esri.FeatureLayerView;
+        this._highlightedFeature = layerView.highlight(
+          this.view.popup.selectedFeature
+        );
+      }
+      const watchHighlight = "watch-highlight";
+      this._handles.add(
+        watchUtils.whenFalse(this, "screenshotModeIsActive", () => {
+          if (!this.screenshotModeIsActive) {
+            if (this.featureWidget) {
+              this.featureWidget = null;
+            }
+            if (this._highlightedFeature) {
+              this._highlightedFeature.remove();
+              this._highlightedFeature = null;
+            }
+          }
+          this.notifyChange("state");
+          this._handles.remove(watchHighlight);
+        }),
+        watchHighlight
+      );
+    });
+  }
+
+  // _watchScreenshotMode
+  private _watchScreenshotMode(): __esri.WatchHandle {
+    return watchUtils.watch(this, "screenshotModeIsActive", () => {
+      if (!this.view) {
+        return;
+      }
+      if (this.view.popup) {
+        this.view.popup.visible = false;
+      }
+    });
+  }
+
+  // _watchLegendWidgetAndView
+  private _watchLegendWidgetAndView(): __esri.WatchHandle {
+    return watchUtils.init(this, ["legendWidget", "view"], () => {
+      if (this.view && !this.legendWidget) {
+        this.legendWidget = new InteractiveLegend({
+          view: this.view,
+          style: "classic",
+          filterMode: "featureFilter",
+          layerListViewModel: new LayerList({ view: this.view }).viewModel,
+          onboardingPanelEnabled: false,
+          opacity: 30,
+          grayScale: 100,
+          offscreen: true
+        });
+        this.legendWidget.style.selectedStyleData = this.selectedStyleData;
+      }
+    });
+  }
+
+  // _watchIncludedProperties
+  private _watchIncludedProperties(): __esri.WatchHandle {
+    return watchUtils.init(
+      this,
+      ["legendIncludedInScreenshot", "popupIncludedInScreenshot"],
+      () => {
+        if (this.legendIncludedInScreenshot) {
+          this.legendScreenshotEnabled = true;
+        } else {
+          this.legendScreenshotEnabled = false;
+        }
+        if (this.popupIncludedInScreenshot) {
+          this.popupScreenshotEnabled = false;
+        }
+        this.notifyChange("state");
+      }
+    );
   }
 }
 

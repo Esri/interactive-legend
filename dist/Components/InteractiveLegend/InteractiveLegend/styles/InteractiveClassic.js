@@ -568,6 +568,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 : null;
             if (featureLayerData && featureLayerData.applyStyles === null) {
                 featureLayerData.applyStyles = applySelect ? true : false;
+                this.scheduleRender();
             }
             return (widget_1.tsx("div", { class: CSS.interactiveLegendLayerRowContainer },
                 widget_1.tsx("div", { bind: this, class: (activeLayerInfo.layer.type === "feature" &&

@@ -16,7 +16,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "./html2canvas/html2canvas", "esri/core/Handles", "esri/core/watchUtils", "esri/core/accessorSupport/decorators"], function (require, exports, __extends, __decorate, Accessor, html2canvas, Handles, watchUtils, decorators_1) {
+define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "./html2canvas/html2canvas", "esri/core/Handles", "esri/core/watchUtils", "esri/widgets/LayerList", "../../InteractiveLegend/InteractiveLegend", "esri/core/accessorSupport/decorators"], function (require, exports, __extends, __decorate, Accessor, html2canvas, Handles, watchUtils, LayerList, InteractiveLegend, decorators_1) {
     "use strict";
     var ScreenshotViewModel = /** @class */ (function (_super) {
         __extends(ScreenshotViewModel, _super);
@@ -32,6 +32,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this._handles = new Handles();
             _this._screenshotPromise = null;
             _this._expandWidgetGroup = null;
+            _this._highlightedFeature = null;
             //----------------------------------
             //
             //  Properties
@@ -44,7 +45,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             // screenshotModeIsActive
             _this.screenshotModeIsActive = null;
             // mapComponentSelectors
-            _this.mapComponentSelectors = [];
+            _this.mapComponentSelectors = [
+                ".esri-screenshot__offscreen-legend-container",
+                ".esri-screenshot__offscreen-pop-up-container"
+            ];
             // firstMapComponent
             _this.firstMapComponent = null;
             // secondMapComponent
@@ -52,11 +56,23 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             // legendScreenshotEnabled
             _this.legendScreenshotEnabled = true;
             // popupScreenshotEnabled
-            _this.popupScreenshotEnabled = null;
+            _this.popupScreenshotEnabled = false;
+            // legendIncludedInScreenshot
+            _this.legendIncludedInScreenshot = null;
+            // popupIncludedInScreenshot
+            _this.popupIncludedInScreenshot = null;
             // expandWidget
             _this.expandWidget = null;
             // dragHandler
             _this.dragHandler = null;
+            // featureWidget
+            _this.featureWidget = null;
+            // legendWidget
+            _this.legendWidget = null;
+            // selectedStyleData
+            _this.selectedStyleData = null;
+            // expandWidgetEnabled
+            _this.expandWidgetEnabled = true;
             return _this;
         }
         Object.defineProperty(ScreenshotViewModel.prototype, "state", {
@@ -81,11 +97,25 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         //----------------------------------
         ScreenshotViewModel.prototype.initialize = function () {
             var _this = this;
-            watchUtils.init(this, "expandWidget", function () {
-                var widgetGroupKey = "widget-group-key";
-                _this._handles.remove(widgetGroupKey);
-                _this._handles.add(_this._handleExpandWidgetGroup(), widgetGroupKey);
-            });
+            this._handles.add([
+                this._watchPopup(),
+                this._watchScreenshotMode(),
+                this._watchLegendWidgetAndView(),
+                this._watchIncludedProperties()
+            ]);
+            if (this.expandWidgetEnabled) {
+                this._handles.add([
+                    watchUtils.watch(this, "expandWidgetEnabled", function () {
+                        _this._handles.add([
+                            watchUtils.init(_this, "expandWidget", function () {
+                                var widgetGroupKey = "widget-group-key";
+                                _this._handles.remove(widgetGroupKey);
+                                _this._handles.add(_this._handleExpandWidgetGroup(), widgetGroupKey);
+                            })
+                        ]);
+                    })
+                ]);
+            }
         };
         ScreenshotViewModel.prototype.destroy = function () {
             this._handles.removeAll();
@@ -437,6 +467,85 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 }
             });
         };
+        // _watchPopup
+        ScreenshotViewModel.prototype._watchPopup = function () {
+            var _this = this;
+            return watchUtils.watch(this, "view.popup.visible", function () {
+                if (!_this.view) {
+                    return;
+                }
+                if (!_this.view.popup.visible &&
+                    _this.screenshotModeIsActive &&
+                    _this.popupIncludedInScreenshot &&
+                    _this.view.popup.selectedFeature) {
+                    var layerView = _this.view.layerViews.find(function (layerView) {
+                        return layerView.layer.id === _this.view.popup.selectedFeature.layer.id;
+                    });
+                    _this._highlightedFeature = layerView.highlight(_this.view.popup.selectedFeature);
+                }
+                var watchHighlight = "watch-highlight";
+                _this._handles.add(watchUtils.whenFalse(_this, "screenshotModeIsActive", function () {
+                    if (!_this.screenshotModeIsActive) {
+                        if (_this.featureWidget) {
+                            _this.featureWidget = null;
+                        }
+                        if (_this._highlightedFeature) {
+                            _this._highlightedFeature.remove();
+                            _this._highlightedFeature = null;
+                        }
+                    }
+                    _this.notifyChange("state");
+                    _this._handles.remove(watchHighlight);
+                }), watchHighlight);
+            });
+        };
+        // _watchScreenshotMode
+        ScreenshotViewModel.prototype._watchScreenshotMode = function () {
+            var _this = this;
+            return watchUtils.watch(this, "screenshotModeIsActive", function () {
+                if (!_this.view) {
+                    return;
+                }
+                if (_this.view.popup) {
+                    _this.view.popup.visible = false;
+                }
+            });
+        };
+        // _watchLegendWidgetAndView
+        ScreenshotViewModel.prototype._watchLegendWidgetAndView = function () {
+            var _this = this;
+            return watchUtils.init(this, ["legendWidget", "view"], function () {
+                if (_this.view && !_this.legendWidget) {
+                    _this.legendWidget = new InteractiveLegend({
+                        view: _this.view,
+                        style: "classic",
+                        filterMode: "featureFilter",
+                        layerListViewModel: new LayerList({ view: _this.view }).viewModel,
+                        onboardingPanelEnabled: false,
+                        opacity: 30,
+                        grayScale: 100,
+                        offscreen: true
+                    });
+                    _this.legendWidget.style.selectedStyleData = _this.selectedStyleData;
+                }
+            });
+        };
+        // _watchIncludedProperties
+        ScreenshotViewModel.prototype._watchIncludedProperties = function () {
+            var _this = this;
+            return watchUtils.init(this, ["legendIncludedInScreenshot", "popupIncludedInScreenshot"], function () {
+                if (_this.legendIncludedInScreenshot) {
+                    _this.legendScreenshotEnabled = true;
+                }
+                else {
+                    _this.legendScreenshotEnabled = false;
+                }
+                if (_this.popupIncludedInScreenshot) {
+                    _this.popupScreenshotEnabled = false;
+                }
+                _this.notifyChange("state");
+            });
+        };
         __decorate([
             decorators_1.property({
                 dependsOn: ["view.ready"],
@@ -469,10 +578,28 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         ], ScreenshotViewModel.prototype, "popupScreenshotEnabled", void 0);
         __decorate([
             decorators_1.property()
+        ], ScreenshotViewModel.prototype, "legendIncludedInScreenshot", void 0);
+        __decorate([
+            decorators_1.property()
+        ], ScreenshotViewModel.prototype, "popupIncludedInScreenshot", void 0);
+        __decorate([
+            decorators_1.property()
         ], ScreenshotViewModel.prototype, "expandWidget", void 0);
         __decorate([
             decorators_1.property()
         ], ScreenshotViewModel.prototype, "dragHandler", void 0);
+        __decorate([
+            decorators_1.property()
+        ], ScreenshotViewModel.prototype, "featureWidget", void 0);
+        __decorate([
+            decorators_1.property()
+        ], ScreenshotViewModel.prototype, "legendWidget", void 0);
+        __decorate([
+            decorators_1.property()
+        ], ScreenshotViewModel.prototype, "selectedStyleData", void 0);
+        __decorate([
+            decorators_1.property()
+        ], ScreenshotViewModel.prototype, "expandWidgetEnabled", void 0);
         ScreenshotViewModel = __decorate([
             decorators_1.subclass("ScreenshotViewModel")
         ], ScreenshotViewModel);

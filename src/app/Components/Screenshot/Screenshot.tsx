@@ -21,106 +21,76 @@ import MapView = require("esri/views/MapView");
 // esri.views.SceneView
 import SceneView = require("esri/views/SceneView");
 
-// esri.core.watchUtils
-import watchUtils = require("esri/core/watchUtils");
-
-// esri.widgets.Feature
-import Feature = require("esri/widgets/Feature");
-
 // esri.widgets.Expand
 import Expand = require("esri/widgets/Expand");
+
+// ScreenshotPanel
+import ScreenshotPanel = require("./Screenshot/ScreenshotPanel");
+
+// esri.core.watchUtils.
+import watchUtils = require("esri/core/watchUtils");
+
+// esri.core.Collection
+import Collection = require("esri/core/Collection");
 
 // esri.core.Handles
 import Handles = require("esri/core/Handles");
 
-//esri.widgets.support
-import {
-  accessibleHandler,
-  renderable,
-  tsx,
-  storeNode
-} from "esri/widgets/support/widget";
+import { SelectedStyleData } from "../../interfaces/interfaces";
 
-// ScreenshotViewModel
-import ScreenshotViewModel = require("./Screenshot/ScreenshotViewModel");
-
-//----------------------------------
-//
-//  CSS Classes
-//
-//----------------------------------
 const CSS = {
-  base: "esri-screenshot",
-  widget: "esri-widget",
-  screenshotBtn: "esri-screenshot__btn",
-  mainContainer: "esri-screenshot__main-container",
-  panelTitle: "esri-screenshot__panel-title",
-  panelSubTitle: "esri-screenshot__panel-subtitle",
-  screenshotOption: "esri-screenshot__screenshot-option",
-  buttonContainer: "esri-screenshot__screenshot-button-container",
-  hide: "esri-screenshot--hide",
   screenshotCursor: "esri-screenshot__cursor",
-  maskDiv: "esri-screenshot__mask-div",
-  actionBtn: "esri-screenshot__action-btn",
-  screenshotImg: "esri-screenshot__js-screenshot-image",
-  screenshotDiv: "esri-screenshot__screenshot-div",
-  screenshotImgContainer: "esri-screenshot__screenshot-img-container",
-  downloadBtn: "esri-screenshot__download-btn",
-  backBtn: "esri-screenshot__back-btn",
-  showOverlay: "esri-screenshot--show-overlay",
-  hideOverlay: "esri-screenshot--hide-overlay",
-  mediaIcon: "icon-ui-media",
-  pointerCursor: "esri-screenshot--pointer",
-  disabledCursor: "esri-screenshot--disabled",
-  tooltip: "tooltip",
-  tooltipRight: "tooltip-right",
-  modifierClass: "modifier-class",
-  closeIcon: "icon-ui-close",
-  fieldsetCheckbox: "fieldset-checkbox",
-  button: "btn",
-  buttonRed: "btn-red",
-  alert: "alert",
-  greenAlert: "alert-green",
-  alertClose: "alert-close",
-  popupAlert: "esri-screenshot__popup-alert",
-  screenshotfieldSetCheckbox: "esri-screenshot__field-set-checkbox"
+  mediaIcon: "icon-ui-media"
 };
 
 @subclass("Screenshot")
 class Screenshot extends declared(Widget) {
-  //----------------------------------
-  //
-  //  Variables
-  //
-  //----------------------------------
+  constructor(value: any) {
+    super();
+  }
 
-  // Stored Nodes
-  private _maskNode: HTMLElement = null;
-  private _screenshotImgNode: HTMLImageElement = null;
-  private _downloadBtnNode: HTMLButtonElement = null;
-  private _activeScreenshotBtnNode: HTMLButtonElement = null;
-  private _selectFeatureAlertIsVisible: boolean = null;
-
-  // _popupIsIncluded
-  private _popupIsIncluded: boolean = null;
-
+  // _handles
   private _handles: Handles = new Handles();
 
-  //----------------------------------
-  //
-  //  Properties
-  //
-  //----------------------------------
-
   // view
-  @aliasOf("viewModel.view")
+  @aliasOf("screenshotPanel.view")
   @property()
   view: MapView | SceneView = null;
 
-  // mapComponentSelectors
-  @aliasOf("viewModel.mapComponentSelectors")
+  // legendIncludedInScreenshot
+  @aliasOf("screenshotPanel.legendIncludedInScreenshot")
   @property()
-  mapComponentSelectors: string[] = [];
+  legendIncludedInScreenshot: boolean = null;
+
+  // popupIncludedInScreenshot
+  @aliasOf("screenshotPanel.popupIncludedInScreenshot")
+  @property()
+  popupIncludedInScreenshot: boolean = null;
+
+  // legendScreenshotEnabled
+  @aliasOf("screenshotPanel.legendScreenshotEnabled")
+  @property()
+  legendScreenshotEnabled: boolean = null;
+
+  // popupScreenshotEnabled
+  @aliasOf("screenshotPanel.popupScreenshotEnabled")
+  @property()
+  popupScreenshotEnabled: boolean = null;
+
+  // selectedStyleData
+  @aliasOf("screenshotPanel.selectedStyleData")
+  @property()
+  selectedStyleData: Collection<SelectedStyleData> = null;
+
+  // expandWidgetEnabled
+  @aliasOf("screenshotPanel.expandWidgetEnabled")
+  @property()
+  expandWidgetEnabled: boolean = null;
+
+  // expandWidget
+  @aliasOf("screenshotPanel.expandWidget")
+  @property()
+  expandWidget: Expand = null;
 
   // iconClass
   @property()
@@ -130,414 +100,62 @@ class Screenshot extends declared(Widget) {
   @property()
   label = i18n.widgetLabel;
 
-  // legendScreenshotEnabled
-  @aliasOf("viewModel.legendScreenshotEnabled")
+  // screenshotPanel
   @property()
-  legendScreenshotEnabled: boolean = null;
-
-  // popupScreenshotEnabled
-  @aliasOf("viewModel.popupScreenshotEnabled")
-  @property()
-  popupScreenshotEnabled: boolean = null;
-
-  // legendIncludedInScreenshot
-  @property()
-  legendIncludedInScreenshot: boolean = null;
-
-  // popupIncludedInScreenshot
-  @property()
-  popupIncludedInScreenshot: boolean = null;
-
-  @property()
-  featureWidget = new Feature();
-
-  @aliasOf("viewModel.expandWidget")
-  @property()
-  expandWidget: Expand = null;
-
-  // viewModel
-  @property()
-  @renderable(["viewModel.state"])
-  viewModel: ScreenshotViewModel = new ScreenshotViewModel();
-
-  //----------------------------------
-  //
-  //  Lifecycle Methods
-  //
-  //----------------------------------
-
-  constructor(value: any) {
-    super();
-  }
+  screenshotPanel: ScreenshotPanel = new ScreenshotPanel();
 
   postInitialize() {
+    this.own([this._watchScreenshotViewProperties()]);
+
+    if (this.expandWidgetEnabled) {
+      this._watchScreenshotView();
+    }
+  }
+
+  render() {
+    return this.screenshotPanel
+      ? this.expandWidgetEnabled
+        ? this.expandWidget.render()
+        : this.screenshotPanel.render()
+      : this.screenshotPanel.render();
+  }
+
+  // _watchScreenshotViewProperties
+  private _watchScreenshotViewProperties(): __esri.WatchHandle {
+    return watchUtils.init(
+      this,
+      [
+        "view",
+        "legendIncludedInScreenshot",
+        "popupIncludedInScreenshot",
+        "selectedStyleData",
+        "expandWidgetEnabled"
+      ],
+      () => {
+        const { screenshotPanel } = this;
+        screenshotPanel.view = this.view;
+        screenshotPanel.legendIncludedInScreenshot = this.legendIncludedInScreenshot;
+        screenshotPanel.popupIncludedInScreenshot = this.popupIncludedInScreenshot;
+        screenshotPanel.selectedStyleData = this.selectedStyleData;
+        screenshotPanel.expandWidgetEnabled = this.expandWidgetEnabled;
+        screenshotPanel.legendScreenshotEnabled = this.legendScreenshotEnabled;
+        screenshotPanel.popupScreenshotEnabled = this.popupScreenshotEnabled;
+      }
+    );
+  }
+
+  // _watchScreenshotView
+  private _watchScreenshotView(): void {
     this.own([
-      this._watchMapComponentSelectors(),
-      this._watchPopups(),
-      watchUtils.when(this, "featureWidget", () => {
-        this.own([
-          watchUtils.watch(this, "popupScreenshotEnabled", () => {
-            if (this.popupScreenshotEnabled && this.popupIncludedInScreenshot) {
-              this.own([
-                watchUtils.init(this, "featureWidget.graphic", () => {
-                  if (!this.featureWidget.graphic) {
-                    this._selectFeatureAlertIsVisible = true;
-                  } else {
-                    this._selectFeatureAlertIsVisible = false;
-                  }
-                })
-              ]);
-            } else {
-              this._selectFeatureAlertIsVisible = false;
-            }
-            this.scheduleRender();
-          })
-        ]);
+      watchUtils.when(this, "screenshotPanel", () => {
+        this.expandWidget = new Expand({
+          view: this.view,
+          content: this.screenshotPanel,
+          expandIconClass: CSS.mediaIcon
+        });
+        this._handleExpandWidget();
       })
     ]);
-    this._handleExpandWidget();
-  }
-
-  render(): any {
-    const { screenshotModeIsActive } = this.viewModel;
-    const screenshotPreviewOverlay = this._renderScreenshotPreviewOverlay();
-    const maskNode = this._renderMaskNode(screenshotModeIsActive);
-
-    return (
-      <div class={this.classes(CSS.widget, CSS.base)}>
-        {screenshotModeIsActive ? (
-          <button
-            bind={this}
-            tabIndex={0}
-            class={this.classes(
-              CSS.screenshotBtn,
-              CSS.pointerCursor,
-              CSS.button,
-              CSS.buttonRed
-            )}
-            onclick={this._deactivateScreenshot}
-            onkeydown={this._deactivateScreenshot}
-            title={i18n.deactivateScreenshot}
-          >
-            <span class={CSS.closeIcon} />
-          </button>
-        ) : (
-          this._renderScreenshotPanel()
-        )}
-
-        {screenshotPreviewOverlay}
-        {maskNode}
-      </div>
-    );
-  }
-
-  destroy() {
-    this._handles.removeAll();
-    this._handles.destroy();
-    this._handles = null;
-    this._maskNode = null;
-    this._screenshotImgNode = null;
-  }
-
-  //----------------------------------
-  //
-  //  Public Methods
-  //
-  //----------------------------------
-
-  // activateScreenshot
-  @accessibleHandler()
-  activateScreenshot(): void {
-    if (this.viewModel.screenshotModeIsActive) {
-      return;
-    }
-    this.viewModel.screenshotModeIsActive = true;
-    this.view.container.classList.add(CSS.screenshotCursor);
-    this.viewModel.dragHandler = this.view.on("drag", (event: Event) => {
-      this.viewModel.setScreenshotArea(
-        event,
-        this._maskNode,
-        this._screenshotImgNode,
-        this.viewModel.dragHandler,
-        this._downloadBtnNode
-      );
-    });
-    this.scheduleRender();
-  }
-
-  // downloadImage
-  @accessibleHandler()
-  private _downloadImage() {
-    this.viewModel.downloadImage();
-  }
-
-  //----------------------------------
-  //
-  //  Private Methods
-  //
-  //----------------------------------
-
-  //----------------------------------
-  //
-  //  Render Node Methods
-  //
-  //----------------------------------
-
-  // _renderScreenshotPreviewBtns
-  private _renderScreenshotPreviewBtns(): any {
-    return (
-      <div>
-        <button
-          bind={this}
-          tabIndex={0}
-          class={CSS.actionBtn}
-          onclick={this._downloadImage}
-          onkeydown={this._downloadImage}
-          afterCreate={storeNode}
-          data-node-ref="_downloadBtnNode"
-          aria-label={i18n.downloadImage}
-          title={i18n.downloadImage}
-        >
-          {i18n.downloadImage}
-        </button>
-        <button
-          bind={this}
-          tabIndex={0}
-          class={this.classes(CSS.actionBtn, CSS.backBtn)}
-          onclick={this._closePreview}
-          onkeydown={this._closePreview}
-        >
-          {i18n.backButton}
-        </button>
-      </div>
-    );
-  }
-
-  // _renderScreenshotPreviewOverlay
-  private _renderScreenshotPreviewOverlay(): any {
-    const { previewIsVisible } = this.viewModel;
-    const overlayIsVisible = {
-      [CSS.showOverlay]: previewIsVisible,
-      [CSS.hideOverlay]: !previewIsVisible
-    };
-    const screenshotPreviewBtns = this._renderScreenshotPreviewBtns();
-    return (
-      <div class={this.classes(CSS.screenshotDiv, overlayIsVisible)}>
-        <div class={CSS.screenshotImgContainer}>
-          <div>
-            <img
-              bind={this}
-              afterCreate={storeNode}
-              data-node-ref="_screenshotImgNode"
-              class={CSS.screenshotImg}
-            />
-            {screenshotPreviewBtns}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // _renderScreenshotPanel
-  private _renderScreenshotPanel(): any {
-    const {
-      screenshotTitle,
-      screenshotSubtitle,
-      setScreenshotArea,
-      selectAFeature,
-      legend,
-      popup
-    } = i18n;
-
-    const alertIsActive = {
-      ["is-active"]: this._selectFeatureAlertIsVisible
-    };
-    return (
-      // screenshotBtn
-      <div key="screenshot-panel" class={CSS.base}>
-        {this._selectFeatureAlertIsVisible ? (
-          <div
-            key="feature-alert"
-            class={this.classes(
-              CSS.popupAlert,
-              CSS.alert,
-              CSS.greenAlert,
-              CSS.modifierClass,
-              alertIsActive
-            )}
-          >
-            {i18n.selectAFeature}
-            <button
-              bind={this}
-              onclick={this._removeSelectFeatureAlert}
-              onkeydown={this._removeSelectFeatureAlert}
-              class={CSS.alertClose}
-            >
-              <span class={CSS.closeIcon} />
-            </button>
-          </div>
-        ) : null}
-        <div class={CSS.mainContainer}>
-          <h1 class={CSS.panelTitle}>{screenshotTitle}</h1>
-          {this.legendIncludedInScreenshot || this.popupIncludedInScreenshot ? (
-            <h3 class={CSS.panelSubTitle}>{screenshotSubtitle}</h3>
-          ) : null}
-          {this.legendIncludedInScreenshot || this.popupIncludedInScreenshot ? (
-            <fieldset
-              class={this.classes(
-                CSS.fieldsetCheckbox,
-                CSS.screenshotfieldSetCheckbox
-              )}
-            >
-              {this.legendIncludedInScreenshot ? (
-                <label class={CSS.screenshotOption}>
-                  {" "}
-                  <input
-                    bind={this}
-                    onclick={this._toggleLegend}
-                    onkeydown={this._toggleLegend}
-                    checked={this.legendScreenshotEnabled}
-                    type="checkbox"
-                  />
-                  {legend}
-                </label>
-              ) : null}
-              {this.popupIncludedInScreenshot ? (
-                <label class={CSS.screenshotOption}>
-                  <input
-                    bind={this}
-                    onclick={this._togglePopup}
-                    onkeydown={this._togglePopup}
-                    type="checkbox"
-                    checked={this.popupScreenshotEnabled}
-                  />
-                  {popup}
-                </label>
-              ) : null}
-            </fieldset>
-          ) : null}
-          <div class={CSS.buttonContainer}>
-            <button
-              bind={this}
-              tabIndex={0}
-              onclick={this.activateScreenshot}
-              onkeydown={this.activateScreenshot}
-              afterCreate={storeNode}
-              data-node-ref="_activeScreenshotBtnNode"
-              disabled={
-                this.popupIncludedInScreenshot && this.popupScreenshotEnabled
-                  ? this.featureWidget && this.featureWidget.graphic
-                    ? false
-                    : true
-                  : false
-              }
-              class={CSS.button}
-            >
-              {setScreenshotArea}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // _renderMaskNode
-  private _renderMaskNode(screenshotModeIsActive: boolean): any {
-    const maskDivIsHidden = {
-      [CSS.hide]: !screenshotModeIsActive
-    };
-    return (
-      <div
-        bind={this}
-        class={this.classes(CSS.maskDiv, maskDivIsHidden)}
-        afterCreate={storeNode}
-        data-node-ref="_maskNode"
-      />
-    );
-  }
-
-  // End of render node methods
-
-  // _watchMapComponentSelectors
-  private _watchMapComponentSelectors(): __esri.WatchHandle {
-    return watchUtils.init(this, "mapComponentSelectors", () => {
-      if (this.mapComponentSelectors === null) {
-        this.mapComponentSelectors = [];
-      }
-      if (this.mapComponentSelectors.length === 0) {
-        return;
-      }
-      this.mapComponentSelectors.forEach((componentSelector: string) => {
-        if (componentSelector.indexOf("popup") !== -1) {
-          this._popupIsIncluded = true;
-          this.scheduleRender();
-        }
-      });
-    });
-  }
-
-  // _watchPopups
-  private _watchPopups(): __esri.WatchHandle {
-    return watchUtils.init(this, "view.popup.visible", () => {
-      if (
-        this._popupIsIncluded &&
-        !this.view.popup.visible &&
-        this.viewModel.dragHandler
-      ) {
-        this.viewModel.screenshotModeIsActive = false;
-        this.view.container.classList.remove(CSS.screenshotCursor);
-        this.scheduleRender();
-      }
-    });
-  }
-
-  // _deactivateScreenshot
-  @accessibleHandler()
-  private _deactivateScreenshot(): void {
-    this.viewModel.screenshotModeIsActive = false;
-    this.view.container.classList.remove(CSS.screenshotCursor);
-    if (this.featureWidget && this.featureWidget.graphic) {
-      this.featureWidget.graphic = null;
-    }
-    if (this.viewModel.dragHandler) {
-      this.viewModel.dragHandler.remove();
-      this.viewModel.dragHandler = null;
-    }
-
-    window.setTimeout(() => {
-      this._activeScreenshotBtnNode.focus();
-    }, 10);
-
-    this.scheduleRender();
-  }
-
-  // _toggleLegend
-  @accessibleHandler()
-  private _toggleLegend(event: Event): void {
-    const node = event.currentTarget as HTMLInputElement;
-    this.legendScreenshotEnabled = node.checked;
-    this.scheduleRender();
-  }
-
-  // _togglePopup
-  @accessibleHandler()
-  private _togglePopup(event: Event): void {
-    const node = event.currentTarget as HTMLInputElement;
-    this.popupScreenshotEnabled = node.checked;
-    this.scheduleRender();
-  }
-
-  // _closePreview
-  @accessibleHandler()
-  private _closePreview(): void {
-    const { viewModel } = this;
-    viewModel.previewIsVisible = false;
-    viewModel.screenshotModeIsActive = false;
-    this.view.popup.clear();
-    window.setTimeout(() => {
-      this._activeScreenshotBtnNode.focus();
-    }, 10);
-    this.scheduleRender();
   }
 
   // _handleExpandWidget
@@ -553,20 +171,23 @@ class Screenshot extends declared(Widget) {
           this._handles.add(
             watchUtils.whenTrue(
               this,
-              "viewModel.screenshotModeIsActive",
+              "screenshotPanel.viewModel.screenshotModeIsActive",
               () => {
                 const expandedKey = "expanded";
                 this._handles.remove(expandedKey);
                 this._handles.add(
                   watchUtils.whenFalse(this, "expandWidget.expanded", () => {
-                    this.viewModel.screenshotModeIsActive = false;
+                    this.screenshotPanel.viewModel.screenshotModeIsActive = false;
                     this.view.container.classList.remove(CSS.screenshotCursor);
-                    if (this.featureWidget && this.featureWidget.graphic) {
-                      this.featureWidget.graphic = null;
+                    if (
+                      this.screenshotPanel.featureWidget &&
+                      this.screenshotPanel.featureWidget.graphic
+                    ) {
+                      this.screenshotPanel.featureWidget.graphic = null;
                     }
-                    if (this.viewModel.dragHandler) {
-                      this.viewModel.dragHandler.remove();
-                      this.viewModel.dragHandler = null;
+                    if (this.screenshotPanel.viewModel.dragHandler) {
+                      this.screenshotPanel.viewModel.dragHandler.remove();
+                      this.screenshotPanel.viewModel.dragHandler = null;
                     }
                     if (this.expandWidget) {
                       this.expandWidget.expanded = false;
@@ -583,12 +204,6 @@ class Screenshot extends declared(Widget) {
       }),
       expandWidgetKey
     );
-  }
-  // _removeSelectFeatureAlert
-  @accessibleHandler()
-  private _removeSelectFeatureAlert(): void {
-    this._selectFeatureAlertIsVisible = false;
-    this.scheduleRender();
   }
 }
 
