@@ -210,11 +210,11 @@
           "condition": false,
           "items": [{
               "type": "boolean",
-              "fieldName": "legendOptionEnabled",
+              "fieldName": "enableLegendOption",
               "label": "Enable option to include legend in screenshot"
             }, {
               "type": "boolean",
-              "fieldName": "popupOptionEnabled",
+              "fieldName": "enablePopupOption",
               "label": "Enable option to include pop-up in screenshot"
             }, {
               "type": "options",
@@ -482,8 +482,8 @@
     "homePosition": "top-left",
     "screenshotEnabled": false,
     "screenshotPosition": "top-left",
-    "legendOptionEnabled": true,
-    "popupOptionEnabled": true,
+    "enableLegendOption": true,
+    "enablePopupOption": true,
     "infoPanelEnabled": false,
     "infoPanelPosition": "top-left",
     "searchEnabled": false,
