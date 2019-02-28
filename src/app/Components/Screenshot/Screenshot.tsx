@@ -24,8 +24,8 @@ import SceneView = require("esri/views/SceneView");
 // esri.widgets.Expand
 import Expand = require("esri/widgets/Expand");
 
-// ScreenshotView
-import ScreenshotView = require("./Screenshot/ScreenshotView");
+// ScreenshotPanel
+import ScreenshotPanel = require("./Screenshot/ScreenshotPanel");
 
 // esri.core.watchUtils.
 import watchUtils = require("esri/core/watchUtils");
@@ -53,32 +53,42 @@ class Screenshot extends declared(Widget) {
   private _handles: Handles = new Handles();
 
   // view
-  @aliasOf("screenshotView.view")
+  @aliasOf("screenshotPanel.view")
   @property()
   view: MapView | SceneView = null;
 
   // legendIncludedInScreenshot
-  @aliasOf("screenshotView.legendIncludedInScreenshot")
+  @aliasOf("screenshotPanel.legendIncludedInScreenshot")
   @property()
   legendIncludedInScreenshot: boolean = null;
 
   // popupIncludedInScreenshot
-  @aliasOf("screenshotView.popupIncludedInScreenshot")
+  @aliasOf("screenshotPanel.popupIncludedInScreenshot")
   @property()
   popupIncludedInScreenshot: boolean = null;
 
+  // legendScreenshotEnabled
+  @aliasOf("screenshotPanel.legendScreenshotEnabled")
+  @property()
+  legendScreenshotEnabled: boolean = null;
+
+  // popupScreenshotEnabled
+  @aliasOf("screenshotPanel.popupScreenshotEnabled")
+  @property()
+  popupScreenshotEnabled: boolean = null;
+
   // selectedStyleData
-  @aliasOf("screenshotView.selectedStyleData")
+  @aliasOf("screenshotPanel.selectedStyleData")
   @property()
   selectedStyleData: Collection<SelectedStyleData> = null;
 
   // expandWidgetEnabled
-  @aliasOf("screenshotView.expandWidgetEnabled")
+  @aliasOf("screenshotPanel.expandWidgetEnabled")
   @property()
   expandWidgetEnabled: boolean = null;
 
   // expandWidget
-  @aliasOf("screenshotView.expandWidget")
+  @aliasOf("screenshotPanel.expandWidget")
   @property()
   expandWidget: Expand = null;
 
@@ -90,9 +100,9 @@ class Screenshot extends declared(Widget) {
   @property()
   label = i18n.widgetLabel;
 
-  // screenshotView
+  // screenshotPanel
   @property()
-  screenshotView: ScreenshotView = new ScreenshotView();
+  screenshotPanel: ScreenshotPanel = new ScreenshotPanel();
 
   postInitialize() {
     this.own([this._watchScreenshotViewProperties()]);
@@ -103,11 +113,11 @@ class Screenshot extends declared(Widget) {
   }
 
   render() {
-    return this.screenshotView
+    return this.screenshotPanel
       ? this.expandWidgetEnabled
         ? this.expandWidget.render()
-        : this.screenshotView.render()
-      : this.screenshotView.render();
+        : this.screenshotPanel.render()
+      : this.screenshotPanel.render();
   }
 
   // _watchScreenshotViewProperties
@@ -122,12 +132,14 @@ class Screenshot extends declared(Widget) {
         "expandWidgetEnabled"
       ],
       () => {
-        const { screenshotView } = this;
-        screenshotView.view = this.view;
-        screenshotView.legendIncludedInScreenshot = this.legendIncludedInScreenshot;
-        screenshotView.popupIncludedInScreenshot = this.popupIncludedInScreenshot;
-        screenshotView.selectedStyleData = this.selectedStyleData;
-        screenshotView.expandWidgetEnabled = this.expandWidgetEnabled;
+        const { screenshotPanel } = this;
+        screenshotPanel.view = this.view;
+        screenshotPanel.legendIncludedInScreenshot = this.legendIncludedInScreenshot;
+        screenshotPanel.popupIncludedInScreenshot = this.popupIncludedInScreenshot;
+        screenshotPanel.selectedStyleData = this.selectedStyleData;
+        screenshotPanel.expandWidgetEnabled = this.expandWidgetEnabled;
+        screenshotPanel.legendScreenshotEnabled = this.legendScreenshotEnabled;
+        screenshotPanel.popupScreenshotEnabled = this.popupScreenshotEnabled;
       }
     );
   }
@@ -135,10 +147,10 @@ class Screenshot extends declared(Widget) {
   // _watchScreenshotView
   private _watchScreenshotView(): void {
     this.own([
-      watchUtils.when(this, "screenshotView", () => {
+      watchUtils.when(this, "screenshotPanel", () => {
         this.expandWidget = new Expand({
           view: this.view,
-          content: this.screenshotView,
+          content: this.screenshotPanel,
           expandIconClass: CSS.mediaIcon
         });
         this._handleExpandWidget();
@@ -159,23 +171,23 @@ class Screenshot extends declared(Widget) {
           this._handles.add(
             watchUtils.whenTrue(
               this,
-              "screenshotView.viewModel.screenshotModeIsActive",
+              "screenshotPanel.viewModel.screenshotModeIsActive",
               () => {
                 const expandedKey = "expanded";
                 this._handles.remove(expandedKey);
                 this._handles.add(
                   watchUtils.whenFalse(this, "expandWidget.expanded", () => {
-                    this.screenshotView.viewModel.screenshotModeIsActive = false;
+                    this.screenshotPanel.viewModel.screenshotModeIsActive = false;
                     this.view.container.classList.remove(CSS.screenshotCursor);
                     if (
-                      this.screenshotView.featureWidget &&
-                      this.screenshotView.featureWidget.graphic
+                      this.screenshotPanel.featureWidget &&
+                      this.screenshotPanel.featureWidget.graphic
                     ) {
-                      this.screenshotView.featureWidget.graphic = null;
+                      this.screenshotPanel.featureWidget.graphic = null;
                     }
-                    if (this.screenshotView.viewModel.dragHandler) {
-                      this.screenshotView.viewModel.dragHandler.remove();
-                      this.screenshotView.viewModel.dragHandler = null;
+                    if (this.screenshotPanel.viewModel.dragHandler) {
+                      this.screenshotPanel.viewModel.dragHandler.remove();
+                      this.screenshotPanel.viewModel.dragHandler = null;
                     }
                     if (this.expandWidget) {
                       this.expandWidget.expanded = false;

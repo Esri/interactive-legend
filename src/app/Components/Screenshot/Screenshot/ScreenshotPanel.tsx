@@ -97,8 +97,8 @@ const CSS = {
   offScreenLegendContainer: "esri-screenshot__offscreen-legend-container"
 };
 
-@subclass("ScreenshotView")
-class ScreenshotView extends declared(Widget) {
+@subclass("ScreenshotPanel")
+class ScreenshotPanel extends declared(Widget) {
   //----------------------------------
   //
   //  Variables
@@ -646,4 +646,4 @@ class ScreenshotView extends declared(Widget) {
   }
 }
 
-export = ScreenshotView;
+export = ScreenshotPanel;

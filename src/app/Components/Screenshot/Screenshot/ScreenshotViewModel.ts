@@ -167,7 +167,8 @@ class ScreenshotViewModel extends declared(Accessor) {
     this._handles.add([
       this._watchPopup(),
       this._watchScreenshotMode(),
-      this._watchLegendWidgetAndView()
+      this._watchLegendWidgetAndView(),
+      this._watchIncludedProperties()
     ]);
     if (this.expandWidgetEnabled) {
       this._handles.add([
@@ -853,6 +854,25 @@ class ScreenshotViewModel extends declared(Accessor) {
         this.legendWidget.style.selectedStyleData = this.selectedStyleData;
       }
     });
+  }
+
+  // _watchIncludedProperties
+  private _watchIncludedProperties(): __esri.WatchHandle {
+    return watchUtils.init(
+      this,
+      ["legendIncludedInScreenshot", "popupIncludedInScreenshot"],
+      () => {
+        if (this.legendIncludedInScreenshot) {
+          this.legendScreenshotEnabled = true;
+        } else {
+          this.legendScreenshotEnabled = false;
+        }
+        if (this.popupIncludedInScreenshot) {
+          this.popupScreenshotEnabled = false;
+        }
+        this.notifyChange("state");
+      }
+    );
   }
 }
 

@@ -100,7 +100,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             this._handles.add([
                 this._watchPopup(),
                 this._watchScreenshotMode(),
-                this._watchLegendWidgetAndView()
+                this._watchLegendWidgetAndView(),
+                this._watchIncludedProperties()
             ]);
             if (this.expandWidgetEnabled) {
                 this._handles.add([
@@ -528,6 +529,22 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     });
                     _this.legendWidget.style.selectedStyleData = _this.selectedStyleData;
                 }
+            });
+        };
+        // _watchIncludedProperties
+        ScreenshotViewModel.prototype._watchIncludedProperties = function () {
+            var _this = this;
+            return watchUtils.init(this, ["legendIncludedInScreenshot", "popupIncludedInScreenshot"], function () {
+                if (_this.legendIncludedInScreenshot) {
+                    _this.legendScreenshotEnabled = true;
+                }
+                else {
+                    _this.legendScreenshotEnabled = false;
+                }
+                if (_this.popupIncludedInScreenshot) {
+                    _this.popupScreenshotEnabled = false;
+                }
+                _this.notifyChange("state");
             });
         };
         __decorate([

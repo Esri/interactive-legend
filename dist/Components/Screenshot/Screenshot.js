@@ -16,7 +16,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "dojo/i18n!./Screenshot/nls/resources", "esri/widgets/Widget", "esri/core/accessorSupport/decorators", "esri/widgets/Expand", "./Screenshot/ScreenshotView", "esri/core/watchUtils", "esri/core/Handles"], function (require, exports, __extends, __decorate, i18n, Widget, decorators_1, Expand, ScreenshotView, watchUtils, Handles) {
+define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "dojo/i18n!./Screenshot/nls/resources", "esri/widgets/Widget", "esri/core/accessorSupport/decorators", "esri/widgets/Expand", "./Screenshot/ScreenshotPanel", "esri/core/watchUtils", "esri/core/Handles"], function (require, exports, __extends, __decorate, i18n, Widget, decorators_1, Expand, ScreenshotPanel, watchUtils, Handles) {
     "use strict";
     var CSS = {
         screenshotCursor: "esri-screenshot__cursor",
@@ -34,6 +34,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this.legendIncludedInScreenshot = null;
             // popupIncludedInScreenshot
             _this.popupIncludedInScreenshot = null;
+            // legendScreenshotEnabled
+            _this.legendScreenshotEnabled = null;
+            // popupScreenshotEnabled
+            _this.popupScreenshotEnabled = null;
             // selectedStyleData
             _this.selectedStyleData = null;
             // expandWidgetEnabled
@@ -44,8 +48,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this.iconClass = CSS.mediaIcon;
             // label
             _this.label = i18n.widgetLabel;
-            // screenshotView
-            _this.screenshotView = new ScreenshotView();
+            // screenshotPanel
+            _this.screenshotPanel = new ScreenshotPanel();
             return _this;
         }
         Screenshot.prototype.postInitialize = function () {
@@ -55,11 +59,11 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             }
         };
         Screenshot.prototype.render = function () {
-            return this.screenshotView
+            return this.screenshotPanel
                 ? this.expandWidgetEnabled
                     ? this.expandWidget.render()
-                    : this.screenshotView.render()
-                : this.screenshotView.render();
+                    : this.screenshotPanel.render()
+                : this.screenshotPanel.render();
         };
         // _watchScreenshotViewProperties
         Screenshot.prototype._watchScreenshotViewProperties = function () {
@@ -71,22 +75,24 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 "selectedStyleData",
                 "expandWidgetEnabled"
             ], function () {
-                var screenshotView = _this.screenshotView;
-                screenshotView.view = _this.view;
-                screenshotView.legendIncludedInScreenshot = _this.legendIncludedInScreenshot;
-                screenshotView.popupIncludedInScreenshot = _this.popupIncludedInScreenshot;
-                screenshotView.selectedStyleData = _this.selectedStyleData;
-                screenshotView.expandWidgetEnabled = _this.expandWidgetEnabled;
+                var screenshotPanel = _this.screenshotPanel;
+                screenshotPanel.view = _this.view;
+                screenshotPanel.legendIncludedInScreenshot = _this.legendIncludedInScreenshot;
+                screenshotPanel.popupIncludedInScreenshot = _this.popupIncludedInScreenshot;
+                screenshotPanel.selectedStyleData = _this.selectedStyleData;
+                screenshotPanel.expandWidgetEnabled = _this.expandWidgetEnabled;
+                screenshotPanel.legendScreenshotEnabled = _this.legendScreenshotEnabled;
+                screenshotPanel.popupScreenshotEnabled = _this.popupScreenshotEnabled;
             });
         };
         // _watchScreenshotView
         Screenshot.prototype._watchScreenshotView = function () {
             var _this = this;
             this.own([
-                watchUtils.when(this, "screenshotView", function () {
+                watchUtils.when(this, "screenshotPanel", function () {
                     _this.expandWidget = new Expand({
                         view: _this.view,
-                        content: _this.screenshotView,
+                        content: _this.screenshotPanel,
                         expandIconClass: CSS.mediaIcon
                     });
                     _this._handleExpandWidget();
@@ -102,19 +108,19 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 if (_this.expandWidget) {
                     var screenshotModeIsActiveKey = "screenshot-active";
                     _this._handles.remove(screenshotModeIsActiveKey);
-                    _this._handles.add(watchUtils.whenTrue(_this, "screenshotView.viewModel.screenshotModeIsActive", function () {
+                    _this._handles.add(watchUtils.whenTrue(_this, "screenshotPanel.viewModel.screenshotModeIsActive", function () {
                         var expandedKey = "expanded";
                         _this._handles.remove(expandedKey);
                         _this._handles.add(watchUtils.whenFalse(_this, "expandWidget.expanded", function () {
-                            _this.screenshotView.viewModel.screenshotModeIsActive = false;
+                            _this.screenshotPanel.viewModel.screenshotModeIsActive = false;
                             _this.view.container.classList.remove(CSS.screenshotCursor);
-                            if (_this.screenshotView.featureWidget &&
-                                _this.screenshotView.featureWidget.graphic) {
-                                _this.screenshotView.featureWidget.graphic = null;
+                            if (_this.screenshotPanel.featureWidget &&
+                                _this.screenshotPanel.featureWidget.graphic) {
+                                _this.screenshotPanel.featureWidget.graphic = null;
                             }
-                            if (_this.screenshotView.viewModel.dragHandler) {
-                                _this.screenshotView.viewModel.dragHandler.remove();
-                                _this.screenshotView.viewModel.dragHandler = null;
+                            if (_this.screenshotPanel.viewModel.dragHandler) {
+                                _this.screenshotPanel.viewModel.dragHandler.remove();
+                                _this.screenshotPanel.viewModel.dragHandler = null;
                             }
                             if (_this.expandWidget) {
                                 _this.expandWidget.expanded = false;
@@ -126,27 +132,35 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             }), expandWidgetKey);
         };
         __decorate([
-            decorators_1.aliasOf("screenshotView.view"),
+            decorators_1.aliasOf("screenshotPanel.view"),
             decorators_1.property()
         ], Screenshot.prototype, "view", void 0);
         __decorate([
-            decorators_1.aliasOf("screenshotView.legendIncludedInScreenshot"),
+            decorators_1.aliasOf("screenshotPanel.legendIncludedInScreenshot"),
             decorators_1.property()
         ], Screenshot.prototype, "legendIncludedInScreenshot", void 0);
         __decorate([
-            decorators_1.aliasOf("screenshotView.popupIncludedInScreenshot"),
+            decorators_1.aliasOf("screenshotPanel.popupIncludedInScreenshot"),
             decorators_1.property()
         ], Screenshot.prototype, "popupIncludedInScreenshot", void 0);
         __decorate([
-            decorators_1.aliasOf("screenshotView.selectedStyleData"),
+            decorators_1.aliasOf("screenshotPanel.legendScreenshotEnabled"),
+            decorators_1.property()
+        ], Screenshot.prototype, "legendScreenshotEnabled", void 0);
+        __decorate([
+            decorators_1.aliasOf("screenshotPanel.popupScreenshotEnabled"),
+            decorators_1.property()
+        ], Screenshot.prototype, "popupScreenshotEnabled", void 0);
+        __decorate([
+            decorators_1.aliasOf("screenshotPanel.selectedStyleData"),
             decorators_1.property()
         ], Screenshot.prototype, "selectedStyleData", void 0);
         __decorate([
-            decorators_1.aliasOf("screenshotView.expandWidgetEnabled"),
+            decorators_1.aliasOf("screenshotPanel.expandWidgetEnabled"),
             decorators_1.property()
         ], Screenshot.prototype, "expandWidgetEnabled", void 0);
         __decorate([
-            decorators_1.aliasOf("screenshotView.expandWidget"),
+            decorators_1.aliasOf("screenshotPanel.expandWidget"),
             decorators_1.property()
         ], Screenshot.prototype, "expandWidget", void 0);
         __decorate([
@@ -157,7 +171,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         ], Screenshot.prototype, "label", void 0);
         __decorate([
             decorators_1.property()
-        ], Screenshot.prototype, "screenshotView", void 0);
+        ], Screenshot.prototype, "screenshotPanel", void 0);
         Screenshot = __decorate([
             decorators_1.subclass("Screenshot")
         ], Screenshot);
