@@ -2,6 +2,14 @@
   "configurationSettings": [{
       "category": "General",
       "fields": [{
+          "type": "subcategory",
+          "label": "Interactive Legend"
+        },
+        {
+          "type": "paragraph",
+          "value": "Documentation on how to modify the legend drawing style can be found here: <a href='https://doc.arcgis.com/en/arcgis-online/create-maps/change-style.htm' target='_blank' rel='noopener'>https://doc.arcgis.com/en/arcgis-online/create-maps/change-style.htm</a>"
+        },
+        {
           "type": "itembrowser",
           "fieldName": "webmap",
           "label": "Select",
