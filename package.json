@@ -36,6 +36,7 @@
     "lint": "grunt lint"
   },
   "dependencies": {
-    "html2canvas-render-offscreen": "0.0.3"
+    "html2canvas-render-offscreen": "0.0.3",
+    "lodash": ">=4.17.11"
   }
 }
