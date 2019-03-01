@@ -96,6 +96,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         interactiveLegendCheckMarkIconStyles: "esri-interactive-legend__checkmark-icon",
         interactiveLegendCheckMarkIconSelected: "esri-interactive-legend__checkmark-icon--selected",
         interactiveLegendCheckMarkIconNotSelected: "esri-interactive-legend__checkmark-icon--not-selected",
+        interactiveLegendNoCaption: "esri-interactive-legend__no-caption",
         onboarding: {
             mainContainer: "esri-interactive-legend__onboarding-main-container",
             contentContainer: "esri-interactive-legend__onboarding-content-container",
@@ -382,7 +383,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 !isSizeRamp &&
                 !isHeatRamp) ||
                 (isPredominance && !isSizeRamp && !isOpacityRamp) ? (widget_1.tsx("div", { class: CSS.interactiveLegendHeaderContainer },
-                widget_1.tsx("div", { class: this.classes(layerCaption, CSS.layerCaptionContainer) }, title),
+                widget_1.tsx("div", { key: "layer-caption", class: this.classes(layerCaption, CSS.layerCaptionContainer) }, title),
                 (!isRelationship &&
                     hasMoreThanOneInfo &&
                     !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
@@ -401,6 +402,18 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 _c);
             return (widget_1.tsx("div", { class: this.classes(tableClass, tableClasses) },
                 caption,
+                (!isRelationship &&
+                    hasMoreThanOneInfo &&
+                    !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
+                    activeLayerInfo.layer.type === "feature" &&
+                    field &&
+                    featureLayerData &&
+                    !isColorRamp &&
+                    !isOpacityRamp &&
+                    !isSizeRamp &&
+                    !isHeatRamp &&
+                    !caption) ||
+                    (isPredominance && !isSizeRamp && !isOpacityRamp && !caption) ? (widget_1.tsx("div", { class: CSS.interactiveLegendNoCaption }, renderResetButton)) : null,
                 content));
         };
         // _renderResetButton
@@ -598,6 +611,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         if ((!isRelationship &&
                             hasMoreThanOneInfo &&
                             !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
+                            activeLayerInfo.layer.type === "feature" &&
                             field &&
                             featureLayerData &&
                             !isSizeRamp) ||
@@ -608,12 +622,12 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     widget_1.tsx("div", { class: applySelect ? CSS.interactiveLegendInfoContainer : null },
                         widget_1.tsx("div", { class: this.classes(CSS.symbolContainer, symbolClasses) }, content),
                         widget_1.tsx("div", { class: this.classes(CSS.layerInfo, labelClasses) }, styleUtils_1.getTitle(elementInfo.label, false) || "")),
-                    selectedInfoIndex ? (featureLayerData.selectedInfoIndex &&
+                    applySelect ? (selectedInfoIndex ? (featureLayerData.selectedInfoIndex &&
                         selectedInfoIndex.indexOf(legendInfoIndex) === -1 &&
                         selectedInfoIndex.length > 0 ? (widget_1.tsx("div", null,
                         widget_1.tsx("span", { class: this.classes(CSS.calciteStyles.checkMark, CSS.interactiveLegendCheckMarkIconNotSelected) }))) : (widget_1.tsx("div", null,
                         widget_1.tsx("span", { class: this.classes(CSS.interactiveLegendCheckMarkIconSelected, CSS.calciteStyles.checkMark) })))) : (widget_1.tsx("div", null,
-                        widget_1.tsx("span", { class: this.classes(CSS.interactiveLegendCheckMarkIconStyles, CSS.calciteStyles.checkMark) }))))));
+                        widget_1.tsx("span", { class: this.classes(CSS.interactiveLegendCheckMarkIconSelected, CSS.calciteStyles.checkMark) })))) : null)));
         };
         // _renderImage
         InteractiveClassic.prototype._renderImage = function (elementInfo, layer, isStretched) {

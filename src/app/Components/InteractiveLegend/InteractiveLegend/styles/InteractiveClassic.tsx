@@ -50,12 +50,6 @@ import FeatureLayer = require("esri/layers/FeatureLayer");
 // InteractiveClassicViewModel
 import InteractiveStyleViewModel = require("./InteractiveStyle/InteractiveStyleViewModel");
 
-// esri.views.layers.support.FeatureFilter
-import FeatureFilter = require("esri/views/layers/support/FeatureFilter");
-
-// esri.views.layers.support.FeatureEffect
-import FeatureEffect = require("esri/views/layers/support/FeatureEffect");
-
 // // esri.Grahpic
 // import Graphic = require("esri/Graphic");
 
@@ -173,6 +167,7 @@ const CSS = {
     "esri-interactive-legend__checkmark-icon--selected",
   interactiveLegendCheckMarkIconNotSelected:
     "esri-interactive-legend__checkmark-icon--not-selected",
+  interactiveLegendNoCaption: "esri-interactive-legend__no-caption",
   onboarding: {
     mainContainer: "esri-interactive-legend__onboarding-main-container",
     contentContainer: "esri-interactive-legend__onboarding-content-container",
@@ -561,7 +556,6 @@ class InteractiveClassic extends declared(Widget) {
           )
         )
         .filter((row: any) => !!row);
-
       if (rows.length) {
         content = <div class={this.classes(CSS.layerBody)}>{rows}</div>;
       }
@@ -637,7 +631,7 @@ class InteractiveClassic extends declared(Widget) {
     const hasMoreThanOneInfo =
       legendElement && legendElement.infos && legendElement.infos.length > 1;
 
-    const tableClass = isChild ? CSS.layerChildTable : layerTable,
+    let tableClass = isChild ? CSS.layerChildTable : layerTable,
       caption = title ? (
         (!isRelationship &&
           hasMoreThanOneInfo &&
@@ -651,7 +645,10 @@ class InteractiveClassic extends declared(Widget) {
           !isHeatRamp) ||
         (isPredominance && !isSizeRamp && !isOpacityRamp) ? (
           <div class={CSS.interactiveLegendHeaderContainer}>
-            <div class={this.classes(layerCaption, CSS.layerCaptionContainer)}>
+            <div
+              key="layer-caption"
+              class={this.classes(layerCaption, CSS.layerCaptionContainer)}
+            >
               {title}
             </div>
             {(!isRelationship &&
@@ -678,6 +675,20 @@ class InteractiveClassic extends declared(Widget) {
     return (
       <div class={this.classes(tableClass, tableClasses)}>
         {caption}
+        {(!isRelationship &&
+          hasMoreThanOneInfo &&
+          !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
+          activeLayerInfo.layer.type === "feature" &&
+          field &&
+          featureLayerData &&
+          !isColorRamp &&
+          !isOpacityRamp &&
+          !isSizeRamp &&
+          !isHeatRamp &&
+          !caption) ||
+        (isPredominance && !isSizeRamp && !isOpacityRamp && !caption) ? (
+          <div class={CSS.interactiveLegendNoCaption}>{renderResetButton}</div>
+        ) : null}
         {content}
       </div>
     );
@@ -1018,6 +1029,7 @@ class InteractiveClassic extends declared(Widget) {
               (!isRelationship &&
                 hasMoreThanOneInfo &&
                 !activeLayerInfo.layer.hasOwnProperty("sublayers") &&
+                activeLayerInfo.layer.type === "feature" &&
                 field &&
                 featureLayerData &&
                 !isSizeRamp) ||
@@ -1044,18 +1056,29 @@ class InteractiveClassic extends declared(Widget) {
               {getTitle(elementInfo.label, false) || ""}
             </div>
           </div>
-          {selectedInfoIndex ? (
-            featureLayerData.selectedInfoIndex &&
-            selectedInfoIndex.indexOf(legendInfoIndex) === -1 &&
-            selectedInfoIndex.length > 0 ? (
-              <div>
-                <span
-                  class={this.classes(
-                    CSS.calciteStyles.checkMark,
-                    CSS.interactiveLegendCheckMarkIconNotSelected
-                  )}
-                />
-              </div>
+          {applySelect ? (
+            selectedInfoIndex ? (
+              featureLayerData.selectedInfoIndex &&
+              selectedInfoIndex.indexOf(legendInfoIndex) === -1 &&
+              selectedInfoIndex.length > 0 ? (
+                <div>
+                  <span
+                    class={this.classes(
+                      CSS.calciteStyles.checkMark,
+                      CSS.interactiveLegendCheckMarkIconNotSelected
+                    )}
+                  />
+                </div>
+              ) : (
+                <div>
+                  <span
+                    class={this.classes(
+                      CSS.interactiveLegendCheckMarkIconSelected,
+                      CSS.calciteStyles.checkMark
+                    )}
+                  />
+                </div>
+              )
             ) : (
               <div>
                 <span
@@ -1066,16 +1089,7 @@ class InteractiveClassic extends declared(Widget) {
                 />
               </div>
             )
-          ) : (
-            <div>
-              <span
-                class={this.classes(
-                  CSS.interactiveLegendCheckMarkIconStyles,
-                  CSS.calciteStyles.checkMark
-                )}
-              />
-            </div>
-          )}
+          ) : null}
         </div>
       </div>
     );
