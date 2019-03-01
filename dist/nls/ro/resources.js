@@ -21,5 +21,6 @@ define({
   "onboardingPanelScreenshotStepTwo": "Dacă este posibil, optați pentru includerea legendei hărții și a ferestrei pop-up în imagine.",
   "onboardingPanelScreenshotStepThree": "Pentru a include un pop-up, selectați un obiect spaţial de pe hartă.",
   "onboardingPanelScreenshotStepFour": "Faceți clic pe Setare suprafață hartă. Trasați un dreptunghi pentru a selecta o regiune pentru imaginea dvs.",
-  "onboardingPanelScreenshotStepFive": "Faceţi clic pe Descărcare imagine."
+  "onboardingPanelScreenshotStepFive": "Faceţi clic pe Descărcare imagine.",
+  "showAll": "Ă_Show All_________________ș"
 });

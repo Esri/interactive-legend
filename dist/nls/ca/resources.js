@@ -21,5 +21,6 @@ define({
   "onboardingPanelScreenshotStepTwo": "Si s'escau, opteu per incloure la llegenda del mapa i la finestra emergent a la imatge.",
   "onboardingPanelScreenshotStepThree": "Per incloure una finestra emergent, seleccioneu una entitat al mapa.",
   "onboardingPanelScreenshotStepFour": "Feu clic a Defineix l'àrea del mapa. Dibuixeu un rectangle per seleccionar una regió per a la imatge.",
-  "onboardingPanelScreenshotStepFive": "Feu clic a Baixa la imatge."
+  "onboardingPanelScreenshotStepFive": "Feu clic a Baixa la imatge.",
+  "showAll": "ó_Show All_________________à"
 });

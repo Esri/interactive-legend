@@ -21,5 +21,6 @@ define({
   "onboardingPanelScreenshotStepTwo": "Nếu có thể, hãy chọn đưa chú giải bản đồ và cửa sổ pop-up vào hình ảnh.",
   "onboardingPanelScreenshotStepThree": "Để đưa cửa sổ pop-up vào, hãy chọn một đối tượng trên bản đồ.",
   "onboardingPanelScreenshotStepFour": "Nhấp vào Thiết lập khu vực bản đồ. Vẽ một hình chữ nhật để chọn khu vực cho hình ảnh của bạn.",
-  "onboardingPanelScreenshotStepFive": "Nhấp vào Tải Hình ảnh."
+  "onboardingPanelScreenshotStepFive": "Nhấp vào Tải Hình ảnh.",
+  "showAll": "Đ_Show All_________________ớ"
 });

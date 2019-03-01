@@ -21,5 +21,6 @@ define({
   "onboardingPanelScreenshotStepTwo": "Ako je primenljivo, izaberite da u snimak uključite legendu mape i iskačući prozor.",
   "onboardingPanelScreenshotStepThree": "Da biste uključili iskačući prozor, izaberite geoobjekat na mapi.",
   "onboardingPanelScreenshotStepFour": "Kliknite na Podesi oblast mape. Nacrtajte pravougaonik da izaberete region za svoj snimak.",
-  "onboardingPanelScreenshotStepFive": "Kliknite na Preuzmi snimak."
+  "onboardingPanelScreenshotStepFive": "Kliknite na Preuzmi snimak.",
+  "showAll": "Č_Show All_________________ž"
 });

@@ -21,5 +21,6 @@ define({
   "onboardingPanelScreenshotStepTwo": "如果適用，選擇在圖片中加入地圖圖例和快顯視窗。",
   "onboardingPanelScreenshotStepThree": "若要包含快顯視窗，請在地圖上選擇圖徵。",
   "onboardingPanelScreenshotStepFour": "按一下「設定地圖區域」。 繪製矩形以選擇圖片的地區。",
-  "onboardingPanelScreenshotStepFive": "按一下「下載圖片」。"
+  "onboardingPanelScreenshotStepFive": "按一下「下載圖片」。",
+  "showAll": "試_Show All_________________驗"
 });

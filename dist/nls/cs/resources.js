@@ -21,5 +21,6 @@ define({
   "onboardingPanelScreenshotStepTwo": "Případně do snímku zahrňte legendu mapy a vyskakovací okno.",
   "onboardingPanelScreenshotStepThree": "Pokud chcete zahrnout vyskakovací okno, vyberte prvek v mapě.",
   "onboardingPanelScreenshotStepFour": "Klikněte na možnost Nastavit oblast mapy. Region pro váš obrázek vyberete nakreslením obdélníku.",
-  "onboardingPanelScreenshotStepFive": "Klikněte na možnost Stáhnout obrázek."
+  "onboardingPanelScreenshotStepFive": "Klikněte na možnost Stáhnout obrázek.",
+  "showAll": "Ř_Show All_________________ů"
 });

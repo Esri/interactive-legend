@@ -21,5 +21,6 @@ define({
   "onboardingPanelScreenshotStepTwo": "Le cas échéant, choisissez d’inclure la légende de la carte et la fenêtre contextuelle dans l’image.",
   "onboardingPanelScreenshotStepThree": "Pour inclure une fenêtre contextuelle, sélectionnez une entité sur la carte.",
   "onboardingPanelScreenshotStepFour": "Cliquez sur Définir la zone cartographique. Dessinez un rectangle pour sélectionner une région pour votre image.",
-  "onboardingPanelScreenshotStepFive": "Cliquez sur Télécharger l’image."
+  "onboardingPanelScreenshotStepFive": "Cliquez sur Télécharger l’image.",
+  "showAll": "æ_Show All_________________Â"
 });

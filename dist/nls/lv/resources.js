@@ -21,5 +21,6 @@ define({
   "onboardingPanelScreenshotStepTwo": "Iekļaujiet attēlā kartes apzīmējumu un iznirstošo logu, ja tas ir iespējams.",
   "onboardingPanelScreenshotStepThree": "Lai iekļautu uznirstošo logu, kartē izvēlieties elementu.",
   "onboardingPanelScreenshotStepFour": "Noklikšķiniet uz Iestatīt kartes teritoriju. Uzzīmējiet taisnstūri, lai izvēlētos sava attēla reģionu.",
-  "onboardingPanelScreenshotStepFive": "Noklikšķiniet uz Lejupielādēt attēlu."
+  "onboardingPanelScreenshotStepFive": "Noklikšķiniet uz Lejupielādēt attēlu.",
+  "showAll": "ķ_Show All_________________ū"
 });

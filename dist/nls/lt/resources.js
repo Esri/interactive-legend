@@ -21,5 +21,6 @@ define({
   "onboardingPanelScreenshotStepTwo": "Jei reikia, pasirinkite, kad būtų įtraukta žemėlapio legenda ir iškylantis langas.",
   "onboardingPanelScreenshotStepThree": "Norėdami įtraukti iškylantį langą, žemėlapyje pasirinkite elementą.",
   "onboardingPanelScreenshotStepFour": "Spustelėkite Nustatyti žemėlapio sritį. Nubrėžkite stačiakampį, kad pasirinktumėte vaizdo aprėpiamą teritoriją.",
-  "onboardingPanelScreenshotStepFive": "Spustelėkite Atsisiųsti vaizdą."
+  "onboardingPanelScreenshotStepFive": "Spustelėkite Atsisiųsti vaizdą.",
+  "showAll": "Į_Show All_________________š"
 });
