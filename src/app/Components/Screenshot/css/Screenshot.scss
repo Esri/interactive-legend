@@ -199,11 +199,21 @@ html[dir="rtl"] {
   }
 }
 
+
 .esri-screenshot__offscreen-pop-up-container {
   position: absolute;
   top: -99999px;
   left: -99999px;
   width: 400px;
+
+  .esri-feature__media-container {
+    height: auto;
+
+    .esri-feature__media-chart {
+      height: 100%;
+    }
+  }
+
 }
 
 .esri-screenshot__offscreen-legend-container {
