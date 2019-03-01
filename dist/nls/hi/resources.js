@@ -21,5 +21,6 @@ define({
   "onboardingPanelScreenshotStepTwo": "यदि लागू हो, तो चित्र में मानचित्र लीजेंड और पॉप-अप को शामिल करने का विकल्प चुनें।",
   "onboardingPanelScreenshotStepThree": "पॉप-अप को शामिल करने के लिए, मानचित्र पर कोई सुविधा चुनें।",
   "onboardingPanelScreenshotStepFour": "मानचित्र क्षेत्र सेट करें' पर क्लिक करें। अपनी छवि के लिए कोई क्षेत्र चुनने हेतु एक आयत बनाएँ।",
-  "onboardingPanelScreenshotStepFive": "छवि डाउनलोड करें' पर क्लिक करें।"
+  "onboardingPanelScreenshotStepFive": "छवि डाउनलोड करें' पर क्लिक करें।",
+  "showAll": "आ_Show All_________________ज"
 });

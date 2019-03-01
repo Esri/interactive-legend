@@ -21,5 +21,6 @@ define({
   "onboardingPanelScreenshotStepTwo": "Kui see on asjakohane, valige kaardi legendi kaasamine ja hüpikaken pildil.",
   "onboardingPanelScreenshotStepThree": "Hüpikakna kaasamiseks valige kaardil objekt.",
   "onboardingPanelScreenshotStepFour": "Klõpsake Kaardiala seadistamine. Pildi piirkonna valimiseks joonistage ristkülik.",
-  "onboardingPanelScreenshotStepFive": "Klõpsake Laadi pilt alla."
+  "onboardingPanelScreenshotStepFive": "Klõpsake Laadi pilt alla.",
+  "showAll": "Š_Show All_________________ä"
 });

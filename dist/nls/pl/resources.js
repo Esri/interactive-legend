@@ -21,5 +21,6 @@ define({
   "onboardingPanelScreenshotStepTwo": "Jeśli jest to możliwe, wybierz opcję uwzględnienia legendy mapy i okna podręcznego w obrazie.",
   "onboardingPanelScreenshotStepThree": "Aby uwzględnić okno podręczne, wybierz obiekt na mapie.",
   "onboardingPanelScreenshotStepFour": "Kliknij przycisk Ustaw obszar mapy. Narysuj prostokąt, aby wybrać region dla swojego obrazu.",
-  "onboardingPanelScreenshotStepFive": "Kliknij przycisk Pobierz obraz."
+  "onboardingPanelScreenshotStepFive": "Kliknij przycisk Pobierz obraz.",
+  "showAll": "ł_Show All_________________ą"
 });

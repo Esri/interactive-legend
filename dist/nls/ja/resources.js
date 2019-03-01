@@ -21,5 +21,6 @@ define({
   "onboardingPanelScreenshotStepTwo": "該当する場合、マップの凡例とポップアップを画像に含めるか選択します。",
   "onboardingPanelScreenshotStepThree": "ポップアップを含める場合、マップ上のフィーチャを選択します。",
   "onboardingPanelScreenshotStepFour": "[マップ エリアの設定] をクリックします。 四角形を描画して、画像の領域を選択します。",
-  "onboardingPanelScreenshotStepFive": "[画像のダウンロード] をクリックします。"
+  "onboardingPanelScreenshotStepFive": "[画像のダウンロード] をクリックします。",
+  "showAll": "須_Show All_________________鷗"
 });

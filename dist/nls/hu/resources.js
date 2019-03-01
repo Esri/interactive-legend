@@ -21,5 +21,6 @@ define({
   "onboardingPanelScreenshotStepTwo": "Adott esetben szüntesse meg annak lehetőségét, hogy a képen szerepeljen a térkép jelmagyarázata és az előugró ablak.",
   "onboardingPanelScreenshotStepThree": "Ha szeretné feltüntetni az előugró ablakot, válassza ki a térkép valamelyik vektoros elemét.",
   "onboardingPanelScreenshotStepFour": "Kattintson a Térképen ábrázolt terület beállítása elemre. Rajzoljon négyszöget a képen megjeleníteni kívánt régió kiválasztásához.",
-  "onboardingPanelScreenshotStepFive": "Kattintson a Kép letöltése elemre."
+  "onboardingPanelScreenshotStepFive": "Kattintson a Kép letöltése elemre.",
+  "showAll": "í_Show All_________________ő"
 });

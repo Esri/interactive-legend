@@ -21,5 +21,6 @@ define({
   "onboardingPanelScreenshotStepTwo": "אם אפשר, כלול בתמונה את המקרא של המפה ואת החלון הקופץ שמופיע.",
   "onboardingPanelScreenshotStepThree": "כדי לכלול חלון קופץ, בחר ישות במפה.",
   "onboardingPanelScreenshotStepFour": "לחץ על 'הגדר את אזור המפה'. שרטט מלבן כדי לבחור אזור עבור התמונה.",
-  "onboardingPanelScreenshotStepFive": "לחץ על 'הורד תמונה'."
+  "onboardingPanelScreenshotStepFive": "לחץ על 'הורד תמונה'.",
+  "showAll": "כן_Show All_________________ש"
 });

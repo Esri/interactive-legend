@@ -21,5 +21,6 @@ define({
   "onboardingPanelScreenshotStepTwo": "Si corresponde, puede incluir la leyenda de mapa y un elemento emergente en la imagen.",
   "onboardingPanelScreenshotStepThree": "Para incluir un elemento emergente, seleccione una entidad en el mapa.",
   "onboardingPanelScreenshotStepFour": "Haga clic en Definir área de mapa. Dibuje un rectángulo para seleccionar la región de su imagen.",
-  "onboardingPanelScreenshotStepFive": "Haga clic en Descargar imagen."
+  "onboardingPanelScreenshotStepFive": "Haga clic en Descargar imagen.",
+  "showAll": "á_Show All_________________Ó"
 });

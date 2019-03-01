@@ -21,5 +21,6 @@ define({
   "onboardingPanelScreenshotStepTwo": "Ove applicabile, scegliere di includere la legenda della mappa e il popup nell'immagine.",
   "onboardingPanelScreenshotStepThree": "Per includere un popup, selezionare una feature sulla mappa.",
   "onboardingPanelScreenshotStepFour": "Fai clic su Imposta area mappa. Disegnare un rettangolo per selezionare un'area per l’immagine.",
-  "onboardingPanelScreenshotStepFive": "Fare clic su Scarica immagine."
+  "onboardingPanelScreenshotStepFive": "Fare clic su Scarica immagine.",
+  "showAll": "é_Show All_________________È"
 });
