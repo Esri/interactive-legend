@@ -67,7 +67,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             // state
             get: function () {
                 return this.view
-                    ? this.get("view.ready") && !this.view.updating
+                    ? this.get("view.ready")
                         ? "ready"
                         : "loading"
                     : "disabled";
@@ -652,12 +652,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         ], InteractiveStyleViewModel.prototype, "featureLayerViews", void 0);
         __decorate([
             decorators_1.property({
-                dependsOn: [
-                    "view.updating",
-                    "searchExpressions",
-                    "layerListViewModel",
-                    "view.ready"
-                ],
+                dependsOn: ["view.updating", "searchExpressions", "layerListViewModel"],
                 readOnly: true
             })
         ], InteractiveStyleViewModel.prototype, "state", null);

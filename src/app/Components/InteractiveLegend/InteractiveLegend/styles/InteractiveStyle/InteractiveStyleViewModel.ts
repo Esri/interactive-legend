@@ -100,17 +100,12 @@ class InteractiveStyleViewModel extends declared(Accessor) {
 
   // state
   @property({
-    dependsOn: [
-      "view.updating",
-      "searchExpressions",
-      "layerListViewModel",
-      "view.ready"
-    ],
+    dependsOn: ["view.updating", "searchExpressions", "layerListViewModel"],
     readOnly: true
   })
   get state(): State {
     return this.view
-      ? this.get("view.ready") && !this.view.updating
+      ? this.get("view.ready")
         ? "ready"
         : "loading"
       : "disabled";
