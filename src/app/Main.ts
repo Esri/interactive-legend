@@ -23,6 +23,8 @@
 // dojo.i18n
 import * as i18nInteractiveLegend from "dojo/i18n!./nls/resources";
 
+import * as i18nScreenshot from "dojo/i18n!./Components/Screenshot/Screenshot/nls/resources";
+
 // ApplicationBase.ApplicationBase
 import ApplicationBase = require("ApplicationBase/ApplicationBase");
 
@@ -527,7 +529,8 @@ class InteractiveLegendApp {
       }
       const screenshotExpand = new Expand({
         view,
-        content: this.screenshot
+        content: this.screenshot,
+        expandTooltip: i18nScreenshot.takeAScreenshot
       });
 
       watchUtils.whenFalse(screenshotExpand, "expanded", () => {

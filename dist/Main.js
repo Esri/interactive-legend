@@ -27,7 +27,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     }
     return t;
 };
-define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/support/itemUtils", "ApplicationBase/support/domHelper", "esri/widgets/Home", "esri/widgets/LayerList", "esri/widgets/Search", "esri/layers/FeatureLayer", "esri/widgets/BasemapToggle", "esri/widgets/Expand", "esri/core/watchUtils", "esri/Color", "./Components/Screenshot/Screenshot", "./Components/Info/Info", "telemetry/telemetry.dojo", "./Components/InteractiveLegend/InteractiveLegend", "./Components/Splash/Splash", "./Components/Header/Header"], function (require, exports, i18nInteractiveLegend, itemUtils_1, domHelper_1, Home, LayerList, Search, FeatureLayer, BasemapToggle, Expand, watchUtils, Color, Screenshot, Info, Telemetry, InteractiveLegend, Splash, Header) {
+define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/i18n!./Components/Screenshot/Screenshot/nls/resources", "ApplicationBase/support/itemUtils", "ApplicationBase/support/domHelper", "esri/widgets/Home", "esri/widgets/LayerList", "esri/widgets/Search", "esri/layers/FeatureLayer", "esri/widgets/BasemapToggle", "esri/widgets/Expand", "esri/core/watchUtils", "esri/Color", "./Components/Screenshot/Screenshot", "./Components/Info/Info", "telemetry/telemetry.dojo", "./Components/InteractiveLegend/InteractiveLegend", "./Components/Splash/Splash", "./Components/Header/Header"], function (require, exports, i18nInteractiveLegend, i18nScreenshot, itemUtils_1, domHelper_1, Home, LayerList, Search, FeatureLayer, BasemapToggle, Expand, watchUtils, Color, Screenshot, Info, Telemetry, InteractiveLegend, Splash, Header) {
     "use strict";
     // CSS
     var CSS = {
@@ -341,7 +341,8 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "ApplicationBase/supp
                 }
                 var screenshotExpand = new Expand({
                     view: view,
-                    content: this.screenshot
+                    content: this.screenshot,
+                    expandTooltip: i18nScreenshot.takeAScreenshot
                 });
                 watchUtils.whenFalse(screenshotExpand, "expanded", function () {
                     if (_this.screenshot.screenshotModeIsActive) {
