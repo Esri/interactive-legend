@@ -631,7 +631,7 @@ class InteractiveClassic extends declared(Widget) {
     const hasMoreThanOneInfo =
       legendElement && legendElement.infos && legendElement.infos.length > 1;
 
-    let tableClass = isChild ? CSS.layerChildTable : layerTable,
+    const tableClass = isChild ? CSS.layerChildTable : layerTable,
       caption = title ? (
         (!isRelationship &&
           hasMoreThanOneInfo &&
