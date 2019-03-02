@@ -208,9 +208,11 @@ html[dir="rtl"] {
 
   .esri-feature__media-container {
     height: auto;
+    width: auto;
 
     .esri-feature__media-chart {
       height: 100%;
+      width: 100%;
     }
   }
 
