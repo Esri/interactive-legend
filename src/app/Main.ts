@@ -485,6 +485,7 @@ class InteractiveLegendApp {
   ): void {
     if (config.splash) {
       const splash = new Splash.default({
+        view,
         config,
         container: document.createElement("div")
       });
