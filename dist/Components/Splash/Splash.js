@@ -14,26 +14,57 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/accessorSupport/decorators", "esri/widgets/Widget", "esri/widgets/support/widget"], function (require, exports, __extends, __decorate, decorators_1, Widget, widget_1) {
+define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/accessorSupport/decorators", "esri/widgets/Widget", "esri/widgets/support/widget", "esri/core/watchUtils"], function (require, exports, __extends, __decorate, decorators_1, Widget, widget_1, watchUtils) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    var CSS = {
+        jsModal: "js-modal",
+        modalOverlay: "modal-overlay",
+        modifierClass: "modifier-class",
+        modalContent: "modal-content",
+        column12: "column-12",
+        appBody: "app-body",
+        trailerHalf: "trailer-half",
+        textRight: "text-right",
+        btn: "btn",
+        btnClear: "btn-clear",
+        jsModalToggle: "js-modal-toggle",
+        appButton: "app-button",
+        jsModalButton: "js-modal-toggle",
+        esriWidget: "esri-widget",
+        esriWidgetButton: "esri-widget--button",
+        flushIcon: "icon-ui-flush",
+        descriptionIcon: "icon-ui-description"
+    };
     var Splash = /** @class */ (function (_super) {
         __extends(Splash, _super);
         function Splash(params) {
             var _this = _super.call(this, params) || this;
+            _this.view = null;
             _this.modalId = "splash";
             _this.config = params.config;
             return _this;
         }
+        Splash.prototype.postInitialize = function () {
+            var _this = this;
+            this.own([
+                watchUtils.init(this, "view", function () {
+                    _this.own([
+                        watchUtils.whenTrueOnce(_this, "view.ready", function () {
+                            calcite.init();
+                        })
+                    ]);
+                })
+            ]);
+        };
         Splash.prototype.render = function () {
-            calcite.init();
             var description = this.config.splashContent ? (widget_1.tsx("span", { innerHTML: this.config.splashContent })) : null;
-            var splashContent = (widget_1.tsx("div", { class: "js-modal modal-overlay modifier-class", "data-modal": this.modalId },
-                widget_1.tsx("div", { class: "modal-content column-12 app-body", role: "dialog", "aria-labelledby": "modal" },
-                    widget_1.tsx("h3", { class: "trailer-half" }, this.config.splashTitle),
+            var splashContent = (widget_1.tsx("div", { class: this.classes(CSS.jsModal, CSS.modalOverlay, CSS.modifierClass), "data-modal": this.modalId },
+                widget_1.tsx("div", { class: this.classes(CSS.modalContent, CSS.column12, CSS.appBody), role: "dialog", "aria-labelledby": "modal" },
+                    widget_1.tsx("h3", { class: CSS.trailerHalf }, this.config.splashTitle),
                     widget_1.tsx("p", null, description),
-                    widget_1.tsx("div", { class: "text-right" },
-                        widget_1.tsx("button", { class: "btn btn-clear js-modal-toggle app-button" }, this.config.splashButtonText)))));
+                    widget_1.tsx("div", { class: CSS.textRight },
+                        widget_1.tsx("button", { class: this.classes(CSS.btn, CSS.btnClear, CSS.jsModalToggle, CSS.appButton) }, this.config.splashButtonText)))));
             return widget_1.tsx("div", null, splashContent);
         };
         Splash.prototype.createToolbarButton = function () {
@@ -41,12 +72,13 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             // add a button to the app that toggles the splash and setup to add to the view
             var splashButton = document.createElement("button");
             splashButton.setAttribute("data-modal", this.modalId);
+            var jsModalToggle = CSS.jsModalToggle, esriWidget = CSS.esriWidget, esriWidgetButton = CSS.esriWidgetButton, flushIcon = CSS.flushIcon, descriptionIcon = CSS.descriptionIcon;
             var headerButtonClasses = [
-                "js-modal-toggle",
-                "esri-widget",
-                "esri-widget--button",
-                "icon-ui-flush",
-                "icon-ui-description"
+                jsModalToggle,
+                esriWidget,
+                esriWidgetButton,
+                flushIcon,
+                descriptionIcon
             ];
             (_a = splashButton.classList).add.apply(_a, headerButtonClasses);
             return splashButton;
@@ -65,13 +97,17 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         __decorate([
             decorators_1.property(),
             widget_1.renderable()
+        ], Splash.prototype, "view", void 0);
+        __decorate([
+            decorators_1.property(),
+            widget_1.renderable()
         ], Splash.prototype, "config", void 0);
         __decorate([
             decorators_1.property(),
             widget_1.renderable()
         ], Splash.prototype, "modalId", void 0);
         Splash = __decorate([
-            decorators_1.subclass("app.Splash")
+            decorators_1.subclass("Splash")
         ], Splash);
         return Splash;
     }(decorators_1.declared(Widget)));

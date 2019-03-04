@@ -306,6 +306,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/i18n!./Componen
         InteractiveLegendApp.prototype._handleSplash = function (config, view, splashButtonPosition) {
             if (config.splash) {
                 var splash = new Splash.default({
+                    view: view,
                     config: config,
                     container: document.createElement("div")
                 });
