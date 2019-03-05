@@ -339,33 +339,49 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 ? value
                 : label;
             if (legendElement.type === "symbol-table") {
+                // Classify data size/color ramp
                 if (label.indexOf(">") !== -1) {
-                    return Array.isArray(elementInfoHasValue)
+                    var expression = Array.isArray(elementInfoHasValue)
                         ? field + " > " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfo.value[1]
                         : field + " = " + elementInfoHasValue + " OR " + field + " = '" + elementInfoHasValue + "'";
+                    return expression;
                 }
                 else if (!elementInfo.hasOwnProperty("value")) {
-                    var expressionList_1 = [];
-                    legendElementInfos.forEach(function (legendElementInfo) {
-                        if (legendElementInfo.value) {
-                            var value_1 = legendElementInfo.value;
-                            var singleQuote = value_1.indexOf("'") !== -1 ? value_1.split("'").join("''") : null;
-                            var expression = singleQuote
-                                ? field + " <> '" + singleQuote + "'"
-                                : isNaN(value_1)
-                                    ? field + " <> '" + value_1 + "'"
-                                    : field + " <> " + value_1 + " AND " + field + " <> '" + value_1 + "'";
-                            expressionList_1.push(expression);
-                        }
-                    });
-                    return expressionList_1.join(" AND ");
+                    // Classify data size/color ramp - 'Other' category
+                    if (legendElementInfos[0].hasOwnProperty("value") &&
+                        Array.isArray(legendElementInfos[0].value) &&
+                        legendElementInfos[legendElementInfos.length - 2].hasOwnProperty("value") &&
+                        Array.isArray(legendElementInfos[legendElementInfos.length - 2].value)) {
+                        var expression = field + " > " + legendElementInfos[0].value[1] + " OR " + field + " < " + legendElementInfos[legendElementInfos.length - 2].value[0];
+                        return expression;
+                    }
+                    else {
+                        // Types unique symbols - 'Other' category
+                        var expressionList_1 = [];
+                        legendElementInfos.forEach(function (legendElementInfo) {
+                            if (legendElementInfo.value) {
+                                var value_1 = legendElementInfo.value;
+                                var singleQuote = value_1.indexOf("'") !== -1 ? value_1.split("'").join("''") : null;
+                                var expression = singleQuote
+                                    ? field + " <> '" + singleQuote + "'"
+                                    : isNaN(value_1)
+                                        ? field + " <> '" + value_1 + "'"
+                                        : field + " <> " + value_1 + " AND " + field + " <> '" + value_1 + "'";
+                                expressionList_1.push(expression);
+                            }
+                        });
+                        return expressionList_1.join(" AND ");
+                    }
                 }
                 else {
+                    // Types unique symbols
                     var singleQuote = elementInfoHasValue.indexOf("'") !== -1
                         ? elementInfoHasValue.split("'").join("''")
                         : null;
                     var expression = Array.isArray(elementInfo.value)
-                        ? legendElementInfos.length - 1 === legendInfoIndex
+                        ? legendElementInfos.length - 1 === legendInfoIndex ||
+                            (!legendElementInfos[legendElementInfos.length - 1].hasOwnProperty("value") &&
+                                legendInfoIndex === legendElementInfos.length - 2)
                             ? field + " >= " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfoHasValue[1]
                             : field + " > " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfoHasValue[1]
                         : singleQuote
