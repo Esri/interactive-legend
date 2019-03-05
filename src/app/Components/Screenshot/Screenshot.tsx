@@ -642,15 +642,15 @@ class Screenshot extends declared(Widget) {
         }
         this.featureWidget.graphic = null;
         this._set("featureWidget", null);
-        this._set(
-          "featureWidget",
-          new FeatureWidget({
-            container: this._offscreenPopupContainer,
-            graphic: this.view.popup.selectedFeature
-          })
-        );
-        this.scheduleRender();
       }
+      this._set(
+        "featureWidget",
+        new FeatureWidget({
+          container: this._offscreenPopupContainer,
+          graphic: this.view.popup.selectedFeature
+        })
+      );
+      this.scheduleRender();
     });
   }
 }

@@ -379,12 +379,12 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     }
                     _this.featureWidget.graphic = null;
                     _this._set("featureWidget", null);
-                    _this._set("featureWidget", new FeatureWidget({
-                        container: _this._offscreenPopupContainer,
-                        graphic: _this.view.popup.selectedFeature
-                    }));
-                    _this.scheduleRender();
                 }
+                _this._set("featureWidget", new FeatureWidget({
+                    container: _this._offscreenPopupContainer,
+                    graphic: _this.view.popup.selectedFeature
+                }));
+                _this.scheduleRender();
             });
         };
         __decorate([
