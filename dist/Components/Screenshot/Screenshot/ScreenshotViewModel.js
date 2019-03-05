@@ -34,6 +34,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this._highlightedFeature = null;
             _this._firstMapComponent = null;
             _this._secondMapComponent = null;
+            _this._screenshotConfig = null;
             _this._mapComponentSelectors = [
                 ".esri-screenshot__offscreen-legend-container",
                 ".esri-screenshot__offscreen-pop-up-container"
@@ -114,8 +115,24 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 var type = this.get("view.type");
                 if (type === "2d") {
                     var view = this.view;
+                    var _a = this._area, width = _a.width, height = _a.height, x = _a.x, y = _a.y;
+                    if (width === 0 || height === 0) {
+                        this._screenshotConfig = {
+                            area: {
+                                x: x,
+                                y: y,
+                                width: 1,
+                                height: 1
+                            }
+                        };
+                    }
+                    else {
+                        this._screenshotConfig = {
+                            area: this._area
+                        };
+                    }
                     this._screenshotPromise = view
-                        .takeScreenshot({ area: this._area })
+                        .takeScreenshot(this._screenshotConfig)
                         .catch(function (err) {
                         console.error("ERROR: ", err);
                     })
