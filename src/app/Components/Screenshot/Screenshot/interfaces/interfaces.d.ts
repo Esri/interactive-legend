@@ -9,3 +9,11 @@ export interface Area {
   width: number;
   height: number;
 }
+
+interface ScreenshotConfig {
+  format?: string;
+  quality?: number;
+  width?: number;
+  height?: number;
+  area?: Area;
+}

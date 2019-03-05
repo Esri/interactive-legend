@@ -42,7 +42,7 @@ import {
 type State = "ready" | "takingScreenshot" | "complete" | "disabled";
 
 // interfaces
-import { Area, Screenshot } from "./interfaces/interfaces";
+import { Area, Screenshot, ScreenshotConfig } from "./interfaces/interfaces";
 import { SelectedStyleData } from "../../../interfaces/interfaces";
 
 @subclass("ScreenshotViewModel")
@@ -59,7 +59,7 @@ class ScreenshotViewModel extends declared(Accessor) {
   private _highlightedFeature: any = null;
   private _firstMapComponent: HTMLCanvasElement = null;
   private _secondMapComponent: HTMLCanvasElement = null;
-  private _screenshotConfig = null;
+  private _screenshotConfig: ScreenshotConfig = null;
   private _mapComponentSelectors = [
     ".esri-screenshot__offscreen-legend-container",
     ".esri-screenshot__offscreen-pop-up-container"
