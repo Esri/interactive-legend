@@ -507,7 +507,11 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       } else if (!elementInfo.hasOwnProperty("value")) {
         if (
           legendElementInfos[0].hasOwnProperty("value") &&
-          Array.isArray(legendElementInfos[0].value)
+          Array.isArray(legendElementInfos[0].value) &&
+          legendElementInfos[legendElementInfos.length - 2].hasOwnProperty(
+            "value"
+          ) &&
+          Array.isArray(legendElementInfos[legendElementInfos.length - 2].value)
         ) {
           const expression = `${field} > ${
             legendElementInfos[0].value[1]
@@ -517,7 +521,6 @@ class InteractiveStyleViewModel extends declared(Accessor) {
           return expression;
         } else {
           const expressionList = [];
-
           legendElementInfos.forEach(legendElementInfo => {
             if (legendElementInfo.value) {
               const { value } = legendElementInfo;
