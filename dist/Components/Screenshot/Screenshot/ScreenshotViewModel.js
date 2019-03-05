@@ -148,17 +148,33 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 }
                 else if (type === "3d") {
                     var view = this.view;
+                    var _b = this._area, width = _b.width, height = _b.height, x = _b.x, y = _b.y;
+                    if (width === 0 || height === 0) {
+                        this._screenshotConfig = {
+                            area: {
+                                x: x,
+                                y: y,
+                                width: 1,
+                                height: 1
+                            }
+                        };
+                    }
+                    else {
+                        this._screenshotConfig = {
+                            area: this._area
+                        };
+                    }
                     this._screenshotPromise = view
-                        .takeScreenshot({ area: this._area })
+                        .takeScreenshot(this._screenshotConfig)
                         .catch(function (err) {
                         console.error("ERROR: ", err);
                     })
                         .then(function (viewScreenshot) {
                         _this._processScreenshot(viewScreenshot, screenshotImageElement, maskDiv, downloadBtnNode);
                         _this._screenshotPromise = null;
-                        if (dragHandler) {
-                            dragHandler.remove();
-                            dragHandler = null;
+                        if (_this.dragHandler) {
+                            _this.dragHandler.remove();
+                            _this.dragHandler = null;
                         }
                         _this.notifyChange("state");
                     });
