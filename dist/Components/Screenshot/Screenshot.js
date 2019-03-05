@@ -369,11 +369,14 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         Screenshot.prototype._watchSelectedFeature = function () {
             var _this = this;
             return watchUtils.watch(this, "view.popup.selectedFeature", function () {
-                while (_this._offscreenPopupContainer &&
-                    _this._offscreenPopupContainer.firstChild) {
-                    _this._offscreenPopupContainer.removeChild(_this._offscreenPopupContainer.firstChild);
-                }
-                if (_this.featureWidget) {
+                if (_this.featureWidget &&
+                    _this.view &&
+                    _this.view.popup &&
+                    _this.view.popup.selectedFeature) {
+                    while (_this._offscreenPopupContainer &&
+                        _this._offscreenPopupContainer.firstChild) {
+                        _this._offscreenPopupContainer.removeChild(_this._offscreenPopupContainer.firstChild);
+                    }
                     _this.featureWidget.graphic = null;
                     _this._set("featureWidget", null);
                     _this._set("featureWidget", new FeatureWidget({

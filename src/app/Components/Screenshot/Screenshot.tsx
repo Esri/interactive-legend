@@ -626,15 +626,20 @@ class Screenshot extends declared(Widget) {
   // _watchSelectedFeature
   private _watchSelectedFeature(): __esri.WatchHandle {
     return watchUtils.watch(this, "view.popup.selectedFeature", () => {
-      while (
-        this._offscreenPopupContainer &&
-        this._offscreenPopupContainer.firstChild
+      if (
+        this.featureWidget &&
+        this.view &&
+        this.view.popup &&
+        this.view.popup.selectedFeature
       ) {
-        this._offscreenPopupContainer.removeChild(
+        while (
+          this._offscreenPopupContainer &&
           this._offscreenPopupContainer.firstChild
-        );
-      }
-      if (this.featureWidget) {
+        ) {
+          this._offscreenPopupContainer.removeChild(
+            this._offscreenPopupContainer.firstChild
+          );
+        }
         this.featureWidget.graphic = null;
         this._set("featureWidget", null);
         this._set(
