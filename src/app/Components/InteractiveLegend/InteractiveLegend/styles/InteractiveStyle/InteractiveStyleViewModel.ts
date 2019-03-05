@@ -497,6 +497,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       : label;
 
     if (legendElement.type === "symbol-table") {
+      // Classify data size/color ramp
       if (label.indexOf(">") !== -1) {
         const expression = Array.isArray(elementInfoHasValue)
           ? `${field} > ${elementInfoHasValue[0]} AND ${field} <= ${
@@ -505,6 +506,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
           : `${field} = ${elementInfoHasValue} OR ${field} = '${elementInfoHasValue}'`;
         return expression;
       } else if (!elementInfo.hasOwnProperty("value")) {
+        // Classify data size/color ramp - 'Other' category
         if (
           legendElementInfos[0].hasOwnProperty("value") &&
           Array.isArray(legendElementInfos[0].value) &&
@@ -520,6 +522,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
           }`;
           return expression;
         } else {
+          // Predominant category
           const expressionList = [];
           legendElementInfos.forEach(legendElementInfo => {
             if (legendElementInfo.value) {
@@ -537,6 +540,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
           return expressionList.join(" AND ");
         }
       } else {
+        // Types unique symbols
         const singleQuote =
           elementInfoHasValue.indexOf("'") !== -1
             ? elementInfoHasValue.split("'").join("''")

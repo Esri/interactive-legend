@@ -339,6 +339,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 ? value
                 : label;
             if (legendElement.type === "symbol-table") {
+                // Classify data size/color ramp
                 if (label.indexOf(">") !== -1) {
                     var expression = Array.isArray(elementInfoHasValue)
                         ? field + " > " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfo.value[1]
@@ -346,12 +347,16 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                     return expression;
                 }
                 else if (!elementInfo.hasOwnProperty("value")) {
+                    // Classify data size/color ramp - 'Other' category
                     if (legendElementInfos[0].hasOwnProperty("value") &&
-                        Array.isArray(legendElementInfos[0].value)) {
+                        Array.isArray(legendElementInfos[0].value) &&
+                        legendElementInfos[legendElementInfos.length - 2].hasOwnProperty("value") &&
+                        Array.isArray(legendElementInfos[legendElementInfos.length - 2].value)) {
                         var expression = field + " > " + legendElementInfos[0].value[1] + " OR " + field + " < " + legendElementInfos[legendElementInfos.length - 2].value[0];
                         return expression;
                     }
                     else {
+                        // Predominant category
                         var expressionList_1 = [];
                         legendElementInfos.forEach(function (legendElementInfo) {
                             if (legendElementInfo.value) {
@@ -369,6 +374,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                     }
                 }
                 else {
+                    // Types unique symbols
                     var singleQuote = elementInfoHasValue.indexOf("'") !== -1
                         ? elementInfoHasValue.split("'").join("''")
                         : null;
