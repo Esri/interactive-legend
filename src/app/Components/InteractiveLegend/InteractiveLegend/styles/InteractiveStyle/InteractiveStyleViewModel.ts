@@ -522,7 +522,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
           }`;
           return expression;
         } else {
-          // Predominant category
+          // Types unique symbols - 'Other' category
           const expressionList = [];
           legendElementInfos.forEach(legendElementInfo => {
             if (legendElementInfo.value) {

@@ -356,7 +356,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                         return expression;
                     }
                     else {
-                        // Predominant category
+                        // Types unique symbols - 'Other' category
                         var expressionList_1 = [];
                         legendElementInfos.forEach(function (legendElementInfo) {
                             if (legendElementInfo.value) {
