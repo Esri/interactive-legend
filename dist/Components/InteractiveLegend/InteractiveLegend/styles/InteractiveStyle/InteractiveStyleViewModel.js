@@ -154,8 +154,6 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         };
         // applyFeatureMute
         InteractiveStyleViewModel.prototype.applyFeatureMute = function (elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos, isPredominance) {
-            var featureLayer = this.layerListViewModel.operationalItems.getItemAt(operationalItemIndex).layer;
-            var renderer = featureLayer.renderer;
             if (isPredominance) {
                 var queryExpression = this._handlePredominanceExpression(elementInfo, operationalItemIndex).join(" AND ");
                 var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
@@ -168,22 +166,30 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 }
                 var featureLayerView = this.featureLayerViews.getItemAt(operationalItemIndex);
                 var filterExpression = queryExpressions.join(" OR ");
+                this._setSearchExpression(filterExpression);
                 var opacity = this.opacity === null ? 30 : this.opacity;
                 var grayScale = this.grayScale === null ? 100 : this.grayScale;
-                this._setSearchExpression(filterExpression);
                 featureLayerView.effect = new FeatureEffect({
-                    outsideEffect: "opacity(" + opacity + "%) grayscale(" + grayScale + "%)",
+                    excludedEffect: "opacity(" + opacity + "%) grayscale(" + grayScale + "%)",
                     filter: {
                         where: filterExpression
                     }
                 });
             }
-            else if (renderer.hasOwnProperty("uniqueValueInfos")) {
-                this._muteUniqueValues(elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, legendElementInfos);
-            }
-            else if (Array.isArray(elementInfo.value) &&
-                elementInfo.value.length === 2) {
-                this._muteRangeValues(elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, legendElementInfos);
+            else {
+                this._generateQueryExpressions(elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, legendElementInfos);
+                var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
+                var featureLayerView = this.featureLayerViews.getItemAt(operationalItemIndex);
+                var filterExpression = queryExpressions.join(" OR ");
+                this._setSearchExpression(filterExpression);
+                var opacity = this.opacity === null ? 30 : this.opacity;
+                var grayScale = this.grayScale === null ? 100 : this.grayScale;
+                featureLayerView.effect = new FeatureEffect({
+                    excludedEffect: "opacity(" + opacity + "%) grayscale(" + grayScale + "%)",
+                    filter: {
+                        where: filterExpression
+                    }
+                });
             }
         };
         // // applyFeatureHighlight
@@ -352,7 +358,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                         Array.isArray(legendElementInfos[0].value) &&
                         legendElementInfos[legendElementInfos.length - 2].hasOwnProperty("value") &&
                         Array.isArray(legendElementInfos[legendElementInfos.length - 2].value)) {
-                        var expression = field + " > " + legendElementInfos[0].value[1] + " OR " + field + " < " + legendElementInfos[legendElementInfos.length - 2].value[0];
+                        var expression = field + " > " + legendElementInfos[0].value[1] + " OR " + field + " < " + legendElementInfos[legendElementInfos.length - 2].value[0] + " OR " + field + " IS NULL";
                         return expression;
                     }
                     else {
@@ -403,7 +409,8 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 if (elementInfo.value === field) {
                     return;
                 }
-                expressionArr.push(elementInfo.value + " > " + field);
+                var sqlQuery = "(" + elementInfo.value + " > " + field + " OR " + field + " IS NULL)";
+                expressionArr.push(sqlQuery);
             });
             return expressionArr;
         };
@@ -580,42 +587,6 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         //   });
         //   highlightedFeatures[legendInfoIndex] = null;
         // }
-        //----------------------------------
-        //
-        //  Mute Methods
-        //
-        //----------------------------------
-        InteractiveStyleViewModel.prototype._muteUniqueValues = function (elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, legendElementInfos) {
-            this._generateQueryExpressions(elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, legendElementInfos);
-            var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
-            var featureLayerView = this.featureLayerViews.getItemAt(operationalItemIndex);
-            var filterExpression = queryExpressions.join(" OR ");
-            var opacity = this.opacity === null ? 30 : this.opacity;
-            var grayScale = this.grayScale === null ? 100 : this.grayScale;
-            this._setSearchExpression(filterExpression);
-            featureLayerView.effect = new FeatureEffect({
-                outsideEffect: "opacity(" + opacity + "%) grayscale(" + grayScale + "%)",
-                filter: {
-                    where: filterExpression
-                }
-            });
-        };
-        // _muteRangeValues
-        InteractiveStyleViewModel.prototype._muteRangeValues = function (elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, legendElementInfos) {
-            this._generateQueryExpressions(elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, legendElementInfos);
-            var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
-            var featureLayerView = this.featureLayerViews.getItemAt(operationalItemIndex);
-            var filterExpression = queryExpressions.join(" OR ");
-            var opacity = this.opacity === null ? 30 : this.opacity;
-            var grayScale = this.grayScale === null ? 100 : this.grayScale;
-            this._setSearchExpression(filterExpression);
-            featureLayerView.effect = new FeatureEffect({
-                outsideEffect: "opacity(" + opacity + "%) grayscale(" + grayScale + "%)",
-                filter: {
-                    where: filterExpression
-                }
-            });
-        };
         // End of filter methods
         // _setSearchExpression
         InteractiveStyleViewModel.prototype._setSearchExpression = function (filterExpression) {

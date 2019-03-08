@@ -124,6 +124,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/i18n!./Componen
                 itemUtils_1.createMapFromItem({ item: item, appProxies: appProxies }).then(function (map) {
                     return itemUtils_1.createView(__assign({}, viewProperties, { map: map })).then(function (view) {
                         return itemUtils_1.findQuery(find, view).then(function () {
+                            console.log(view);
                             _this._handleBasemapToggleWidget(basemapToggleEnabled, view, nextBasemap, basemapTogglePosition);
                             if (!zoomControlsEnabled) {
                                 view.ui.remove("zoom");
@@ -343,7 +344,8 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/i18n!./Componen
                 var screenshotExpand = new Expand({
                     view: view,
                     content: this.screenshot,
-                    expandTooltip: i18nScreenshot.takeAScreenshot
+                    expandTooltip: i18nScreenshot.takeAScreenshot,
+                    mode: "floating"
                 });
                 watchUtils.whenFalse(screenshotExpand, "expanded", function () {
                     if (_this.screenshot.screenshotModeIsActive) {

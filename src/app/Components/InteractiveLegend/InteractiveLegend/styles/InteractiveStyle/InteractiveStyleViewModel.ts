@@ -21,9 +21,6 @@ import watchUtils = require("esri/core/watchUtils");
 // esri.views.MapView
 import MapView = require("esri/views/MapView");
 
-// esri.layers.FeatureLayer
-import FeatureLayer = require("esri/layers/FeatureLayer");
-
 // esri.views.layers.FeatureLayerView
 import FeatureLayerView = require("esri/views/layers/FeatureLayerView");
 
@@ -256,10 +253,6 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     legendElementInfos: any[],
     isPredominance: boolean
   ): void {
-    const featureLayer = this.layerListViewModel.operationalItems.getItemAt(
-      operationalItemIndex
-    ).layer as FeatureLayer;
-    const { renderer } = featureLayer;
     if (isPredominance) {
       const queryExpression = this._handlePredominanceExpression(
         elementInfo,
@@ -280,17 +273,17 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         operationalItemIndex
       );
       const filterExpression = queryExpressions.join(" OR ");
+      this._setSearchExpression(filterExpression);
       const opacity = this.opacity === null ? 30 : this.opacity;
       const grayScale = this.grayScale === null ? 100 : this.grayScale;
-      this._setSearchExpression(filterExpression);
       featureLayerView.effect = new FeatureEffect({
-        outsideEffect: `opacity(${opacity}%) grayscale(${grayScale}%)`,
+        excludedEffect: `opacity(${opacity}%) grayscale(${grayScale}%)`,
         filter: {
           where: filterExpression
         }
       });
-    } else if (renderer.hasOwnProperty("uniqueValueInfos")) {
-      this._muteUniqueValues(
+    } else {
+      this._generateQueryExpressions(
         elementInfo,
         field,
         operationalItemIndex,
@@ -298,18 +291,22 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         legendInfoIndex,
         legendElementInfos
       );
-    } else if (
-      Array.isArray(elementInfo.value) &&
-      elementInfo.value.length === 2
-    ) {
-      this._muteRangeValues(
-        elementInfo,
-        field,
-        operationalItemIndex,
-        legendElement,
-        legendInfoIndex,
-        legendElementInfos
+      const queryExpressions = this.interactiveStyleData.queryExpressions[
+        operationalItemIndex
+      ];
+      const featureLayerView = this.featureLayerViews.getItemAt(
+        operationalItemIndex
       );
+      const filterExpression = queryExpressions.join(" OR ");
+      this._setSearchExpression(filterExpression);
+      const opacity = this.opacity === null ? 30 : this.opacity;
+      const grayScale = this.grayScale === null ? 100 : this.grayScale;
+      featureLayerView.effect = new FeatureEffect({
+        excludedEffect: `opacity(${opacity}%) grayscale(${grayScale}%)`,
+        filter: {
+          where: filterExpression
+        }
+      });
     }
   }
 
@@ -519,7 +516,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
             legendElementInfos[0].value[1]
           } OR ${field} < ${
             legendElementInfos[legendElementInfos.length - 2].value[0]
-          }`;
+          } OR ${field} IS NULL`;
           return expression;
         } else {
           // Types unique symbols - 'Other' category
@@ -582,9 +579,9 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       if (elementInfo.value === field) {
         return;
       }
-      expressionArr.push(`${elementInfo.value} > ${field}`);
+      const sqlQuery = `(${elementInfo.value} > ${field} OR ${field} IS NULL)`;
+      expressionArr.push(sqlQuery);
     });
-
     return expressionArr;
   }
 
@@ -774,81 +771,6 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   //   });
   //   highlightedFeatures[legendInfoIndex] = null;
   // }
-
-  //----------------------------------
-  //
-  //  Mute Methods
-  //
-  //----------------------------------
-
-  private _muteUniqueValues(
-    elementInfo: any,
-    field: string,
-    operationalItemIndex: number,
-    legendElement: LegendElement,
-    legendInfoIndex: number,
-    legendElementInfos: any[]
-  ): void {
-    this._generateQueryExpressions(
-      elementInfo,
-      field,
-      operationalItemIndex,
-      legendElement,
-      legendInfoIndex,
-      legendElementInfos
-    );
-    const queryExpressions = this.interactiveStyleData.queryExpressions[
-      operationalItemIndex
-    ];
-    const featureLayerView = this.featureLayerViews.getItemAt(
-      operationalItemIndex
-    );
-    const filterExpression = queryExpressions.join(" OR ");
-    const opacity = this.opacity === null ? 30 : this.opacity;
-    const grayScale = this.grayScale === null ? 100 : this.grayScale;
-    this._setSearchExpression(filterExpression);
-    featureLayerView.effect = new FeatureEffect({
-      outsideEffect: `opacity(${opacity}%) grayscale(${grayScale}%)`,
-      filter: {
-        where: filterExpression
-      }
-    });
-  }
-
-  // _muteRangeValues
-  private _muteRangeValues(
-    elementInfo: any,
-    field: string,
-    operationalItemIndex: number,
-    legendElement: LegendElement,
-    legendInfoIndex: number,
-    legendElementInfos: any[]
-  ): void {
-    this._generateQueryExpressions(
-      elementInfo,
-      field,
-      operationalItemIndex,
-      legendElement,
-      legendInfoIndex,
-      legendElementInfos
-    );
-    const queryExpressions = this.interactiveStyleData.queryExpressions[
-      operationalItemIndex
-    ];
-    const featureLayerView = this.featureLayerViews.getItemAt(
-      operationalItemIndex
-    );
-    const filterExpression = queryExpressions.join(" OR ");
-    const opacity = this.opacity === null ? 30 : this.opacity;
-    const grayScale = this.grayScale === null ? 100 : this.grayScale;
-    this._setSearchExpression(filterExpression);
-    featureLayerView.effect = new FeatureEffect({
-      outsideEffect: `opacity(${opacity}%) grayscale(${grayScale}%)`,
-      filter: {
-        where: filterExpression
-      }
-    });
-  }
 
   // End of filter methods
 

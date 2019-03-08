@@ -531,7 +531,8 @@ class InteractiveLegendApp {
       const screenshotExpand = new Expand({
         view,
         content: this.screenshot,
-        expandTooltip: i18nScreenshot.takeAScreenshot
+        expandTooltip: i18nScreenshot.takeAScreenshot,
+        mode: "floating"
       });
 
       watchUtils.whenFalse(screenshotExpand, "expanded", () => {
