@@ -343,7 +343,8 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/i18n!./Componen
                 var screenshotExpand = new Expand({
                     view: view,
                     content: this.screenshot,
-                    expandTooltip: i18nScreenshot.takeAScreenshot
+                    expandTooltip: i18nScreenshot.takeAScreenshot,
+                    mode: "floating"
                 });
                 watchUtils.whenFalse(screenshotExpand, "expanded", function () {
                     if (_this.screenshot.screenshotModeIsActive) {
