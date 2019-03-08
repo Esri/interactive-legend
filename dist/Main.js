@@ -124,7 +124,6 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/i18n!./Componen
                 itemUtils_1.createMapFromItem({ item: item, appProxies: appProxies }).then(function (map) {
                     return itemUtils_1.createView(__assign({}, viewProperties, { map: map })).then(function (view) {
                         return itemUtils_1.findQuery(find, view).then(function () {
-                            console.log(view);
                             _this._handleBasemapToggleWidget(basemapToggleEnabled, view, nextBasemap, basemapTogglePosition);
                             if (!zoomControlsEnabled) {
                                 view.ui.remove("zoom");
