@@ -254,3 +254,11 @@ html[dir="rtl"] {
     }
   }
 }
+
+html[dir="rtl"] {
+  .esri-screenshot__close-button {
+    .icon-ui-close {
+      right: 7px;
+    }
+  }
+}
