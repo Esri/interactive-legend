@@ -25,7 +25,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
     //----------------------------------
     var CSS = {
         base: "esri-screenshot",
-        widget: "esri-widget",
+        widget: "esri-widget esri-widget--panel",
         screenshotBtn: "esri-screenshot__btn",
         mainContainer: "esri-screenshot__main-container",
         panelTitle: "esri-screenshot__panel-title",
@@ -59,7 +59,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         popupAlert: "esri-screenshot__popup-alert",
         screenshotfieldSetCheckbox: "esri-screenshot__field-set-checkbox",
         offScreenPopupContainer: "esri-screenshot__offscreen-pop-up-container",
-        offScreenLegendContainer: "esri-screenshot__offscreen-legend-container"
+        offScreenLegendContainer: "esri-screenshot__offscreen-legend-container",
+        screenshotClose: "esri-screenshot__close-button",
+        closeButtonContainer: "esri-screenshot__close-button-container"
     };
     var Screenshot = /** @class */ (function (_super) {
         __extends(Screenshot, _super);
@@ -133,8 +135,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             if (this.legendWidget && !this.legendWidget.container) {
                 this.legendWidget.container = this._offscreenLegendContainer;
             }
-            return (widget_1.tsx("div", { class: this.classes(CSS.widget, CSS.base) },
-                screenshotModeIsActive ? optOutOfScreenshotButton : screenshotPanel,
+            return (widget_1.tsx("div", null,
+                screenshotModeIsActive ? (widget_1.tsx("div", { key: "screenshot-container", class: CSS.closeButtonContainer }, optOutOfScreenshotButton)) : (screenshotPanel),
                 screenshotPreviewOverlay,
                 maskNode,
                 offScreenNodes));
@@ -186,7 +188,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var setMapAreaButton = this._renderSetMapAreaButton();
             return (
             // screenshotBtn
-            widget_1.tsx("div", { key: "screenshot-panel", class: CSS.base },
+            widget_1.tsx("div", { key: "screenshot-panel", class: this.classes(CSS.base, CSS.widget) },
                 this._selectFeatureAlertIsVisible ? featureAlert : null,
                 widget_1.tsx("div", { class: CSS.mainContainer },
                     widget_1.tsx("h1", { class: CSS.panelTitle }, screenshotTitle),
@@ -258,7 +260,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         };
         // _renderOptOutOfScreenshotButton
         Screenshot.prototype._renderOptOutOfScreenshotButton = function () {
-            return (widget_1.tsx("button", { bind: this, tabIndex: 0, class: this.classes(CSS.screenshotBtn, CSS.pointerCursor, CSS.button, CSS.buttonRed), onclick: this.deactivateScreenshot, onkeydown: this.deactivateScreenshot, title: i18n.deactivateScreenshot },
+            return (widget_1.tsx("button", { bind: this, tabIndex: 0, class: this.classes(CSS.screenshotBtn, CSS.pointerCursor, CSS.button, CSS.buttonRed, CSS.screenshotClose), onclick: this.deactivateScreenshot, onkeydown: this.deactivateScreenshot, title: i18n.deactivateScreenshot },
                 widget_1.tsx("span", { class: CSS.closeIcon })));
         };
         // _renderOffScreenNodes

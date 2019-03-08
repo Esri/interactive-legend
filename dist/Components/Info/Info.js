@@ -25,7 +25,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
     //----------------------------------
     var CSS = {
         base: "esri-info",
-        widget: "esri-widget",
+        widget: "esri-widget esri-widget--panel",
         paginationContainer: "esri-info__pagination-container",
         paginationItem: "esri-info__pagination-item",
         paginationItemSelected: "esri-info__pagination-item--selected",
