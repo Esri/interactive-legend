@@ -52,7 +52,7 @@ import { SelectedStyleData } from "../../interfaces/interfaces";
 //----------------------------------
 const CSS = {
   base: "esri-screenshot",
-  widget: "esri-widget",
+  widget: "esri-widget esri-widget--panel",
   screenshotBtn: "esri-screenshot__btn",
   mainContainer: "esri-screenshot__main-container",
   panelTitle: "esri-screenshot__panel-title",
@@ -86,7 +86,9 @@ const CSS = {
   popupAlert: "esri-screenshot__popup-alert",
   screenshotfieldSetCheckbox: "esri-screenshot__field-set-checkbox",
   offScreenPopupContainer: "esri-screenshot__offscreen-pop-up-container",
-  offScreenLegendContainer: "esri-screenshot__offscreen-legend-container"
+  offScreenLegendContainer: "esri-screenshot__offscreen-legend-container",
+  screenshotClose: "esri-screenshot__close-button",
+  closeButtonContainer: "esri-screenshot__close-button-container"
 };
 
 @subclass("Screenshot")
@@ -215,9 +217,16 @@ class Screenshot extends declared(Widget) {
     if (this.legendWidget && !this.legendWidget.container) {
       this.legendWidget.container = this._offscreenLegendContainer;
     }
+
     return (
-      <div class={this.classes(CSS.widget, CSS.base)}>
-        {screenshotModeIsActive ? optOutOfScreenshotButton : screenshotPanel}
+      <div>
+        {screenshotModeIsActive ? (
+          <div key="screenshot-container" class={CSS.closeButtonContainer}>
+            {optOutOfScreenshotButton}
+          </div>
+        ) : (
+          screenshotPanel
+        )}
         {screenshotPreviewOverlay}
         {maskNode}
         {offScreenNodes}
@@ -285,7 +294,7 @@ class Screenshot extends declared(Widget) {
     const setMapAreaButton = this._renderSetMapAreaButton();
     return (
       // screenshotBtn
-      <div key="screenshot-panel" class={CSS.base}>
+      <div key="screenshot-panel" class={this.classes(CSS.base, CSS.widget)}>
         {this._selectFeatureAlertIsVisible ? featureAlert : null}
         <div class={CSS.mainContainer}>
           <h1 class={CSS.panelTitle}>{screenshotTitle}</h1>
@@ -474,7 +483,8 @@ class Screenshot extends declared(Widget) {
           CSS.screenshotBtn,
           CSS.pointerCursor,
           CSS.button,
-          CSS.buttonRed
+          CSS.buttonRed,
+          CSS.screenshotClose
         )}
         onclick={this.deactivateScreenshot}
         onkeydown={this.deactivateScreenshot}

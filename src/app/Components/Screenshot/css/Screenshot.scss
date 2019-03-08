@@ -213,6 +213,29 @@ html[dir="rtl"] {
   }
 }
 
+.esri-screenshot__close-button-container {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background-color: #fff;
+
+  .esri-screenshot__close-button {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+
+    .icon-ui-close {
+      position: relative;
+      left: 3px;
+    }
+
+  }
+}
+
+
 .esri-screenshot__offscreen-legend-container {
   position: absolute;
   top: -99999px;
@@ -222,4 +245,12 @@ html[dir="rtl"] {
 
 .esri-widget.esri-legend.esri-screenshot__offscreen-legend-container {
   max-height: none;
+}
+
+@media only screen and (orientation: landscape) {
+  .esri-screenshot__screenshot-img-container {
+    .esri-screenshot__js-screenshot-image {
+      width: 20%;
+    }
+  }
 }
