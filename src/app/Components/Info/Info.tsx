@@ -179,14 +179,14 @@ class Info extends declared(Widget) {
     const contentItem = this.infoContent.getItemAt(selectedItemIndex);
     const { type } = contentItem;
     if (type === "explanation") {
-      return this._generateExplanationNodes(contentItem);
+      return this._generateExplanationNode(contentItem);
     } else if (type === "list") {
-      return this._generateListNodes(contentItem);
+      return this._generateListNode(contentItem);
     }
   }
 
   //   _generateListNode
-  private _generateListNodes(contentItem: any): any {
+  private _generateListNode(contentItem: any): any {
     const listItemNodes = contentItem.infoContentItems.map(
       (listItem, listItemIndex) => {
         const listItemNode = this._generateListItemNodes(
@@ -212,7 +212,7 @@ class Info extends declared(Widget) {
   }
 
   // _generateExplanationNode
-  private _generateExplanationNodes(contentItem: any): any {
+  private _generateExplanationNode(contentItem: any): any {
     const explanationItemNodes = contentItem.infoContentItems.map(
       (explanationItem, explanationItemIndex) => {
         return this._generateExplanationItemNodes(

@@ -119,14 +119,14 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var contentItem = this.infoContent.getItemAt(selectedItemIndex);
             var type = contentItem.type;
             if (type === "explanation") {
-                return this._generateExplanationNodes(contentItem);
+                return this._generateExplanationNode(contentItem);
             }
             else if (type === "list") {
-                return this._generateListNodes(contentItem);
+                return this._generateListNode(contentItem);
             }
         };
         //   _generateListNode
-        Info.prototype._generateListNodes = function (contentItem) {
+        Info.prototype._generateListNode = function (contentItem) {
             var _this = this;
             var listItemNodes = contentItem.infoContentItems.map(function (listItem, listItemIndex) {
                 var listItemNode = _this._generateListItemNodes(listItem, listItemIndex);
@@ -142,7 +142,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 widget_1.tsx("div", { class: CSS.listItemTextContainer }, listItem)));
         };
         // _generateExplanationNode
-        Info.prototype._generateExplanationNodes = function (contentItem) {
+        Info.prototype._generateExplanationNode = function (contentItem) {
             var _this = this;
             var explanationItemNodes = contentItem.infoContentItems.map(function (explanationItem, explanationItemIndex) {
                 return _this._generateExplanationItemNodes(explanationItem, explanationItemIndex);
