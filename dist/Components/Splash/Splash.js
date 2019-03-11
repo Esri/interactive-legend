@@ -1,3 +1,6 @@
+/// <amd-dependency path="esri/core/tsSupport/assignHelper" name="__assign" />
+/// <amd-dependency path="esri/core/tsSupport/declareExtendsHelper" name="__extends" />
+/// <amd-dependency path="esri/core/tsSupport/decorateHelper" name="__decorate" />
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -14,7 +17,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/accessorSupport/decorators", "esri/widgets/Widget", "esri/widgets/support/widget", "esri/core/watchUtils"], function (require, exports, __extends, __decorate, decorators_1, Widget, widget_1, watchUtils) {
+define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/accessorSupport/decorators", "esri/widgets/Widget", "esri/widgets/support/widget", "esri/core/watchUtils"], function (require, exports, __assign, __extends, __decorate, decorators_1, Widget, widget_1, watchUtils) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var CSS = {
@@ -34,7 +37,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         esriWidget: "esri-widget",
         esriWidgetButton: "esri-widget--button",
         flushIcon: "icon-ui-flush",
-        descriptionIcon: "icon-ui-description"
+        descriptionIcon: "icon-ui-description",
+        splashButtonStyles: "splash-button"
     };
     var Splash = /** @class */ (function (_super) {
         __extends(Splash, _super);
@@ -68,19 +72,25 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             return widget_1.tsx("div", null, splashContent);
         };
         Splash.prototype.createToolbarButton = function () {
-            var _a;
             // add a button to the app that toggles the splash and setup to add to the view
             var splashButton = document.createElement("button");
             splashButton.setAttribute("data-modal", this.modalId);
-            var jsModalToggle = CSS.jsModalToggle, esriWidget = CSS.esriWidget, esriWidgetButton = CSS.esriWidgetButton, flushIcon = CSS.flushIcon, descriptionIcon = CSS.descriptionIcon;
+            var jsModalToggle = CSS.jsModalToggle, esriWidget = CSS.esriWidget, esriWidgetButton = CSS.esriWidgetButton, flushIcon = CSS.flushIcon, descriptionIcon = CSS.descriptionIcon, splashButtonStyles = CSS.splashButtonStyles;
             var headerButtonClasses = [
                 jsModalToggle,
                 esriWidget,
                 esriWidgetButton,
-                flushIcon,
-                descriptionIcon
+                splashButtonStyles
             ];
-            (_a = splashButton.classList).add.apply(_a, headerButtonClasses);
+            var iconClasses = [descriptionIcon, flushIcon];
+            headerButtonClasses.forEach(function (className) {
+                splashButton.classList.add(className);
+            });
+            var spanElement = document.createElement("span");
+            iconClasses.forEach(function (className) {
+                spanElement.classList.add(className);
+            });
+            splashButton.appendChild(spanElement);
             return splashButton;
         };
         Splash.prototype.showSplash = function () {

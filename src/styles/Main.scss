@@ -143,8 +143,15 @@ body {
   border: 0;
 }
 
+.splash-button {
+  width: 32px;
+  height: 32px;
+  text-align: center;
+}
+
 html[dir="rtl"] {
   .title-container {
     padding-right: 15px
   }
+
 }

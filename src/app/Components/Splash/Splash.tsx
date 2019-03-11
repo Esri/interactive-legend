@@ -1,5 +1,7 @@
+/// <amd-dependency path="esri/core/tsSupport/assignHelper" name="__assign" />
 /// <amd-dependency path="esri/core/tsSupport/declareExtendsHelper" name="__extends" />
 /// <amd-dependency path="esri/core/tsSupport/decorateHelper" name="__decorate" />
+
 import i18n = require("dojo/i18n!./../nls/resources");
 import {
   subclass,
@@ -37,7 +39,8 @@ const CSS = {
   esriWidget: "esri-widget",
   esriWidgetButton: "esri-widget--button",
   flushIcon: "icon-ui-flush",
-  descriptionIcon: "icon-ui-description"
+  descriptionIcon: "icon-ui-description",
+  splashButtonStyles: "splash-button"
 };
 
 declare var calcite: any;
@@ -117,19 +120,26 @@ class Splash extends declared(Widget) {
       esriWidget,
       esriWidgetButton,
       flushIcon,
-      descriptionIcon
+      descriptionIcon,
+      splashButtonStyles
     } = CSS;
 
     const headerButtonClasses = [
       jsModalToggle,
       esriWidget,
       esriWidgetButton,
-      flushIcon,
-      descriptionIcon
+      splashButtonStyles
     ];
 
-    splashButton.classList.add(...headerButtonClasses);
-
+    const iconClasses = [descriptionIcon, flushIcon];
+    headerButtonClasses.forEach(className => {
+      splashButton.classList.add(className);
+    });
+    const spanElement = document.createElement("span");
+    iconClasses.forEach(className => {
+      spanElement.classList.add(className);
+    });
+    splashButton.appendChild(spanElement);
     return splashButton;
   }
 
