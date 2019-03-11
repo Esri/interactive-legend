@@ -27,7 +27,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     }
     return t;
 };
-define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/i18n!./Components/Screenshot/Screenshot/nls/resources", "ApplicationBase/support/itemUtils", "ApplicationBase/support/domHelper", "esri/widgets/Home", "esri/widgets/LayerList", "esri/widgets/Search", "esri/layers/FeatureLayer", "esri/widgets/BasemapToggle", "esri/widgets/Expand", "esri/core/watchUtils", "esri/Color", "./Components/Screenshot/Screenshot", "./Components/Info/Info", "telemetry/telemetry.dojo", "./Components/InteractiveLegend/InteractiveLegend", "./Components/Splash/Splash", "./Components/Header/Header", "./Components/Info/Info/InfoItem", "esri/core/Collection"], function (require, exports, i18nInteractiveLegend, i18nScreenshot, itemUtils_1, domHelper_1, Home, LayerList, Search, FeatureLayer, BasemapToggle, Expand, watchUtils, Color, Screenshot, Info, Telemetry, InteractiveLegend, Splash, Header, InfoItem, Collection) {
+define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/i18n!./Components/Screenshot/Screenshot/nls/resources", "ApplicationBase/support/itemUtils", "ApplicationBase/support/domHelper", "esri/widgets/Home", "esri/widgets/LayerList", "esri/widgets/Search", "esri/layers/FeatureLayer", "esri/widgets/BasemapToggle", "esri/widgets/Expand", "esri/core/watchUtils", "esri/Color", "./Components/Screenshot/Screenshot", "./Components/Info/Info", "telemetry/telemetry.dojo", "./Components/InteractiveLegend/InteractiveLegend", "./Components/Splash/Splash", "./Components/Header/Header", "./Components/Info/Info/InfoItem", "esri/core/Collection", "esri/core/urlUtils"], function (require, exports, i18nInteractiveLegend, i18nScreenshot, itemUtils_1, domHelper_1, Home, LayerList, Search, FeatureLayer, BasemapToggle, Expand, watchUtils, Color, Screenshot, Info, Telemetry, InteractiveLegend, Splash, Header, InfoItem, Collection, urlUtils) {
     "use strict";
     // CSS
     var CSS = {
@@ -158,6 +158,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/i18n!./Componen
                             //     color: new Color("#000000")
                             //   };
                             // }
+                            _this._defineUrlParams(view);
                             _this._handleHomeWidget(view, homeEnabled, homePosition);
                             _this._handleSplash(config, view, splashButtonPosition);
                             _this.layerList = new LayerList({
@@ -454,6 +455,43 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/i18n!./Componen
                     }
                 });
                 view.ui.add(this.searchExpand, searchPosition);
+            }
+        };
+        // _defineUrlParams
+        InteractiveLegendApp.prototype._defineUrlParams = function (view) {
+            if (this.base.config.customUrlLayer.id &&
+                this.base.config.customUrlLayer.fields.length > 0 &&
+                this.base.config.customUrlParam) {
+                if (!Search && urlUtils) {
+                    return;
+                }
+                var searchResults = urlUtils.urlToObject(document.location.href);
+                var searchTerm = null;
+                if (searchResults && searchResults.query) {
+                    if (this.base.config.customUrlParam in searchResults.query) {
+                        searchTerm = searchResults.query[this.base.config.customUrlParam];
+                    }
+                }
+                var featureLayer = view.map.findLayerById(this.base.config.customUrlLayer.id);
+                if (featureLayer && searchTerm) {
+                    var search = new Search({
+                        view: view,
+                        resultGraphicEnabled: false,
+                        searchAllEnabled: false,
+                        includeDefaultSources: false,
+                        suggestionsEnabled: false,
+                        searchTerm: searchTerm,
+                        sources: [
+                            {
+                                layer: featureLayer,
+                                searchFields: this.base.config.customUrlLayer.fields[0].fields,
+                                outFields: ["*"],
+                                exactMatch: true
+                            }
+                        ]
+                    });
+                    search.search();
+                }
             }
         };
         return InteractiveLegendApp;
