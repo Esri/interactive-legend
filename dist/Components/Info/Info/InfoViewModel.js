@@ -52,7 +52,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var node = event.currentTarget;
             var itemIndex = node.getAttribute("data-pagination-index");
             this.selectedItemIndex = parseInt(itemIndex);
-            paginationNodes[this.selectedItemIndex].domNodde.focus();
+            paginationNodes[this.selectedItemIndex].domNode.focus();
         };
         // nextPage
         InfoViewModel.prototype.nextPage = function (paginationNodes) {

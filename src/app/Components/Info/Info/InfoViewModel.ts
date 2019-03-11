@@ -71,7 +71,7 @@ class InfoViewModel extends declared(Accessor) {
     const node = event.currentTarget as HTMLElement;
     const itemIndex = node.getAttribute("data-pagination-index");
     this.selectedItemIndex = parseInt(itemIndex);
-    paginationNodes[this.selectedItemIndex].domNodde.focus();
+    paginationNodes[this.selectedItemIndex].domNode.focus();
   }
 
   // nextPage
