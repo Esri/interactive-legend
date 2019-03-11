@@ -90,6 +90,12 @@ import Splash = require("./Components/Splash/Splash");
 // Header
 import Header = require("./Components/Header/Header");
 
+// InfoItem
+import InfoItem = require("./Components/Info/Info/InfoItem");
+
+// esri.core.Collection
+import Collection = require("esri/core/Collection");
+
 import { ApplicationConfig } from "ApplicationBase/interfaces";
 
 // CSS
@@ -363,13 +369,13 @@ class InteractiveLegendApp {
                 onboardingPanelScreenshotStepFive
               ];
               const infoContent = screenshotEnabled
-                ? [
-                    {
+                ? new Collection([
+                    new InfoItem({
                       type: "list",
                       title: screenshotTitle,
                       infoContentItems: screenshotSteps
-                    },
-                    {
+                    }),
+                    new InfoItem({
                       type: "explanation",
                       title: newInteractiveLegend,
                       infoContentItems: [
@@ -377,10 +383,10 @@ class InteractiveLegendApp {
                         secondOnboardingWelcomeMessage,
                         thirdOnboardingWelcomeMessage
                       ]
-                    }
-                  ]
-                : [
-                    {
+                    })
+                  ])
+                : new Collection([
+                    new InfoItem({
                       type: "explanation",
                       title: newInteractiveLegend,
                       infoContentItems: [
@@ -388,8 +394,9 @@ class InteractiveLegendApp {
                         secondOnboardingWelcomeMessage,
                         thirdOnboardingWelcomeMessage
                       ]
-                    }
-                  ];
+                    })
+                  ]);
+
               const infoWidget = new Info({
                 view,
                 infoContent

@@ -11,8 +11,6 @@ import {
   property
 } from "esri/core/accessorSupport/decorators";
 
-import { InfoContentItem } from "../interfaces/interfaces";
-
 // esri.widgets.Expand
 import Expand = require("esri/widgets/Expand");
 
@@ -22,10 +20,25 @@ import MapView = require("esri/views/MapView");
 // esri.views.SceneView
 import SceneView = require("esri/views/SceneView");
 
+// esri.core.Collection
+import Collection = require("esri/core/Collection");
+
+// InfoItem
+import InfoItem = require("./InfoItem");
+
+//----------------------------------
+//
+//  Info Item Collection
+//
+//----------------------------------
+const InfoItemCollection = Collection.ofType<InfoItem>(InfoItem);
+
+// State
 type State = "ready" | "loading" | "disabled";
 
 @subclass("InfoViewModel")
 class InfoViewModel extends declared(Accessor) {
+  // state
   @property({
     dependsOn: ["view.ready"],
     readOnly: true
@@ -35,25 +48,30 @@ class InfoViewModel extends declared(Accessor) {
     return ready ? "ready" : this.view ? "loading" : "disabled";
   }
 
+  // view
   @property()
   view: MapView | SceneView = null;
 
+  // selectedItemIndex
   @property()
   selectedItemIndex: number = 0;
 
+  // expandWidget
   @property()
   expandWidget: Expand = null;
 
-  @property()
-  infoContent: InfoContentItem[] = [];
+  // infoContent
+  @property({
+    type: InfoItemCollection
+  })
+  infoContent: Collection<InfoItem> = new InfoItemCollection();
 
   // goToPage
   goToPage(event: Event, paginationNodes: any[]): void {
     const node = event.currentTarget as HTMLElement;
     const itemIndex = node.getAttribute("data-pagination-index");
     this.selectedItemIndex = parseInt(itemIndex);
-    paginationNodes[this.selectedItemIndex].domNode.focus();
-    this.notifyChange("state");
+    paginationNodes[this.selectedItemIndex].domNodde.focus();
   }
 
   // nextPage
