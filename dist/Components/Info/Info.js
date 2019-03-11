@@ -16,7 +16,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "dojo/i18n!./Info/nls/resources", "esri/core/accessorSupport/decorators", "esri/core/watchUtils", "esri/widgets/Widget", "esri/widgets/support/widget", "./Info/InfoViewModel"], function (require, exports, __extends, __decorate, i18n, decorators_1, watchUtils, Widget, widget_1, InfoViewModel) {
+define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "dojo/i18n!./Info/nls/resources", "esri/core/accessorSupport/decorators", "esri/widgets/Widget", "esri/widgets/support/widget", "./Info/InfoViewModel"], function (require, exports, __extends, __decorate, i18n, decorators_1, Widget, widget_1, InfoViewModel) {
     "use strict";
     //----------------------------------
     //
@@ -63,7 +63,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             //  Private Variables
             //
             //----------------------------------
-            _this._contentNodes = [];
             _this._paginationNodes = [];
             //----------------------------------
             //
@@ -96,48 +95,42 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         //  Lifecycle
         //
         //----------------------------------
-        Info.prototype.postInitialize = function () {
-            var _this = this;
-            this.own([
-                watchUtils.init(this, "content", function () {
-                    _this._generateContentNodes();
-                })
-            ]);
-        };
         Info.prototype.render = function () {
-            var content = this._renderContent();
-            var paginationNodes = this.infoContent.length > 1 ? this._generatePaginationNodes() : null;
+            var paginationNodes = this.infoContent && this.infoContent.length > 1
+                ? this._generatePaginationNodes()
+                : null;
             var pageNavButtons = this._renderPageNavButtons();
+            var content = this._renderContent(this.selectedItemIndex);
+            var infoContentItem = this.infoContent.getItemAt(this.selectedItemIndex);
             return (widget_1.tsx("div", { class: this.classes(CSS.widget, CSS.base) },
                 paginationNodes ? (widget_1.tsx("div", { class: CSS.paginationContainer }, paginationNodes)) : null,
                 widget_1.tsx("div", { class: CSS.contentContainer },
                     widget_1.tsx("div", { class: CSS.titleContainer },
-                        widget_1.tsx("h1", null, this.infoContent[this.selectedItemIndex].title)),
+                        widget_1.tsx("h1", null, infoContentItem.title)),
                     widget_1.tsx("div", { class: CSS.infoContent }, content)),
                 widget_1.tsx("div", { class: CSS.buttonContainer }, pageNavButtons)));
         };
         //   _renderContent
-        Info.prototype._renderContent = function () {
-            return this._contentNodes[this.selectedItemIndex];
+        Info.prototype._renderContent = function (selectedItemIndex) {
+            return this._generateContentNodes(selectedItemIndex);
         };
-        //   _generateContentNodes
-        Info.prototype._generateContentNodes = function () {
-            var _this = this;
-            this.infoContent.forEach(function (contentItem) {
-                var type = contentItem.type;
-                if (type === "list") {
-                    _this._contentNodes.push(_this._generateListNode(contentItem));
-                }
-                else if (type === "explanation") {
-                    _this._contentNodes.push(_this._generateExplanationNode(contentItem));
-                }
-            });
+        // _generateContentNodes
+        Info.prototype._generateContentNodes = function (selectedItemIndex) {
+            var contentItem = this.infoContent.getItemAt(selectedItemIndex);
+            var type = contentItem.type;
+            if (type === "explanation") {
+                return this._generateExplanationNode(contentItem);
+            }
+            else if (type === "list") {
+                return this._generateListNode(contentItem);
+            }
         };
         //   _generateListNode
         Info.prototype._generateListNode = function (contentItem) {
             var _this = this;
             var listItemNodes = contentItem.infoContentItems.map(function (listItem, listItemIndex) {
-                return _this._generateListItemNodes(listItem, listItemIndex);
+                var listItemNode = _this._generateListItemNodes(listItem, listItemIndex);
+                return listItemNode;
             });
             return widget_1.tsx("ul", { class: CSS.list }, listItemNodes);
         };
@@ -164,7 +157,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         Info.prototype._generatePaginationNodes = function () {
             var _this = this;
             this._paginationNodes = [];
-            return this.infoContent.map(function (contentItem, contentItemIndex) {
+            return this.infoContent.toArray().map(function (contentItem, contentItemIndex) {
                 var paginationClass = _this.selectedItemIndex === contentItemIndex
                     ? _this.classes(CSS.paginationItem, CSS.paginationItemSelected)
                     : CSS.paginationItem;
@@ -208,18 +201,22 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         // _goToPage
         Info.prototype._goToPage = function (event) {
             this.viewModel.goToPage(event, this._paginationNodes);
+            this.scheduleRender();
         };
         // _nextPage
         Info.prototype._nextPage = function () {
             this.viewModel.nextPage(this._paginationNodes);
+            this.scheduleRender();
         };
         // _previousPage
         Info.prototype._previousPage = function () {
             this.viewModel.previousPage(this._paginationNodes);
+            this.scheduleRender();
         };
         // _closeInfoPanel
         Info.prototype._closeInfoPanel = function () {
             this.viewModel.closeInfoPanel();
+            this.scheduleRender();
         };
         __decorate([
             decorators_1.aliasOf("viewModel.view"),

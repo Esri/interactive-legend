@@ -16,19 +16,30 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "esri/core/accessorSupport/decorators"], function (require, exports, __extends, __decorate, Accessor, decorators_1) {
+define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "esri/core/accessorSupport/decorators", "esri/core/Collection", "./InfoItem"], function (require, exports, __extends, __decorate, Accessor, decorators_1, Collection, InfoItem) {
     "use strict";
+    //----------------------------------
+    //
+    //  Info Item Collection
+    //
+    //----------------------------------
+    var InfoItemCollection = Collection.ofType(InfoItem);
     var InfoViewModel = /** @class */ (function (_super) {
         __extends(InfoViewModel, _super);
         function InfoViewModel() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
+            // view
             _this.view = null;
+            // selectedItemIndex
             _this.selectedItemIndex = 0;
+            // expandWidget
             _this.expandWidget = null;
-            _this.infoContent = [];
+            // infoContent
+            _this.infoContent = new InfoItemCollection();
             return _this;
         }
         Object.defineProperty(InfoViewModel.prototype, "state", {
+            // state
             get: function () {
                 var ready = this.get("view.ready");
                 return ready ? "ready" : this.view ? "loading" : "disabled";
@@ -42,7 +53,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var itemIndex = node.getAttribute("data-pagination-index");
             this.selectedItemIndex = parseInt(itemIndex);
             paginationNodes[this.selectedItemIndex].domNode.focus();
-            this.notifyChange("state");
         };
         // nextPage
         InfoViewModel.prototype.nextPage = function (paginationNodes) {
@@ -79,7 +89,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             decorators_1.property()
         ], InfoViewModel.prototype, "expandWidget", void 0);
         __decorate([
-            decorators_1.property()
+            decorators_1.property({
+                type: InfoItemCollection
+            })
         ], InfoViewModel.prototype, "infoContent", void 0);
         InfoViewModel = __decorate([
             decorators_1.subclass("InfoViewModel")

@@ -22,12 +22,23 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         __extends(InfoItem, _super);
         function InfoItem() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.contentItem = null;
+            // type
+            _this.type = null;
+            // title
+            _this.title = null;
+            // infoContentItems
+            _this.infoContentItems = null;
             return _this;
         }
         __decorate([
             decorators_1.property()
-        ], InfoItem.prototype, "contentItem", void 0);
+        ], InfoItem.prototype, "type", void 0);
+        __decorate([
+            decorators_1.property()
+        ], InfoItem.prototype, "title", void 0);
+        __decorate([
+            decorators_1.property()
+        ], InfoItem.prototype, "infoContentItems", void 0);
         InfoItem = __decorate([
             decorators_1.subclass("InfoItem")
         ], InfoItem);

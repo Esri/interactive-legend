@@ -12,9 +12,6 @@ import {
   aliasOf
 } from "esri/core/accessorSupport/decorators";
 
-// esri.core.watchUtils
-import watchUtils = require("esri/core/watchUtils");
-
 // esri.widgets
 import Widget = require("esri/widgets/Widget");
 
@@ -28,14 +25,17 @@ import {
   renderable
 } from "esri/widgets/support/widget";
 
-// InfoContentItem
-import { InfoContentItem } from "./interfaces/interfaces";
-
 // esri.views.MapView
 import MapView = require("esri/views/MapView");
 
 // esri.views.SceneView
 import SceneView = require("esri/views/SceneView");
+
+// esri.core.Collection
+import Collection = require("esri/core/Collection");
+
+// InfoItem
+import InfoItem = require("./Info/InfoItem");
 
 // InfoViewModel
 import InfoViewModel = require("./Info/InfoViewModel");
@@ -88,7 +88,6 @@ class Info extends declared(Widget) {
   //  Private Variables
   //
   //----------------------------------
-  private _contentNodes: any[] = [];
   private _paginationNodes: any[] = [];
   //----------------------------------
   //
@@ -105,7 +104,7 @@ class Info extends declared(Widget) {
   @aliasOf("viewModel.infoContent")
   @property()
   @renderable()
-  infoContent: InfoContentItem[] = null;
+  infoContent: Collection<InfoItem> = null;
 
   // expandWidget
   @aliasOf("viewModel.expandWidget")
@@ -146,19 +145,14 @@ class Info extends declared(Widget) {
   //
   //----------------------------------
 
-  postInitialize() {
-    this.own([
-      watchUtils.init(this, "content", () => {
-        this._generateContentNodes();
-      })
-    ]);
-  }
-
   render() {
-    const content = this._renderContent();
     const paginationNodes =
-      this.infoContent.length > 1 ? this._generatePaginationNodes() : null;
+      this.infoContent && this.infoContent.length > 1
+        ? this._generatePaginationNodes()
+        : null;
     const pageNavButtons = this._renderPageNavButtons();
+    const content = this._renderContent(this.selectedItemIndex);
+    const infoContentItem = this.infoContent.getItemAt(this.selectedItemIndex);
     return (
       <div class={this.classes(CSS.widget, CSS.base)}>
         {paginationNodes ? (
@@ -166,7 +160,7 @@ class Info extends declared(Widget) {
         ) : null}
         <div class={CSS.contentContainer}>
           <div class={CSS.titleContainer}>
-            <h1>{this.infoContent[this.selectedItemIndex].title}</h1>
+            <h1>{infoContentItem.title}</h1>
           </div>
           <div class={CSS.infoContent}>{content}</div>
         </div>
@@ -176,27 +170,30 @@ class Info extends declared(Widget) {
   }
 
   //   _renderContent
-  private _renderContent(): any {
-    return this._contentNodes[this.selectedItemIndex];
+  private _renderContent(selectedItemIndex: number): any {
+    return this._generateContentNodes(selectedItemIndex);
   }
 
-  //   _generateContentNodes
-  private _generateContentNodes(): void {
-    this.infoContent.forEach(contentItem => {
-      const { type } = contentItem;
-      if (type === "list") {
-        this._contentNodes.push(this._generateListNode(contentItem));
-      } else if (type === "explanation") {
-        this._contentNodes.push(this._generateExplanationNode(contentItem));
-      }
-    });
+  // _generateContentNodes
+  private _generateContentNodes(selectedItemIndex: number): any[] {
+    const contentItem = this.infoContent.getItemAt(selectedItemIndex);
+    const { type } = contentItem;
+    if (type === "explanation") {
+      return this._generateExplanationNode(contentItem);
+    } else if (type === "list") {
+      return this._generateListNode(contentItem);
+    }
   }
 
   //   _generateListNode
   private _generateListNode(contentItem: any): any {
     const listItemNodes = contentItem.infoContentItems.map(
       (listItem, listItemIndex) => {
-        return this._generateListItemNodes(listItem, listItemIndex);
+        const listItemNode = this._generateListItemNodes(
+          listItem,
+          listItemIndex
+        );
+        return listItemNode;
       }
     );
     return <ul class={CSS.list}>{listItemNodes}</ul>;
@@ -242,7 +239,7 @@ class Info extends declared(Widget) {
   // _generatePaginationNodes
   private _generatePaginationNodes(): any {
     this._paginationNodes = [];
-    return this.infoContent.map((contentItem, contentItemIndex) => {
+    return this.infoContent.toArray().map((contentItem, contentItemIndex) => {
       const paginationClass =
         this.selectedItemIndex === contentItemIndex
           ? this.classes(CSS.paginationItem, CSS.paginationItemSelected)
@@ -355,24 +352,28 @@ class Info extends declared(Widget) {
   @accessibleHandler()
   private _goToPage(event: Event): void {
     this.viewModel.goToPage(event, this._paginationNodes);
+    this.scheduleRender();
   }
 
   // _nextPage
   @accessibleHandler()
   private _nextPage(): void {
     this.viewModel.nextPage(this._paginationNodes);
+    this.scheduleRender();
   }
 
   // _previousPage
   @accessibleHandler()
   private _previousPage(): void {
     this.viewModel.previousPage(this._paginationNodes);
+    this.scheduleRender();
   }
 
   // _closeInfoPanel
   @accessibleHandler()
   private _closeInfoPanel(): void {
     this.viewModel.closeInfoPanel();
+    this.scheduleRender();
   }
 }
 
