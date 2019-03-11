@@ -96,6 +96,9 @@ import InfoItem = require("./Components/Info/Info/InfoItem");
 // esri.core.Collection
 import Collection = require("esri/core/Collection");
 
+// urlUtils
+import urlUtils = require("esri/core/urlUtils");
+
 import { ApplicationConfig } from "ApplicationBase/interfaces";
 
 // CSS
@@ -275,6 +278,7 @@ class InteractiveLegendApp {
             //     color: new Color("#000000")
             //   };
             // }
+            this._defineUrlParams(view);
             this._handleHomeWidget(view, homeEnabled, homePosition);
             this._handleSplash(config, view, splashButtonPosition);
 
@@ -682,6 +686,49 @@ class InteractiveLegendApp {
       });
 
       view.ui.add(this.searchExpand, searchPosition);
+    }
+  }
+
+  // _defineUrlParams
+  private _defineUrlParams(view: MapView): void {
+    if (
+      this.base.config.customUrlLayer.id &&
+      this.base.config.customUrlLayer.fields.length > 0 &&
+      this.base.config.customUrlParam
+    ) {
+      if (!Search && urlUtils) {
+        return;
+      }
+      const searchResults = urlUtils.urlToObject(document.location.href);
+      let searchTerm = null;
+      if (searchResults && searchResults.query) {
+        if (this.base.config.customUrlParam in searchResults.query) {
+          searchTerm = searchResults.query[this.base.config.customUrlParam];
+        }
+      }
+
+      const featureLayer = view.map.findLayerById(
+        this.base.config.customUrlLayer.id
+      );
+      if (featureLayer && searchTerm) {
+        const search = new Search({
+          view,
+          resultGraphicEnabled: false,
+          searchAllEnabled: false,
+          includeDefaultSources: false,
+          suggestionsEnabled: false,
+          searchTerm,
+          sources: [
+            {
+              layer: featureLayer,
+              searchFields: this.base.config.customUrlLayer.fields[0].fields,
+              outFields: ["*"],
+              exactMatch: true
+            }
+          ]
+        });
+        search.search();
+      }
     }
   }
 }

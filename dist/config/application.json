@@ -78,6 +78,11 @@
       }
     }
   },
+  "customUrlLayer": {
+    "id": null,
+    "fields": []
+  },
+  "customUrlParam": null,
   "helperServices": {
     "geometry": {
       "url": null
