@@ -158,6 +158,7 @@ const CSS = {
     "esri-interactive-legend__gray-button-styles",
   interactiveLegendResetButtonContainer:
     "esri-interactive-legend__reset-button-container",
+  interactiveLegendResetButton: "esri-interactive-legend__reset-button",
   interactiveLegendLayerRowContainer:
     "esri-interactive-legend__layer-row-container",
   interactiveLegendRemoveOutline: "esri-interactive-legend__remove-outline",
@@ -714,6 +715,7 @@ class InteractiveClassic extends declared(Widget) {
         <button
           bind={this}
           class={this.classes(
+            CSS.interactiveLegendResetButton,
             CSS.calciteStyles.btn,
             CSS.calciteStyles.btnClear,
             CSS.calciteStyles.btnSmall,

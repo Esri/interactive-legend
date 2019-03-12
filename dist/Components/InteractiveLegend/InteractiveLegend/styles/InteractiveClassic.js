@@ -91,6 +91,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         interactiveLegendInfoContainer: "esri-interactive-legend__legend-info-container",
         interactiveLegendGrayButtonStyles: "esri-interactive-legend__gray-button-styles",
         interactiveLegendResetButtonContainer: "esri-interactive-legend__reset-button-container",
+        interactiveLegendResetButton: "esri-interactive-legend__reset-button",
         interactiveLegendLayerRowContainer: "esri-interactive-legend__layer-row-container",
         interactiveLegendRemoveOutline: "esri-interactive-legend__remove-outline",
         interactiveLegendCheckMarkIconStyles: "esri-interactive-legend__checkmark-icon",
@@ -429,7 +430,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 _a[CSS.interactiveLegendGrayButtonStyles] = disabled,
                 _a);
             return (widget_1.tsx("div", { class: CSS.interactiveLegendResetButtonContainer },
-                widget_1.tsx("button", { bind: this, class: this.classes(CSS.calciteStyles.btn, CSS.calciteStyles.btnClear, CSS.calciteStyles.btnSmall, grayStyles), tabIndex: this.offscreen ? -1 : 0, disabled: disabled ? true : false, onclick: function (event) {
+                widget_1.tsx("button", { bind: this, class: this.classes(CSS.interactiveLegendResetButton, CSS.calciteStyles.btn, CSS.calciteStyles.btnClear, CSS.calciteStyles.btnSmall, grayStyles), tabIndex: this.offscreen ? -1 : 0, disabled: disabled ? true : false, onclick: function (event) {
                         _this._resetLegendFilter(event, featureLayerData, operationalItemIndex);
                     }, onkeydown: function (event) {
                         _this._resetLegendFilter(event, featureLayerData, operationalItemIndex);
