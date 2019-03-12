@@ -198,7 +198,7 @@
       margin-top: 2%;
       margin-bottom: 2%;
       display: flex;
-      align-items: center;
+      justify-content: space-between;
       height: 3.5vh;
       min-height: 30px;
     }
@@ -213,16 +213,17 @@
 
     .esri-interactive-legend__reset-button-container {
       display: flex;
-      justify-content: center;
+      justify-content: flex-end;
       align-items: center;
       height: 100%;
 
       .esri-interactive-legend__reset-button {
+        display: flex;
         vertical-align: middle;
         text-align: center;
         height: 100%;
         width: 100%;
-        font-size: 90%;
+        font-size: 80%;
         white-space: nowrap;
       }
 
