@@ -167,6 +167,9 @@
     height: 100%;
 
     .esri-interactive-legend__layer-table {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: -ms-flexbox;
       display: flex;
 
     }
