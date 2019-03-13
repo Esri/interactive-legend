@@ -47,6 +47,8 @@ import FeatureFilter = require("esri/views/layers/support/FeatureFilter");
 // esri.views.layers.support.FeatureEffect
 import FeatureEffect = require("esri/views/layers/support/FeatureEffect");
 
+import Query = require("esri/tasks/support/Query");
+
 // interfaces
 import {
   FilterMode,
@@ -200,8 +202,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       const queryExpression = this._handlePredominanceExpression(
         elementInfo,
         operationalItemIndex
-      ).join(" AND ");
-
+      );
       const queryExpressions = this.interactiveStyleData.queryExpressions[
         operationalItemIndex
       ];
@@ -257,7 +258,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       const queryExpression = this._handlePredominanceExpression(
         elementInfo,
         operationalItemIndex
-      ).join(" AND ");
+      );
 
       const queryExpressions = this.interactiveStyleData.queryExpressions[
         operationalItemIndex
@@ -492,17 +493,9 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     const elementInfoHasValue = elementInfo.hasOwnProperty("value")
       ? value
       : label;
-
     if (legendElement.type === "symbol-table") {
       // Classify data size/color ramp
-      if (label.indexOf(">") !== -1) {
-        const expression = Array.isArray(elementInfoHasValue)
-          ? `${field} > ${elementInfoHasValue[0]} AND ${field} <= ${
-              elementInfo.value[1]
-            }`
-          : `${field} = ${elementInfoHasValue} OR ${field} = '${elementInfoHasValue}'`;
-        return expression;
-      } else if (!elementInfo.hasOwnProperty("value")) {
+      if (!elementInfo.hasOwnProperty("value")) {
         // Classify data size/color ramp - 'Other' category
         if (
           legendElementInfos[0].hasOwnProperty("value") &&
@@ -534,8 +527,16 @@ class InteractiveStyleViewModel extends declared(Accessor) {
               expressionList.push(expression);
             }
           });
-          return expressionList.join(" AND ");
+          const noExpression = expressionList.join(" AND ");
+          return noExpression;
         }
+      } else if (label.indexOf(">") !== -1) {
+        const expression = Array.isArray(elementInfoHasValue)
+          ? `${field} > ${elementInfoHasValue[0]} AND ${field} <= ${
+              elementInfo.value[1]
+            }`
+          : `${field} = ${elementInfoHasValue} OR ${field} = '${elementInfoHasValue}'`;
+        return expression;
       } else {
         // Types unique symbols
         const singleQuote =
@@ -568,21 +569,69 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   private _handlePredominanceExpression(
     elementInfo: any,
     operationalItemIndex: number
-  ): string[] {
+  ): string {
     const featureLayerView = this.featureLayerViews.getItemAt(
       operationalItemIndex
     );
     const authoringInfo = featureLayerView.layer.renderer.authoringInfo as any;
     const fields = authoringInfo.fields;
     const expressionArr = [];
-    fields.forEach(field => {
-      if (elementInfo.value === field) {
-        return;
+    if (elementInfo.hasOwnProperty("value")) {
+      fields.forEach(field => {
+        if (elementInfo.value === field) {
+          return;
+        }
+        const sqlQuery = `(${
+          elementInfo.value
+        } > ${field} OR ${field} IS NULL)`;
+
+        expressionArr.push(sqlQuery);
+      });
+      return expressionArr.join(" AND ");
+    } else {
+      const queryForZeroes = [];
+      fields.forEach(field => {
+        queryForZeroes.push(`${field} = 0`);
+      });
+
+      const otherExpression = [];
+      if (fields.length > 2) {
+        fields.forEach(field1 => {
+          fields.forEach(field2 => {
+            if (field1 === field2) {
+              return;
+            }
+            const queryForMultiplePredominance = [];
+            fields.forEach(field3 => {
+              if (field1 === field3 || field2 === field3) {
+                return;
+              }
+              queryForMultiplePredominance.push(
+                `${field1} = ${field2} AND (${field1} > ${field3} OR ${field1} >= ${field3})`
+              );
+            });
+            otherExpression.push(
+              `(${queryForMultiplePredominance.join(" AND ")})`
+            );
+          });
+        });
+        return `(${queryForZeroes.join(" AND ")}) OR ${otherExpression.join(
+          " OR "
+        )}`;
+      } else {
+        const expressions = [];
+        fields.forEach(field1 => {
+          fields.forEach(field2 => {
+            if (field1 === field2) {
+              return;
+            }
+            expressions.push(`${field1} = ${field2}`);
+            expressions.push(`(${queryForZeroes.join(" AND ")})`);
+          });
+        });
+        return `(${expressions.join(" OR ")})`;
       }
-      const sqlQuery = `(${elementInfo.value} > ${field} OR ${field} IS NULL)`;
-      expressionArr.push(sqlQuery);
-    });
-    return expressionArr;
+    }
   }
 
   //----------------------------------
