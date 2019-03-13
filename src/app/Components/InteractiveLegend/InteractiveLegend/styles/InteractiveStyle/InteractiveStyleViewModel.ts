@@ -47,8 +47,6 @@ import FeatureFilter = require("esri/views/layers/support/FeatureFilter");
 // esri.views.layers.support.FeatureEffect
 import FeatureEffect = require("esri/views/layers/support/FeatureEffect");
 
-import Query = require("esri/tasks/support/Query");
-
 // interfaces
 import {
   FilterMode,
