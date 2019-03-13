@@ -123,7 +123,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         //
         //----------------------------------
         // applyFeatureFilter
-        InteractiveStyleViewModel.prototype.applyFeatureFilter = function (elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, isPredominance, legendElementInfos) {
+        InteractiveStyleViewModel.prototype.applyFeatureFilter = function (elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, isPredominance, legendElementInfos, normalizationField) {
             if (isPredominance) {
                 var queryExpression = this._handlePredominanceExpression(elementInfo, operationalItemIndex);
                 var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
@@ -142,7 +142,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 });
             }
             else {
-                this._generateQueryExpressions(elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, legendElementInfos);
+                this._generateQueryExpressions(elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, legendElementInfos, normalizationField);
                 var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
                 var featureLayerView = this.featureLayerViews.getItemAt(operationalItemIndex);
                 var filterExpression = queryExpressions.join(" OR ");
@@ -153,7 +153,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             }
         };
         // applyFeatureMute
-        InteractiveStyleViewModel.prototype.applyFeatureMute = function (elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos, isPredominance) {
+        InteractiveStyleViewModel.prototype.applyFeatureMute = function (elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos, isPredominance, normalizationField) {
             if (isPredominance) {
                 var queryExpression = this._handlePredominanceExpression(elementInfo, operationalItemIndex);
                 var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
@@ -177,7 +177,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 });
             }
             else {
-                this._generateQueryExpressions(elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, legendElementInfos);
+                this._generateQueryExpressions(elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, legendElementInfos, normalizationField);
                 var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
                 var featureLayerView = this.featureLayerViews.getItemAt(operationalItemIndex);
                 var filterExpression = queryExpressions.join(" OR ");
@@ -327,8 +327,8 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         //
         //----------------------------------
         // _generateQueryExpressions
-        InteractiveStyleViewModel.prototype._generateQueryExpressions = function (elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, legendElementInfos) {
-            var queryExpression = this._generateQueryExpression(elementInfo, field, legendInfoIndex, legendElement, legendElementInfos);
+        InteractiveStyleViewModel.prototype._generateQueryExpressions = function (elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, legendElementInfos, normalizationField) {
+            var queryExpression = this._generateQueryExpression(elementInfo, field, legendInfoIndex, legendElement, legendElementInfos, normalizationField);
             var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
             var expressionIndex = queryExpressions.indexOf(queryExpression);
             if (queryExpressions.length === 0 || expressionIndex === -1) {
@@ -339,7 +339,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             }
         };
         // _generateQueryExpression
-        InteractiveStyleViewModel.prototype._generateQueryExpression = function (elementInfo, field, legendInfoIndex, legendElement, legendElementInfos) {
+        InteractiveStyleViewModel.prototype._generateQueryExpression = function (elementInfo, field, legendInfoIndex, legendElement, legendElementInfos, normalizationField) {
             var value = elementInfo.value, label = elementInfo.label;
             var elementInfoHasValue = elementInfo.hasOwnProperty("value")
                 ? value
@@ -352,7 +352,9 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                         Array.isArray(legendElementInfos[0].value) &&
                         legendElementInfos[legendElementInfos.length - 2].hasOwnProperty("value") &&
                         Array.isArray(legendElementInfos[legendElementInfos.length - 2].value)) {
-                        var expression = field + " > " + legendElementInfos[0].value[1] + " OR " + field + " < " + legendElementInfos[legendElementInfos.length - 2].value[0] + " OR " + field + " IS NULL";
+                        var expression = normalizationField
+                            ? normalizationField + " = 0 OR ((" + field + "/" + normalizationField + ") > " + legendElementInfos[0].value[1] + ") OR ((" + field + "/" + normalizationField + ") < " + legendElementInfos[legendElementInfos.length - 2].value[0] + ") OR " + field + " IS NULL"
+                            : field + " > " + legendElementInfos[0].value[1] + " OR " + field + " < " + legendElementInfos[legendElementInfos.length - 2].value[0] + " OR " + field + " IS NULL";
                         return expression;
                     }
                     else {
@@ -376,7 +378,9 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 }
                 else if (label.indexOf(">") !== -1) {
                     var expression = Array.isArray(elementInfoHasValue)
-                        ? field + " > " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfo.value[1]
+                        ? normalizationField
+                            ? "(" + field + "/" + normalizationField + ") > " + elementInfoHasValue[0] + " AND (" + field + "/" + normalizationField + ")<= " + elementInfo.value[1]
+                            : field + " > " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfo.value[1]
                         : field + " = " + elementInfoHasValue + " OR " + field + " = '" + elementInfoHasValue + "'";
                     return expression;
                 }
@@ -389,7 +393,9 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                         ? legendElementInfos.length - 1 === legendInfoIndex ||
                             (!legendElementInfos[legendElementInfos.length - 1].hasOwnProperty("value") &&
                                 legendInfoIndex === legendElementInfos.length - 2)
-                            ? field + " >= " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfoHasValue[1]
+                            ? normalizationField
+                                ? "(" + field + "/" + normalizationField + ") >= " + elementInfoHasValue[0] + " AND (" + field + "/" + normalizationField + ")<= " + elementInfo.value[1]
+                                : field + " >= " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfoHasValue[1]
                             : field + " > " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfoHasValue[1]
                         : singleQuote
                             ? field + " = '" + singleQuote + "'"

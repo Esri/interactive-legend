@@ -175,12 +175,21 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                             var featureLayer = featureLayerView.layer;
                             var renderer = featureLayer.renderer;
                             var field = renderer ? renderer.field : null;
+                            var normalizationField = renderer &&
+                                renderer.hasOwnProperty("normalizationField") &&
+                                renderer.hasOwnProperty("normalizationType") &&
+                                renderer.normalizationField &&
+                                renderer.normalizationType &&
+                                renderer.normalizationType === "field"
+                                ? renderer.normalizationField
+                                : null;
                             _this.selectedStyleData.add({
                                 layerItemId: featureLayer.id,
                                 field: field,
                                 selectedInfoIndex: [],
                                 applyStyles: null,
-                                featureLayerView: featureLayerView
+                                featureLayerView: featureLayerView,
+                                normalizationField: normalizationField
                             });
                         }
                     });
@@ -314,11 +323,15 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var field = this.selectedStyleData.getItemAt(operationalItemIndex)
                 ? this.selectedStyleData.getItemAt(operationalItemIndex).field
                 : null;
+            var normalizationField = this.selectedStyleData.getItemAt(operationalItemIndex)
+                ? this.selectedStyleData.getItemAt(operationalItemIndex)
+                    .normalizationField
+                : null;
             // build symbol table or size ramp
             if (legendElement.type === "symbol-table" || isSizeRamp) {
                 var rows = legendElement.infos
                     .map(function (info, legendInfoIndex) {
-                    return _this._renderLegendForElementInfo(info, layer, isSizeRamp, legendElement.legendType, legendInfoIndex, field, legendElementIndex, legendElement, activeLayerInfo, activeLayerInfoIndex, operationalItemIndex, legendElementInfos);
+                    return _this._renderLegendForElementInfo(info, layer, isSizeRamp, legendElement.legendType, legendInfoIndex, field, legendElementIndex, legendElement, activeLayerInfo, activeLayerInfoIndex, operationalItemIndex, legendElementInfos, normalizationField);
                 })
                     .filter(function (row) { return !!row; });
                 if (rows.length) {
@@ -361,7 +374,11 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 _a);
             var layerCaption = this.classes(CSS.layerCaption, interactiveLegendLayerCaption);
             var interactiveLegendLayerTable = (_b = {},
-                _b[CSS.interactiveLegendLayerTable] = featureLayerData && featureLayerData.applyStyles,
+                _b[CSS.interactiveLegendLayerTable] = featureLayerData &&
+                    featureLayerData.applyStyles &&
+                    !(legendElement.type === "color-ramp" ||
+                        legendElement.type === "opacity-ramp" ||
+                        legendElement.type === "heatmap-ramp"),
                 _b);
             var layerTable = this.classes(CSS.layerTable, interactiveLegendLayerTable);
             var renderResetButton = this.offscreen
@@ -505,7 +522,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     widget_1.tsx("div", { class: CSS.rampLabelsContainer, styles: rampLabelsContainerStyles }, labelsContent))));
         };
         // _renderLegendForElementInfo
-        InteractiveClassic.prototype._renderLegendForElementInfo = function (elementInfo, layer, isSizeRamp, legendType, legendInfoIndex, field, legendElementIndex, legendElement, activeLayerInfo, activeLayerInfoIndex, operationalItemIndex, legendElementInfos) {
+        InteractiveClassic.prototype._renderLegendForElementInfo = function (elementInfo, layer, isSizeRamp, legendType, legendInfoIndex, field, legendElementIndex, legendElement, activeLayerInfo, activeLayerInfoIndex, operationalItemIndex, legendElementInfos, normalizationField) {
             var _this = this;
             var _a, _b;
             // nested
@@ -606,7 +623,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                             featureLayerData &&
                             !isSizeRamp) ||
                             (isPredominance && !isSizeRamp)) {
-                            _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos);
+                            _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos, normalizationField);
                         }
                     }, onkeydown: function (event) {
                         if ((!isRelationship &&
@@ -617,7 +634,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                             featureLayerData &&
                             !isSizeRamp) ||
                             (isPredominance && !isSizeRamp)) {
-                            _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos);
+                            _this._handleFilterOption(event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos, normalizationField);
                         }
                     } },
                     widget_1.tsx("div", { class: applySelect ? CSS.interactiveLegendInfoContainer : null },
@@ -665,7 +682,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         //  Filter methods
         //
         //-------------------------------------------------------------------
-        InteractiveClassic.prototype._handleFilterOption = function (event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos) {
+        InteractiveClassic.prototype._handleFilterOption = function (event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos, normalizationField) {
             // this.filterMode === "featureFilter"
             //   ? this._featureFilter(
             //       elementInfo,
@@ -700,16 +717,16 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             //     )
             //   : null;
             if (this.filterMode === "featureFilter") {
-                this._featureFilter(event, elementInfo, field, operationalItemIndex, legendInfoIndex, legendElement, isPredominance, legendElementInfos);
+                this._featureFilter(event, elementInfo, field, operationalItemIndex, legendInfoIndex, legendElement, isPredominance, legendElementInfos, normalizationField);
             }
             else if (this.filterMode === "mute") {
-                this._featureMute(event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos, isPredominance);
+                this._featureMute(event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos, isPredominance, normalizationField);
             }
         };
         //_filterFeatures
-        InteractiveClassic.prototype._featureFilter = function (event, elementInfo, field, operationalItemIndex, legendInfoIndex, legendElement, isPredominance, legendElementInfos) {
+        InteractiveClassic.prototype._featureFilter = function (event, elementInfo, field, operationalItemIndex, legendInfoIndex, legendElement, isPredominance, legendElementInfos, normalizationField) {
             this._handleSelectedStyles(event);
-            this.viewModel.applyFeatureFilter(elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, isPredominance, legendElementInfos);
+            this.viewModel.applyFeatureFilter(elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, isPredominance, legendElementInfos, normalizationField);
         };
         // // _highlightFeatures
         // private _featureHighlight(
@@ -738,9 +755,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         //   this._handleSelectedStyles(event, operationalItemIndex, legendInfoIndex);
         // }
         // _muteFeatures
-        InteractiveClassic.prototype._featureMute = function (event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos, isPredominance) {
+        InteractiveClassic.prototype._featureMute = function (event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos, isPredominance, normalizationField) {
             this._handleSelectedStyles(event);
-            this.viewModel.applyFeatureMute(elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos, isPredominance);
+            this.viewModel.applyFeatureMute(elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos, isPredominance, normalizationField);
         };
         // End of filter methods
         // _resetLegendFilter
