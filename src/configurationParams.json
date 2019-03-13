@@ -217,6 +217,10 @@
           "label": "Screenshot",
           "condition": false,
           "items": [{
+              "type": "paragraph",
+              "value": "Please note: A third-party tool, Html2Canvas is used to capture the interactive map legend and pop-up in the screenshot, which may have unexpected behaviors across different browsers such as IE11."
+            },
+            {
               "type": "boolean",
               "fieldName": "enableLegendOption",
               "label": "Enable option to include legend in screenshot"
