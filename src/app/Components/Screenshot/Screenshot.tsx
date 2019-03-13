@@ -77,6 +77,7 @@ const CSS = {
   tooltipRight: "tooltip-right",
   modifierClass: "modifier-class",
   closeIcon: "icon-ui-close",
+  iconFlush: "icon-ui-flush",
   fieldsetCheckbox: "fieldset-checkbox",
   button: "btn",
   buttonRed: "btn-red",
@@ -480,7 +481,6 @@ class Screenshot extends declared(Widget) {
         bind={this}
         tabIndex={0}
         class={this.classes(
-          CSS.screenshotBtn,
           CSS.pointerCursor,
           CSS.button,
           CSS.buttonRed,
@@ -490,7 +490,7 @@ class Screenshot extends declared(Widget) {
         onkeydown={this.deactivateScreenshot}
         title={i18n.deactivateScreenshot}
       >
-        <span class={CSS.closeIcon} />
+        <span class={this.classes(CSS.closeIcon, CSS.iconFlush)} />
       </button>
     );
   }

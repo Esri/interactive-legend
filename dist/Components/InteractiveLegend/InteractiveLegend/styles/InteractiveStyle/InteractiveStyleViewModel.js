@@ -125,7 +125,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         // applyFeatureFilter
         InteractiveStyleViewModel.prototype.applyFeatureFilter = function (elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, isPredominance, legendElementInfos) {
             if (isPredominance) {
-                var queryExpression = this._handlePredominanceExpression(elementInfo, operationalItemIndex).join(" AND ");
+                var queryExpression = this._handlePredominanceExpression(elementInfo, operationalItemIndex);
                 var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
                 var expressionIndex = queryExpressions.indexOf(queryExpression);
                 if (queryExpressions.length === 0 || expressionIndex === -1) {
@@ -155,7 +155,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         // applyFeatureMute
         InteractiveStyleViewModel.prototype.applyFeatureMute = function (elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, legendElementInfos, isPredominance) {
             if (isPredominance) {
-                var queryExpression = this._handlePredominanceExpression(elementInfo, operationalItemIndex).join(" AND ");
+                var queryExpression = this._handlePredominanceExpression(elementInfo, operationalItemIndex);
                 var queryExpressions = this.interactiveStyleData.queryExpressions[operationalItemIndex];
                 var expressionIndex = queryExpressions.indexOf(queryExpression);
                 if (queryExpressions.length === 0 || expressionIndex === -1) {
@@ -346,13 +346,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 : label;
             if (legendElement.type === "symbol-table") {
                 // Classify data size/color ramp
-                if (label.indexOf(">") !== -1) {
-                    var expression = Array.isArray(elementInfoHasValue)
-                        ? field + " > " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfo.value[1]
-                        : field + " = " + elementInfoHasValue + " OR " + field + " = '" + elementInfoHasValue + "'";
-                    return expression;
-                }
-                else if (!elementInfo.hasOwnProperty("value")) {
+                if (!elementInfo.hasOwnProperty("value")) {
                     // Classify data size/color ramp - 'Other' category
                     if (legendElementInfos[0].hasOwnProperty("value") &&
                         Array.isArray(legendElementInfos[0].value) &&
@@ -376,8 +370,15 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                                 expressionList_1.push(expression);
                             }
                         });
-                        return expressionList_1.join(" AND ");
+                        var noExpression = expressionList_1.join(" AND ");
+                        return noExpression;
                     }
+                }
+                else if (label.indexOf(">") !== -1) {
+                    var expression = Array.isArray(elementInfoHasValue)
+                        ? field + " > " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfo.value[1]
+                        : field + " = " + elementInfoHasValue + " OR " + field + " = '" + elementInfoHasValue + "'";
+                    return expression;
                 }
                 else {
                     // Types unique symbols
@@ -405,14 +406,54 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             var authoringInfo = featureLayerView.layer.renderer.authoringInfo;
             var fields = authoringInfo.fields;
             var expressionArr = [];
-            fields.forEach(function (field) {
-                if (elementInfo.value === field) {
-                    return;
+            if (elementInfo.hasOwnProperty("value")) {
+                fields.forEach(function (field) {
+                    if (elementInfo.value === field) {
+                        return;
+                    }
+                    var sqlQuery = "(" + elementInfo.value + " > " + field + " OR " + field + " IS NULL)";
+                    expressionArr.push(sqlQuery);
+                });
+                return expressionArr.join(" AND ");
+            }
+            else {
+                var queryForZeroes_1 = [];
+                fields.forEach(function (field) {
+                    queryForZeroes_1.push(field + " = 0");
+                });
+                var otherExpression_1 = [];
+                if (fields.length > 2) {
+                    fields.forEach(function (field1) {
+                        fields.forEach(function (field2) {
+                            if (field1 === field2) {
+                                return;
+                            }
+                            var queryForMultiplePredominance = [];
+                            fields.forEach(function (field3) {
+                                if (field1 === field3 || field2 === field3) {
+                                    return;
+                                }
+                                queryForMultiplePredominance.push(field1 + " = " + field2 + " AND (" + field1 + " > " + field3 + " OR " + field1 + " >= " + field3 + ")");
+                            });
+                            otherExpression_1.push("(" + queryForMultiplePredominance.join(" AND ") + ")");
+                        });
+                    });
+                    return "(" + queryForZeroes_1.join(" AND ") + ") OR " + otherExpression_1.join(" OR ");
                 }
-                var sqlQuery = "(" + elementInfo.value + " > " + field + " OR " + field + " IS NULL)";
-                expressionArr.push(sqlQuery);
-            });
-            return expressionArr;
+                else {
+                    var expressions_1 = [];
+                    fields.forEach(function (field1) {
+                        fields.forEach(function (field2) {
+                            if (field1 === field2) {
+                                return;
+                            }
+                            expressions_1.push(field1 + " = " + field2);
+                            expressions_1.push("(" + queryForZeroes_1.join(" AND ") + ")");
+                        });
+                    });
+                    return "(" + expressions_1.join(" OR ") + ")";
+                }
+            }
         };
         //----------------------------------
         //

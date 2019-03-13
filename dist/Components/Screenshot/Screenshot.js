@@ -50,6 +50,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         tooltipRight: "tooltip-right",
         modifierClass: "modifier-class",
         closeIcon: "icon-ui-close",
+        iconFlush: "icon-ui-flush",
         fieldsetCheckbox: "fieldset-checkbox",
         button: "btn",
         buttonRed: "btn-red",
@@ -260,8 +261,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         };
         // _renderOptOutOfScreenshotButton
         Screenshot.prototype._renderOptOutOfScreenshotButton = function () {
-            return (widget_1.tsx("button", { bind: this, tabIndex: 0, class: this.classes(CSS.screenshotBtn, CSS.pointerCursor, CSS.button, CSS.buttonRed, CSS.screenshotClose), onclick: this.deactivateScreenshot, onkeydown: this.deactivateScreenshot, title: i18n.deactivateScreenshot },
-                widget_1.tsx("span", { class: CSS.closeIcon })));
+            return (widget_1.tsx("button", { bind: this, tabIndex: 0, class: this.classes(CSS.pointerCursor, CSS.button, CSS.buttonRed, CSS.screenshotClose), onclick: this.deactivateScreenshot, onkeydown: this.deactivateScreenshot, title: i18n.deactivateScreenshot },
+                widget_1.tsx("span", { class: this.classes(CSS.closeIcon, CSS.iconFlush) })));
         };
         // _renderOffScreenNodes
         Screenshot.prototype._renderOffScreenNodes = function () {
