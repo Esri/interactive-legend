@@ -100,7 +100,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                                 if (_this.state !== "ready") {
                                     console.warn("Warning: Interactive Legend tool may not load if view cannot finish updating.");
                                 }
-                            }, 20000);
+                            }, 60000);
                         })
                         // watchUtils.whenFalse(this, "view.updating", () => {
                         //   this.layerListViewModel.operationalItems.forEach(() => {
