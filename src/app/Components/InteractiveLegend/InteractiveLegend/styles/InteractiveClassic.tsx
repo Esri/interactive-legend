@@ -81,7 +81,6 @@ import {
   LayerUID
 } from "../../../../interfaces/interfaces";
 import { renderRelationshipRamp } from "../relationshipRamp/utils";
-import { normalize } from "dojox/gfx/matrix";
 
 //----------------------------------
 //
