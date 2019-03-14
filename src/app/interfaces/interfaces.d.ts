@@ -49,6 +49,7 @@ export interface SelectedStyleData {
   field: string;
   applyStyles: boolean;
   featureLayerView: FeatureLayerView;
+  normalizationField: string;
 }
 
 // export type FilterMode = "featureFilter" | "highlight" | "mute";

@@ -53,6 +53,7 @@ import {
   InteractiveStyleData,
   LegendElement
 } from "../../../../../interfaces/interfaces";
+import { normalize } from "dojox/gfx/matrix";
 
 // HighLightState
 // type HighLightState = "ready" | "querying" | "loading";
@@ -194,7 +195,8 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     legendElement: LegendElement,
     legendInfoIndex: number,
     isPredominance: boolean,
-    legendElementInfos?: any[]
+    legendElementInfos?: any[],
+    normalizationField?: string
   ): void {
     if (isPredominance) {
       const queryExpression = this._handlePredominanceExpression(
@@ -226,8 +228,10 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         operationalItemIndex,
         legendElement,
         legendInfoIndex,
-        legendElementInfos
+        legendElementInfos,
+        normalizationField
       );
+
       const queryExpressions = this.interactiveStyleData.queryExpressions[
         operationalItemIndex
       ];
@@ -250,7 +254,8 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     operationalItemIndex: number,
     legendElement: LegendElement,
     legendElementInfos: any[],
-    isPredominance: boolean
+    isPredominance: boolean,
+    normalizationField: string
   ): void {
     if (isPredominance) {
       const queryExpression = this._handlePredominanceExpression(
@@ -288,7 +293,8 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         operationalItemIndex,
         legendElement,
         legendInfoIndex,
-        legendElementInfos
+        legendElementInfos,
+        normalizationField
       );
       const queryExpressions = this.interactiveStyleData.queryExpressions[
         operationalItemIndex
@@ -459,14 +465,16 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     operationalItemIndex: number,
     legendElement: LegendElement,
     legendInfoIndex?: number,
-    legendElementInfos?: any[]
+    legendElementInfos?: any[],
+    normalizationField?: string
   ): void {
     const queryExpression = this._generateQueryExpression(
       elementInfo,
       field,
       legendInfoIndex,
       legendElement,
-      legendElementInfos
+      legendElementInfos,
+      normalizationField
     );
     const queryExpressions = this.interactiveStyleData.queryExpressions[
       operationalItemIndex
@@ -485,7 +493,8 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     field: string,
     legendInfoIndex: number,
     legendElement: LegendElement,
-    legendElementInfos?: any[]
+    legendElementInfos?: any[],
+    normalizationField?: string
   ): string {
     const { value, label } = elementInfo;
     const elementInfoHasValue = elementInfo.hasOwnProperty("value")
@@ -503,11 +512,15 @@ class InteractiveStyleViewModel extends declared(Accessor) {
           ) &&
           Array.isArray(legendElementInfos[legendElementInfos.length - 2].value)
         ) {
-          const expression = `${field} > ${
-            legendElementInfos[0].value[1]
-          } OR ${field} < ${
-            legendElementInfos[legendElementInfos.length - 2].value[0]
-          } OR ${field} IS NULL`;
+          const expression = normalizationField
+            ? `${normalizationField} = 0 OR ((${field}/${normalizationField}) > ${
+                legendElementInfos[0].value[1]
+              }) OR ((${field}/${normalizationField}) < ${
+                legendElementInfos[legendElementInfos.length - 2].value[0]
+              }) OR ${field} IS NULL`
+            : `${field} > ${legendElementInfos[0].value[1]} OR ${field} < ${
+                legendElementInfos[legendElementInfos.length - 2].value[0]
+              } OR ${field} IS NULL`;
           return expression;
         } else {
           // Types unique symbols - 'Other' category
@@ -530,9 +543,13 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         }
       } else if (label.indexOf(">") !== -1) {
         const expression = Array.isArray(elementInfoHasValue)
-          ? `${field} > ${elementInfoHasValue[0]} AND ${field} <= ${
-              elementInfo.value[1]
-            }`
+          ? normalizationField
+            ? `(${field}/${normalizationField}) > ${
+                elementInfoHasValue[0]
+              } AND (${field}/${normalizationField})<= ${elementInfo.value[1]}`
+            : `${field} > ${elementInfoHasValue[0]} AND ${field} <= ${
+                elementInfo.value[1]
+              }`
           : `${field} = ${elementInfoHasValue} OR ${field} = '${elementInfoHasValue}'`;
         return expression;
       } else {
@@ -547,9 +564,15 @@ class InteractiveStyleViewModel extends declared(Accessor) {
               "value"
             ) &&
               legendInfoIndex === legendElementInfos.length - 2)
-            ? `${field} >= ${elementInfoHasValue[0]} AND ${field} <= ${
-                elementInfoHasValue[1]
-              }`
+            ? normalizationField
+              ? `(${field}/${normalizationField}) >= ${
+                  elementInfoHasValue[0]
+                } AND (${field}/${normalizationField})<= ${
+                  elementInfo.value[1]
+                }`
+              : `${field} >= ${elementInfoHasValue[0]} AND ${field} <= ${
+                  elementInfoHasValue[1]
+                }`
             : `${field} > ${elementInfoHasValue[0]} AND ${field} <= ${
                 elementInfoHasValue[1]
               }`

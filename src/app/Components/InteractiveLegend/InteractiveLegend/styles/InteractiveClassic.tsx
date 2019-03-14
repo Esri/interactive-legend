@@ -81,6 +81,7 @@ import {
   LayerUID
 } from "../../../../interfaces/interfaces";
 import { renderRelationshipRamp } from "../relationshipRamp/utils";
+import { normalize } from "dojox/gfx/matrix";
 
 //----------------------------------
 //
@@ -290,16 +291,24 @@ class InteractiveClassic extends declared(Widget) {
               this.selectedStyleData.add(null);
             } else {
               const featureLayer = featureLayerView.layer as FeatureLayer;
-              const renderer = featureLayer.renderer as
-                | __esri.UniqueValueRenderer
-                | __esri.ClassBreaksRenderer;
+              const renderer = featureLayer.renderer as any;
               const field = renderer ? renderer.field : null;
+              const normalizationField =
+                renderer &&
+                renderer.hasOwnProperty("normalizationField") &&
+                renderer.hasOwnProperty("normalizationType") &&
+                renderer.normalizationField &&
+                renderer.normalizationType &&
+                renderer.normalizationType === "field"
+                  ? renderer.normalizationField
+                  : null;
               this.selectedStyleData.add({
                 layerItemId: featureLayer.id,
                 field,
                 selectedInfoIndex: [],
                 applyStyles: null,
-                featureLayerView
+                featureLayerView,
+                normalizationField
               });
             }
           }
@@ -537,6 +546,13 @@ class InteractiveClassic extends declared(Widget) {
       ? this.selectedStyleData.getItemAt(operationalItemIndex).field
       : null;
 
+    const normalizationField = this.selectedStyleData.getItemAt(
+      operationalItemIndex
+    )
+      ? this.selectedStyleData.getItemAt(operationalItemIndex)
+          .normalizationField
+      : null;
+
     // build symbol table or size ramp
     if (legendElement.type === "symbol-table" || isSizeRamp) {
       const rows = (legendElement.infos as any)
@@ -553,7 +569,8 @@ class InteractiveClassic extends declared(Widget) {
             activeLayerInfo,
             activeLayerInfoIndex,
             operationalItemIndex,
-            legendElementInfos
+            legendElementInfos,
+            normalizationField
           )
         )
         .filter((row: any) => !!row);
@@ -608,7 +625,13 @@ class InteractiveClassic extends declared(Widget) {
 
     const interactiveLegendLayerTable = {
       [CSS.interactiveLegendLayerTable]:
-        featureLayerData && featureLayerData.applyStyles
+        featureLayerData &&
+        featureLayerData.applyStyles &&
+        !(
+          legendElement.type === "color-ramp" ||
+          legendElement.type === "opacity-ramp" ||
+          legendElement.type === "heatmap-ramp"
+        )
     };
 
     const layerTable = this.classes(
@@ -860,7 +883,8 @@ class InteractiveClassic extends declared(Widget) {
     activeLayerInfo: ActiveLayerInfo,
     activeLayerInfoIndex: number,
     operationalItemIndex: number,
-    legendElementInfos: any[]
+    legendElementInfos: any[],
+    normalizationField: string
   ): VNode {
     // nested
     if (elementInfo.type) {
@@ -1022,7 +1046,8 @@ class InteractiveClassic extends declared(Widget) {
                 operationalItemIndex,
                 legendElement,
                 isPredominance,
-                legendElementInfos
+                legendElementInfos,
+                normalizationField
               );
             }
           }}
@@ -1045,7 +1070,8 @@ class InteractiveClassic extends declared(Widget) {
                 operationalItemIndex,
                 legendElement,
                 isPredominance,
-                legendElementInfos
+                legendElementInfos,
+                normalizationField
               );
             }
           }}
@@ -1184,7 +1210,8 @@ class InteractiveClassic extends declared(Widget) {
     operationalItemIndex: number,
     legendElement: LegendElement,
     isPredominance: boolean,
-    legendElementInfos?: any[]
+    legendElementInfos?: any[],
+    normalizationField?: string
   ): void {
     // this.filterMode === "featureFilter"
     //   ? this._featureFilter(
@@ -1228,7 +1255,8 @@ class InteractiveClassic extends declared(Widget) {
         legendInfoIndex,
         legendElement,
         isPredominance,
-        legendElementInfos
+        legendElementInfos,
+        normalizationField
       );
     } else if (this.filterMode === "mute") {
       this._featureMute(
@@ -1239,7 +1267,8 @@ class InteractiveClassic extends declared(Widget) {
         operationalItemIndex,
         legendElement,
         legendElementInfos,
-        isPredominance
+        isPredominance,
+        normalizationField
       );
     }
   }
@@ -1253,7 +1282,8 @@ class InteractiveClassic extends declared(Widget) {
     legendInfoIndex: number,
     legendElement: LegendElement,
     isPredominance: boolean,
-    legendElementInfos?: any[]
+    legendElementInfos?: any[],
+    normalizationField?: string
   ): void {
     this._handleSelectedStyles(event);
     this.viewModel.applyFeatureFilter(
@@ -1263,7 +1293,8 @@ class InteractiveClassic extends declared(Widget) {
       legendElement,
       legendInfoIndex,
       isPredominance,
-      legendElementInfos
+      legendElementInfos,
+      normalizationField
     );
   }
 
@@ -1304,7 +1335,8 @@ class InteractiveClassic extends declared(Widget) {
     operationalItemIndex: number,
     legendElement: LegendElement,
     legendElementInfos: any[],
-    isPredominance: boolean
+    isPredominance: boolean,
+    normalizationField?: string
   ): void {
     this._handleSelectedStyles(event);
     this.viewModel.applyFeatureMute(
@@ -1314,7 +1346,8 @@ class InteractiveClassic extends declared(Widget) {
       operationalItemIndex,
       legendElement,
       legendElementInfos,
-      isPredominance
+      isPredominance,
+      normalizationField
     );
   }
   // End of filter methods
