@@ -164,7 +164,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
                   "Warning: Interactive Legend tool may not load if view cannot finish updating."
                 );
               }
-            }, 20000);
+            }, 45000);
           })
           // watchUtils.whenFalse(this, "view.updating", () => {
           //   this.layerListViewModel.operationalItems.forEach(() => {
