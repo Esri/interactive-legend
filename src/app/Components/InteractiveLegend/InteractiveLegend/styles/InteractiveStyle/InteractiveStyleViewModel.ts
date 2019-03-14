@@ -53,7 +53,6 @@ import {
   InteractiveStyleData,
   LegendElement
 } from "../../../../../interfaces/interfaces";
-import { normalize } from "dojox/gfx/matrix";
 
 // HighLightState
 // type HighLightState = "ready" | "querying" | "loading";
