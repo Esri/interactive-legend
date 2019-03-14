@@ -156,6 +156,15 @@ class InteractiveStyleViewModel extends declared(Accessor) {
               this.searchExpressions.add(null);
             });
             this._storeFeatureData(layerViewKey);
+          }),
+          watchUtils.whenOnce(this, "view", () => {
+            setTimeout(() => {
+              if (this.state !== "ready") {
+                console.warn(
+                  "Warning: Interactive Legend tool may not load if view cannot finish updating."
+                );
+              }
+            }, 60000);
           })
           // watchUtils.whenFalse(this, "view.updating", () => {
           //   this.layerListViewModel.operationalItems.forEach(() => {
