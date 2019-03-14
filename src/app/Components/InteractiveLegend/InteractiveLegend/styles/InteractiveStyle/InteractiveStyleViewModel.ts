@@ -155,15 +155,6 @@ class InteractiveStyleViewModel extends declared(Accessor) {
               this.searchExpressions.add(null);
             });
             this._storeFeatureData(layerViewKey);
-          }),
-          watchUtils.whenOnce(this, "view", () => {
-            setTimeout(() => {
-              if (this.state !== "ready") {
-                console.warn(
-                  "Warning: Interactive Legend tool may not load if view cannot finish updating."
-                );
-              }
-            }, 60000);
           })
           // watchUtils.whenFalse(this, "view.updating", () => {
           //   this.layerListViewModel.operationalItems.forEach(() => {
@@ -547,7 +538,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
             }
           });
           const noExpression = expressionList.join(" AND ");
-          return noExpression;
+          return `${noExpression} OR ${field} IS NULL`;
         }
       } else if (label.indexOf(">") !== -1) {
         const expression = Array.isArray(elementInfoHasValue)
