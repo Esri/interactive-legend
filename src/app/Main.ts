@@ -558,6 +558,23 @@ class InteractiveLegendApp {
       screenshotExpand.group = screenshotGroup;
 
       view.ui.add(screenshotExpand, screenshotPosition);
+      watchUtils.whenTrue(this.screenshot, "screenshotModeIsActive", () => {
+        if (
+          this.interactiveLegendExpand &&
+          this.interactiveLegendExpand.expanded
+        ) {
+          this.interactiveLegendExpand.expanded = false;
+        }
+        if (this.infoExpand && this.infoExpand.expanded) {
+          this.infoExpand.expanded = false;
+        }
+        if (this.searchExpand && this.searchExpand.expanded) {
+          this.searchExpand.expanded = false;
+        }
+        if (this.layerListExpand && this.layerListExpand.expanded) {
+          this.layerListExpand.expanded = false;
+        }
+      });
     }
   }
 

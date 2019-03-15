@@ -355,6 +355,21 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/i18n!./Componen
                 var screenshotGroup = screenshotPosition.indexOf("left") !== -1 ? "left" : "right";
                 screenshotExpand.group = screenshotGroup;
                 view.ui.add(screenshotExpand, screenshotPosition);
+                watchUtils.whenTrue(this.screenshot, "screenshotModeIsActive", function () {
+                    if (_this.interactiveLegendExpand &&
+                        _this.interactiveLegendExpand.expanded) {
+                        _this.interactiveLegendExpand.expanded = false;
+                    }
+                    if (_this.infoExpand && _this.infoExpand.expanded) {
+                        _this.infoExpand.expanded = false;
+                    }
+                    if (_this.searchExpand && _this.searchExpand.expanded) {
+                        _this.searchExpand.expanded = false;
+                    }
+                    if (_this.layerListExpand && _this.layerListExpand.expanded) {
+                        _this.layerListExpand.expanded = false;
+                    }
+                });
             }
         };
         // _handleLayerListWidget
