@@ -22,5 +22,5 @@ define({
   "onboardingPanelScreenshotStepThree": "Per includere un popup, selezionare una feature sulla mappa.",
   "onboardingPanelScreenshotStepFour": "Fai clic su Imposta area mappa. Disegnare un rettangolo per selezionare un'area per l’immagine.",
   "onboardingPanelScreenshotStepFive": "Fare clic su Scarica immagine.",
-  "showAll": "é_Show All_________________È"
+  "showAll": "Mostra tutto"
 });

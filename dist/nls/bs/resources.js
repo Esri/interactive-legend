@@ -22,5 +22,5 @@ define({
   "onboardingPanelScreenshotStepThree": "Kako biste uključili skočni prozor, odaberi geoobjekt na karti.",
   "onboardingPanelScreenshotStepFour": "Kliknite Postavi područje karte. Nacrtajte pravokutnik da biste odabrali regiju za sliku.",
   "onboardingPanelScreenshotStepFive": "Kliknite Preuzmi sliku.",
-  "showAll": "Č_Show All_________________ž"
+  "showAll": "Prikaži sve"
 });

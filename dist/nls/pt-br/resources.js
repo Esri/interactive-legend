@@ -22,5 +22,5 @@ define({
   "onboardingPanelScreenshotStepThree": "Para incluir um pop-up, selecione uma feição no mapa.",
   "onboardingPanelScreenshotStepFour": "Clique em Definir a área do mapa. Desenhe um retângulo para selecionar uma região para sua imagem.",
   "onboardingPanelScreenshotStepFive": "Clique em Baixar Imagem.",
-  "showAll": "ã_Show All_________________Ç"
+  "showAll": "Mostrar Todos"
 });

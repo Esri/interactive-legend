@@ -22,5 +22,5 @@ define({
   "onboardingPanelScreenshotStepThree": "Lai iekļautu uznirstošo logu, kartē izvēlieties elementu.",
   "onboardingPanelScreenshotStepFour": "Noklikšķiniet uz Iestatīt kartes teritoriju. Uzzīmējiet taisnstūri, lai izvēlētos sava attēla reģionu.",
   "onboardingPanelScreenshotStepFive": "Noklikšķiniet uz Lejupielādēt attēlu.",
-  "showAll": "ķ_Show All_________________ū"
+  "showAll": "Rādīt visu"
 });

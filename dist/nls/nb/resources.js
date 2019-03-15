@@ -22,5 +22,5 @@ define({
   "onboardingPanelScreenshotStepThree": "Velg et geoobjekt på kartet for å inkludere et popupfelt.",
   "onboardingPanelScreenshotStepFour": "Klikk på Angi kartområde. Tegn et rektangel for å velge en region for bildet.",
   "onboardingPanelScreenshotStepFive": "Klikk på Last ned bilde.",
-  "showAll": "å_Show All_________________ø"
+  "showAll": "Vis alle"
 });

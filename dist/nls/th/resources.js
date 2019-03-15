@@ -22,5 +22,5 @@ define({
   "onboardingPanelScreenshotStepThree": "หากต้องการเพิ่มป็อปอัพ ให้เลือกฟีเจอร์บนแผนที่",
   "onboardingPanelScreenshotStepFour": "คลิก ตั้งค่าพื้นที่แผนที่ วาดสี่เหลี่ยมเพื่อเลือกขอบเขตสำหรับภาพของคุณ",
   "onboardingPanelScreenshotStepFive": "คลิก ดาวน์โหลดภาพ",
-  "showAll": "ก้_Show All_________________ษฺ"
+  "showAll": "แสดงทั้งหมด"
 });

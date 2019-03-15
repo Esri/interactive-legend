@@ -22,5 +22,5 @@ define({
   "onboardingPanelScreenshotStepThree": "Selecteer een object op de kaart om een pop-up op te nemen.",
   "onboardingPanelScreenshotStepFour": "Klik op Het kaartgebied instellen. Teken een rechthoek om een deel van uw afbeelding te selecteren.",
   "onboardingPanelScreenshotStepFive": "Klik op Afbeelding downloaden.",
-  "showAll": "Ĳ_Show All_________________ä"
+  "showAll": "Alles tonen"
 });

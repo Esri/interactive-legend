@@ -22,5 +22,5 @@ define({
   "onboardingPanelScreenshotStepThree": "要包含弹出窗口，请在地图上选择一个要素。",
   "onboardingPanelScreenshotStepFour": "单击“设置地图区域”。 绘制一个矩形以选择图像的区域。",
   "onboardingPanelScreenshotStepFive": "单击“下载图像”。",
-  "showAll": "试_Show All_________________验"
+  "showAll": "显示全部"
 });

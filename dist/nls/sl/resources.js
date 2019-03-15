@@ -22,5 +22,5 @@ define({
   "onboardingPanelScreenshotStepThree": "Če želite vključiti pojavno okno, na karti izberite geoobjekt.",
   "onboardingPanelScreenshotStepFour": "Kliknite »Nastavi območje karte«. Narišite pravokotnik, da izberete regijo za svojo sliko.",
   "onboardingPanelScreenshotStepFive": "Kliknite »Prenesi sliko«.",
-  "showAll": "Š_Show All_________________č"
+  "showAll": "Prikaži vse"
 });

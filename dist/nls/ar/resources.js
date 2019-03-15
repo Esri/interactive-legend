@@ -22,5 +22,5 @@ define({
   "onboardingPanelScreenshotStepThree": "لتضمين عنصر منبثق، حدد إحدى المعالم على الخريطة.",
   "onboardingPanelScreenshotStepFour": "انقر على \"تعيين منطقة الخريطة\". ارسم مستطيلاً لتحديد منطقة لصورتك.",
   "onboardingPanelScreenshotStepFive": "انقر على \"تنزيل الصورة\".",
-  "showAll": "بيت_Show All_________________لاحقة"
+  "showAll": "إظهار الكل"
 });

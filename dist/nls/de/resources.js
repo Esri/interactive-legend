@@ -22,5 +22,5 @@ define({
   "onboardingPanelScreenshotStepThree": "Um ein Pop-up einzubeziehen, wählen Sie auf der Karte ein Feature aus.",
   "onboardingPanelScreenshotStepFour": "Klicken Sie auf \"Kartenbereich festlegen\". Ziehen Sie ein Rechteck auf, um eine Region für das Bild auszuwählen.",
   "onboardingPanelScreenshotStepFive": "Klicken Sie auf \"Bild herunterladen\".",
-  "showAll": "ä_Show All_________________Ü"
+  "showAll": "Alle anzeigen"
 });

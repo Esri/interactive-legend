@@ -14,7 +14,7 @@ define({
   "firstOnboardingWelcomeMessage": "凡例内の値を選択してマップ レイヤーをフィルター処理して、データを探索します。",
   "secondOnboardingWelcomeMessage": "フィルター条件と一致するフィーチャがマップ上で強調されます。",
   "thirdOnboardingWelcomeMessage": "選択した凡例項目をクリックすると、フィルターから削除されます。",
-  "onboardingConfirmation": "取得",
+  "onboardingConfirmation": "OK",
   "close": "閉じる",
   "onboardingPanelScreenshotTitle": "マップ画像の取得",
   "onboardingPanelScreenshotStepOne": "[スクリーンショット] ボタンをクリックします。",
@@ -22,5 +22,5 @@ define({
   "onboardingPanelScreenshotStepThree": "ポップアップを含める場合、マップ上のフィーチャを選択します。",
   "onboardingPanelScreenshotStepFour": "[マップ エリアの設定] をクリックします。 四角形を描画して、画像の領域を選択します。",
   "onboardingPanelScreenshotStepFive": "[画像のダウンロード] をクリックします。",
-  "showAll": "須_Show All_________________鷗"
+  "showAll": "すべて表示"
 });
