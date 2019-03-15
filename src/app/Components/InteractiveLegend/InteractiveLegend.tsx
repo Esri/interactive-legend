@@ -41,8 +41,8 @@ import InteractiveClassic = require("./InteractiveLegend/styles/InteractiveClass
 // interfaces
 import { LayerInfo, FilterMode, LayerUID } from "../../interfaces/interfaces";
 
-// InteractiveLegendViewModel
-import InteractiveLegendViewModel = require("./InteractiveLegend/InteractiveLegendViewModel");
+// LegendViewModel
+import LegendViewModel = require("esri/widgets/Legend/LegendViewModel");
 
 // esri.widgets.LayerList.LayerListViewModel
 import LayerListViewModel = require("esri/widgets/LayerList/LayerListViewModel");
@@ -92,7 +92,7 @@ class InteractiveLegend extends declared(Widget) {
   // viewModel
   @property()
   @renderable(["view.size"])
-  viewModel: InteractiveLegendViewModel = new InteractiveLegendViewModel();
+  viewModel: LegendViewModel = new LegendViewModel();
 
   // filterMode
   @aliasOf("style.filterMode")

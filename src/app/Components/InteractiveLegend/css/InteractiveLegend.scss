@@ -306,8 +306,21 @@
 }
 
 html[dir="rtl"] {
+  .esri-interactive-legend__interactive-styles {
+    .esri-legend__layer-body {
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    .esri-interactive-legend__layer {
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+
   .esri-interactive-legend__onboarding-close-container {
     right: auto;
     left: 8px;
   }
+
 }

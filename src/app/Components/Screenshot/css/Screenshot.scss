@@ -252,8 +252,10 @@ html[dir="rtl"] {
 
 @media only screen and (min-device-width: 320px) and (max-device-width: 568px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: landscape) {
   .esri-screenshot__screenshot-img-container {
+    max-width: 85vw;
+
     .esri-screenshot__js-screenshot-image {
-      width: 20%;
+      width: 50%;
     }
   }
 }
