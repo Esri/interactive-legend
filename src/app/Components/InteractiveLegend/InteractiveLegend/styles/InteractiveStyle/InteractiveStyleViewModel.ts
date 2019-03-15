@@ -545,7 +545,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
           ? normalizationField
             ? `(${field}/${normalizationField}) > ${
                 elementInfoHasValue[0]
-              } AND (${field}/${normalizationField})<= ${elementInfo.value[1]}`
+              } AND (${field}/${normalizationField}) <= ${elementInfo.value[1]}`
             : `${field} > ${elementInfoHasValue[0]} AND ${field} <= ${
                 elementInfo.value[1]
               }`
@@ -566,7 +566,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
             ? normalizationField
               ? `(${field}/${normalizationField}) >= ${
                   elementInfoHasValue[0]
-                } AND (${field}/${normalizationField})<= ${
+                } AND (${field}/${normalizationField}) <= ${
                   elementInfo.value[1]
                 }`
               : `${field} >= ${elementInfoHasValue[0]} AND ${field} <= ${

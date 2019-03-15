@@ -62,7 +62,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         offScreenPopupContainer: "esri-screenshot__offscreen-pop-up-container",
         offScreenLegendContainer: "esri-screenshot__offscreen-legend-container",
         screenshotClose: "esri-screenshot__close-button",
-        closeButtonContainer: "esri-screenshot__close-button-container"
+        closeButtonContainer: "esri-screenshot__close-button-container",
+        screenshotPreviewContainer: "esri-screenshot__img-preview-container"
     };
     var Screenshot = /** @class */ (function (_super) {
         __extends(Screenshot, _super);
@@ -240,10 +241,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 _a);
             var screenshotPreviewBtns = this._renderScreenshotPreviewBtns();
             return (widget_1.tsx("div", { class: this.classes(CSS.screenshotDiv, overlayIsVisible) },
-                widget_1.tsx("div", { class: CSS.screenshotImgContainer },
-                    widget_1.tsx("div", null,
-                        widget_1.tsx("img", { bind: this, afterCreate: widget_1.storeNode, "data-node-ref": "_screenshotImgNode", class: CSS.screenshotImg }),
-                        screenshotPreviewBtns))));
+                widget_1.tsx("div", { class: CSS.screenshotPreviewContainer },
+                    widget_1.tsx("div", { class: CSS.screenshotImgContainer },
+                        widget_1.tsx("img", { bind: this, afterCreate: widget_1.storeNode, "data-node-ref": "_screenshotImgNode", class: CSS.screenshotImg })),
+                    screenshotPreviewBtns)));
         };
         // _renderScreenshotPreviewBtns
         Screenshot.prototype._renderScreenshotPreviewBtns = function () {
