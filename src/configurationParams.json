@@ -7,7 +7,7 @@
         },
         {
           "type": "paragraph",
-          "value": "Documentation on how to modify the legend drawing style can be found here: <a href='https://doc.arcgis.com/en/arcgis-online/create-maps/change-style.htm' target='_blank' rel='noopener'>https://doc.arcgis.com/en/arcgis-online/create-maps/change-style.htm</a>"
+          "value": "Documentation on how to modify the legend drawing style can be found here: <a href='https://doc.arcgis.com/en/arcgis-online/create-maps/change-style.htm' target='_blank' rel='noopener'>https://doc.arcgis.com/en/arcgis-online/create-maps/change-style.htm</a>. The interactive legend tool does not support field attributes added to the map legend via custom expression."
         },
         {
           "type": "itembrowser",
