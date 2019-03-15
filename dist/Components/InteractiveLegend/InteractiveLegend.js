@@ -25,7 +25,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "dojo/i18n!./InteractiveLegend/nls/Legend", "esri/widgets/Widget", "esri/core/accessorSupport/decorators", "esri/widgets/support/widget", "esri/core/Handles", "esri/core/watchUtils", "./InteractiveLegend/styles/InteractiveClassic", "./InteractiveLegend/InteractiveLegendViewModel"], function (require, exports, __assign, __extends, __decorate, i18n, Widget, decorators_1, widget_1, Handles, watchUtils, InteractiveClassic, InteractiveLegendViewModel) {
+define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "dojo/i18n!./InteractiveLegend/nls/Legend", "esri/widgets/Widget", "esri/core/accessorSupport/decorators", "esri/widgets/support/widget", "esri/core/Handles", "esri/core/watchUtils", "./InteractiveLegend/styles/InteractiveClassic", "esri/widgets/Legend/LegendViewModel"], function (require, exports, __assign, __extends, __decorate, i18n, Widget, decorators_1, widget_1, Handles, watchUtils, InteractiveClassic, LegendViewModel) {
     "use strict";
     //----------------------------------
     //
@@ -61,7 +61,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             // view
             _this.view = null;
             // viewModel
-            _this.viewModel = new InteractiveLegendViewModel();
+            _this.viewModel = new LegendViewModel();
             // filterMode
             _this.filterMode = null;
             // basemapLegendVisible
