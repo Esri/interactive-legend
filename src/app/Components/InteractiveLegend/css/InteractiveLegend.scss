@@ -260,6 +260,17 @@
       }
     }
 
+    .esri-interactive-legend__no-caption {
+      .esri-interactive-legend__reset-button-container {
+        width: 100%;
+
+        .esri-interactive-legend__reset-button {
+          padding-top: 2.5%;
+          padding-bottom: 2.5%;
+        }
+      }
+    }
+
   }
 
 
