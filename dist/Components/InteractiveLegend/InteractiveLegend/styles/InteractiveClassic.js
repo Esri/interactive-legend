@@ -183,14 +183,27 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                                 renderer.normalizationType === "field"
                                 ? renderer.normalizationField
                                 : null;
-                            _this.selectedStyleData.add({
-                                layerItemId: featureLayer.id,
-                                field: field,
-                                selectedInfoIndex: [],
-                                applyStyles: null,
-                                featureLayerView: featureLayerView,
-                                normalizationField: normalizationField
-                            });
+                            var hasCustomArcade = renderer &&
+                                renderer.hasOwnProperty("field2") &&
+                                renderer.hasOwnProperty("field3") &&
+                                renderer.hasOwnProperty("fieldDelimiter") &&
+                                ((renderer.field2 || renderer.field3) &&
+                                    renderer.fieldDelimiter)
+                                ? true
+                                : false;
+                            if (hasCustomArcade) {
+                                _this.selectedStyleData.add(null);
+                            }
+                            else {
+                                _this.selectedStyleData.add({
+                                    layerItemId: featureLayer.id,
+                                    field: field,
+                                    selectedInfoIndex: [],
+                                    applyStyles: null,
+                                    featureLayerView: featureLayerView,
+                                    normalizationField: normalizationField
+                                });
+                            }
                         }
                     });
                 })
@@ -378,7 +391,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     featureLayerData.applyStyles &&
                     !(legendElement.type === "color-ramp" ||
                         legendElement.type === "opacity-ramp" ||
-                        legendElement.type === "heatmap-ramp"),
+                        legendElement.type === "heatmap-ramp" ||
+                        legendElement.type === "size-ramp"),
                 _b);
             var layerTable = this.classes(CSS.layerTable, interactiveLegendLayerTable);
             var renderResetButton = this.offscreen

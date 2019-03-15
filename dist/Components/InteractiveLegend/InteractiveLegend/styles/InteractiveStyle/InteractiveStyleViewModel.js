@@ -94,13 +94,6 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                                 _this.searchExpressions.add(null);
                             });
                             _this._storeFeatureData(layerViewKey);
-                        }),
-                        watchUtils.whenOnce(_this, "view", function () {
-                            setTimeout(function () {
-                                if (_this.state !== "ready") {
-                                    console.warn("Warning: Interactive Legend tool may not load if view cannot finish updating.");
-                                }
-                            }, 60000);
                         })
                         // watchUtils.whenFalse(this, "view.updating", () => {
                         //   this.layerListViewModel.operationalItems.forEach(() => {
@@ -380,7 +373,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                             }
                         });
                         var noExpression = expressionList_1.join(" AND ");
-                        return noExpression;
+                        return noExpression + " OR " + field + " IS NULL";
                     }
                 }
                 else if (label.indexOf(">") !== -1) {

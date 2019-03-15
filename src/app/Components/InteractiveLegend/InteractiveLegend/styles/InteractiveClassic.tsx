@@ -301,14 +301,27 @@ class InteractiveClassic extends declared(Widget) {
                 renderer.normalizationType === "field"
                   ? renderer.normalizationField
                   : null;
-              this.selectedStyleData.add({
-                layerItemId: featureLayer.id,
-                field,
-                selectedInfoIndex: [],
-                applyStyles: null,
-                featureLayerView,
-                normalizationField
-              });
+              const hasCustomArcade =
+                renderer &&
+                renderer.hasOwnProperty("field2") &&
+                renderer.hasOwnProperty("field3") &&
+                renderer.hasOwnProperty("fieldDelimiter") &&
+                ((renderer.field2 || renderer.field3) &&
+                  renderer.fieldDelimiter)
+                  ? true
+                  : false;
+              if (hasCustomArcade) {
+                this.selectedStyleData.add(null);
+              } else {
+                this.selectedStyleData.add({
+                  layerItemId: featureLayer.id,
+                  field,
+                  selectedInfoIndex: [],
+                  applyStyles: null,
+                  featureLayerView,
+                  normalizationField
+                });
+              }
             }
           }
         );
@@ -629,7 +642,8 @@ class InteractiveClassic extends declared(Widget) {
         !(
           legendElement.type === "color-ramp" ||
           legendElement.type === "opacity-ramp" ||
-          legendElement.type === "heatmap-ramp"
+          legendElement.type === "heatmap-ramp" ||
+          legendElement.type === "size-ramp"
         )
     };
 
