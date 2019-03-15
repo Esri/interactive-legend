@@ -379,7 +379,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 else if (label.indexOf(">") !== -1) {
                     var expression = Array.isArray(elementInfoHasValue)
                         ? normalizationField
-                            ? "(" + field + "/" + normalizationField + ") > " + elementInfoHasValue[0] + " AND (" + field + "/" + normalizationField + ")<= " + elementInfo.value[1]
+                            ? "(" + field + "/" + normalizationField + ") > " + elementInfoHasValue[0] + " AND (" + field + "/" + normalizationField + ") <= " + elementInfo.value[1]
                             : field + " > " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfo.value[1]
                         : field + " = " + elementInfoHasValue + " OR " + field + " = '" + elementInfoHasValue + "'";
                     return expression;
@@ -394,7 +394,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                             (!legendElementInfos[legendElementInfos.length - 1].hasOwnProperty("value") &&
                                 legendInfoIndex === legendElementInfos.length - 2)
                             ? normalizationField
-                                ? "(" + field + "/" + normalizationField + ") >= " + elementInfoHasValue[0] + " AND (" + field + "/" + normalizationField + ")<= " + elementInfo.value[1]
+                                ? "(" + field + "/" + normalizationField + ") >= " + elementInfoHasValue[0] + " AND (" + field + "/" + normalizationField + ") <= " + elementInfo.value[1]
                                 : field + " >= " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfoHasValue[1]
                             : field + " > " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfoHasValue[1]
                         : singleQuote

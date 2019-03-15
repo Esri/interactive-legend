@@ -89,7 +89,8 @@ const CSS = {
   offScreenPopupContainer: "esri-screenshot__offscreen-pop-up-container",
   offScreenLegendContainer: "esri-screenshot__offscreen-legend-container",
   screenshotClose: "esri-screenshot__close-button",
-  closeButtonContainer: "esri-screenshot__close-button-container"
+  closeButtonContainer: "esri-screenshot__close-button-container",
+  screenshotPreviewContainer: "esri-screenshot__img-preview-container"
 };
 
 @subclass("Screenshot")
@@ -414,16 +415,16 @@ class Screenshot extends declared(Widget) {
     const screenshotPreviewBtns = this._renderScreenshotPreviewBtns();
     return (
       <div class={this.classes(CSS.screenshotDiv, overlayIsVisible)}>
-        <div class={CSS.screenshotImgContainer}>
-          <div>
+        <div class={CSS.screenshotPreviewContainer}>
+          <div class={CSS.screenshotImgContainer}>
             <img
               bind={this}
               afterCreate={storeNode}
               data-node-ref="_screenshotImgNode"
               class={CSS.screenshotImg}
             />
-            {screenshotPreviewBtns}
           </div>
+          {screenshotPreviewBtns}
         </div>
       </div>
     );
