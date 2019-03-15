@@ -642,7 +642,8 @@ class InteractiveClassic extends declared(Widget) {
         !(
           legendElement.type === "color-ramp" ||
           legendElement.type === "opacity-ramp" ||
-          legendElement.type === "heatmap-ramp"
+          legendElement.type === "heatmap-ramp" ||
+          legendElement.type === "size-ramp"
         )
     };
 

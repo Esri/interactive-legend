@@ -391,7 +391,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     featureLayerData.applyStyles &&
                     !(legendElement.type === "color-ramp" ||
                         legendElement.type === "opacity-ramp" ||
-                        legendElement.type === "heatmap-ramp"),
+                        legendElement.type === "heatmap-ramp" ||
+                        legendElement.type === "size-ramp"),
                 _b);
             var layerTable = this.classes(CSS.layerTable, interactiveLegendLayerTable);
             var renderResetButton = this.offscreen
