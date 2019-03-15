@@ -228,7 +228,7 @@
       display: -ms-flexbox;
       display: flex;
       align-items: center;
-      width: 72%;
+      width: 60%;
       height: 100%;
       padding-left: 1%;
     }
@@ -241,6 +241,7 @@
       justify-content: flex-end;
       align-items: center;
       height: 100%;
+      width: 40%;
 
       .esri-interactive-legend__reset-button {
         vertical-align: middle;
@@ -248,8 +249,8 @@
         height: 100%;
         width: 100%;
         font-size: 90%;
-        padding-top: 8%;
-        padding-bottom: 8%;
+        padding-top: 7%;
+        padding-bottom: 7%;
       }
 
       .esri-interactive-legend__reset-button:focus {
