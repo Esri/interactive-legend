@@ -22,5 +22,5 @@ define({
   "onboardingPanelScreenshotStepThree": "Чтобы включить всплывающее окно, выберите объект на карте.",
   "onboardingPanelScreenshotStepFour": "Щёлкните Установить область карты. Нарисуйте прямоугольник, чтобы выбрать область для вашего изображения.",
   "onboardingPanelScreenshotStepFive": "Щёлкните Скачать изображение.",
-  "showAll": "Ж_Show All_________________Я"
+  "showAll": "Показать все"
 });

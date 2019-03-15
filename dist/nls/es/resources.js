@@ -22,5 +22,5 @@ define({
   "onboardingPanelScreenshotStepThree": "Para incluir un elemento emergente, seleccione una entidad en el mapa.",
   "onboardingPanelScreenshotStepFour": "Haga clic en Definir área de mapa. Dibuje un rectángulo para seleccionar la región de su imagen.",
   "onboardingPanelScreenshotStepFive": "Haga clic en Descargar imagen.",
-  "showAll": "á_Show All_________________Ó"
+  "showAll": "Mostrar todo"
 });

@@ -22,5 +22,5 @@ define({
   "onboardingPanelScreenshotStepThree": "Açılır bilgi eklemek için, haritada bir detay seçin.",
   "onboardingPanelScreenshotStepFour": "Harita alanını ayarla’yı tıklayın. Görüntünüze bir bölge seçmek için bir dikdörtgen çizin.",
   "onboardingPanelScreenshotStepFive": "Görüntü İndir’i tıklayın.",
-  "showAll": "ı_Show All_________________İ"
+  "showAll": "Tümünü Göster"
 });

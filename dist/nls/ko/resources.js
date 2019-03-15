@@ -22,5 +22,5 @@ define({
   "onboardingPanelScreenshotStepThree": "팝업을 포함시키려면 맵에서 피처를 선택합니다.",
   "onboardingPanelScreenshotStepFour": "맵 영역 설정을 클릭합니다. 사각형을 그려 이미지 영역을 선택합니다.",
   "onboardingPanelScreenshotStepFive": "이미지 다운로드를 클릭합니다.",
-  "showAll": "한_Show All_________________빠"
+  "showAll": "모두 보기"
 });

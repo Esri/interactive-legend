@@ -22,5 +22,5 @@ define({
   "onboardingPanelScreenshotStepThree": "Jos haluat sisällyttää ponnahdusikkunan, valitse kohde kartalta.",
   "onboardingPanelScreenshotStepFour": "Valitse Määritä kartta-alue. Valitse kuva-alue piirtämällä suorakulmio.",
   "onboardingPanelScreenshotStepFive": "Valitse Lataa kuva.",
-  "showAll": "Å_Show All_________________ö"
+  "showAll": "Näytä kaikki"
 });

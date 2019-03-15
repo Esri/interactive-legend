@@ -22,5 +22,5 @@ define({
   "onboardingPanelScreenshotStepThree": "Щоб включити спливаюче вікно, виберіть об'єкт на карті.",
   "onboardingPanelScreenshotStepFour": "Клацніть «Задати область карти». Намалюйте прямокутник, щоб вибрати область для вашого зображення.",
   "onboardingPanelScreenshotStepFive": "Клацніть «Завантажити зображення».",
-  "showAll": "ґ_Show All_________________Ї"
+  "showAll": "Показати всі"
 });

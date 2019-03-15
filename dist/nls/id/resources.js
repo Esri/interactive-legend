@@ -22,5 +22,5 @@ define({
   "onboardingPanelScreenshotStepThree": "Untuk menyertakan pop-up, pilih fitur di peta.",
   "onboardingPanelScreenshotStepFour": "Klik Atur area peta. Gambar persegi untuk memilih wilayah pada gambar Anda.",
   "onboardingPanelScreenshotStepFive": "Klik Unduh Gambar.",
-  "showAll": "ng_Show All_________________ny"
+  "showAll": "Tampilkan Semua"
 });

@@ -11,7 +11,7 @@ define({
   "sizeRampFilterNotSupported": "Dydžio sekos legendos tipo filtravimas šiuo metu nepalaikomas.",
   "featureLayerError": "Filtravimą galima taikyti tik elementų sluoksniams.",
   "newInteractiveLegend": "Išbandykite interaktyvią legendą",
-  "firstOnboardingWelcomeMessage": "Norėdami filtruoti žemėlapio sluoksnius, tyrinėkite duomenis pasirinkdami reikšmes legendoje.",
+  "firstOnboardingWelcomeMessage": "Norėdami filtruoti žemėlapio sluoksnius, analizuokite duomenis pasirinkdami reikšmes legendoje.",
   "secondOnboardingWelcomeMessage": "Filtravimo kriterijus atitinkantys elementai žemėlapyje paryškinami.",
   "thirdOnboardingWelcomeMessage": "Spustelėkite pasirinktą legendos elementą, kad pašalintumėte jį iš filtro.",
   "onboardingConfirmation": "Supratau!",
@@ -22,5 +22,5 @@ define({
   "onboardingPanelScreenshotStepThree": "Norėdami įtraukti iškylantį langą, žemėlapyje pasirinkite elementą.",
   "onboardingPanelScreenshotStepFour": "Spustelėkite Nustatyti žemėlapio sritį. Nubrėžkite stačiakampį, kad pasirinktumėte vaizdo aprėpiamą teritoriją.",
   "onboardingPanelScreenshotStepFive": "Spustelėkite Atsisiųsti vaizdą.",
-  "showAll": "Į_Show All_________________š"
+  "showAll": "Rodyti visus"
 });

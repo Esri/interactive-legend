@@ -22,5 +22,5 @@ define({
   "onboardingPanelScreenshotStepThree": "Para incluir uma janela pop-up, selecione um elemento no mapa.",
   "onboardingPanelScreenshotStepFour": "Clique em Definir a área do mapa. Desenhe um retângulo para selecionar uma região para a sua imagem.",
   "onboardingPanelScreenshotStepFive": "Clique em Transferir Imagem.",
-  "showAll": "ã_Show All_________________Ç"
+  "showAll": "Mostrar Tudo"
 });

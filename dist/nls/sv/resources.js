@@ -22,5 +22,5 @@ define({
   "onboardingPanelScreenshotStepThree": "Ta med en popup genom att välja ett geoobjekt på kartan.",
   "onboardingPanelScreenshotStepFour": "Klicka på Ställ in kartområdet. Välj en region för bilden genom att rita en rektangel.",
   "onboardingPanelScreenshotStepFive": "Klicka på Hämta bild.",
-  "showAll": "Å_Show All_________________ö"
+  "showAll": "Visa alla"
 });

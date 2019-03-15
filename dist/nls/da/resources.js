@@ -22,5 +22,5 @@ define({
   "onboardingPanelScreenshotStepThree": "Hvis du vil inkludere en pop-up, skal du vælge et objekt på kortet.",
   "onboardingPanelScreenshotStepFour": "Klik på Indstil kortområde. Tegn et rektangel for at vælge et område til dit billede.",
   "onboardingPanelScreenshotStepFive": "Klik på Hent billede.",
-  "showAll": "ø_Show All_________________å"
+  "showAll": "Vis alle"
 });
