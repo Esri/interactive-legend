@@ -1,5 +1,5 @@
 /*
-  Copyright 2017 Esri
+  Copyright 2019 Esri
 
   Licensed under the Apache License, Version 2.0 (the "License");
 
@@ -25,6 +25,8 @@ import applicationConfig = require("dojo/text!../config/application.json");
 
 import ApplicationBase = require("ApplicationBase/ApplicationBase");
 
+import i18n = require("dojo/i18n!./userTypesError/nls/resources");
+
 import Application = require("./Main");
 
 const Main = new Application();
@@ -34,4 +36,15 @@ new ApplicationBase({
   settings: applicationBaseConfig
 })
   .load()
-  .then(base => Main.init(base));
+  .then(
+    base => Main.init(base),
+    message => {
+      if (message === "identity-manager:not-authorized") {
+        document.body.classList.remove("configurable-application--loading");
+        document.body.classList.add("app-error");
+        document.getElementById("main-container").innerHTML = `<h1>${
+          i18n.licenseError.title
+        }</h1><p>${i18n.licenseError.message}</p>`;
+      }
+    }
+  );

@@ -14,7 +14,7 @@
     "TypeScript"
   ],
   "devDependencies": {
-    "@esri/application-base-js": "0.0.2",
+    "@esri/application-base-js": "^0.0.5",
     "@types/arcgis-js-api": "^4.10.0",
     "autoprefixer": "^6.3.6",
     "dojo-typings": "^1.11.9",
