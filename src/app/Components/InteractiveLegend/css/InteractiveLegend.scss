@@ -187,6 +187,7 @@
       font-weight: 550;
       width: 70.5%;
       text-align: left;
+      word-break: break-word;
     }
 
     .esri-interactive-legend__visible-icon {
@@ -241,7 +242,7 @@
       justify-content: flex-end;
       align-items: center;
       height: 100%;
-      width: 40%;
+      width: 38%;
 
       .esri-interactive-legend__reset-button {
         vertical-align: middle;

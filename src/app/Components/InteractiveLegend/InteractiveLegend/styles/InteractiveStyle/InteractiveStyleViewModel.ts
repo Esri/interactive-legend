@@ -512,11 +512,11 @@ class InteractiveStyleViewModel extends declared(Accessor) {
           Array.isArray(legendElementInfos[legendElementInfos.length - 2].value)
         ) {
           const expression = normalizationField
-            ? `${normalizationField} = 0 OR ((${field}/${normalizationField}) > ${
+            ? `((${field}/${normalizationField}) > ${
                 legendElementInfos[0].value[1]
               }) OR ((${field}/${normalizationField}) < ${
                 legendElementInfos[legendElementInfos.length - 2].value[0]
-              }) OR ${field} IS NULL`
+              }) OR ${normalizationField} = 0 OR ${normalizationField} IS NULL`
             : `${field} > ${legendElementInfos[0].value[1]} OR ${field} < ${
                 legendElementInfos[legendElementInfos.length - 2].value[0]
               } OR ${field} IS NULL`;
