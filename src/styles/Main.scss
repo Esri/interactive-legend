@@ -155,3 +155,17 @@ html[dir="rtl"] {
   }
 
 }
+
+.app-error {
+  background-position: top center;
+  padding-top: 60px;
+  position: relative;
+  z-index: 2;
+  top: 35%;
+  left: 0;
+  text-align: center;
+}
+
+.app-error .configurable-application__view-container {
+  display: block;
+}

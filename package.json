@@ -14,7 +14,7 @@
     "TypeScript"
   ],
   "devDependencies": {
-    "@esri/application-base-js": "0.0.2",
+    "@esri/application-base-js": "^0.0.5",
     "@types/arcgis-js-api": "^4.10.0",
     "autoprefixer": "^6.3.6",
     "dojo-typings": "^1.11.9",
@@ -36,7 +36,6 @@
     "lint": "grunt lint"
   },
   "dependencies": {
-    "html2canvas-render-offscreen": "0.0.3",
     "lodash": ">=4.17.11"
   }
 }

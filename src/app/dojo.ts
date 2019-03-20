@@ -30,6 +30,10 @@
 
   const config = {
     async: true,
+    has: {
+      "esri-promise-compatibility": 1,
+      "esri-promise-compatibility-deprecation-warnings": 1
+    },
     locale: dojoLocale,
     packages: [
       {
