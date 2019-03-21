@@ -165,6 +165,7 @@
   .esri-interactive-legend__interactive-styles {
     background-color: #f5f5f5;
     height: 100%;
+    overflow: hidden;
 
     .esri-interactive-legend__layer-table {
       display: -webkit-box;
