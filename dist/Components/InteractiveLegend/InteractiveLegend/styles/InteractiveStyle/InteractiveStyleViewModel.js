@@ -385,18 +385,23 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                     return expression;
                 }
                 else {
-                    // Types unique symbols
                     var singleQuote = elementInfoHasValue.indexOf("'") !== -1
                         ? elementInfoHasValue.split("'").join("''")
                         : null;
-                    var expression = Array.isArray(elementInfo.value)
-                        ? legendElementInfos.length - 1 === legendInfoIndex ||
-                            (!legendElementInfos[legendElementInfos.length - 1].hasOwnProperty("value") &&
-                                legendInfoIndex === legendElementInfos.length - 2)
-                            ? normalizationField
-                                ? "(" + field + "/" + normalizationField + ") >= " + elementInfoHasValue[0] + " AND (" + field + "/" + normalizationField + ") <= " + elementInfo.value[1]
-                                : field + " >= " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfoHasValue[1]
-                            : field + " > " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfoHasValue[1]
+                    var isArray = Array.isArray(elementInfo.value);
+                    var isLastElement = legendElementInfos.length - 1 === legendInfoIndex;
+                    var lastElementAndNoValue = !legendElementInfos[legendElementInfos.length - 1].hasOwnProperty("value");
+                    var secondToLastElement = legendInfoIndex === legendElementInfos.length - 2;
+                    var expression = isArray
+                        ? normalizationField
+                            ? "(" + field + "/" + normalizationField + ") >= " + elementInfoHasValue[0] + " AND (" + field + "/" + normalizationField + ") <= " + elementInfo.value[1]
+                            : isLastElement ||
+                                (lastElementAndNoValue && secondToLastElement) ||
+                                (label.indexOf(">") === -1 &&
+                                    elementInfoHasValue[0] &&
+                                    elementInfoHasValue[1])
+                                ? field + " >= " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfoHasValue[1]
+                                : field + " > " + elementInfoHasValue[0] + " AND " + field + " <= " + elementInfoHasValue[1]
                         : singleQuote
                             ? field + " = '" + singleQuote + "'"
                             : isNaN(elementInfoHasValue) || !elementInfoHasValue.trim().length

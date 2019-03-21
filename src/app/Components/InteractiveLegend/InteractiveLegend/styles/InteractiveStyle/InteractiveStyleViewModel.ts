@@ -552,26 +552,30 @@ class InteractiveStyleViewModel extends declared(Accessor) {
           : `${field} = ${elementInfoHasValue} OR ${field} = '${elementInfoHasValue}'`;
         return expression;
       } else {
-        // Types unique symbols
         const singleQuote =
           elementInfoHasValue.indexOf("'") !== -1
             ? elementInfoHasValue.split("'").join("''")
             : null;
-        const expression = Array.isArray(elementInfo.value)
-          ? legendElementInfos.length - 1 === legendInfoIndex ||
-            (!legendElementInfos[legendElementInfos.length - 1].hasOwnProperty(
-              "value"
-            ) &&
-              legendInfoIndex === legendElementInfos.length - 2)
-            ? normalizationField
-              ? `(${field}/${normalizationField}) >= ${
-                  elementInfoHasValue[0]
-                } AND (${field}/${normalizationField}) <= ${
-                  elementInfo.value[1]
-                }`
-              : `${field} >= ${elementInfoHasValue[0]} AND ${field} <= ${
-                  elementInfoHasValue[1]
-                }`
+        const isArray = Array.isArray(elementInfo.value);
+        const isLastElement = legendElementInfos.length - 1 === legendInfoIndex;
+        const lastElementAndNoValue = !legendElementInfos[
+          legendElementInfos.length - 1
+        ].hasOwnProperty("value");
+        const secondToLastElement =
+          legendInfoIndex === legendElementInfos.length - 2;
+        const expression = isArray
+          ? normalizationField
+            ? `(${field}/${normalizationField}) >= ${
+                elementInfoHasValue[0]
+              } AND (${field}/${normalizationField}) <= ${elementInfo.value[1]}`
+            : isLastElement ||
+              (lastElementAndNoValue && secondToLastElement) ||
+              (label.indexOf(">") === -1 &&
+                elementInfoHasValue[0] &&
+                elementInfoHasValue[1])
+            ? `${field} >= ${elementInfoHasValue[0]} AND ${field} <= ${
+                elementInfoHasValue[1]
+              }`
             : `${field} > ${elementInfoHasValue[0]} AND ${field} <= ${
                 elementInfoHasValue[1]
               }`
