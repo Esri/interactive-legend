@@ -19,6 +19,9 @@
           "showOnLoad": true
         },
         {
+          "type": "appproxies"
+        },
+        {
           "type": "string",
           "fieldName": "title",
           "tooltip": "Use this to title your app.",
