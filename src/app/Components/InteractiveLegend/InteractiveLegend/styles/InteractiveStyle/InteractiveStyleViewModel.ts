@@ -540,17 +540,6 @@ class InteractiveStyleViewModel extends declared(Accessor) {
           const noExpression = expressionList.join(" AND ");
           return `${noExpression} OR ${field} IS NULL`;
         }
-      } else if (label.indexOf(">") !== -1) {
-        const expression = Array.isArray(elementInfoHasValue)
-          ? normalizationField
-            ? `(${field}/${normalizationField}) > ${
-                elementInfoHasValue[0]
-              } AND (${field}/${normalizationField}) <= ${elementInfo.value[1]}`
-            : `${field} > ${elementInfoHasValue[0]} AND ${field} <= ${
-                elementInfo.value[1]
-              }`
-          : `${field} = ${elementInfoHasValue} OR ${field} = '${elementInfoHasValue}'`;
-        return expression;
       } else {
         const singleQuote =
           elementInfoHasValue.indexOf("'") !== -1
@@ -565,14 +554,18 @@ class InteractiveStyleViewModel extends declared(Accessor) {
           legendInfoIndex === legendElementInfos.length - 2;
         const expression = isArray
           ? normalizationField
-            ? `(${field}/${normalizationField}) >= ${
-                elementInfoHasValue[0]
-              } AND (${field}/${normalizationField}) <= ${elementInfo.value[1]}`
-            : isLastElement ||
-              (lastElementAndNoValue && secondToLastElement) ||
-              (label.indexOf(">") === -1 &&
-                elementInfoHasValue[0] &&
-                elementInfoHasValue[1])
+            ? isLastElement || (lastElementAndNoValue && secondToLastElement)
+              ? `(${field}/${normalizationField}) >= ${
+                  elementInfoHasValue[0]
+                } AND (${field}/${normalizationField}) <= ${
+                  elementInfo.value[1]
+                }`
+              : `(${field}/${normalizationField}) > ${
+                  elementInfoHasValue[0]
+                } AND (${field}/${normalizationField}) <= ${
+                  elementInfo.value[1]
+                }`
+            : isLastElement || (lastElementAndNoValue && secondToLastElement)
             ? `${field} >= ${elementInfoHasValue[0]} AND ${field} <= ${
                 elementInfoHasValue[1]
               }`
