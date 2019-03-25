@@ -192,7 +192,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                                     renderer.fieldDelimiter)
                                 ? true
                                 : false;
-                            var invalidNormalization = renderer.hasOwnProperty("normalizationType") &&
+                            var invalidNormalization = renderer &&
+                                renderer.hasOwnProperty("normalizationType") &&
                                 (renderer.normalizationType === "percent-of-total" ||
                                     renderer.normalizationType === "log");
                             if (hasCustomArcade || invalidNormalization) {

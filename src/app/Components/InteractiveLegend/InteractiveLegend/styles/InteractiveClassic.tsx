@@ -313,6 +313,7 @@ class InteractiveClassic extends declared(Widget) {
                   ? true
                   : false;
               const invalidNormalization =
+                renderer &&
                 renderer.hasOwnProperty("normalizationType") &&
                 (renderer.normalizationType === "percent-of-total" ||
                   renderer.normalizationType === "log");
