@@ -327,7 +327,16 @@
 
 
 .esri-interactive-legend__layer-cell.esri-interactive-legend__layer-cell--info {
-  word-break: break-word;
+  -ms-word-break: break-all;
+  -moz-word-break: break-all;
+  word-break: break-all;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  .esri-interactive-legend__layer-cell.esri-interactive-legend__layer-cell--info {
+    word-break: break-word;
+
+  }
 }
 
 html[dir="rtl"] {
