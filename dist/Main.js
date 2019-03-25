@@ -109,9 +109,10 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/i18n!./Componen
             }
             config.title = !config.title ? itemUtils_1.getItemTitle(firstItem) : config.title;
             domHelper_1.setPageTitle(config.title);
-            // todo: Typings will be fixed in next release.
             var portalItem = this.base.results.applicationItem.value;
-            var appProxies = portalItem && portalItem.appProxies ? portalItem.appProxies : null;
+            var appProxies = portalItem && portalItem.applicationProxies
+                ? portalItem.applicationProxies
+                : null;
             var viewContainerNode = document.getElementById("viewContainer");
             var defaultViewProperties = itemUtils_1.getConfigViewProperties(config);
             validWebMapItems.forEach(function (item) {
