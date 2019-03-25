@@ -40,6 +40,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         layerRow: "esri-legend__layer-row",
         layerCell: "esri-legend__layer-cell",
         layerInfo: "esri-legend__layer-cell esri-legend__layer-cell--info",
+        interactiveLayerInfo: "esri-interactive-legend__layer-cell esri-interactive-legend__layer-cell--info",
         imageryLayerStretchedImage: "esri-legend__imagery-layer-image--stretched",
         imageryLayerCellStretched: "esri-legend__imagery-layer-cell--stretched",
         imageryLayerInfoStretched: "esri-legend__imagery-layer-info--stretched",
@@ -191,7 +192,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                                     renderer.fieldDelimiter)
                                 ? true
                                 : false;
-                            if (hasCustomArcade) {
+                            var invalidNormalization = renderer.hasOwnProperty("normalizationType") &&
+                                (renderer.normalizationType === "percent-of-total" ||
+                                    renderer.normalizationType === "log");
+                            if (hasCustomArcade || invalidNormalization) {
                                 _this.selectedStyleData.add(null);
                             }
                             else {
@@ -653,7 +657,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     } },
                     widget_1.tsx("div", { class: applySelect ? CSS.interactiveLegendInfoContainer : null },
                         widget_1.tsx("div", { class: this.classes(CSS.symbolContainer, symbolClasses) }, content),
-                        widget_1.tsx("div", { class: this.classes(CSS.layerInfo, labelClasses) }, styleUtils_1.getTitle(elementInfo.label, false) || "")),
+                        widget_1.tsx("div", { class: this.classes(CSS.layerInfo, labelClasses, CSS.interactiveLayerInfo) }, styleUtils_1.getTitle(elementInfo.label, false) || "")),
                     applySelect ? (selectedInfoIndex ? (featureLayerData.selectedInfoIndex &&
                         selectedInfoIndex.indexOf(legendInfoIndex) === -1 &&
                         selectedInfoIndex.length > 0 ? (widget_1.tsx("div", null,

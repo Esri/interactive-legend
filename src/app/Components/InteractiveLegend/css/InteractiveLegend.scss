@@ -325,6 +325,11 @@
   }
 }
 
+
+.esri-interactive-legend__layer-cell.esri-interactive-legend__layer-cell--info {
+  word-break: break-word;
+}
+
 html[dir="rtl"] {
   .esri-interactive-legend__interactive-styles {
     .esri-legend__layer-body {
