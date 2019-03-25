@@ -104,6 +104,8 @@ const CSS = {
   layerRow: "esri-legend__layer-row",
   layerCell: "esri-legend__layer-cell",
   layerInfo: "esri-legend__layer-cell esri-legend__layer-cell--info",
+  interactiveLayerInfo:
+    "esri-interactive-legend__layer-cell esri-interactive-legend__layer-cell--info",
   imageryLayerStretchedImage: "esri-legend__imagery-layer-image--stretched",
   imageryLayerCellStretched: "esri-legend__imagery-layer-cell--stretched",
   imageryLayerInfoStretched: "esri-legend__imagery-layer-info--stretched",
@@ -310,7 +312,12 @@ class InteractiveClassic extends declared(Widget) {
                   renderer.fieldDelimiter)
                   ? true
                   : false;
-              if (hasCustomArcade) {
+              const invalidNormalization =
+                renderer.hasOwnProperty("normalizationType") &&
+                (renderer.normalizationType === "percent-of-total" ||
+                  renderer.normalizationType === "log");
+
+              if (hasCustomArcade || invalidNormalization) {
                 this.selectedStyleData.add(null);
               } else {
                 this.selectedStyleData.add({
@@ -1093,7 +1100,13 @@ class InteractiveClassic extends declared(Widget) {
             <div class={this.classes(CSS.symbolContainer, symbolClasses)}>
               {content}
             </div>
-            <div class={this.classes(CSS.layerInfo, labelClasses)}>
+            <div
+              class={this.classes(
+                CSS.layerInfo,
+                labelClasses,
+                CSS.interactiveLayerInfo
+              )}
+            >
               {getTitle(elementInfo.label, false) || ""}
             </div>
           </div>
