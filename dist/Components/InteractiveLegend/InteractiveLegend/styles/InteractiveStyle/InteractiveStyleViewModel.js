@@ -463,7 +463,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                             if (field1 === field2) {
                                 return;
                             }
-                            zeroAndNull_1.push(field1 + " = 0 AND " + field2 + " IS NULL OR (" + field1 + " IS NULL AND " + field2 + " IS NULL)");
+                            zeroAndNull_1.push("(" + field1 + " = 0 AND " + field2 + " IS NULL) OR (" + field1 + " IS NULL AND " + field2 + " IS NULL)");
                         });
                     });
                     return "(" + expressions_1.join(" OR ") + ") OR (" + zeroAndNull_1.join(" OR ") + ")";

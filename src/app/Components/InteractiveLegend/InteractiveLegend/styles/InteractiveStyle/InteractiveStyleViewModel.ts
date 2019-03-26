@@ -663,7 +663,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
               return;
             }
             zeroAndNull.push(
-              `${field1} = 0 AND ${field2} IS NULL OR (${field1} IS NULL AND ${field2} IS NULL)`
+              `(${field1} = 0 AND ${field2} IS NULL) OR (${field1} IS NULL AND ${field2} IS NULL)`
             );
           });
         });
