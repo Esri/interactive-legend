@@ -412,7 +412,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                     if (elementInfo.value === field) {
                         return;
                     }
-                    var sqlQuery = "(" + elementInfo.value + " > " + field + " OR " + field + " IS NULL)";
+                    var sqlQuery = "(" + elementInfo.value + " > " + field + " OR (" + field + " IS NULL AND " + elementInfo.value + " <> 0 AND " + elementInfo.value + " IS NOT NULL))";
                     expressionArr.push(sqlQuery);
                 });
                 return expressionArr.join(" AND ");
@@ -439,7 +439,12 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                             otherExpression_1.push("(" + queryForMultiplePredominance.join(" AND ") + ")");
                         });
                     });
-                    return "(" + queryForZeroes_1.join(" AND ") + ") OR " + otherExpression_1.join(" OR ");
+                    var isNull_1 = [];
+                    fields.forEach(function (field) {
+                        isNull_1.push(field + " IS NULL");
+                    });
+                    var generatedOtherExpression = "(" + queryForZeroes_1.join(" AND ") + ") OR (" + otherExpression_1.join(" OR ") + ") OR (" + isNull_1.join(" AND ") + ")";
+                    return generatedOtherExpression;
                 }
                 else {
                     var expressions_1 = [];
@@ -452,7 +457,16 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                             expressions_1.push("(" + queryForZeroes_1.join(" AND ") + ")");
                         });
                     });
-                    return "(" + expressions_1.join(" OR ") + ")";
+                    var zeroAndNull_1 = [];
+                    fields.forEach(function (field1) {
+                        fields.forEach(function (field2) {
+                            if (field1 === field2) {
+                                return;
+                            }
+                            zeroAndNull_1.push("(" + field1 + " = 0 AND " + field2 + " IS NULL) OR (" + field1 + " IS NULL AND " + field2 + " IS NULL)");
+                        });
+                    });
+                    return "(" + expressions_1.join(" OR ") + ") OR (" + zeroAndNull_1.join(" OR ") + ")";
                 }
             }
         };

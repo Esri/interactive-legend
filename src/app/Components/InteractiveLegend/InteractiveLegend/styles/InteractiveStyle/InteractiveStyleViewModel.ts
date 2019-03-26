@@ -600,7 +600,9 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         }
         const sqlQuery = `(${
           elementInfo.value
-        } > ${field} OR ${field} IS NULL)`;
+        } > ${field} OR (${field} IS NULL AND ${elementInfo.value} <> 0 AND ${
+          elementInfo.value
+        } IS NOT NULL))`;
 
         expressionArr.push(sqlQuery);
       });
@@ -632,9 +634,16 @@ class InteractiveStyleViewModel extends declared(Accessor) {
             );
           });
         });
-        return `(${queryForZeroes.join(" AND ")}) OR ${otherExpression.join(
-          " OR "
-        )}`;
+
+        const isNull = [];
+
+        fields.forEach(field => {
+          isNull.push(`${field} IS NULL`);
+        });
+        const generatedOtherExpression = `(${queryForZeroes.join(
+          " AND "
+        )}) OR (${otherExpression.join(" OR ")}) OR (${isNull.join(" AND ")})`;
+        return generatedOtherExpression;
       } else {
         const expressions = [];
         fields.forEach(field1 => {
@@ -646,7 +655,20 @@ class InteractiveStyleViewModel extends declared(Accessor) {
             expressions.push(`(${queryForZeroes.join(" AND ")})`);
           });
         });
-        return `(${expressions.join(" OR ")})`;
+
+        const zeroAndNull = [];
+        fields.forEach(field1 => {
+          fields.forEach(field2 => {
+            if (field1 === field2) {
+              return;
+            }
+            zeroAndNull.push(
+              `(${field1} = 0 AND ${field2} IS NULL) OR (${field1} IS NULL AND ${field2} IS NULL)`
+            );
+          });
+        });
+
+        return `(${expressions.join(" OR ")}) OR (${zeroAndNull.join(" OR ")})`;
       }
     }
   }
