@@ -20,6 +20,8 @@
   limitations under the License.​
 */
 
+import * as i18nInteractiveLegend from "dojo/i18n!./nls/resources";
+
 import applicationBaseConfig = require("dojo/text!../config/applicationBase.json");
 import applicationConfig = require("dojo/text!../config/application.json");
 
@@ -45,6 +47,17 @@ new ApplicationBase({
         document.getElementById("main-container").innerHTML = `<h1>${
           i18n.licenseError.title
         }</h1><p>${i18n.licenseError.message}</p>`;
+      } else {
+        const errorMessage =
+          message && message.hasOwnProperty("message") && message.message
+            ? message.message
+            : i18nInteractiveLegend.error;
+
+        document.body.classList.remove("configurable-application--loading");
+        document.body.classList.add("app-error");
+        document.getElementById(
+          "main-container"
+        ).innerHTML = `<h1>${errorMessage}</h1>`;
       }
     }
   );

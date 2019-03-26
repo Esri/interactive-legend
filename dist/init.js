@@ -19,7 +19,7 @@
 
   limitations under the License.​
 */
-define(["require", "exports", "dojo/text!../config/applicationBase.json", "dojo/text!../config/application.json", "ApplicationBase/ApplicationBase", "dojo/i18n!./userTypesError/nls/resources", "./Main"], function (require, exports, applicationBaseConfig, applicationConfig, ApplicationBase, i18n, Application) {
+define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/text!../config/applicationBase.json", "dojo/text!../config/application.json", "ApplicationBase/ApplicationBase", "dojo/i18n!./userTypesError/nls/resources", "./Main"], function (require, exports, i18nInteractiveLegend, applicationBaseConfig, applicationConfig, ApplicationBase, i18n, Application) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Main = new Application();
@@ -33,6 +33,14 @@ define(["require", "exports", "dojo/text!../config/applicationBase.json", "dojo/
             document.body.classList.remove("configurable-application--loading");
             document.body.classList.add("app-error");
             document.getElementById("main-container").innerHTML = "<h1>" + i18n.licenseError.title + "</h1><p>" + i18n.licenseError.message + "</p>";
+        }
+        else {
+            var errorMessage = message && message.hasOwnProperty("message") && message.message
+                ? message.message
+                : i18nInteractiveLegend.error;
+            document.body.classList.remove("configurable-application--loading");
+            document.body.classList.add("app-error");
+            document.getElementById("main-container").innerHTML = "<h1>" + errorMessage + "</h1>";
         }
     });
 });
