@@ -108,6 +108,8 @@ const CSS = {
   popup: "offscreen-pop-up-container"
 };
 
+declare var calcite: any;
+
 class InteractiveLegendApp {
   //--------------------------------------------------------------------------
   //
@@ -496,6 +498,7 @@ class InteractiveLegendApp {
     splashButtonPosition: string
   ): void {
     if (config.splash) {
+      calcite.init();
       const splash = new Splash.default({
         view,
         config,
