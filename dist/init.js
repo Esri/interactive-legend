@@ -35,7 +35,11 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/text!../config/
             document.getElementById("main-container").innerHTML = "<h1>" + i18n.licenseError.title + "</h1><p>" + i18n.licenseError.message + "</p>";
         }
         else {
-            var errorMessage = message && message.hasOwnProperty("message") && message.message
+            var errorMessage = message &&
+                typeof message === "object" &&
+                message.hasOwnProperty("message") &&
+                typeof message.message === "string" &&
+                message.message
                 ? message.message
                 : i18nInteractiveLegend.error;
             document.body.classList.remove("configurable-application--loading");

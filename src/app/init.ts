@@ -49,7 +49,11 @@ new ApplicationBase({
         }</h1><p>${i18n.licenseError.message}</p>`;
       } else {
         const errorMessage =
-          message && message.hasOwnProperty("message") && message.message
+          message &&
+          typeof message === "object" &&
+          message.hasOwnProperty("message") &&
+          typeof message.message === "string" &&
+          message.message
             ? message.message
             : i18nInteractiveLegend.error;
 
