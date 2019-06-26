@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Kokeile vuorovaikutteista selitettä",
   "firstOnboardingWelcomeMessage": "Tutki aineistoa valitsemalla arvot selitteestä kartan karttatasojen suodatusta varten.",
   "secondOnboardingWelcomeMessage": "Suodatusehtoja vastaavat kohteet on korostettu kartassa.",
-  "thirdOnboardingWelcomeMessage": "Poista selitteen kohde suodattimesta napsauttamalla kohdetta.",
+  "thirdOnboardingWelcomeMessage": "Käytä suodatinta napsauttamalla selitekohdetta.",
   "onboardingConfirmation": "Selvä!",
   "close": "Sulje",
   "onboardingPanelScreenshotTitle": "Sieppaa karttakuvia",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Jos haluat sisällyttää ponnahdusikkunan, valitse kohde kartalta.",
   "onboardingPanelScreenshotStepFour": "Valitse Määritä kartta-alue. Valitse kuva-alue piirtämällä suorakulmio.",
   "onboardingPanelScreenshotStepFive": "Valitse Lataa kuva.",
-  "showAll": "Näytä kaikki"
+  "showAll": "Näytä kaikki",
+  "expandInteractiveLegend": "Avaa vuorovaikutteinen selite",
+  "zoomTo": "Tarkenna kohteeseen",
+  "totalFeatureCount": "Kohteiden kokonaismäärä",
+  "relationshipInstruction": "Suodata kartta napsauttamalla värineliöitä",
+  "relationshipLegendElement": "Suhdeselitteen elementti"
 });

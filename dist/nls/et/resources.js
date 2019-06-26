@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Proovige interaktiivset legendi",
   "firstOnboardingWelcomeMessage": "Tutvuge andmetega, valides väärtused legendil, et filtreerida kaardikihte.",
   "secondOnboardingWelcomeMessage": "Kaardil rõhutatakse objekte, mis sobivad filtri kriteeriumidega.",
-  "thirdOnboardingWelcomeMessage": "Klõpsake legendi valitud üksust, et eemaldada see filtrist.",
+  "thirdOnboardingWelcomeMessage": "Filtri rakendamiseks klikkige legendil.",
   "onboardingConfirmation": "Sain aru!",
   "close": "Sule",
   "onboardingPanelScreenshotTitle": "Tuvastage kaardi pildid",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Hüpikakna kaasamiseks valige kaardil objekt.",
   "onboardingPanelScreenshotStepFour": "Klõpsake Kaardiala seadistamine. Pildi piirkonna valimiseks joonistage ristkülik.",
   "onboardingPanelScreenshotStepFive": "Klõpsake Laadi pilt alla.",
-  "showAll": "Kuva kõik"
+  "showAll": "Kuva kõik",
+  "expandInteractiveLegend": "Avage interaktiivne legend",
+  "zoomTo": "Suumi",
+  "totalFeatureCount": "Objektide koguarv",
+  "relationshipInstruction": "Kaardi filtreerimiseks klikkige värvilistel ruutudel",
+  "relationshipLegendElement": "Suhte legendi element"
 });

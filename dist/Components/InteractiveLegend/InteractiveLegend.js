@@ -81,9 +81,12 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             _this.layerListViewModel = null;
             // onboardingPanelEnabled
             _this.onboardingPanelEnabled = null;
+            // offscreen
             _this.offscreen = null;
             _this.opacity = null;
             _this.grayScale = null;
+            _this.featureCountEnabled = null;
+            _this.updateExtentEnabled = null;
             // style
             _this.style = new InteractiveClassic({
                 view: _this.view,
@@ -94,7 +97,9 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 onboardingPanelEnabled: _this.onboardingPanelEnabled,
                 offscreen: _this.offscreen,
                 opacity: _this.opacity,
-                grayScale: _this.grayScale
+                grayScale: _this.grayScale,
+                featureCountEnabled: _this.featureCountEnabled,
+                updateExtentEnabled: _this.updateExtentEnabled
             });
             return _this;
         }
@@ -113,7 +118,9 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                     onboardingPanelEnabled: this.onboardingPanelEnabled,
                     offscreen: this.offscreen,
                     opacity: this.opacity,
-                    grayScale: this.grayScale
+                    grayScale: this.grayScale,
+                    featureCountEnabled: this.featureCountEnabled,
+                    updateExtentEnabled: this.updateExtentEnabled
                 });
             }
             if (value && typeof value.type === "string") {
@@ -131,7 +138,9 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 onboardingPanelEnabled: this.onboardingPanelEnabled,
                 offscreen: this.offscreen,
                 opacity: this.opacity,
-                grayScale: this.grayScale
+                grayScale: this.grayScale,
+                featureCountEnabled: this.featureCountEnabled,
+                updateExtentEnabled: this.updateExtentEnabled
             });
         };
         InteractiveLegend.prototype.postInitialize = function () {
@@ -253,6 +262,14 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             decorators_1.aliasOf("style.grayScale"),
             widget_1.renderable()
         ], InteractiveLegend.prototype, "grayScale", void 0);
+        __decorate([
+            decorators_1.aliasOf("style.featureCountEnabled"),
+            widget_1.renderable()
+        ], InteractiveLegend.prototype, "featureCountEnabled", void 0);
+        __decorate([
+            decorators_1.aliasOf("style.updateExtentEnabled"),
+            widget_1.renderable()
+        ], InteractiveLegend.prototype, "updateExtentEnabled", void 0);
         __decorate([
             decorators_1.property(),
             widget_1.renderable()

@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "尝试交互式图例",
   "firstOnboardingWelcomeMessage": "通过选择图例中的值来过滤地图图层，从而浏览数据。",
   "secondOnboardingWelcomeMessage": "在地图上突出显示符合过滤条件的要素。",
-  "thirdOnboardingWelcomeMessage": "单击选定的图例项目以将其从过滤器中移除。",
+  "thirdOnboardingWelcomeMessage": "单击图例项目以应用过滤器。",
   "onboardingConfirmation": "知道了!",
   "close": "关闭",
   "onboardingPanelScreenshotTitle": "捕获地图图像",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "要包含弹出窗口，请在地图上选择一个要素。",
   "onboardingPanelScreenshotStepFour": "单击“设置地图区域”。 绘制一个矩形以选择图像的区域。",
   "onboardingPanelScreenshotStepFive": "单击“下载图像”。",
-  "showAll": "显示全部"
+  "showAll": "显示全部",
+  "expandInteractiveLegend": "打开交互式图例",
+  "zoomTo": "缩放至",
+  "totalFeatureCount": "总的要素计数",
+  "relationshipInstruction": "单击色块以过滤地图",
+  "relationshipLegendElement": "关系图例元素"
 });

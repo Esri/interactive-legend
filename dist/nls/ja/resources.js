@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "対話形式の凡例を試してください",
   "firstOnboardingWelcomeMessage": "凡例内の値を選択してマップ レイヤーをフィルター処理して、データを探索します。",
   "secondOnboardingWelcomeMessage": "フィルター条件と一致するフィーチャがマップ上で強調されます。",
-  "thirdOnboardingWelcomeMessage": "選択した凡例項目をクリックすると、フィルターから削除されます。",
+  "thirdOnboardingWelcomeMessage": "凡例アイテムをクリックすると、フィルターを適用できます。",
   "onboardingConfirmation": "OK",
   "close": "閉じる",
   "onboardingPanelScreenshotTitle": "マップ画像の取得",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "ポップアップを含める場合、マップ上のフィーチャを選択します。",
   "onboardingPanelScreenshotStepFour": "[マップ エリアの設定] をクリックします。 四角形を描画して、画像の領域を選択します。",
   "onboardingPanelScreenshotStepFive": "[画像のダウンロード] をクリックします。",
-  "showAll": "すべて表示"
+  "showAll": "すべて表示",
+  "expandInteractiveLegend": "対話形式の凡例を開く",
+  "zoomTo": "ズーム",
+  "totalFeatureCount": "フィーチャ総数",
+  "relationshipInstruction": "色の四角形をクリックしてマップをフィルター処理",
+  "relationshipLegendElement": "リレーションシップ凡例エレメント"
 });

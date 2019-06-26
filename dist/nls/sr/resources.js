@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Isprobajte interaktivnu legendu",
   "firstOnboardingWelcomeMessage": "Istražite podatke selektovanjem vrednosti u legendi da biste filtrirali slojeve mape.",
   "secondOnboardingWelcomeMessage": "Geoobjekti koji se podudaraju sa kriterijumom filtriranja su naglašeni na mapi.",
-  "thirdOnboardingWelcomeMessage": "Kliknite na selektovanu stavku legende da biste je uklonili iz filtera.",
+  "thirdOnboardingWelcomeMessage": "Kliknite na stavku legende da biste primenili filter.",
   "onboardingConfirmation": "Razumem!",
   "close": "Zatvori",
   "onboardingPanelScreenshotTitle": "Snimi snimke mape",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Da biste uključili iskačući prozor, izaberite geoobjekat na mapi.",
   "onboardingPanelScreenshotStepFour": "Kliknite na Podesi oblast mape. Nacrtajte pravougaonik da izaberete region za svoj snimak.",
   "onboardingPanelScreenshotStepFive": "Kliknite na Preuzmi snimak.",
-  "showAll": "Prikaži sve"
+  "showAll": "Prikaži sve",
+  "expandInteractiveLegend": "Otvori interaktivnu legendu",
+  "zoomTo": "Uveličaj na",
+  "totalFeatureCount": "Ukupan brojač geoobjekata",
+  "relationshipInstruction": "Kliknite na kvadratiće u boji da biste filtrirali mapu",
+  "relationshipLegendElement": "Element legende odnosa"
 });

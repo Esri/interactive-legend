@@ -19,6 +19,20 @@ import gfxBase = require("dojox/gfx/_base");
 // Create2DColorRamp
 import Create2DColorRamp = require("./Create2DColorRamp");
 
+// esri.views.MapView
+import MapView = require("esri/views/MapView");
+
+// esri.view.SceneView
+import SceneView = require("esri/views/SceneView");
+
+// esri.core.Collection
+import Collection = require("esri/core/Collection");
+
+// esri.widgets.Legend.support.ActiveLayerInfo
+import ActiveLayerInfo = require("esri/widgets/Legend/support/ActiveLayerInfo");
+
+import Ramp = require("./Ramp");
+
 // interfaces
 import {
   RelationshipRampElement,
@@ -87,7 +101,9 @@ function getSymbolColor(symbol: any): Fill {
   const { type } = symbol;
 
   if (type.indexOf("3d") > -1) {
-    return getSymbolLayerFill((symbol as Symbol3D).symbolLayers.getItemAt(0));
+    return getSymbolLayerFill((symbol as Symbol3D).symbolLayers.getItemAt(
+      0
+    ) as Symbol3DLayerCustom);
   } else {
     if (type === "simple-line") {
       const stroke = getStroke(symbol);
@@ -246,8 +262,12 @@ function pt2px(pt): number {
   return (pt / 72) * DPI;
 }
 
+interface Symbol3DLayerCustom extends Symbol3DLayer {
+  material: any;
+}
+
 function getSymbolLayerFill(
-  symbolLayer: Symbol3DLayer,
+  symbolLayer: Symbol3DLayerCustom,
   brightnessFactor: number = 0
 ): PreviewFill {
   if (!symbolLayer.material || !symbolLayer.material.color) {
@@ -279,6 +299,15 @@ function adjustBrightness(colorComponent: number, factor: number): number {
 export function renderRamp(
   legendElement: RelationshipRampElement,
   id: string,
+  view: MapView | SceneView,
+  activeLayerInfos: Collection<ActiveLayerInfo>,
+  layerView: any,
+  filterMode: string,
+  opacity: number,
+  grayScale: number,
+  searchViewModel: __esri.SearchViewModel,
+  layerListViewModel: __esri.LayerListViewModel,
+  featureCountEnabled: boolean,
   size: number = 60
 ): any {
   const { focus, numClasses, colors, rotation } = legendElement;
@@ -308,9 +337,18 @@ export function renderRamp(
   };
 
   const shape = new Create2DColorRamp({
+    view,
+    activeLayerInfos,
     colorRampProperties,
     legendElement,
-    surface
+    layerView,
+    surface,
+    filterMode,
+    opacity,
+    grayScale,
+    searchViewModel,
+    layerListViewModel,
+    featureCountEnabled
   });
   shape.generateCells();
 
@@ -353,7 +391,10 @@ export function renderRamp(
   } else {
     (surface.rawNode as HTMLElement).style.margin = "-15px -15px -18px -15px";
   }
-  return rampDiv;
+  return new Ramp({
+    rampDiv,
+    shape
+  });
 }
 
 export function getFill(symbol: any): Fill {
@@ -448,4 +489,127 @@ export function getRotationAngleForFocus(focus: string): number {
   }
 
   return rotation || 0;
+}
+
+// _twoClasses
+export function twoClasses(index: number, focus: string): number {
+  if (focus === "HH" || focus === null) {
+    return index === 0 || index === 2
+      ? index + 1
+      : index === 1 || index === 3
+      ? index - 1
+      : null;
+  } else if (focus === "LH") {
+    return index === 0
+      ? index + 3
+      : index === 1
+      ? index + 1
+      : index === 2
+      ? index - 1
+      : index === 3
+      ? index - 3
+      : index === 4
+      ? index + 0
+      : null;
+  } else if (focus === "LL") {
+    return index === 0 || index === 1
+      ? index + 2
+      : index === 2 || index === 3
+      ? index - 2
+      : null;
+  }
+}
+
+// _threeClasses
+export function threeClasses(index: number, focus: string): number {
+  if (focus === "HH" || focus === null) {
+    return index === 0 || index === 3 || index === 6
+      ? index + 2
+      : index === 2 || index === 5 || index === 8
+      ? index - 2
+      : index;
+  } else if (focus === "LH") {
+    return index === 0
+      ? index + 8
+      : index === 1
+      ? index + 6
+      : index === 2
+      ? index + 4
+      : index === 3
+      ? index + 2
+      : index === 5
+      ? index - 2
+      : index === 6
+      ? index - 4
+      : index === 7
+      ? index - 6
+      : index === 8
+      ? index - 8
+      : index;
+  } else if (focus === "LL") {
+    return index === 0 || index === 1 || index === 2
+      ? index + 6
+      : index === 6 || index === 7 || index === 8
+      ? index - 6
+      : index;
+  }
+}
+
+// _fourNumClasses
+export function fourClasses(index: number, focus: string): number {
+  if (focus === "HH" || focus === null) {
+    return index === 0 || index === 4 || index === 8 || index === 12
+      ? index + 3
+      : index === 1 || index === 5 || index === 9 || index === 13
+      ? index + 1
+      : index === 2 || index === 6 || index === 10 || index === 14
+      ? index - 1
+      : index === 3 || index === 7 || index === 11 || index === 15
+      ? index - 3
+      : null;
+  } else if (focus === "LH") {
+    return index === 0
+      ? index + 15
+      : index === 1
+      ? index + 13
+      : index === 2
+      ? index + 11
+      : index === 3
+      ? index + 9
+      : index === 4
+      ? index + 7
+      : index === 5
+      ? index + 5
+      : index === 6
+      ? index + 3
+      : index === 7
+      ? index + 1
+      : index === 8
+      ? index - 1
+      : index === 9
+      ? index - 3
+      : index === 10
+      ? index - 5
+      : index === 11
+      ? index - 7
+      : index === 12
+      ? index - 9
+      : index === 13
+      ? index - 11
+      : index === 14
+      ? index - 13
+      : index === 15
+      ? index - 15
+      : null;
+  } else if (focus === "LL") {
+    return index === 0 || index === 1 || index === 2 || index === 3
+      ? index + 12
+      : index === 4 || index === 5 || index === 6 || index === 7
+      ? index + 4
+      : index === 8 || index === 9 || index === 10 || index === 11
+      ? index - 4
+      : index === 12 || index === 13 || index === 14 || index === 15
+      ? index - 12
+      : null;
+  }
 }

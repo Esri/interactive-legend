@@ -37,7 +37,7 @@ define({
     "ok": "Gerai",
     "password": "Slaptažodis",
     "submit": "Pateikti",
-    "username": "Vartotojo vardas",
+    "username": "Naudotojo vardas",
     "yes": "Taip"
   },
   "help": "Pagalba",

@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Essayer la légende interactive",
   "firstOnboardingWelcomeMessage": "Explorez les données en sélectionnant des valeurs dans la légende afin de filtrer les couches de carte.",
   "secondOnboardingWelcomeMessage": "Les entités qui répondent aux critères de filtre sont mises en évidence sur la carte.",
-  "thirdOnboardingWelcomeMessage": "Cliquez sur un élément de légende sélectionné pour le supprimer du filtre.",
+  "thirdOnboardingWelcomeMessage": "Cliquez sur un élément de la légende pour appliquer un filtre.",
   "onboardingConfirmation": "J'ai compris !",
   "close": "Fermer",
   "onboardingPanelScreenshotTitle": "Capturer des images cartographiques",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Pour inclure une fenêtre contextuelle, sélectionnez une entité sur la carte.",
   "onboardingPanelScreenshotStepFour": "Cliquez sur Définir la zone cartographique. Dessinez un rectangle pour sélectionner une région pour votre image.",
   "onboardingPanelScreenshotStepFive": "Cliquez sur Télécharger l’image.",
-  "showAll": "Afficher tout"
+  "showAll": "Afficher tout",
+  "expandInteractiveLegend": "Ouvrir la légende interactive",
+  "zoomTo": "Zoom sur",
+  "totalFeatureCount": "Nombre total d’entités",
+  "relationshipInstruction": "Cliquez sur les carrés de couleur pour filtrer la carte",
+  "relationshipLegendElement": "Élément de légende des relations"
 });

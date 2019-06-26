@@ -58,6 +58,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this.enableLegendOption = null;
             // enablePopupOption
             _this.enablePopupOption = null;
+            // legendFeatureCountEnabled
+            _this.legendFeatureCountEnabled = null;
             // dragHandler
             _this.dragHandler = null;
             // featureWidget
@@ -528,11 +530,12 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         view: _this.view,
                         layerListViewModel: _this.layerListViewModel,
                         onboardingPanelEnabled: false,
+                        featureCountEnabled: _this.legendFeatureCountEnabled,
                         offscreen: true
                     }));
                 }
                 if (_this.legendWidget) {
-                    _this.legendWidget.style.selectedStyleData = _this.selectedStyleData;
+                    _this.legendWidget.style.selectedStyleDataCollection = _this.selectedStyleData;
                 }
             });
         };
@@ -590,6 +593,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         __decorate([
             decorators_1.property()
         ], ScreenshotViewModel.prototype, "enablePopupOption", void 0);
+        __decorate([
+            decorators_1.property()
+        ], ScreenshotViewModel.prototype, "legendFeatureCountEnabled", void 0);
         __decorate([
             decorators_1.property()
         ], ScreenshotViewModel.prototype, "dragHandler", void 0);

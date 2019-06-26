@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Pruebe la leyenda interactiva",
   "firstOnboardingWelcomeMessage": "Explore datos seleccionando valores de la leyenda para filtrar las capas de mapa.",
   "secondOnboardingWelcomeMessage": "Las entidades que reúnen los criterios del filtro se resaltan en el mapa.",
-  "thirdOnboardingWelcomeMessage": "Haga clic en un elemento de leyenda seleccionado para eliminarlo del filtro.",
+  "thirdOnboardingWelcomeMessage": "Haga clic en un elemento de la leyenda para aplicar un filtro.",
   "onboardingConfirmation": "¡Lo tengo!",
   "close": "Cerrar",
   "onboardingPanelScreenshotTitle": "Capturar imágenes de mapa",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Para incluir un elemento emergente, seleccione una entidad en el mapa.",
   "onboardingPanelScreenshotStepFour": "Haga clic en Definir área de mapa. Dibuje un rectángulo para seleccionar la región de su imagen.",
   "onboardingPanelScreenshotStepFive": "Haga clic en Descargar imagen.",
-  "showAll": "Mostrar todo"
+  "showAll": "Mostrar todo",
+  "expandInteractiveLegend": "Abrir leyenda interactiva",
+  "zoomTo": "Zoom a",
+  "totalFeatureCount": "Recuento total de entidades",
+  "relationshipInstruction": "Haga clic en los cuadrados de color para filtrar el mapa",
+  "relationshipLegendElement": "Elemento de leyenda de relación"
 });

@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Prova den interaktiva teckenförklaringen",
   "firstOnboardingWelcomeMessage": "Utforska data genom att välja värden i teckenförklaringen för att filtrera kartlager.",
   "secondOnboardingWelcomeMessage": "Geoobjekt som matchar filterkriterierna framhävs på kartan.",
-  "thirdOnboardingWelcomeMessage": "Klicka på ett valt teckenförklaringsobjekt om du vill ta bort det från filtret.",
+  "thirdOnboardingWelcomeMessage": "Klicka på ett förklaringsobjekt om du vill tillämpa ett filter.",
   "onboardingConfirmation": "Uppfattat!",
   "close": "Stäng",
   "onboardingPanelScreenshotTitle": "Ta bild av kartbilder",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Ta med en popup genom att välja ett geoobjekt på kartan.",
   "onboardingPanelScreenshotStepFour": "Klicka på Ställ in kartområdet. Välj en region för bilden genom att rita en rektangel.",
   "onboardingPanelScreenshotStepFive": "Klicka på Hämta bild.",
-  "showAll": "Visa alla"
+  "showAll": "Visa alla",
+  "expandInteractiveLegend": "Öppna den interaktiva teckenförklaringen",
+  "zoomTo": "Zooma till",
+  "totalFeatureCount": "Totalt antal geoobjekt",
+  "relationshipInstruction": "Klicka på de färgade rutorna för att filtrera kartan",
+  "relationshipLegendElement": "Teckenförklaringselement för relationer"
 });

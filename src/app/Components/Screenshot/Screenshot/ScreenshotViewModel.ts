@@ -43,7 +43,7 @@ type State = "ready" | "takingScreenshot" | "complete" | "disabled";
 
 // interfaces
 import { Area, Screenshot, ScreenshotConfig } from "./interfaces/interfaces";
-import { SelectedStyleData } from "../../../interfaces/interfaces";
+import SelectedStyleData = require("../../InteractiveLegend/InteractiveLegend/styles/InteractiveStyle/SelectedStyleData");
 
 @subclass("ScreenshotViewModel")
 class ScreenshotViewModel extends declared(Accessor) {
@@ -114,6 +114,10 @@ class ScreenshotViewModel extends declared(Accessor) {
   // enablePopupOption
   @property()
   enablePopupOption: boolean = null;
+
+  // legendFeatureCountEnabled
+  @property()
+  legendFeatureCountEnabled: boolean = null;
 
   // dragHandler
   @property()
@@ -837,12 +841,13 @@ class ScreenshotViewModel extends declared(Accessor) {
             view: this.view,
             layerListViewModel: this.layerListViewModel,
             onboardingPanelEnabled: false,
+            featureCountEnabled: this.legendFeatureCountEnabled,
             offscreen: true
           })
         );
       }
       if (this.legendWidget) {
-        this.legendWidget.style.selectedStyleData = this.selectedStyleData;
+        this.legendWidget.style.selectedStyleDataCollection = this.selectedStyleData;
       }
     });
   }

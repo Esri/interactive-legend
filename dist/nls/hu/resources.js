@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Próbálkozzon az interaktív jelmagyarázat használatával",
   "firstOnboardingWelcomeMessage": "Böngésszen az adatok között a jelmagyarázatban szereplő értékek közül választva a térképrétegek szűréséhez.",
   "secondOnboardingWelcomeMessage": "A szűrési feltételeknek megfelelő vektoros elemek kiemelve jelennek meg a térképen.",
-  "thirdOnboardingWelcomeMessage": "Ha szeretné eltávolítani a szűrőből a kiválasztott jelmagyarázat-elemet, kattintson rá.",
+  "thirdOnboardingWelcomeMessage": "Ha szűrőt szeretne alkalmazni, kattintson a kívánt jelmagyarázat-elemre.",
   "onboardingConfirmation": "Értem!",
   "close": "Bezárás",
   "onboardingPanelScreenshotTitle": "Térképképek rögzítése",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Ha szeretné feltüntetni az előugró ablakot, válassza ki a térkép valamelyik vektoros elemét.",
   "onboardingPanelScreenshotStepFour": "Kattintson a Térképen ábrázolt terület beállítása elemre. Rajzoljon négyszöget a képen megjeleníteni kívánt régió kiválasztásához.",
   "onboardingPanelScreenshotStepFive": "Kattintson a Kép letöltése elemre.",
-  "showAll": "Összes mutatása"
+  "showAll": "Összes mutatása",
+  "expandInteractiveLegend": "Interaktív jelmagyarázat megnyitása",
+  "zoomTo": "Nagyítás erre:",
+  "totalFeatureCount": "Vektoros elemek teljes száma:",
+  "relationshipInstruction": "A térkép szűréséhez kattintson a színes négyzetekre",
+  "relationshipLegendElement": "Adatkapcsolati jelmagyarázat eleme"
 });

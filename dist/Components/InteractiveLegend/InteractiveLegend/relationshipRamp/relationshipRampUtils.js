@@ -6,7 +6,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     }
     return t;
 };
-define(["require", "exports", "dojox/gfx", "dojox/gfx/matrix", "esri/Color", "dojox/gfx/_base", "./Create2DColorRamp"], function (require, exports, gfx_1, gfxMatrix, Color, gfxBase, Create2DColorRamp) {
+define(["require", "exports", "dojox/gfx", "dojox/gfx/matrix", "esri/Color", "dojox/gfx/_base", "./Create2DColorRamp", "./Ramp"], function (require, exports, gfx_1, gfxMatrix, Color, gfxBase, Create2DColorRamp, Ramp) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var svgNS = "http://www.w3.org/2000/svg";
@@ -189,7 +189,7 @@ define(["require", "exports", "dojox/gfx", "dojox/gfx/matrix", "esri/Color", "do
         var magnitudeFactor = 0.75;
         return Math.min(Math.max(colorComponent + 255 * factor * magnitudeFactor, 0), 255);
     }
-    function renderRamp(legendElement, id, size) {
+    function renderRamp(legendElement, id, view, activeLayerInfos, layerView, filterMode, opacity, grayScale, searchViewModel, layerListViewModel, featureCountEnabled, size) {
         if (size === void 0) { size = 60; }
         var focus = legendElement.focus, numClasses = legendElement.numClasses, colors = legendElement.colors, rotation = legendElement.rotation;
         var isDiamond = !!focus;
@@ -214,9 +214,18 @@ define(["require", "exports", "dojox/gfx", "dojox/gfx/matrix", "esri/Color", "do
             focus: focus
         };
         var shape = new Create2DColorRamp({
+            view: view,
+            activeLayerInfos: activeLayerInfos,
             colorRampProperties: colorRampProperties,
             legendElement: legendElement,
-            surface: surface
+            layerView: layerView,
+            surface: surface,
+            filterMode: filterMode,
+            opacity: opacity,
+            grayScale: grayScale,
+            searchViewModel: searchViewModel,
+            layerListViewModel: layerListViewModel,
+            featureCountEnabled: featureCountEnabled
         });
         shape.generateCells();
         var arrowGroup = surface.createGroup();
@@ -253,7 +262,10 @@ define(["require", "exports", "dojox/gfx", "dojox/gfx/matrix", "esri/Color", "do
         else {
             surface.rawNode.style.margin = "-15px -15px -18px -15px";
         }
-        return rampDiv;
+        return new Ramp({
+            rampDiv: rampDiv,
+            shape: shape
+        });
     }
     exports.renderRamp = renderRamp;
     function getFill(symbol) {
@@ -326,5 +338,134 @@ define(["require", "exports", "dojox/gfx", "dojox/gfx/matrix", "esri/Color", "do
         return rotation || 0;
     }
     exports.getRotationAngleForFocus = getRotationAngleForFocus;
+    // _twoClasses
+    function twoClasses(index, focus) {
+        if (focus === "HH" || focus === null) {
+            return index === 0 || index === 2
+                ? index + 1
+                : index === 1 || index === 3
+                    ? index - 1
+                    : null;
+        }
+        else if (focus === "LH") {
+            return index === 0
+                ? index + 3
+                : index === 1
+                    ? index + 1
+                    : index === 2
+                        ? index - 1
+                        : index === 3
+                            ? index - 3
+                            : index === 4
+                                ? index + 0
+                                : null;
+        }
+        else if (focus === "LL") {
+            return index === 0 || index === 1
+                ? index + 2
+                : index === 2 || index === 3
+                    ? index - 2
+                    : null;
+        }
+    }
+    exports.twoClasses = twoClasses;
+    // _threeClasses
+    function threeClasses(index, focus) {
+        if (focus === "HH" || focus === null) {
+            return index === 0 || index === 3 || index === 6
+                ? index + 2
+                : index === 2 || index === 5 || index === 8
+                    ? index - 2
+                    : index;
+        }
+        else if (focus === "LH") {
+            return index === 0
+                ? index + 8
+                : index === 1
+                    ? index + 6
+                    : index === 2
+                        ? index + 4
+                        : index === 3
+                            ? index + 2
+                            : index === 5
+                                ? index - 2
+                                : index === 6
+                                    ? index - 4
+                                    : index === 7
+                                        ? index - 6
+                                        : index === 8
+                                            ? index - 8
+                                            : index;
+        }
+        else if (focus === "LL") {
+            return index === 0 || index === 1 || index === 2
+                ? index + 6
+                : index === 6 || index === 7 || index === 8
+                    ? index - 6
+                    : index;
+        }
+    }
+    exports.threeClasses = threeClasses;
+    // _fourNumClasses
+    function fourClasses(index, focus) {
+        if (focus === "HH" || focus === null) {
+            return index === 0 || index === 4 || index === 8 || index === 12
+                ? index + 3
+                : index === 1 || index === 5 || index === 9 || index === 13
+                    ? index + 1
+                    : index === 2 || index === 6 || index === 10 || index === 14
+                        ? index - 1
+                        : index === 3 || index === 7 || index === 11 || index === 15
+                            ? index - 3
+                            : null;
+        }
+        else if (focus === "LH") {
+            return index === 0
+                ? index + 15
+                : index === 1
+                    ? index + 13
+                    : index === 2
+                        ? index + 11
+                        : index === 3
+                            ? index + 9
+                            : index === 4
+                                ? index + 7
+                                : index === 5
+                                    ? index + 5
+                                    : index === 6
+                                        ? index + 3
+                                        : index === 7
+                                            ? index + 1
+                                            : index === 8
+                                                ? index - 1
+                                                : index === 9
+                                                    ? index - 3
+                                                    : index === 10
+                                                        ? index - 5
+                                                        : index === 11
+                                                            ? index - 7
+                                                            : index === 12
+                                                                ? index - 9
+                                                                : index === 13
+                                                                    ? index - 11
+                                                                    : index === 14
+                                                                        ? index - 13
+                                                                        : index === 15
+                                                                            ? index - 15
+                                                                            : null;
+        }
+        else if (focus === "LL") {
+            return index === 0 || index === 1 || index === 2 || index === 3
+                ? index + 12
+                : index === 4 || index === 5 || index === 6 || index === 7
+                    ? index + 4
+                    : index === 8 || index === 9 || index === 10 || index === 11
+                        ? index - 4
+                        : index === 12 || index === 13 || index === 14 || index === 15
+                            ? index - 12
+                            : null;
+        }
+    }
+    exports.fourClasses = fourClasses;
 });
 //# sourceMappingURL=relationshipRampUtils.js.map

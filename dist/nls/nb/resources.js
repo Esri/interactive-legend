@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Prøv den interaktive tegnforklaringen",
   "firstOnboardingWelcomeMessage": "Utforsk data ved å velge verdier i tegnforklaringen for å filtrere kartlag.",
   "secondOnboardingWelcomeMessage": "Geoobjekter som matcher filterkriteriene, fremheves på kartet.",
-  "thirdOnboardingWelcomeMessage": "Klikk på et valgt element i tegnforklaringen for å fjerne det fra filteret.",
+  "thirdOnboardingWelcomeMessage": "Klikk på et element i tegnforklaringen for å bruke et filter.",
   "onboardingConfirmation": "Oppfattet",
   "close": "Lukk",
   "onboardingPanelScreenshotTitle": "Ta kartbilder",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Velg et geoobjekt på kartet for å inkludere et popupfelt.",
   "onboardingPanelScreenshotStepFour": "Klikk på Angi kartområde. Tegn et rektangel for å velge en region for bildet.",
   "onboardingPanelScreenshotStepFive": "Klikk på Last ned bilde.",
-  "showAll": "Vis alle"
+  "showAll": "Vis alle",
+  "expandInteractiveLegend": "Åpne interaktiv tegnforklaring",
+  "zoomTo": "Zoom til",
+  "totalFeatureCount": "Totalt antall geoobjekter",
+  "relationshipInstruction": "Klikk på fargefirkant for å filtrere kartet",
+  "relationshipLegendElement": "Tegnforklaringselement for relasjon"
 });

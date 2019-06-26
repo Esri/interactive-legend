@@ -141,6 +141,7 @@ class InteractiveLegendApp {
     }
     setPageLocale(base.locale);
     setPageDirection(base.direction);
+
     this.base = base;
 
     const { config, results, portal } = base;
@@ -187,11 +188,12 @@ class InteractiveLegendApp {
       splashButtonPosition,
       interactiveLegendPosition,
       filterMode,
-      // highlightShade,
       mutedShade,
       muteOpacity,
       muteGrayScale,
-      searchOpenAtStart
+      searchOpenAtStart,
+      featureCountEnabled,
+      updateExtentEnabled
     } = config;
 
     const { webMapItems } = results;
@@ -212,6 +214,7 @@ class InteractiveLegendApp {
     }
 
     config.title = !config.title ? getItemTitle(firstItem) : config.title;
+
     setPageTitle(config.title);
 
     const portalItem: any = this.base.results.applicationItem.value;
@@ -269,18 +272,6 @@ class InteractiveLegendApp {
             const defaultStyle = "classic";
             const defaultMode = filterMode ? filterMode : "featureFilter";
 
-            // if (highlightShade) {
-            //   const highlightedShade = new Color(highlightShade);
-            //   const { r, g, b, a } = highlightedShade;
-            //   view.highlightOptions = {
-            //     color: new Color(`rgb(${r},${g},${b})`),
-            //     fillOpacity: a
-            //   };
-            // } else {
-            //   view.highlightOptions = {
-            //     color: new Color("#000000")
-            //   };
-            // }
             this._defineUrlParams(view);
             this._handleHomeWidget(view, homeEnabled, homePosition);
             this._handleSplash(config, view, splashButtonPosition);
@@ -308,12 +299,15 @@ class InteractiveLegendApp {
             this.interactiveLegend = new InteractiveLegend({
               view,
               mutedShade: defaultShade,
+              container: document.createElement("div"),
               style: defaultStyle,
               filterMode: defaultMode,
               layerListViewModel,
               onboardingPanelEnabled,
               opacity: muteOpacity,
-              grayScale: muteGrayScale
+              grayScale: muteGrayScale,
+              featureCountEnabled,
+              updateExtentEnabled
             });
 
             this._handleSearchWidget(
@@ -334,7 +328,8 @@ class InteractiveLegendApp {
               content: this.interactiveLegend,
               mode: "floating",
               expanded: true,
-              expandTooltip: this.interactiveLegend.label
+              expandTooltip: i18nInteractiveLegend.expandInteractiveLegend,
+              expandIconClass: "custom-interactive-legend"
             });
 
             watchUtils.whenOnce(
@@ -425,6 +420,12 @@ class InteractiveLegendApp {
                   const container = this.infoExpand.container as HTMLElement;
                   container.classList.add("expand-content-z-index");
                 }
+                if (base.locale === "ar") {
+                  const questionMarkIcon = document.querySelector(
+                    ".esri-collapse__icon.icon-ui-question.icon-ui-flush"
+                  ) as HTMLElement;
+                  questionMarkIcon.style.transform = "scaleX(-1)";
+                }
               });
 
               view.ui.add(this.infoExpand, infoPanelPosition);
@@ -435,11 +436,14 @@ class InteractiveLegendApp {
               enableLegendOption,
               enablePopupOption,
               view,
-              screenshotPosition
+              screenshotPosition,
+              featureCountEnabled
             );
 
             goToMarker(marker, view);
+
             this._handleHeader(config);
+
             if (config.customCSS) {
               this._handleCustomCSS(config);
             }
@@ -479,6 +483,7 @@ class InteractiveLegendApp {
     const headerContainer = header.container as HTMLElement;
 
     parentContainer.insertBefore(headerContainer, parentContainer.firstChild);
+
     const parentContainerHeight = parentContainer.offsetHeight;
     const headerContainerHeight = headerContainer.offsetHeight;
     const hcProportion = headerContainerHeight * 100;
@@ -525,7 +530,8 @@ class InteractiveLegendApp {
     enableLegendOption: boolean,
     enablePopupOption: boolean,
     view: MapView,
-    screenshotPosition: string
+    screenshotPosition: string,
+    featureCountEnabled: boolean
   ): void {
     if (screenshotEnabled) {
       this.screenshot = new Screenshot({
@@ -533,7 +539,9 @@ class InteractiveLegendApp {
         enableLegendOption,
         enablePopupOption,
         includeLegendInScreenshot: true,
-        selectedStyleData: this.interactiveLegend.style.selectedStyleData,
+        selectedStyleData: this.interactiveLegend.style
+          .selectedStyleDataCollection,
+        legendFeatureCountEnabled: featureCountEnabled,
         layerListViewModel: this.layerList.viewModel
       });
 

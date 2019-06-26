@@ -1,6 +1,6 @@
 {
   "environment": {
-    "isEsri": false,
+    "isEsri": true,
     "webTierSecurity": false
   },
   "localStorage": {

@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "ลองใช้สัญลักษณ์เชิงโต้ตอบ",
   "firstOnboardingWelcomeMessage": "สำรวจข้อมูลโดยเลือกค่าในสัญลักษณ์ เพื่อกรองชั้นข้อมูลแผนที่",
   "secondOnboardingWelcomeMessage": "ฟีเจอร์ที่ตรงกับเกณฑ์การกรองจะถูกเน้นอยู่บนแผนที่",
-  "thirdOnboardingWelcomeMessage": "คลิกรายการสัญลักษณ์ที่เลือก เพื่อลบออกจากตัวกรอง",
+  "thirdOnboardingWelcomeMessage": "คลิกรายการสัญลักษณ์เพื่อใช้ตัวกีอง",
   "onboardingConfirmation": "ได้รับ!",
   "close": "ปิด",
   "onboardingPanelScreenshotTitle": "บันทึกภาพแผนที่",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "หากต้องการเพิ่มป็อปอัพ ให้เลือกฟีเจอร์บนแผนที่",
   "onboardingPanelScreenshotStepFour": "คลิก ตั้งค่าพื้นที่แผนที่ วาดสี่เหลี่ยมเพื่อเลือกขอบเขตสำหรับภาพของคุณ",
   "onboardingPanelScreenshotStepFive": "คลิก ดาวน์โหลดภาพ",
-  "showAll": "แสดงทั้งหมด"
+  "showAll": "แสดงทั้งหมด",
+  "expandInteractiveLegend": "เปิดสัญลักษณ์เชิงโต้ตอบ",
+  "zoomTo": "ขยายไปยัง",
+  "totalFeatureCount": "จำนวนฟีเจอร์ทั้งหมด",
+  "relationshipInstruction": "คลิกที่ตารางสีเพื่อกรองแผนที่",
+  "relationshipLegendElement": "องค์ประกอบสัญลักษณ์ความสัมพันธ์"
 });

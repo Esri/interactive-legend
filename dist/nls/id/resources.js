@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Cobalah legenda interaktif",
   "firstOnboardingWelcomeMessage": "Jelajahi data dengan memilih nilai di legenda untuk memfilter layer peta.",
   "secondOnboardingWelcomeMessage": "Fitur yang cocok dengan kriteria filter ditonjolkan di peta.",
-  "thirdOnboardingWelcomeMessage": "Klik item legenda yang dipilih untuk menghapusnya dari filter.",
+  "thirdOnboardingWelcomeMessage": "Klik item legenda untuk menerapkan filter.",
   "onboardingConfirmation": "Baiklah!",
   "close": "Tutup",
   "onboardingPanelScreenshotTitle": "Ambil gambar peta",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Untuk menyertakan pop-up, pilih fitur di peta.",
   "onboardingPanelScreenshotStepFour": "Klik Atur area peta. Gambar persegi untuk memilih wilayah pada gambar Anda.",
   "onboardingPanelScreenshotStepFive": "Klik Unduh Gambar.",
-  "showAll": "Tampilkan Semua"
+  "showAll": "Tampilkan Semua",
+  "expandInteractiveLegend": "Buka legenda interaktif",
+  "zoomTo": "Zoom Hingga",
+  "totalFeatureCount": "Total Jumlah Fitur",
+  "relationshipInstruction": "Klik persegi warna untuk memfilter peta",
+  "relationshipLegendElement": "Elemen legenda hubungan"
 });

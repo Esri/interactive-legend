@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Încercați legenda interactivă",
   "firstOnboardingWelcomeMessage": "Explorați datele prin selectarea valorilor din legendă pentru filtrarea straturilor tematice de hărți.",
   "secondOnboardingWelcomeMessage": "Obiectele spațiale care corespund criteriilor de filtrare evidențiate pe hartă.",
-  "thirdOnboardingWelcomeMessage": "Faceți clic pe un element de legendă pentru a îl elimina din filtru.",
+  "thirdOnboardingWelcomeMessage": "Faceți clic pe un element de legendă pentru a aplica un filtru.",
   "onboardingConfirmation": "Am înțeles!",
   "close": "Închidere",
   "onboardingPanelScreenshotTitle": "Capturare imagine hartă",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Pentru a include un pop-up, selectați un obiect spaţial de pe hartă.",
   "onboardingPanelScreenshotStepFour": "Faceți clic pe Setare suprafață hartă. Trasați un dreptunghi pentru a selecta o regiune pentru imaginea dvs.",
   "onboardingPanelScreenshotStepFive": "Faceţi clic pe Descărcare imagine.",
-  "showAll": "Afișare toate"
+  "showAll": "Afișare toate",
+  "expandInteractiveLegend": "Deschideți legenda interactivă",
+  "zoomTo": "Transfocare la",
+  "totalFeatureCount": "Număr total de obiecte spațiale",
+  "relationshipInstruction": "Faceți clic pe pătratele colorate pentru a filtra harta",
+  "relationshipLegendElement": "Element de legendă pentru relație"
 });

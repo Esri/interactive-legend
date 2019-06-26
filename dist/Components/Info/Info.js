@@ -51,7 +51,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             btnClear: "btn-clear"
         },
         icons: {
-            widgetIcon: "icon-ui-question"
+            widgetIcon: "icon-ui-question icon-ui-flush"
         }
     };
     var Info = /** @class */ (function (_super) {

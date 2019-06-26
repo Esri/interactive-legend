@@ -18,7 +18,7 @@ define({
     "pause": "Pauzēt",
     "play": "Atskaņot",
     "resume": "Atsākt",
-    "stop": "Pietura"
+    "stop": "Apturēt"
   },
   "copy": "Kopēt",
   "create": "Izveidot",
@@ -42,7 +42,7 @@ define({
   },
   "help": "Palīdzība",
   "home": "Sākums",
-  "info": "Informācija",
+  "info": "Info",
   "information": "Informācija",
   "layer": "Slānis",
   "loading": "Notiek ielādēšana",

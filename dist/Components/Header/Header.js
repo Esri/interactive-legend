@@ -28,7 +28,13 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         }
         Header.prototype.render = function () {
             var _a = this.config, headHTML = _a.headHTML, customHeaderEnabled = _a.customHeaderEnabled, title = _a.title;
-            return (widget_1.tsx("header", { innerHTML: customHeaderEnabled ? (headHTML ? headHTML : null) : null }, customHeaderEnabled ? null : widget_1.tsx("div", { class: CSS.title }, title)));
+            var appTitle = document.body.clientWidth < 813 && title.length > 40
+                ? title
+                    .split("")
+                    .slice(0, 35)
+                    .join("") + "..."
+                : title;
+            return (widget_1.tsx("header", { innerHTML: customHeaderEnabled ? (headHTML ? headHTML : null) : null }, customHeaderEnabled ? null : widget_1.tsx("div", { class: CSS.title }, appTitle)));
         };
         __decorate([
             decorators_1.property(),

@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "נסה את המקרא האינטראקטיבי",
   "firstOnboardingWelcomeMessage": "בדוק נתונים על ידי בחירת ערכים במקרא וסינון שכבות המפה.",
   "secondOnboardingWelcomeMessage": "ישויות שתואמות לקריטריוני הסינון יופיעו במפה בצורה מודגשת.",
-  "thirdOnboardingWelcomeMessage": "לחץ על פריט המקרא שנבחר כדי להסירו מהסינון.",
+  "thirdOnboardingWelcomeMessage": "לחץ על פריט במקרא כדי להחיל מסנן.",
   "onboardingConfirmation": "הבנתי!",
   "close": "סגור",
   "onboardingPanelScreenshotTitle": "לכוד תמונות מפה",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "כדי לכלול חלון קופץ, בחר ישות במפה.",
   "onboardingPanelScreenshotStepFour": "לחץ על 'הגדר את אזור המפה'. שרטט מלבן כדי לבחור אזור עבור התמונה.",
   "onboardingPanelScreenshotStepFive": "לחץ על 'הורד תמונה'.",
-  "showAll": "הצג הכל"
+  "showAll": "הצג הכל",
+  "expandInteractiveLegend": "פתח מקרא אינטראקטיבי",
+  "zoomTo": "התמקד",
+  "totalFeatureCount": "מספר ישויות כולל",
+  "relationshipInstruction": "לחץ על הריבועים הצבעוניים לסינון המפה",
+  "relationshipLegendElement": "רכיב מקרא קשרים"
 });

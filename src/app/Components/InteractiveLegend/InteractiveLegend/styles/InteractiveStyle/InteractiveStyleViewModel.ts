@@ -30,14 +30,6 @@ import Collection = require("esri/core/Collection");
 // esri.widgets.Legend.support.ActiveLayerInfo
 import ActiveLayerInfo = require("esri/widgets/Legend/support/ActiveLayerInfo");
 
-// import ListItem = require("esri/widgets/LayerList/ListItem");
-
-// // esri.Graphic
-// import Graphic = require("esri/Graphic");
-
-// // esri.Color
-// import Color = require("esri/Color");
-
 // esri.widgets.LayerList.LayerListViewModel
 import LayerListViewModel = require("esri/widgets/LayerList/LayerListViewModel");
 
@@ -47,18 +39,21 @@ import FeatureFilter = require("esri/views/layers/support/FeatureFilter");
 // esri.views.layers.support.FeatureEffect
 import FeatureEffect = require("esri/views/layers/support/FeatureEffect");
 
+// esri.tasks.support.Query
+import Query = require("esri/tasks/support/Query");
+
+// InteractiveStyleData
+import InteractiveStyleData = require("./InteractiveStyleData");
+
 // interfaces
 import {
   FilterMode,
-  InteractiveStyleData,
   LegendElement
 } from "../../../../../interfaces/interfaces";
-
-// HighLightState
-// type HighLightState = "ready" | "querying" | "loading";
+import SelectedStyleData = require("./SelectedStyleData");
 
 // State
-type State = "ready" | "loading" | "disabled";
+type State = "ready" | "loading" | "disabled" | "querying";
 
 @subclass("InteractiveStyleViewModel")
 class InteractiveStyleViewModel extends declared(Accessor) {
@@ -68,14 +63,6 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   //
   //----------------------------------
   private _handles = new Handles();
-  // private _querying: boolean | IPromise<any> = true;
-
-  // interactiveStyleData
-  @property()
-  interactiveStyleData: InteractiveStyleData = {
-    queryExpressions: []
-    // highlightedFeatures: []
-  };
 
   //----------------------------------
   //
@@ -91,26 +78,40 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   @property()
   activeLayerInfos: Collection<ActiveLayerInfo> = null;
 
+  // interactiveStyleData
+  @property()
+  interactiveStyleData: InteractiveStyleData = new InteractiveStyleData();
+
   // featureLayerViews
   @property()
   featureLayerViews: Collection<FeatureLayerView> = new Collection();
 
+  @property()
+  featureCountQuery = null;
+
   // state
   @property({
-    dependsOn: ["view.updating", "searchExpressions", "layerListViewModel"],
+    dependsOn: [
+      "view.updating",
+      "searchExpressions",
+      "layerListViewModel",
+      "featureCountQuery"
+    ],
     readOnly: true
   })
   get state(): State {
     return this.view
       ? this.get("view.ready")
-        ? "ready"
+        ? this.featureCountQuery
+          ? "querying"
+          : "ready"
         : "loading"
       : "disabled";
   }
 
-  // // layerGraphics
-  // @property()
-  // layerGraphics: Collection<Graphic[]> = new Collection();
+  // selectedStyleDataCollection
+  @property()
+  selectedStyleDataCollection: Collection<SelectedStyleData> = new Collection();
 
   // filterMode
   @property()
@@ -126,7 +127,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
 
   // searchViewModel
   @property()
-  searchViewModel: any = null;
+  searchViewModel: __esri.SearchViewModel = null;
 
   // opacity
   @property()
@@ -136,6 +137,12 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   @property()
   grayScale: number = null;
 
+  @property()
+  featureCountEnabled: boolean = null;
+
+  @property()
+  updateExtentEnabled: boolean = null;
+
   //----------------------------------
   //
   //  Lifecycle methods
@@ -143,7 +150,6 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   //----------------------------------
 
   initialize() {
-    const layerViewKey = "layer-views";
     this._handles.add([
       watchUtils.init(this, "view", () => {
         if (!this.view) {
@@ -154,16 +160,51 @@ class InteractiveStyleViewModel extends declared(Accessor) {
             this.layerListViewModel.operationalItems.forEach(() => {
               this.searchExpressions.add(null);
             });
-            this._storeFeatureData(layerViewKey);
+            this._storeFeatureData();
           })
-          // watchUtils.whenFalse(this, "view.updating", () => {
-          //   this.layerListViewModel.operationalItems.forEach(() => {
-          //     if (this.filterMode === "highlight") {
-          //       this._queryFeatures(layerViewKey);
-          //     }
-          //   });
-          // })
         ]);
+      }),
+      watchUtils.on(this, "featureLayerViews", "change", () => {
+        this.selectedStyleDataCollection.removeAll();
+        this.featureLayerViews.forEach(
+          (featureLayerView: __esri.FeatureLayerView) => {
+            if (!featureLayerView) {
+              this.selectedStyleDataCollection.add(null);
+            } else {
+              const featureLayer = featureLayerView.get(
+                  "layer"
+                ) as __esri.FeatureLayer,
+                renderer = featureLayer.get("renderer") as any,
+                field = renderer && renderer.get("field"),
+                field2 = renderer && renderer.get("field2"),
+                field3 = renderer && renderer.get("field3"),
+                fieldDelimiter = renderer && renderer.get("fieldDelimiter"),
+                normalizationField =
+                  renderer && renderer.get("normalizationField"),
+                normalizationType =
+                  renderer && renderer.get("normalizationType"),
+                hasCustomArcade =
+                  (field2 || field3) && fieldDelimiter ? true : false,
+                invalidNormalization =
+                  normalizationType === "percent-of-total" ||
+                  normalizationType === "log";
+
+              if (hasCustomArcade || invalidNormalization) {
+                this.selectedStyleDataCollection.add(null);
+              } else {
+                const selectedStyleData = new SelectedStyleData({
+                  layerItemId: featureLayer.id,
+                  field,
+                  selectedInfoIndex: [],
+                  applyStyles: null,
+                  featureLayerView,
+                  normalizationField
+                });
+                this.selectedStyleDataCollection.add(selectedStyleData);
+              }
+            }
+          }
+        );
       })
     ]);
   }
@@ -171,13 +212,8 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   destroy() {
     this._handles.removeAll();
     this._handles.destroy();
-    // this.layerGraphics = null;
     this._handles = null;
-    // this._querying = null;
-    const { interactiveStyleData } = this;
-    for (let interactiveStyleDataProp in interactiveStyleData) {
-      interactiveStyleData[interactiveStyleDataProp] = null;
-    }
+    this.interactiveStyleData.destroy();
   }
 
   //----------------------------------
@@ -197,17 +233,47 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     legendElementInfos?: any[],
     normalizationField?: string
   ): void {
+    const queryExpressionsCollection = this.interactiveStyleData.get(
+      "queryExpressions"
+    ) as __esri.Collection;
+    const queryExpressions = queryExpressionsCollection.getItemAt(
+      operationalItemIndex
+    );
     if (isPredominance) {
       const queryExpression = this._handlePredominanceExpression(
         elementInfo,
         operationalItemIndex
       );
-      const queryExpressions = this.interactiveStyleData.queryExpressions[
-        operationalItemIndex
-      ];
+
       const expressionIndex = queryExpressions.indexOf(queryExpression);
       if (queryExpressions.length === 0 || expressionIndex === -1) {
+        if (queryExpressions && queryExpressions[0] === "1=0") {
+          queryExpressions.splice(0, 1);
+        }
         queryExpressions.push(queryExpression);
+      } else if (
+        queryExpressions &&
+        queryExpressions.length === 1 &&
+        queryExpression === queryExpressions[0]
+      ) {
+        queryExpressions[0] = "1=0";
+      } else if (queryExpressions && queryExpressions.length === 1) {
+        queryExpressions[0] = [queryExpression];
+      } else if (
+        queryExpressions &&
+        queryExpressions.length === 1 &&
+        queryExpression !== queryExpressions[0] &&
+        queryExpressions[0] === "1=0"
+      ) {
+        queryExpressions[0] = [queryExpression];
+        // queryExpressions.push(queryExpression);
+      } else if (
+        queryExpressions &&
+        queryExpressions.length === 1 &&
+        queryExpression === queryExpressions[0] &&
+        queryExpressions[0] === "1=0"
+      ) {
+        queryExpressions[0] = [];
       } else {
         queryExpressions.splice(expressionIndex, 1);
       }
@@ -231,9 +297,6 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         normalizationField
       );
 
-      const queryExpressions = this.interactiveStyleData.queryExpressions[
-        operationalItemIndex
-      ];
       const featureLayerView = this.featureLayerViews.getItemAt(
         operationalItemIndex
       );
@@ -256,18 +319,52 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     isPredominance: boolean,
     normalizationField: string
   ): void {
+    const queryExpressionsCollection = this.interactiveStyleData.get(
+      "queryExpressions"
+    ) as __esri.Collection;
+    const queryExpressions = queryExpressionsCollection.getItemAt(
+      operationalItemIndex
+    );
+
+    const { opacity, grayScale } = this;
+
+    const opacityValue = opacity === null ? 30 : opacity;
+    const grayScaleValue = grayScale === null ? 100 : grayScale;
     if (isPredominance) {
       const queryExpression = this._handlePredominanceExpression(
         elementInfo,
         operationalItemIndex
       );
 
-      const queryExpressions = this.interactiveStyleData.queryExpressions[
-        operationalItemIndex
-      ];
       const expressionIndex = queryExpressions.indexOf(queryExpression);
       if (queryExpressions.length === 0 || expressionIndex === -1) {
+        if (queryExpressions && queryExpressions[0] === "1=0") {
+          queryExpressions.splice(0, 1);
+        }
         queryExpressions.push(queryExpression);
+      } else if (
+        queryExpressions &&
+        queryExpressions.length === 1 &&
+        queryExpression === queryExpressions[0]
+      ) {
+        queryExpressions[0] = "1=0";
+      } else if (queryExpressions && queryExpressions.length === 1) {
+        queryExpressions[0] = [queryExpression];
+      } else if (
+        queryExpressions &&
+        queryExpressions.length === 1 &&
+        queryExpression !== queryExpressions[0] &&
+        queryExpressions[0] === "1=0"
+      ) {
+        queryExpressions[0] = [queryExpression];
+        // queryExpressions.push(queryExpression);
+      } else if (
+        queryExpressions &&
+        queryExpressions.length === 1 &&
+        queryExpression === queryExpressions[0] &&
+        queryExpressions[0] === "1=0"
+      ) {
+        queryExpressions[0] = [];
       } else {
         queryExpressions.splice(expressionIndex, 1);
       }
@@ -277,10 +374,9 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       );
       const filterExpression = queryExpressions.join(" OR ");
       this._setSearchExpression(filterExpression);
-      const opacity = this.opacity === null ? 30 : this.opacity;
-      const grayScale = this.grayScale === null ? 100 : this.grayScale;
+
       featureLayerView.effect = new FeatureEffect({
-        excludedEffect: `opacity(${opacity}%) grayscale(${grayScale}%)`,
+        excludedEffect: `opacity(${opacityValue}%) grayscale(${grayScaleValue}%)`,
         filter: {
           where: filterExpression
         }
@@ -295,18 +391,15 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         legendElementInfos,
         normalizationField
       );
-      const queryExpressions = this.interactiveStyleData.queryExpressions[
-        operationalItemIndex
-      ];
+
       const featureLayerView = this.featureLayerViews.getItemAt(
         operationalItemIndex
       );
       const filterExpression = queryExpressions.join(" OR ");
       this._setSearchExpression(filterExpression);
-      const opacity = this.opacity === null ? 30 : this.opacity;
-      const grayScale = this.grayScale === null ? 100 : this.grayScale;
+
       featureLayerView.effect = new FeatureEffect({
-        excludedEffect: `opacity(${opacity}%) grayscale(${grayScale}%)`,
+        excludedEffect: `opacity(${opacityValue}%) grayscale(${grayScaleValue}%)`,
         filter: {
           where: filterExpression
         }
@@ -314,58 +407,192 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     }
   }
 
-  // // applyFeatureHighlight
-  // applyFeatureHighlight(
-  //   elementInfo: any,
-  //   field: string,
-  //   legendInfoIndex: number,
-  //   operationalItemIndex: number,
-  //   legendElement: LegendElement,
-  //   isPredominance: boolean,
-  //   legendElementInfos: any[]
-  // ): void {
-  //   if (isPredominance) {
-  //     this._handlePredominanceHighlight(
-  //       elementInfo,
-  //       legendElementInfos,
-  //       operationalItemIndex,
-  //       legendInfoIndex
-  //     );
-  //   } else if (
-  //     Array.isArray(elementInfo.value) &&
-  //     elementInfo.value.length === 2
-  //   ) {
-  //     this._highlightRangeValues(
-  //       legendInfoIndex,
-  //       elementInfo,
-  //       field,
-  //       operationalItemIndex,
-  //       legendElementInfos
-  //     );
-  //   } else {
-  //     this._highlightUniqueValues(
-  //       legendInfoIndex,
-  //       elementInfo,
-  //       field,
-  //       operationalItemIndex,
-  //       legendElementInfos
-  //     );
-  //   }
+  // resetLegendFilter
+  resetLegendFilter(featureLayerData: any, operationalItemIndex: number): void {
+    const { featureLayerView, selectedInfoIndex } = featureLayerData;
+    const queryExpressionsCollection = this.interactiveStyleData.get(
+      "queryExpressions"
+    ) as __esri.Collection;
+    const queryExpressions = queryExpressionsCollection.getItemAt(
+      operationalItemIndex
+    );
+    if (queryExpressions) {
+      queryExpressions.length = 0;
+    }
 
-  //   this._generateQueryExpressions(
-  //     elementInfo,
-  //     field,
-  //     operationalItemIndex,
-  //     legendElement,
-  //     null,
-  //     legendElementInfos
-  //   );
-  //   const queryExpressions = this.interactiveStyleData.queryExpressions[
-  //     operationalItemIndex
-  //   ];
-  //   const filterExpression = queryExpressions.join(" OR ");
-  //   this._setSearchExpression(filterExpression);
-  // }
+    if (this.filterMode === "featureFilter") {
+      featureLayerView.filter = null;
+    } else if (this.filterMode === "mute") {
+      featureLayerView.effect = null;
+    }
+    if (selectedInfoIndex.length) {
+      selectedInfoIndex.length = 0;
+    }
+    this._setSearchExpression(null);
+    this.notifyChange("state");
+  }
+
+  // FEATURE COUNT METHODS
+
+  queryFeatureCount(
+    elementInfo: any,
+    field: string,
+    legendInfoIndex: number,
+    operationalItemIndex: number,
+    legendElement: LegendElement,
+    isPredominance: boolean,
+    legendElementIndex: number,
+    legendElementInfos?: any[],
+    normalizationField?: string,
+    generateFeatureCountExpression?: boolean
+  ) {
+    const { featureCount, totalFeatureCount } = this.interactiveStyleData;
+
+    if (!featureCount.getItemAt(operationalItemIndex)) {
+      featureCount.add(new Collection(), operationalItemIndex);
+    }
+    if (totalFeatureCount[operationalItemIndex] === undefined) {
+      totalFeatureCount[operationalItemIndex] = null;
+    }
+
+    const featureLayerView = this.featureLayerViews.getItemAt(
+      operationalItemIndex
+    );
+
+    const handlesKey = featureLayerView
+      ? `${featureLayerView.layer.id}-${legendInfoIndex}`
+      : null;
+    if (!this._handles.has(handlesKey)) {
+      this._handles.add(
+        watchUtils.whenFalse(this.view, "updating", () => {
+          const queryExpression = this._generateQueryCountExpression(
+            elementInfo,
+            field,
+            legendInfoIndex,
+            operationalItemIndex,
+            legendElement,
+            isPredominance,
+            legendElementInfos,
+            normalizationField,
+            generateFeatureCountExpression
+          );
+
+          this.featureCountQuery = featureLayerView.queryFeatureCount(
+            new Query({
+              where: queryExpression
+            })
+          );
+
+          const featureCountValue = featureCount.getItemAt(
+            operationalItemIndex
+          );
+
+          this.featureCountQuery.then(featureCountRes => {
+            if (featureCountValue) {
+              featureCountValue.removeAt(legendInfoIndex);
+            }
+            featureCountValue.add(featureCountRes, legendInfoIndex);
+            if (
+              this.selectedStyleDataCollection.getItemAt(operationalItemIndex)
+                .selectedInfoIndex.length === 0
+            ) {
+              this.queryTotalFeatureCount(operationalItemIndex);
+            } else {
+              this.updateTotalFeatureCount(
+                operationalItemIndex,
+                legendElementIndex
+              );
+            }
+            this.featureCountQuery = null;
+            this.notifyChange("state");
+          });
+        }),
+        handlesKey
+      );
+    }
+  }
+
+  // queryTotalFeatureCount
+  queryTotalFeatureCount(operationalItemIndex: number): void {
+    const { totalFeatureCount } = this.interactiveStyleData;
+    const featureCountCollection = this.interactiveStyleData.get(
+      "featureCount"
+    ) as __esri.Collection;
+
+    const featureCount = featureCountCollection.getItemAt(operationalItemIndex);
+    totalFeatureCount[operationalItemIndex] = null;
+
+    const queryExpressionsCollection = this.interactiveStyleData.get(
+      "queryExpressions"
+    ) as __esri.Collection;
+
+    const queryExpressions = queryExpressionsCollection.getItemAt(
+      operationalItemIndex
+    );
+
+    if (queryExpressions && queryExpressions[0] === "1=0") {
+      totalFeatureCount[operationalItemIndex] = 0;
+    } else if (featureCount) {
+      featureCount.forEach(count => {
+        totalFeatureCount[operationalItemIndex] += count;
+      });
+    }
+
+    this.notifyChange("state");
+  }
+
+  // updateTotalFeatureCount
+  updateTotalFeatureCount(
+    operationalItemIndex: number,
+    legendElementIndex: number
+  ): void {
+    const selectedInfoIndexes = this.selectedStyleDataCollection.getItemAt(
+      operationalItemIndex
+    ).selectedInfoIndex[legendElementIndex];
+    if (selectedInfoIndexes && selectedInfoIndexes.length === 0) {
+      this.queryTotalFeatureCount(operationalItemIndex);
+    } else {
+      const { totalFeatureCount } = this.interactiveStyleData;
+      totalFeatureCount[operationalItemIndex] = null;
+      const featureCount = this.interactiveStyleData.featureCount.getItemAt(
+        operationalItemIndex
+      );
+
+      featureCount.forEach((count, countIndex) => {
+        selectedInfoIndexes.forEach(selectedIndex => {
+          if (countIndex === selectedIndex) {
+            totalFeatureCount[operationalItemIndex] += count;
+          }
+        });
+      });
+    }
+    this.notifyChange("state");
+  }
+
+  // updateExtentToAllFeatures
+
+  // LIMITATION: When complex expressions (normalized fields) are queried against feature services that have Use Standardized Queries set to false - update extent cannot be applied.
+  updateExtentToAllFeatures(operationalItemIndex: number): void {
+    const layerView = this.featureLayerViews.getItemAt(operationalItemIndex);
+    const filterWhere = layerView.get("filter.where");
+    const effectWhere = layerView.get("effect.filter.where");
+    const featureLayer = this.featureLayerViews.getItemAt(operationalItemIndex)
+      .layer;
+    const query = new Query();
+    const queryExpressions =
+      this.filterMode === "featureFilter" ? filterWhere : effectWhere;
+    const whereClause = queryExpressions ? `${queryExpressions}` : "1=1";
+    query.where = whereClause;
+    query.outSpatialReference = this.view.spatialReference;
+    featureLayer
+      .queryExtent(query)
+      .catch(err => {
+        console.error("ERROR: ", err);
+      })
+      .then(extent => {
+        this.view.goTo(extent);
+      });
+  }
 
   //----------------------------------
   //
@@ -374,82 +601,19 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   //----------------------------------
 
   // _storeFeatureData
-  private _storeFeatureData(layerViewKey: string): void {
+  private _storeFeatureData(): void {
     this.layerListViewModel.operationalItems.forEach(operationalItem => {
       this._setUpDataContainers();
-
       const featureLayerView = operationalItem.layerView as FeatureLayerView;
       this.featureLayerViews.push(featureLayerView);
-      // this._queryFeatureLayerData(layerViewKey);
     });
   }
 
   // _setUpDataContainers
   private _setUpDataContainers(): void {
-    // const { highlightedFeatures, queryExpressions } = this.interactiveStyleData;
     const { queryExpressions } = this.interactiveStyleData;
-
-    // highlightedFeatures.push([]);
-    queryExpressions.push([]);
+    queryExpressions.add([]);
   }
-
-  // // _queryFeatureLayerData
-  // private _queryFeatureLayerData(layerViewKey: string): void {
-  //   const { _handles, layerGraphics, layerListViewModel } = this;
-  //   _handles.remove(layerViewKey);
-  //   layerGraphics.removeAll();
-  //   layerListViewModel.operationalItems.forEach(() => {
-  //     layerGraphics.add(null);
-  //   });
-  //   this._queryFeatures(layerViewKey);
-  // }
-
-  // // queryFeatures
-  // private _queryFeatures(layerViewKey: string): void {
-  //   this.featureLayerViews.forEach((layerView, layerViewIndex) => {
-  //     if (layerView) {
-  //       this._handles.add(
-  //         watchUtils.whenFalseOnce(layerView, "updating", () => {
-  //           if (!layerView) {
-  //             return;
-  //           }
-  //           if (typeof layerView.queryFeatures !== "function") {
-  //             this._querying = null;
-  //             this.notifyChange("state");
-  //           } else {
-  //             this._querying = layerView
-  //               .queryFeatures()
-  //               .catch(err => {
-  //                 this._querying = null;
-  //                 this.notifyChange("state");
-  //                 console.error("FEATURE QUERY ERROR: ", err);
-  //               })
-  //               .then((results: any) => {
-  //                 const featureLayerViews = this.featureLayerViews.getItemAt(
-  //                   layerViewIndex
-  //                 );
-  //                 if (
-  //                   results.features &&
-  //                   results.features.hasOwnProperty("length") &&
-  //                   results.features.length > 0 &&
-  //                   featureLayerViews.layer.id === results.features[0].layer.id
-  //                 ) {
-  //                   this.layerGraphics.splice(
-  //                     layerViewIndex,
-  //                     1,
-  //                     results.features
-  //                   );
-  //                 }
-  //                 this._querying = null;
-  //                 this.notifyChange("state");
-  //               });
-  //           }
-  //         }),
-  //         layerViewKey
-  //       );
-  //     }
-  //   });
-  // }
 
   //----------------------------------
   //
@@ -465,8 +629,9 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     legendElement: LegendElement,
     legendInfoIndex?: number,
     legendElementInfos?: any[],
-    normalizationField?: string
-  ): void {
+    normalizationField?: string,
+    generateFeatureCountExpression?: boolean
+  ): string {
     const queryExpression = this._generateQueryExpression(
       elementInfo,
       field,
@@ -475,14 +640,59 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       legendElementInfos,
       normalizationField
     );
-    const queryExpressions = this.interactiveStyleData.queryExpressions[
-      operationalItemIndex
-    ];
-    const expressionIndex = queryExpressions.indexOf(queryExpression);
-    if (queryExpressions.length === 0 || expressionIndex === -1) {
-      queryExpressions.push(queryExpression);
+
+    if (!generateFeatureCountExpression) {
+      const hasOneValue = legendElementInfos && legendElementInfos.length === 1;
+
+      const queryExpressionsCollection = this.interactiveStyleData.get(
+        "queryExpressions"
+      ) as __esri.Collection;
+
+      const queryExpressions = queryExpressionsCollection.getItemAt(
+        operationalItemIndex
+      );
+
+      const expressionIndex = queryExpressions.indexOf(queryExpression);
+      if (queryExpressions.length === 0 || expressionIndex === -1) {
+        if (queryExpressions && queryExpressions[0] === "1=0") {
+          queryExpressions.splice(0, 1);
+        }
+        queryExpressions.push(queryExpression);
+      } else if (
+        queryExpressions &&
+        queryExpressions.length === 1 &&
+        queryExpression === queryExpressions[0] &&
+        !hasOneValue
+      ) {
+        queryExpressions[0] = "1=0";
+      } else if (
+        queryExpressions &&
+        queryExpressions.length === 1 &&
+        !hasOneValue
+      ) {
+        queryExpressions[0] = [queryExpression];
+      } else if (
+        queryExpressions &&
+        queryExpressions.length === 1 &&
+        queryExpression !== queryExpressions[0] &&
+        queryExpressions[0] === "1=0" &&
+        !hasOneValue
+      ) {
+        queryExpressions[0] = [queryExpression];
+        // queryExpressions.push(queryExpression);
+      } else if (
+        queryExpressions &&
+        queryExpressions.length === 1 &&
+        queryExpression === queryExpressions[0] &&
+        queryExpressions[0] === "1=0" &&
+        !hasOneValue
+      ) {
+        queryExpressions[0] = [];
+      } else {
+        queryExpressions.splice(expressionIndex, 1);
+      }
     } else {
-      queryExpressions.splice(expressionIndex, 1);
+      return queryExpression;
     }
   }
 
@@ -495,17 +705,18 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     legendElementInfos?: any[],
     normalizationField?: string
   ): string {
-    const { value, label } = elementInfo;
-    const elementInfoHasValue = elementInfo.hasOwnProperty("value")
-      ? value
-      : label;
+    const { value } = elementInfo;
     if (legendElement.type === "symbol-table") {
       // Classify data size/color ramp
-      if (!elementInfo.hasOwnProperty("value")) {
+      if (
+        !elementInfo.hasOwnProperty("value") ||
+        (Array.isArray(elementInfo.value) && legendElementInfos.length === 1)
+      ) {
         // Classify data size/color ramp - 'Other' category
         if (
           legendElementInfos[0].hasOwnProperty("value") &&
           Array.isArray(legendElementInfos[0].value) &&
+          legendElementInfos[legendElementInfos.length - 2] &&
           legendElementInfos[legendElementInfos.length - 2].hasOwnProperty(
             "value"
           ) &&
@@ -521,6 +732,8 @@ class InteractiveStyleViewModel extends declared(Accessor) {
                 legendElementInfos[legendElementInfos.length - 2].value[0]
               } OR ${field} IS NULL`;
           return expression;
+        } else if (legendElementInfos.length === 1) {
+          return "1=0";
         } else {
           // Types unique symbols - 'Other' category
           const expressionList = [];
@@ -542,9 +755,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         }
       } else {
         const singleQuote =
-          elementInfoHasValue.indexOf("'") !== -1
-            ? elementInfoHasValue.split("'").join("''")
-            : null;
+          value.indexOf("'") !== -1 ? value.split("'").join("''") : null;
         const isArray = Array.isArray(elementInfo.value);
         const isLastElement = legendElementInfos.length - 1 === legendInfoIndex;
         const lastElementAndNoValue = !legendElementInfos[
@@ -556,27 +767,28 @@ class InteractiveStyleViewModel extends declared(Accessor) {
           ? normalizationField
             ? isLastElement || (lastElementAndNoValue && secondToLastElement)
               ? `(${field}/${normalizationField}) >= ${
-                  elementInfoHasValue[0]
+                  value[0]
                 } AND (${field}/${normalizationField}) <= ${
                   elementInfo.value[1]
                 }`
               : `(${field}/${normalizationField}) > ${
-                  elementInfoHasValue[0]
+                  value[0]
                 } AND (${field}/${normalizationField}) <= ${
                   elementInfo.value[1]
                 }`
             : isLastElement || (lastElementAndNoValue && secondToLastElement)
-            ? `${field} >= ${elementInfoHasValue[0]} AND ${field} <= ${
-                elementInfoHasValue[1]
-              }`
-            : `${field} > ${elementInfoHasValue[0]} AND ${field} <= ${
-                elementInfoHasValue[1]
-              }`
+            ? `${field} >= ${value[0]} AND ${field} <= ${value[1]}`
+            : `${field} > ${value[0]} AND ${field} <= ${value[1]}`
+          : legendElementInfos.length === 1 && field
+          ? isNaN(value) || !value.trim().length
+            ? `${field} <> '${value}'`
+            : `${field} <> ${value} OR ${field} <> '${value}'`
           : singleQuote
           ? `${field} = '${singleQuote}'`
-          : isNaN(elementInfoHasValue) || !elementInfoHasValue.trim().length
-          ? `${field} = '${elementInfoHasValue}'`
-          : `${field} = ${elementInfoHasValue} OR ${field} = '${elementInfoHasValue}'`;
+          : isNaN(value) || !value.trim().length
+          ? `${field} = '${value}'`
+          : `${field} = ${value} OR ${field} = '${value}'`;
+
         return expression;
       }
     }
@@ -590,9 +802,14 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     const featureLayerView = this.featureLayerViews.getItemAt(
       operationalItemIndex
     );
-    const authoringInfo = featureLayerView.layer.renderer.authoringInfo as any;
-    const fields = authoringInfo.fields;
+    const authoringInfo = featureLayerView
+      ? (featureLayerView.layer.renderer.authoringInfo as any)
+      : null;
+    const fields = authoringInfo ? authoringInfo.fields : null;
     const expressionArr = [];
+    if (!fields) {
+      return;
+    }
     if (elementInfo.hasOwnProperty("value")) {
       fields.forEach(field => {
         if (elementInfo.value === field) {
@@ -673,231 +890,81 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     }
   }
 
-  //----------------------------------
-  //
-  //  Highlight Methods
-  //
-  //----------------------------------
+  // _generateQueryCountExpression
+  private _generateQueryCountExpression(
+    elementInfo: any,
+    field: string,
+    legendInfoIndex: number,
+    operationalItemIndex: number,
+    legendElement: LegendElement,
+    isPredominance: boolean,
+    legendElementInfos?: any[],
+    normalizationField?: string,
+    generateFeatureCountExpression?: boolean
+  ): string {
+    const singleSymbol = legendElementInfos.length === 1;
+    if (!singleSymbol) {
+      if (isPredominance) {
+        return this._handlePredominanceExpression(
+          elementInfo,
+          operationalItemIndex
+        );
+      } else {
+        return this._generateQueryExpressions(
+          elementInfo,
+          field,
+          operationalItemIndex,
+          legendElement,
+          legendInfoIndex,
+          legendElementInfos,
+          normalizationField,
+          generateFeatureCountExpression
+        );
+      }
+    } else {
+      const queryExpressionCollection = this.interactiveStyleData.get(
+        "queryExpressions"
+      ) as __esri.Collection;
+      const queryExpressions = queryExpressionCollection.getItemAt(
+        operationalItemIndex
+      );
+      const expression = queryExpressions[0];
 
-  // // _highlightRangeValues
-  // private _highlightRangeValues(
-  //   legendInfoIndex: number,
-  //   elementInfo: any,
-  //   field: string,
-  //   operationalItemIndex: number,
-  //   legendElementInfos: any[]
-  // ): void {
-  //   const features = [];
-  //   const highlightedFeatures = this.interactiveStyleData.highlightedFeatures[
-  //     operationalItemIndex
-  //   ];
-
-  //   const elementInfoValue = elementInfo.value;
-  //   if (highlightedFeatures[legendInfoIndex]) {
-  //     this._removeHighlight(operationalItemIndex, legendInfoIndex);
-  //     return;
-  //   }
-  //   this.layerGraphics.getItemAt(operationalItemIndex).forEach(feature => {
-  //     const fieldValue = feature.attributes[field];
-  //     if (legendElementInfos.length - 1 === legendInfoIndex) {
-  //       if (
-  //         fieldValue >= elementInfoValue[0] &&
-  //         fieldValue <= elementInfoValue[1]
-  //       ) {
-  //         features.push(feature);
-  //       }
-  //     } else {
-  //       if (
-  //         fieldValue > elementInfoValue[0] &&
-  //         fieldValue <= elementInfoValue[1]
-  //       ) {
-  //         features.push(feature);
-  //       }
-  //     }
-  //   });
-
-  //   if (features.length === 0) {
-  //     return;
-  //   }
-  //   const highlight = this.featureLayerViews
-  //     .getItemAt(operationalItemIndex)
-  //     .highlight([...features]);
-  //   highlightedFeatures[legendInfoIndex] = [highlight];
-  // }
-
-  // // _highlightUniqueValue
-  // private _highlightUniqueValues(
-  //   legendInfoIndex: number,
-  //   elementInfo: any,
-  //   field: string,
-  //   operationalItemIndex: number,
-  //   legendElementInfos: any[]
-  // ): void {
-  //   const features = [];
-  //   const highlightedFeatures = [];
-  //   const highlightedFeatureData = this.interactiveStyleData
-  //     .highlightedFeatures[operationalItemIndex];
-
-  //   if (highlightedFeatureData[legendInfoIndex]) {
-  //     highlightedFeatureData[legendInfoIndex][0].remove();
-  //     highlightedFeatureData[legendInfoIndex] = null;
-  //     return;
-  //   }
-
-  //   if (elementInfo.hasOwnProperty("value")) {
-  //     this.layerGraphics.getItemAt(operationalItemIndex).map(feature => {
-  //       const attributes = feature.attributes;
-
-  //       if (
-  //         elementInfo.value == attributes[field] ||
-  //         elementInfo.value == attributes[field.toLowerCase()] ||
-  //         elementInfo.value == attributes[field.toUpperCase()]
-  //       ) {
-  //         features.push(feature);
-  //       }
-  //     });
-  //   } else {
-  //     const elementInfoCollection = new Collection(legendElementInfos);
-  //     this.layerGraphics.getItemAt(operationalItemIndex).map(feature => {
-  //       const itemExists = elementInfoCollection.find(elementInfo => {
-  //         if (elementInfo.value) {
-  //           return elementInfo.value == feature.attributes[field];
-  //         }
-  //       });
-  //       if (!itemExists) {
-  //         features.push(feature);
-  //       }
-  //     });
-  //   }
-
-  //   features.forEach(feature => {
-  //     highlightedFeatures.push(feature);
-  //   });
-
-  //   if (features.length === 0) {
-  //     return;
-  //   }
-  //   const highlight = this.featureLayerViews
-  //     .getItemAt(operationalItemIndex)
-  //     .highlight([...highlightedFeatures]);
-  //   highlightedFeatureData[legendInfoIndex] = [highlight];
-  // }
-
-  // // _handlePredominanceHighlight
-  // private _handlePredominanceHighlight(
-  //   elementInfo: any,
-  //   legendElementInfos: any[],
-  //   operationalItemIndex: number,
-  //   legendInfoIndex: number
-  // ): void {
-  //   const predominantFeatures = this.layerGraphics.getItemAt(
-  //     operationalItemIndex
-  //   );
-  //   const { objectIdField } = this.featureLayerViews.getItemAt(
-  //     operationalItemIndex
-  //   ).layer;
-  //   const featuresToHighlight = [];
-  //   predominantFeatures.forEach(predominantFeature => {
-  //     const itemsToCompare = [];
-  //     for (const attr in predominantFeature.attributes) {
-  //       if (
-  //         attr !== elementInfo.value &&
-  //         attr !== objectIdField &&
-  //         legendElementInfos.find(
-  //           elementInfo => elementInfo.value === elementInfo.value
-  //         )
-  //       ) {
-  //         const item = {};
-  //         item[attr] = predominantFeature.attributes[attr];
-  //         itemsToCompare.push(item);
-  //       }
-  //     }
-  //     let pass = true;
-  //     itemsToCompare.forEach(itemToCompare => {
-  //       for (const key in itemToCompare) {
-  //         if (
-  //           predominantFeature.attributes[elementInfo.value] <
-  //           itemToCompare[key]
-  //         ) {
-  //           pass = false;
-  //           break;
-  //         }
-  //       }
-  //     });
-  //     if (pass) {
-  //       featuresToHighlight.push(predominantFeature);
-  //     }
-  //   });
-  //   this.interactiveStyleData.highlightedFeatures;
-
-  //   const highlightedFeatures = this.interactiveStyleData.highlightedFeatures[
-  //     operationalItemIndex
-  //   ];
-  //   const highlightedFeatureData = this.interactiveStyleData
-  //     .highlightedFeatures[operationalItemIndex];
-  //   if (highlightedFeatureData[legendInfoIndex]) {
-  //     this._removeHighlight(operationalItemIndex, legendInfoIndex);
-  //     return;
-  //   }
-  //   const highlight = this.featureLayerViews
-  //     .getItemAt(operationalItemIndex)
-  //     .highlight([...featuresToHighlight]);
-
-  //   highlightedFeatures[legendInfoIndex] = [highlight];
-  // }
-
-  // // _removeHighlight
-  // private _removeHighlight(
-  //   operationalItemIndex: number,
-  //   legendInfoIndex: number
-  // ): void {
-  //   const highlightedFeatures = this.interactiveStyleData.highlightedFeatures[
-  //     operationalItemIndex
-  //   ];
-  //   highlightedFeatures[legendInfoIndex].forEach(feature => {
-  //     feature.remove();
-  //   });
-  //   highlightedFeatures[legendInfoIndex] = null;
-  // }
-
-  // End of filter methods
+      if (
+        (expression && expression === "1=0") ||
+        (expression && expression.indexOf("<>"))
+      ) {
+        return "1=0";
+      } else {
+        return "1=1";
+      }
+    }
+  }
 
   // _setSearchExpression
   private _setSearchExpression(filterExpression: string): void {
     if (!this.searchViewModel) {
       return;
     }
-    this.searchViewModel.sources.forEach(searchSource => {
-      this.layerListViewModel.operationalItems.forEach(operationalItem => {
-        if (
-          searchSource.layer &&
-          searchSource.layer.id === operationalItem.layer.id
-        ) {
-          if (filterExpression) {
-            searchSource.filter = {
-              where: filterExpression
-            };
-          } else {
-            searchSource.filter = null;
-          }
-        }
-      });
-    });
-  }
 
-  // resetLegendFilter
-  resetLegendFilter(featureLayerData: any, operationalItemIndex: number): void {
-    this.interactiveStyleData.queryExpressions[operationalItemIndex].length = 0;
-    if (this.filterMode === "featureFilter") {
-      featureLayerData.featureLayerView.filter = null;
-    } else if (this.filterMode === "mute") {
-      featureLayerData.featureLayerView.effect = null;
-    }
-    if (featureLayerData.selectedInfoIndex.length) {
-      featureLayerData.selectedInfoIndex.length = 0;
-    }
-    this._setSearchExpression(null);
-    this.notifyChange("state");
+    this.searchViewModel.sources.forEach(
+      (searchSource: __esri.LayerSearchSource) => {
+        this.layerListViewModel.operationalItems.forEach(operationalItem => {
+          if (
+            searchSource.layer &&
+            searchSource.layer.id === operationalItem.layer.id
+          ) {
+            if (filterExpression) {
+              searchSource.filter = {
+                where: filterExpression
+              };
+            } else {
+              searchSource.filter = null;
+            }
+          }
+        });
+      }
+    );
   }
 }
 

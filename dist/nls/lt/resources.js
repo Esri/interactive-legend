@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Išbandykite interaktyvią legendą",
   "firstOnboardingWelcomeMessage": "Norėdami filtruoti žemėlapio sluoksnius, analizuokite duomenis pasirinkdami reikšmes legendoje.",
   "secondOnboardingWelcomeMessage": "Filtravimo kriterijus atitinkantys elementai žemėlapyje paryškinami.",
-  "thirdOnboardingWelcomeMessage": "Spustelėkite pasirinktą legendos elementą, kad pašalintumėte jį iš filtro.",
+  "thirdOnboardingWelcomeMessage": "Norėdami pritaikyti filtrą, spustelėkite legendos elementą.",
   "onboardingConfirmation": "Supratau!",
   "close": "Uždaryti",
   "onboardingPanelScreenshotTitle": "Užfiksuokite žemėlapio vaizdus",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Norėdami įtraukti iškylantį langą, žemėlapyje pasirinkite elementą.",
   "onboardingPanelScreenshotStepFour": "Spustelėkite Nustatyti žemėlapio sritį. Nubrėžkite stačiakampį, kad pasirinktumėte vaizdo aprėpiamą teritoriją.",
   "onboardingPanelScreenshotStepFive": "Spustelėkite Atsisiųsti vaizdą.",
-  "showAll": "Rodyti visus"
+  "showAll": "Rodyti visus",
+  "expandInteractiveLegend": "Atverti interaktyvią legendą",
+  "zoomTo": "Artinti į",
+  "totalFeatureCount": "Visas elementų skaičius",
+  "relationshipInstruction": "Spustelėkite spalvotus kvadratus, jei norite filtruoti žemėlapį",
+  "relationshipLegendElement": "Ryšių legendos elementas"
 });
