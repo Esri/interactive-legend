@@ -88,9 +88,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/i18n!./Componen
                 });
                 this.telemetry.logPageView();
             }
-            var homeEnabled = config.homeEnabled, homePosition = config.homePosition, zoomControlsEnabled = config.zoomControlsEnabled, zoomControlsPosition = config.zoomControlsPosition, searchEnabled = config.searchEnabled, searchConfig = config.searchConfig, searchPosition = config.searchPosition, basemapToggleEnabled = config.basemapToggleEnabled, basemapTogglePosition = config.basemapTogglePosition, nextBasemap = config.nextBasemap, layerListEnabled = config.layerListEnabled, layerListPosition = config.layerListPosition, screenshotEnabled = config.screenshotEnabled, screenshotPosition = config.screenshotPosition, enablePopupOption = config.enablePopupOption, enableLegendOption = config.enableLegendOption, infoPanelEnabled = config.infoPanelEnabled, infoPanelPosition = config.infoPanelPosition, splashButtonPosition = config.splashButtonPosition, interactiveLegendPosition = config.interactiveLegendPosition, filterMode = config.filterMode, 
-            // highlightShade,
-            mutedShade = config.mutedShade, muteOpacity = config.muteOpacity, muteGrayScale = config.muteGrayScale, searchOpenAtStart = config.searchOpenAtStart;
+            var homeEnabled = config.homeEnabled, homePosition = config.homePosition, zoomControlsEnabled = config.zoomControlsEnabled, zoomControlsPosition = config.zoomControlsPosition, searchEnabled = config.searchEnabled, searchConfig = config.searchConfig, searchPosition = config.searchPosition, basemapToggleEnabled = config.basemapToggleEnabled, basemapTogglePosition = config.basemapTogglePosition, nextBasemap = config.nextBasemap, layerListEnabled = config.layerListEnabled, layerListPosition = config.layerListPosition, screenshotEnabled = config.screenshotEnabled, screenshotPosition = config.screenshotPosition, enablePopupOption = config.enablePopupOption, enableLegendOption = config.enableLegendOption, infoPanelEnabled = config.infoPanelEnabled, infoPanelPosition = config.infoPanelPosition, splashButtonPosition = config.splashButtonPosition, interactiveLegendPosition = config.interactiveLegendPosition, filterMode = config.filterMode, mutedShade = config.mutedShade, muteOpacity = config.muteOpacity, muteGrayScale = config.muteGrayScale, searchOpenAtStart = config.searchOpenAtStart, featureCountEnabled = config.featureCountEnabled, updateExtentEnabled = config.updateExtentEnabled;
             var webMapItems = results.webMapItems;
             var validWebMapItems = webMapItems.map(function (response) {
                 return response.value;
@@ -147,18 +145,6 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/i18n!./Componen
                             }
                             var defaultStyle = "classic";
                             var defaultMode = filterMode ? filterMode : "featureFilter";
-                            // if (highlightShade) {
-                            //   const highlightedShade = new Color(highlightShade);
-                            //   const { r, g, b, a } = highlightedShade;
-                            //   view.highlightOptions = {
-                            //     color: new Color(`rgb(${r},${g},${b})`),
-                            //     fillOpacity: a
-                            //   };
-                            // } else {
-                            //   view.highlightOptions = {
-                            //     color: new Color("#000000")
-                            //   };
-                            // }
                             _this._defineUrlParams(view);
                             _this._handleHomeWidget(view, homeEnabled, homePosition);
                             _this._handleSplash(config, view, splashButtonPosition);
@@ -180,12 +166,15 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/i18n!./Componen
                             _this.interactiveLegend = new InteractiveLegend({
                                 view: view,
                                 mutedShade: defaultShade,
+                                container: document.createElement("div"),
                                 style: defaultStyle,
                                 filterMode: defaultMode,
                                 layerListViewModel: layerListViewModel,
                                 onboardingPanelEnabled: onboardingPanelEnabled,
                                 opacity: muteOpacity,
-                                grayScale: muteGrayScale
+                                grayScale: muteGrayScale,
+                                featureCountEnabled: featureCountEnabled,
+                                updateExtentEnabled: updateExtentEnabled
                             });
                             _this._handleSearchWidget(searchEnabled, _this.interactiveLegend, view, searchConfig, searchPosition, searchOpenAtStart);
                             var interactiveLegendGroup = interactiveLegendPosition.indexOf("left") !== -1
@@ -197,7 +186,8 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/i18n!./Componen
                                 content: _this.interactiveLegend,
                                 mode: "floating",
                                 expanded: true,
-                                expandTooltip: _this.interactiveLegend.label
+                                expandTooltip: i18nInteractiveLegend.expandInteractiveLegend,
+                                expandIconClass: "custom-interactive-legend"
                             });
                             watchUtils.whenOnce(_this.interactiveLegendExpand, "container", function () {
                                 if (_this.interactiveLegendExpand.container) {
@@ -263,10 +253,14 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/i18n!./Componen
                                         var container_2 = _this.infoExpand.container;
                                         container_2.classList.add("expand-content-z-index");
                                     }
+                                    if (base.locale === "ar") {
+                                        var questionMarkIcon = document.querySelector(".esri-collapse__icon.icon-ui-question.icon-ui-flush");
+                                        questionMarkIcon.style.transform = "scaleX(-1)";
+                                    }
                                 });
                                 view.ui.add(_this.infoExpand, infoPanelPosition);
                             }
-                            _this._handleScreenshotWidget(screenshotEnabled, enableLegendOption, enablePopupOption, view, screenshotPosition);
+                            _this._handleScreenshotWidget(screenshotEnabled, enableLegendOption, enablePopupOption, view, screenshotPosition, featureCountEnabled);
                             itemUtils_1.goToMarker(marker, view);
                             _this._handleHeader(config);
                             if (config.customCSS) {
@@ -326,7 +320,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/i18n!./Componen
             document.head.appendChild(styles);
         };
         // _handleScreenshotWidget
-        InteractiveLegendApp.prototype._handleScreenshotWidget = function (screenshotEnabled, enableLegendOption, enablePopupOption, view, screenshotPosition) {
+        InteractiveLegendApp.prototype._handleScreenshotWidget = function (screenshotEnabled, enableLegendOption, enablePopupOption, view, screenshotPosition, featureCountEnabled) {
             var _this = this;
             if (screenshotEnabled) {
                 this.screenshot = new Screenshot({
@@ -334,7 +328,9 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/i18n!./Componen
                     enableLegendOption: enableLegendOption,
                     enablePopupOption: enablePopupOption,
                     includeLegendInScreenshot: true,
-                    selectedStyleData: this.interactiveLegend.style.selectedStyleData,
+                    selectedStyleData: this.interactiveLegend.style
+                        .selectedStyleDataCollection,
+                    legendFeatureCountEnabled: featureCountEnabled,
                     layerListViewModel: this.layerList.viewModel
                 });
                 if (!enableLegendOption) {

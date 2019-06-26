@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "嘗試互動式圖例",
   "firstOnboardingWelcomeMessage": "在圖例中選擇值以篩選地圖圖層，從而探索資料。",
   "secondOnboardingWelcomeMessage": "會在地圖上強調符合篩選準則的圖徵。",
-  "thirdOnboardingWelcomeMessage": "按一下選擇的圖例項目，從篩選器移除該項目。",
+  "thirdOnboardingWelcomeMessage": "按一下圖例項目以套用篩選器。",
   "onboardingConfirmation": "知道了!",
   "close": "關閉",
   "onboardingPanelScreenshotTitle": "擷取地圖圖片",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "若要包含快顯視窗，請在地圖上選擇圖徵。",
   "onboardingPanelScreenshotStepFour": "按一下「設定地圖區域」。 繪製矩形以選擇圖片的地區。",
   "onboardingPanelScreenshotStepFive": "按一下「下載圖片」。",
-  "showAll": "顯示全部"
+  "showAll": "顯示全部",
+  "expandInteractiveLegend": "開啟互動式圖例",
+  "zoomTo": "縮放至",
+  "totalFeatureCount": "圖徵總計數",
+  "relationshipInstruction": "按一下顏色方塊以篩選地圖",
+  "relationshipLegendElement": "關係圖例元素"
 });

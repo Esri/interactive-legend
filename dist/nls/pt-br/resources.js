@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Experimente a lenda interativa",
   "firstOnboardingWelcomeMessage": "Explore os dados selecionando valores na legenda para filtrar as camadas de mapa.",
   "secondOnboardingWelcomeMessage": "As feições que correspondem aos critérios do filtro são enfatizados no mapa.",
-  "thirdOnboardingWelcomeMessage": "Clique em um item da legenda selecionado para removê-lo do filtro.",
+  "thirdOnboardingWelcomeMessage": "Clique em um item da legenda para aplicar um filtro.",
   "onboardingConfirmation": "Obtido!",
   "close": "Fechar",
   "onboardingPanelScreenshotTitle": "Capturar imagens de mapa",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Para incluir um pop-up, selecione uma feição no mapa.",
   "onboardingPanelScreenshotStepFour": "Clique em Definir a área do mapa. Desenhe um retângulo para selecionar uma região para sua imagem.",
   "onboardingPanelScreenshotStepFive": "Clique em Baixar Imagem.",
-  "showAll": "Mostrar Todos"
+  "showAll": "Mostrar Todos",
+  "expandInteractiveLegend": "Abrir legenda interativa",
+  "zoomTo": "Zoom Para",
+  "totalFeatureCount": "Contagem Total de Feições",
+  "relationshipInstruction": "Clique nos quadrados de cor para filtrar o mapa",
+  "relationshipLegendElement": "Elemento da legenda de relacionamento"
 });

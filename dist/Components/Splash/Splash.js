@@ -17,7 +17,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/accessorSupport/decorators", "esri/widgets/Widget", "esri/widgets/support/widget", "esri/core/watchUtils"], function (require, exports, __assign, __extends, __decorate, decorators_1, Widget, widget_1, watchUtils) {
+define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/accessorSupport/decorators", "esri/widgets/Widget", "esri/widgets/support/widget"], function (require, exports, __assign, __extends, __decorate, decorators_1, Widget, widget_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var CSS = {
@@ -44,25 +44,17 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         __extends(Splash, _super);
         function Splash(params) {
             var _this = _super.call(this, params) || this;
+            _this._calcite = null;
             _this.view = null;
             _this.modalId = "splash";
             _this.config = params.config;
             return _this;
         }
-        Splash.prototype.postInitialize = function () {
-            var _this = this;
-            this.own([
-                watchUtils.init(this, "view", function () {
-                    _this.own([
-                        watchUtils.whenTrueOnce(_this, "view.ready", function () {
-                            calcite.init();
-                        })
-                    ]);
-                })
-            ]);
-        };
         Splash.prototype.render = function () {
             var description = this.config.splashContent ? (widget_1.tsx("span", { innerHTML: this.config.splashContent })) : null;
+            if (!this._calcite) {
+                this._calcite = calcite.init();
+            }
             var splashContent = (widget_1.tsx("div", { class: this.classes(CSS.jsModal, CSS.modalOverlay, CSS.modifierClass), "data-modal": this.modalId },
                 widget_1.tsx("div", { class: this.classes(CSS.modalContent, CSS.column12, CSS.appBody), role: "dialog", "aria-labelledby": "modal" },
                     widget_1.tsx("h3", { class: CSS.trailerHalf }, this.config.splashTitle),
@@ -94,14 +86,19 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             return splashButton;
         };
         Splash.prototype.showSplash = function () {
-            if (this.config.splashOnStart) {
+            if (this.config.splash) {
                 // enable splash screen when app loads then
                 // set info in session storage when its closed
                 // so we don't open again this session.
-                if (!sessionStorage.getItem("disableSplash")) {
+                if (this.config.splashOnStart) {
                     calcite.bus.emit("modal:open", { id: this.modalId });
                 }
-                sessionStorage.setItem("disableSplash", "true");
+                else {
+                    if (!sessionStorage.getItem("disableSplash")) {
+                        calcite.bus.emit("modal:open", { id: this.modalId });
+                    }
+                    sessionStorage.setItem("disableSplash", "true");
+                }
             }
         };
         __decorate([

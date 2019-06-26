@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Zkuste interaktivní legendu",
   "firstOnboardingWelcomeMessage": "Zkoumejte data výběrem hodnot v legendě a filtrujte mapové vrstvy.",
   "secondOnboardingWelcomeMessage": "Prvky odpovídající kritériím filtru jsou na mapě zvýrazněny.",
-  "thirdOnboardingWelcomeMessage": "Kliknutím na vybranou položku legendy ji odeberete z filtru.",
+  "thirdOnboardingWelcomeMessage": "Pro použití filtru klikněte na položku legendy.",
   "onboardingConfirmation": "Rozumím!",
   "close": "Zavřít",
   "onboardingPanelScreenshotTitle": "Zachytit mapové obrázky",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Pokud chcete zahrnout vyskakovací okno, vyberte prvek v mapě.",
   "onboardingPanelScreenshotStepFour": "Klikněte na možnost Nastavit oblast mapy. Region pro váš obrázek vyberete nakreslením obdélníku.",
   "onboardingPanelScreenshotStepFive": "Klikněte na možnost Stáhnout obrázek.",
-  "showAll": "Zobrazit vše"
+  "showAll": "Zobrazit vše",
+  "expandInteractiveLegend": "Otevřít interaktivní legendu",
+  "zoomTo": "Přiblížit na",
+  "totalFeatureCount": "Celkový počet prvků",
+  "relationshipInstruction": "Pro filtrování na mapě klikněte na barevné čtverce",
+  "relationshipLegendElement": "Prvek vztahové legendy"
 });

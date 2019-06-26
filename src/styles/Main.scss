@@ -169,3 +169,22 @@ html[dir="rtl"] {
 .app-error .configurable-application__view-container {
   display: block;
 }
+
+@media only screen and (max-width: 813px) {
+  .parent-container {
+    position: fixed;
+    bottom: 0;
+    z-index: 500;
+    height: 100%;
+    width: 100%;
+  }
+
+  .title-container {
+    height: 5%;
+    box-sizing: border-box;
+  }
+}
+
+.modal-overlay {
+  z-index: 500;
+}

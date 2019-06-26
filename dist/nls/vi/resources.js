@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Dùng thử chú giải tương tác",
   "firstOnboardingWelcomeMessage": "Khám phá dữ liệu bằng cách chọn các giá trị trong chú giải để lọc lớp bản đồ.",
   "secondOnboardingWelcomeMessage": "Các đối tượng khớp với tiêu chí bộ lọc được tô đậm trên bản đồ.",
-  "thirdOnboardingWelcomeMessage": "Nhấp vào mục chú giải đã chọn để xóa mục đó khỏi bộ lọc.",
+  "thirdOnboardingWelcomeMessage": "Bấm vào một mục chú giải để áp dụng bộ lọc.",
   "onboardingConfirmation": "Thành công!",
   "close": "Đóng",
   "onboardingPanelScreenshotTitle": "Chụp ảnh bản đồ",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Để đưa cửa sổ pop-up vào, hãy chọn một đối tượng trên bản đồ.",
   "onboardingPanelScreenshotStepFour": "Nhấp vào Thiết lập khu vực bản đồ. Vẽ một hình chữ nhật để chọn khu vực cho hình ảnh của bạn.",
   "onboardingPanelScreenshotStepFive": "Nhấp vào Tải Hình ảnh.",
-  "showAll": "Hiển thị tất cả"
+  "showAll": "Hiển thị tất cả",
+  "expandInteractiveLegend": "Mở chú giải tương tác",
+  "zoomTo": "Phóng đến",
+  "totalFeatureCount": "Tổng số lượng đối tượng",
+  "relationshipInstruction": "Bấm vào các ô vuông màu để lọc bản đồ",
+  "relationshipLegendElement": "Phần tử chú giải mối quan hệ"
 });

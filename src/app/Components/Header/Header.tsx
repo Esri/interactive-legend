@@ -26,11 +26,18 @@ class Header extends declared(Widget) {
 
   render() {
     const { headHTML, customHeaderEnabled, title } = this.config;
+    const appTitle =
+      document.body.clientWidth < 813 && title.length > 40
+        ? `${title
+            .split("")
+            .slice(0, 35)
+            .join("")}...`
+        : title;
     return (
       <header
         innerHTML={customHeaderEnabled ? (headHTML ? headHTML : null) : null}
       >
-        {customHeaderEnabled ? null : <div class={CSS.title}>{title}</div>}
+        {customHeaderEnabled ? null : <div class={CSS.title}>{appTitle}</div>}
       </header>
     );
   }

@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Спробуйте інтерактивну легенду",
   "firstOnboardingWelcomeMessage": "Вивчайте дані, вибираючи значення в легенді для фільтрування шарів карти.",
   "secondOnboardingWelcomeMessage": "Об'єкти, котрі відповідають критеріям фільтрування, виділятимуться на карті.",
-  "thirdOnboardingWelcomeMessage": "Клацніть по обраному елементу легенди, щоб видалити його з фільтру.",
+  "thirdOnboardingWelcomeMessage": "Клацніть елемент легенди, щоб застосувати фільтр.",
   "onboardingConfirmation": "Зрозумів!",
   "close": "Закрити",
   "onboardingPanelScreenshotTitle": "Захопити зображення карти",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Щоб включити спливаюче вікно, виберіть об'єкт на карті.",
   "onboardingPanelScreenshotStepFour": "Клацніть «Задати область карти». Намалюйте прямокутник, щоб вибрати область для вашого зображення.",
   "onboardingPanelScreenshotStepFive": "Клацніть «Завантажити зображення».",
-  "showAll": "Показати всі"
+  "showAll": "Показати всі",
+  "expandInteractiveLegend": "Відкрити інтерактивну легенду",
+  "zoomTo": "Масштабувати до",
+  "totalFeatureCount": "Загальна кількість об'єктів",
+  "relationshipInstruction": "Клацайте кольорові квадрати для фільтрування карти",
+  "relationshipLegendElement": "Елемент легенди відношень"
 });

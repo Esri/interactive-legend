@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Prøv med den interaktive signaturforklaring",
   "firstOnboardingWelcomeMessage": "Undersøg data ved at vælge værdier i signaturforklaringen for at filtrere kortlag.",
   "secondOnboardingWelcomeMessage": "Objekter, der matcher filterkriterierne, er fremhævede på kortet.",
-  "thirdOnboardingWelcomeMessage": "Klik på et valgt signaturforklaringselement for at fjerne det fra filteret.",
+  "thirdOnboardingWelcomeMessage": "Klik på et signaturforklaringselement for at anvende et filter.",
   "onboardingConfirmation": "Det er modtaget!",
   "close": "Luk",
   "onboardingPanelScreenshotTitle": "Tag kortbilleder",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Hvis du vil inkludere en pop-up, skal du vælge et objekt på kortet.",
   "onboardingPanelScreenshotStepFour": "Klik på Indstil kortområde. Tegn et rektangel for at vælge et område til dit billede.",
   "onboardingPanelScreenshotStepFive": "Klik på Hent billede.",
-  "showAll": "Vis alle"
+  "showAll": "Vis alle",
+  "expandInteractiveLegend": "Åbn interaktiv signaturforklaring",
+  "zoomTo": "Zoom til",
+  "totalFeatureCount": "Samlet optælling af objekter",
+  "relationshipInstruction": "Klik på de farvede kvadrater for at filtrere kortet",
+  "relationshipLegendElement": "Signaturforklaringselement for relationer"
 });

@@ -13,14 +13,19 @@ define({
   "newInteractiveLegend": "대화형 범례 사용",
   "firstOnboardingWelcomeMessage": "맵 레이어를 필터링할 범례 값을 선택하여 데이터를 탐색합니다.",
   "secondOnboardingWelcomeMessage": "필터 기준과 일치하는 피처가 맵에 강조 표시됩니다.",
-  "thirdOnboardingWelcomeMessage": "선택한 범례 항목을 클릭하여 필터에서 해당 항목을 제거할 수 있습니다.",
+  "thirdOnboardingWelcomeMessage": "필터를 적용하려면 범례 항목을 클릭합니다.",
   "onboardingConfirmation": "가져왔습니다!",
   "close": "닫기",
   "onboardingPanelScreenshotTitle": "맵 이미지 캡처",
   "onboardingPanelScreenshotStepOne": "스크린샷 버튼을 클릭합니다.",
-  "onboardingPanelScreenshotStepTwo": "해당되는 경우, 이미지에 맵 범례와 팝업이 포함되도록 선택할 수 있습니다.",
+  "onboardingPanelScreenshotStepTwo": "해당되는 경우 이미지에 맵 범례와 팝업이 포함되도록 선택할 수 있습니다.",
   "onboardingPanelScreenshotStepThree": "팝업을 포함시키려면 맵에서 피처를 선택합니다.",
   "onboardingPanelScreenshotStepFour": "맵 영역 설정을 클릭합니다. 사각형을 그려 이미지 영역을 선택합니다.",
   "onboardingPanelScreenshotStepFive": "이미지 다운로드를 클릭합니다.",
-  "showAll": "모두 보기"
+  "showAll": "모두 보기",
+  "expandInteractiveLegend": "대화형 범례 열기",
+  "zoomTo": "확대",
+  "totalFeatureCount": "총 피처 개수",
+  "relationshipInstruction": "색상 사각형을 클릭하여 맵 필터링",
+  "relationshipLegendElement": "관계 범례 요소"
 });

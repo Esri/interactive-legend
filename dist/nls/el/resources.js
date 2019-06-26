@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Δοκιμάστε να χρησιμοποιήσετε το διαδραστικό υπόμνημα.",
   "firstOnboardingWelcomeMessage": "Εξερευνήστε δεδομένα επιλέγοντας τιμές στο υπόμνημα για φιλτράρισμα θεματικών επιπέδων του χάρτη.",
   "secondOnboardingWelcomeMessage": "Τα στοιχεία που πληρούν τα κριτήρια φιλτραρίσματος επισημαίνονται στον χάρτη.",
-  "thirdOnboardingWelcomeMessage": "Κάντε κλικ σε ένα στοιχείο του επιλεγμένου υπομνήματος για να το καταργήσετε από το φιλτράρισμα.",
+  "thirdOnboardingWelcomeMessage": "Κάντε κλικ σε κάποιο αντικείμενο του υπομνήματος για να εφαρμόσετε ένα φίλτρο.",
   "onboardingConfirmation": "Το κατάλαβα!",
   "close": "Κλείσιμο",
   "onboardingPanelScreenshotTitle": "Καταγραφή εικόνων χάρτη",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Για να συμπεριληφθεί ένα αναδυόμενο παράθυρο, επιλέξτε ένα στοιχείο στον χάρτη.",
   "onboardingPanelScreenshotStepFour": "Κάντε κλικ στην επιλογή «Καθορισμός της περιοχής του χάρτη». Σχεδιάστε ένα ορθογώνιο για να επιλέξετε μια περιοχή για την εικόνα σας.",
   "onboardingPanelScreenshotStepFive": "Κάντε κλικ στην επιλογή «Λήψη εικόνας».",
-  "showAll": "Εμφάνιση όλων"
+  "showAll": "Εμφάνιση όλων",
+  "expandInteractiveLegend": "Άνοιγμα διαδραστικού υπομνήματος",
+  "zoomTo": "Εστίαση σε",
+  "totalFeatureCount": "Συνολικός αριθμός στοιχείων",
+  "relationshipInstruction": "Κάντε κλικ στα χρωματικά τετράγωνα για να φιλτράρετε τον χάρτη.",
+  "relationshipLegendElement": "Στοιχείο υπομνήματος σχέσης"
 });

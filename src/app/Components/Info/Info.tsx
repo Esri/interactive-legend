@@ -74,7 +74,7 @@ const CSS = {
     btnClear: "btn-clear"
   },
   icons: {
-    widgetIcon: "icon-ui-question"
+    widgetIcon: "icon-ui-question icon-ui-flush"
   }
 };
 

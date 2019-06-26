@@ -107,6 +107,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this.selectedStyleData = null;
             // layerListViewModel
             _this.layerListViewModel = null;
+            // legendFeatureCountEnabled
+            _this.legendFeatureCountEnabled = null;
             // iconClass
             _this.iconClass = CSS.mediaIcon;
             // label
@@ -329,7 +331,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     if (!_this.featureWidget) {
                         _this._set("featureWidget", new FeatureWidget({
                             container: _this._offscreenPopupContainer,
-                            graphic: _this.view.popup.selectedFeature
+                            graphic: _this.view.popup.selectedFeature,
+                            map: _this.view.map,
+                            spatialReference: _this.view.spatialReference
                         }));
                         _this._selectFeatureAlertIsVisible = false;
                         _this.scheduleRender();
@@ -386,7 +390,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 }
                 _this._set("featureWidget", new FeatureWidget({
                     container: _this._offscreenPopupContainer,
-                    graphic: _this.view.popup.selectedFeature
+                    graphic: _this.view.popup.selectedFeature,
+                    map: _this.view.map,
+                    spatialReference: _this.view.spatialReference
                 }));
                 _this.scheduleRender();
             });
@@ -435,6 +441,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             decorators_1.aliasOf("viewModel.layerListViewModel"),
             decorators_1.property()
         ], Screenshot.prototype, "layerListViewModel", void 0);
+        __decorate([
+            decorators_1.aliasOf("viewModel.legendFeatureCountEnabled"),
+            decorators_1.property()
+        ], Screenshot.prototype, "legendFeatureCountEnabled", void 0);
         __decorate([
             decorators_1.property()
         ], Screenshot.prototype, "iconClass", void 0);

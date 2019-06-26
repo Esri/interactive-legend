@@ -51,6 +51,8 @@ class Splash extends declared(Widget) {
     this.config = params.config;
   }
 
+  private _calcite: any = null;
+
   @property()
   @renderable()
   view: MapView | SceneView = null;
@@ -63,22 +65,13 @@ class Splash extends declared(Widget) {
   @renderable()
   modalId: string = "splash";
 
-  postInitialize() {
-    this.own([
-      watchUtils.init(this, "view", () => {
-        this.own([
-          watchUtils.whenTrueOnce(this, "view.ready", () => {
-            calcite.init();
-          })
-        ]);
-      })
-    ]);
-  }
-
   render() {
     const description = this.config.splashContent ? (
       <span innerHTML={this.config.splashContent} />
     ) : null;
+    if (!this._calcite) {
+      this._calcite = calcite.init();
+    }
 
     const splashContent = (
       <div
@@ -144,14 +137,18 @@ class Splash extends declared(Widget) {
   }
 
   public showSplash() {
-    if (this.config.splashOnStart) {
+    if (this.config.splash) {
       // enable splash screen when app loads then
       // set info in session storage when its closed
       // so we don't open again this session.
-      if (!sessionStorage.getItem("disableSplash")) {
+      if (this.config.splashOnStart) {
         calcite.bus.emit("modal:open", { id: this.modalId });
+      } else {
+        if (!sessionStorage.getItem("disableSplash")) {
+          calcite.bus.emit("modal:open", { id: this.modalId });
+        }
+        sessionStorage.setItem("disableSplash", "true");
       }
-      sessionStorage.setItem("disableSplash", "true");
     }
   }
 }

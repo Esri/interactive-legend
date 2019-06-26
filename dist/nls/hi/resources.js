@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "इंटरैक्टिव लीजेंड आजमाएं",
   "firstOnboardingWelcomeMessage": "मानचित्र लेयर को फ़िल्टर करने के लिए लीजेंड में मूल्यों का चयन करके डेटा को एक्प्लोर करें।",
   "secondOnboardingWelcomeMessage": "फ़िल्टर मानदंड से मेल खाने वाली सुविधाओं को मानचित्र पर बेहतर तरीके से दिया गया है।",
-  "thirdOnboardingWelcomeMessage": "फ़िल्टर से किसी चयनित लीजेंड आइटम को हटाने के लिए इस पर क्लिक करें।",
+  "thirdOnboardingWelcomeMessage": "फ़िल्टर लागू करने के लिए किसी लीजेंड आइटम पर क्लिक करें।",
   "onboardingConfirmation": "समझ लिया!",
   "close": "बंद",
   "onboardingPanelScreenshotTitle": "मानचित्र छवियां कैप्चर करें",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "पॉप-अप को शामिल करने के लिए, मानचित्र पर कोई सुविधा चुनें।",
   "onboardingPanelScreenshotStepFour": "मानचित्र क्षेत्र सेट करें' पर क्लिक करें। अपनी छवि के लिए कोई क्षेत्र चुनने हेतु एक आयत बनाएँ।",
   "onboardingPanelScreenshotStepFive": "छवि डाउनलोड करें' पर क्लिक करें।",
-  "showAll": "सभी दिखाएँ"
+  "showAll": "सभी दिखाएँ",
+  "expandInteractiveLegend": "इंटरैक्टिव लीजेंड खोलें",
+  "zoomTo": "इस पर जूम करें",
+  "totalFeatureCount": "फीचर की कुल संख्या",
+  "relationshipInstruction": "मानचित्र को फ़िल्टर करने के लिए रंगीन वर्गों पर क्लिक करें",
+  "relationshipLegendElement": "संबंधित लीजेंड एलिमेंट"
 });

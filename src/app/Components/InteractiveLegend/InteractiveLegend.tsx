@@ -140,6 +140,7 @@ class InteractiveLegend extends declared(Widget) {
   @renderable()
   onboardingPanelEnabled: boolean = null;
 
+  // offscreen
   @aliasOf("style.offscreen")
   @renderable()
   offscreen: boolean = null;
@@ -151,6 +152,14 @@ class InteractiveLegend extends declared(Widget) {
   @aliasOf("style.grayScale")
   @renderable()
   grayScale: number = null;
+
+  @aliasOf("style.featureCountEnabled")
+  @renderable()
+  featureCountEnabled: boolean = null;
+
+  @aliasOf("style.updateExtentEnabled")
+  @renderable()
+  updateExtentEnabled: boolean = null;
 
   // style
   @property()
@@ -164,7 +173,9 @@ class InteractiveLegend extends declared(Widget) {
     onboardingPanelEnabled: this.onboardingPanelEnabled,
     offscreen: this.offscreen,
     opacity: this.opacity,
-    grayScale: this.grayScale
+    grayScale: this.grayScale,
+    featureCountEnabled: this.featureCountEnabled,
+    updateExtentEnabled: this.updateExtentEnabled
   });
 
   // castStyle
@@ -186,7 +197,9 @@ class InteractiveLegend extends declared(Widget) {
         onboardingPanelEnabled: this.onboardingPanelEnabled,
         offscreen: this.offscreen,
         opacity: this.opacity,
-        grayScale: this.grayScale
+        grayScale: this.grayScale,
+        featureCountEnabled: this.featureCountEnabled,
+        updateExtentEnabled: this.updateExtentEnabled
       });
     }
 
@@ -208,7 +221,9 @@ class InteractiveLegend extends declared(Widget) {
       onboardingPanelEnabled: this.onboardingPanelEnabled,
       offscreen: this.offscreen,
       opacity: this.opacity,
-      grayScale: this.grayScale
+      grayScale: this.grayScale,
+      featureCountEnabled: this.featureCountEnabled,
+      updateExtentEnabled: this.updateExtentEnabled
     });
   }
 

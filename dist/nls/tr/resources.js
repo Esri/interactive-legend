@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Etkileşimli lejantı deneyin",
   "firstOnboardingWelcomeMessage": "Harita katmanlarını filtrelemek için lejantta değerler seçerek verileri keşfedin.",
   "secondOnboardingWelcomeMessage": "Filtre ölçütleriyle eşleşen detaylar haritada vurgulanır.",
-  "thirdOnboardingWelcomeMessage": "Seçilen bir lejant öğesini, filtreden çıkarmak için tıklayın.",
+  "thirdOnboardingWelcomeMessage": "Bir filtre uygulamak için bir lejant ögesine tıklayın.",
   "onboardingConfirmation": "Anladım!",
   "close": "Kapat",
   "onboardingPanelScreenshotTitle": "Harita görüntüleri yakala",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Açılır bilgi eklemek için, haritada bir detay seçin.",
   "onboardingPanelScreenshotStepFour": "Harita alanını ayarla’yı tıklayın. Görüntünüze bir bölge seçmek için bir dikdörtgen çizin.",
   "onboardingPanelScreenshotStepFive": "Görüntü İndir’i tıklayın.",
-  "showAll": "Tümünü Göster"
+  "showAll": "Tümünü Göster",
+  "expandInteractiveLegend": "Etkileşimli lejantı aç",
+  "zoomTo": "Yakınlaştır",
+  "totalFeatureCount": "Toplam Detay Sayısı",
+  "relationshipInstruction": "Haritayı filtrelemek için renk karelerine tıklayın",
+  "relationshipLegendElement": "İlişki lejant ögesi"
 });

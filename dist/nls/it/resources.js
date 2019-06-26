@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Provare la leggenda interattiva",
   "firstOnboardingWelcomeMessage": "Esplorare i dati selezionando i valori nella legenda per filtrare i layer mappa.",
   "secondOnboardingWelcomeMessage": "Le caratteristiche che corrispondono ai criteri del filtro sono enfatizzate sulla mappa.",
-  "thirdOnboardingWelcomeMessage": "Fare clic su un elemento della legenda selezionato per rimuoverlo dal filtro.",
+  "thirdOnboardingWelcomeMessage": "Fare clic su un elemento della legenda per applicare un filtro.",
   "onboardingConfirmation": "Ricevuto.",
   "close": "Chiudere",
   "onboardingPanelScreenshotTitle": "Acquisire immagini mappa",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Per includere un popup, selezionare una feature sulla mappa.",
   "onboardingPanelScreenshotStepFour": "Fai clic su Imposta area mappa. Disegnare un rettangolo per selezionare un'area per l’immagine.",
   "onboardingPanelScreenshotStepFive": "Fare clic su Scarica immagine.",
-  "showAll": "Mostra tutto"
+  "showAll": "Mostra tutto",
+  "expandInteractiveLegend": "Aprire la legenda interattiva",
+  "zoomTo": "Zoom a",
+  "totalFeatureCount": "Conteggio totale feature",
+  "relationshipInstruction": "Fare clic sui quadrati di colore per filtrare la mappa",
+  "relationshipLegendElement": "Elemento della legenda di relazione"
 });

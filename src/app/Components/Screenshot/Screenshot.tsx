@@ -43,7 +43,8 @@ import Legend = require("esri/widgets/Legend");
 
 // FeatureWidget
 import FeatureWidget = require("esri/widgets/Feature");
-import { SelectedStyleData } from "../../interfaces/interfaces";
+
+import SelectedStyleData = require("../InteractiveLegend/InteractiveLegend/styles/InteractiveStyle/SelectedStyleData");
 
 //----------------------------------
 //
@@ -173,6 +174,11 @@ class Screenshot extends declared(Widget) {
   @aliasOf("viewModel.layerListViewModel")
   @property()
   layerListViewModel: __esri.LayerListViewModel = null;
+
+  // legendFeatureCountEnabled
+  @aliasOf("viewModel.legendFeatureCountEnabled")
+  @property()
+  legendFeatureCountEnabled: boolean = null;
 
   // iconClass
   @property()
@@ -586,7 +592,9 @@ class Screenshot extends declared(Widget) {
             "featureWidget",
             new FeatureWidget({
               container: this._offscreenPopupContainer,
-              graphic: this.view.popup.selectedFeature
+              graphic: this.view.popup.selectedFeature,
+              map: this.view.map,
+              spatialReference: this.view.spatialReference
             })
           );
           this._selectFeatureAlertIsVisible = false;
@@ -658,7 +666,9 @@ class Screenshot extends declared(Widget) {
         "featureWidget",
         new FeatureWidget({
           container: this._offscreenPopupContainer,
-          graphic: this.view.popup.selectedFeature
+          graphic: this.view.popup.selectedFeature,
+          map: this.view.map,
+          spatialReference: this.view.spatialReference
         })
       );
       this.scheduleRender();

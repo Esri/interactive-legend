@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Probeer de interactieve legenda",
   "firstOnboardingWelcomeMessage": "Analyseer gegevens door waarden in de legenda te selecteren om kaartlagen te filteren.",
   "secondOnboardingWelcomeMessage": "Objecten die voldoen aan de filtercriteria worden op de kaart benadrukt.",
-  "thirdOnboardingWelcomeMessage": "Klik op geselecteerd legenda-element om het uit het filter te verwijderen.",
+  "thirdOnboardingWelcomeMessage": "Klik op een item in de legenda om een filter toe te passen.",
   "onboardingConfirmation": "Ik snap het!",
   "close": "Sluiten",
   "onboardingPanelScreenshotTitle": "Kaartafbeeldingen maken",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Selecteer een object op de kaart om een pop-up op te nemen.",
   "onboardingPanelScreenshotStepFour": "Klik op Het kaartgebied instellen. Teken een rechthoek om een deel van uw afbeelding te selecteren.",
   "onboardingPanelScreenshotStepFive": "Klik op Afbeelding downloaden.",
-  "showAll": "Alles tonen"
+  "showAll": "Alles tonen",
+  "expandInteractiveLegend": "Interactieve legenda openen",
+  "zoomTo": "Zoomen naar",
+  "totalFeatureCount": "Totaal objectaantal",
+  "relationshipInstruction": "Klik op gekleurde vierkanten om de kaart te filteren",
+  "relationshipLegendElement": "Relatie legenda-element"
 });

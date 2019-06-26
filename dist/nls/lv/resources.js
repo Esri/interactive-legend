@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Izmēģināt interaktīvu apzīmējumu",
   "firstOnboardingWelcomeMessage": "Izpētiet datus, izvēloties apzīmējuma vērtības, lai filtrētu kartes slāņus.",
   "secondOnboardingWelcomeMessage": "Elementi, kas atbilst filtrēšanas kritērijiem, kartē tiek izcelti.",
-  "thirdOnboardingWelcomeMessage": "Noklikšķiniet uz izvēlētā apzīmējuma vienuma, lai noņemtu to no filtra.",
+  "thirdOnboardingWelcomeMessage": "Noklikšķiniet uz apzīmējuma vienuma, lai lietotu filtru.",
   "onboardingConfirmation": "Sapratu!",
   "close": "Aizvērt",
   "onboardingPanelScreenshotTitle": "Tvert kartes attēlus",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Lai iekļautu uznirstošo logu, kartē izvēlieties elementu.",
   "onboardingPanelScreenshotStepFour": "Noklikšķiniet uz Iestatīt kartes teritoriju. Uzzīmējiet taisnstūri, lai izvēlētos sava attēla reģionu.",
   "onboardingPanelScreenshotStepFive": "Noklikšķiniet uz Lejupielādēt attēlu.",
-  "showAll": "Rādīt visu"
+  "showAll": "Rādīt visu",
+  "expandInteractiveLegend": "Atvērt interaktīvos apzīmējumus",
+  "zoomTo": "Tuvināt",
+  "totalFeatureCount": "Kopējais elementu skaits",
+  "relationshipInstruction": "Noklikšķiniet uz krāsainajiem kvadrātiem, lai filtrētu karti",
+  "relationshipLegendElement": "Saistības apzīmējuma elements"
 });

@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Probieren Sie die interaktive Legende aus",
   "firstOnboardingWelcomeMessage": "Erkunden Sie Daten durch die Auswahl von Werten in der Legende, wodurch die Karten-Layer gefiltert werden.",
   "secondOnboardingWelcomeMessage": "Features, die mit den Filterkriterien übereinstimmen, werden auf der Karte hervorgehoben.",
-  "thirdOnboardingWelcomeMessage": "Klicken Sie auf ein ausgewähltes Legendenelement, um es aus dem Filter zu entfernen.",
+  "thirdOnboardingWelcomeMessage": "Klicken Sie zum Anwenden eines Filters auf ein Legendenelement.",
   "onboardingConfirmation": "Schließen!",
   "close": "Schließen",
   "onboardingPanelScreenshotTitle": "Kartenbilder aufnehmen",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Um ein Pop-up einzubeziehen, wählen Sie auf der Karte ein Feature aus.",
   "onboardingPanelScreenshotStepFour": "Klicken Sie auf \"Kartenbereich festlegen\". Ziehen Sie ein Rechteck auf, um eine Region für das Bild auszuwählen.",
   "onboardingPanelScreenshotStepFive": "Klicken Sie auf \"Bild herunterladen\".",
-  "showAll": "Alle anzeigen"
+  "showAll": "Alle anzeigen",
+  "expandInteractiveLegend": "Interaktive Legende öffnen",
+  "zoomTo": "Zoomen auf",
+  "totalFeatureCount": "Gesamt-Feature-Anzahl",
+  "relationshipInstruction": "Zum Filtern der Karte auf Farbquadrate klicken",
+  "relationshipLegendElement": "Element der Beziehungslegende"
 });

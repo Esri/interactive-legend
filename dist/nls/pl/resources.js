@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Spróbuj zastosować interaktywną legendę",
   "firstOnboardingWelcomeMessage": "Eksploruj dane, wybierając wartości w legendzie do filtrowania warstw mapy.",
   "secondOnboardingWelcomeMessage": "Obiekty pasujące do kryteriów filtrowania są podkreślone na mapie.",
-  "thirdOnboardingWelcomeMessage": "Kliknij wybrany element legendy, aby usunąć go z filtru.",
+  "thirdOnboardingWelcomeMessage": "Kliknij element legendy, aby zastosować filtr.",
   "onboardingConfirmation": "Udało się!",
   "close": "Zamknij",
   "onboardingPanelScreenshotTitle": "Przechwyć obrazy mapy",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Aby uwzględnić okno podręczne, wybierz obiekt na mapie.",
   "onboardingPanelScreenshotStepFour": "Kliknij przycisk Ustaw obszar mapy. Narysuj prostokąt, aby wybrać region dla swojego obrazu.",
   "onboardingPanelScreenshotStepFive": "Kliknij przycisk Pobierz obraz.",
-  "showAll": "Pokaż wszystko"
+  "showAll": "Pokaż wszystko",
+  "expandInteractiveLegend": "Otwórz interaktywną legendę",
+  "zoomTo": "Powiększ do",
+  "totalFeatureCount": "Łączna liczba obiektów",
+  "relationshipInstruction": "Klikaj kolorowe kwadraty, aby filtrować mapę",
+  "relationshipLegendElement": "Element legendy relacji"
 });

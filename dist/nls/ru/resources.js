@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Попробуйте интерактивную легенду",
   "firstOnboardingWelcomeMessage": "Исследуйте данные, выбрав значения в легенде для фильтрации слоев карты.",
   "secondOnboardingWelcomeMessage": "Объекты, которые соответствуют критериям фильтра, выделены на карте.",
-  "thirdOnboardingWelcomeMessage": "Щёлкните выбранный элемент легенды, чтобы удалить его из фильтра.",
+  "thirdOnboardingWelcomeMessage": "Щелкните элемент легенды, чтобы применить фильтр.",
   "onboardingConfirmation": "Понятно!",
   "close": "Закрыть",
   "onboardingPanelScreenshotTitle": "Захват изображения карты",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Чтобы включить всплывающее окно, выберите объект на карте.",
   "onboardingPanelScreenshotStepFour": "Щёлкните Установить область карты. Нарисуйте прямоугольник, чтобы выбрать область для вашего изображения.",
   "onboardingPanelScreenshotStepFive": "Щёлкните Скачать изображение.",
-  "showAll": "Показать все"
+  "showAll": "Показать все",
+  "expandInteractiveLegend": "Открыть интерактивную легенду",
+  "zoomTo": "Приблизить к",
+  "totalFeatureCount": "Общее число пространственных объектов",
+  "relationshipInstruction": "Щелкните цветной квадрат, чтобы применить фильтр к карте",
+  "relationshipLegendElement": "Отношение элемента легенды"
 });

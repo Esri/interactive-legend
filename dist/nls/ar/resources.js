@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "جرب وسيلة الإيضاح التفاعلية",
   "firstOnboardingWelcomeMessage": "استكشف البيانات بتحديد القيم في وسيلة الإيضاح لتصفية طبقات الخريطة.",
   "secondOnboardingWelcomeMessage": "المعالم التي تطابق معايير عامل التصفية بارزة على الخريطة.",
-  "thirdOnboardingWelcomeMessage": "انقر على صنف وسيلة إيضاح محدد لإزالته عامل التصفية.",
+  "thirdOnboardingWelcomeMessage": "انقر على عنصر وسيلة إيضاح لتطبيق عامل تصفية.",
   "onboardingConfirmation": "فهمت!",
   "close": "إغلاق",
   "onboardingPanelScreenshotTitle": "التقاط صور الخريطة",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "لتضمين عنصر منبثق، حدد إحدى المعالم على الخريطة.",
   "onboardingPanelScreenshotStepFour": "انقر على \"تعيين منطقة الخريطة\". ارسم مستطيلاً لتحديد منطقة لصورتك.",
   "onboardingPanelScreenshotStepFive": "انقر على \"تنزيل الصورة\".",
-  "showAll": "إظهار الكل"
+  "showAll": "إظهار الكل",
+  "expandInteractiveLegend": "فتح وسيلة إيضاح تفاعلية",
+  "zoomTo": "تكبير/تصغير",
+  "totalFeatureCount": "إجمالي عدد المعالم",
+  "relationshipInstruction": "انقر على المربعات الملونة لتصفية الخريطة",
+  "relationshipLegendElement": "عنصر وسيلة إيضاح العلاقة"
 });

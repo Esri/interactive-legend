@@ -28,9 +28,6 @@ import ActiveLayerInfo = require("esri/widgets/Legend/support/ActiveLayerInfo");
 // esri.views.View
 import View = require("esri/views/View");
 
-// esri.core.lang
-import Lang = require("esri/core/lang");
-
 export type LegendElement =
   | SymbolTableElement
   | ColorRampElement
@@ -42,15 +39,6 @@ export type LegendElement =
 type SymbolTableElementType =
   | ImageSymbolTableElementInfo
   | SymbolTableElementInfo;
-
-export interface SelectedStyleData {
-  layerItemId: string;
-  selectedInfoIndex: any;
-  field: string;
-  applyStyles: boolean;
-  featureLayerView: FeatureLayerView;
-  normalizationField: string;
-}
 
 // export type FilterMode = "featureFilter" | "highlight" | "mute";
 
@@ -235,11 +223,6 @@ interface SizeRampStop {
   preview?: HTMLElement;
 }
 
-interface InteractiveStyleData {
-  queryExpressions: string[][];
-  // highlightedFeatures: any[][];
-}
-
 interface ActiveLayerInfoProps extends ActiveLayerInfo {
   isScaleDriven: boolean;
   view: View;
@@ -249,6 +232,29 @@ export type VNode = {
   /* avoids exposing vdom implementation details */
 };
 
-interface LangProps extends Lang {
-  substitute: any;
+interface FeatureDataParams {
+  classBreakInfos1: any;
+  classBreakInfos2: any;
+  fieldValue1: number;
+  fieldValue2: number;
+  feature: Graphic;
+}
+
+interface MinMaxData {
+  minValue: number;
+  maxValue: number;
+}
+
+interface RelationshipExpressionParams {
+  data: MinMaxData[][];
+  focus: string;
+  field1: string;
+  field2: string;
+  i: number;
+  j: number;
+}
+
+declare module "*.png" {
+  const value: any;
+  export = value;
 }

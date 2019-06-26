@@ -13,7 +13,7 @@ define({
   "newInteractiveLegend": "Prova la llegenda interactiva",
   "firstOnboardingWelcomeMessage": "Si voleu explorar les dades, seleccioneu els valors de la llegenda per filtrar les capes del mapa.",
   "secondOnboardingWelcomeMessage": "Les entitats que coincideixen amb els criteris de filtre s'emfasitzen al mapa.",
-  "thirdOnboardingWelcomeMessage": "Feu clic en un element de llegenda seleccionat per suprimir-lo del filtre.",
+  "thirdOnboardingWelcomeMessage": "Feu clic en un element de llegenda per aplicar un filtre.",
   "onboardingConfirmation": "Fet!",
   "close": "Tanca",
   "onboardingPanelScreenshotTitle": "Captura imatges del mapa",
@@ -22,5 +22,10 @@ define({
   "onboardingPanelScreenshotStepThree": "Per incloure una finestra emergent, seleccioneu una entitat al mapa.",
   "onboardingPanelScreenshotStepFour": "Feu clic a Defineix l'àrea del mapa. Dibuixeu un rectangle per seleccionar una regió per a la imatge.",
   "onboardingPanelScreenshotStepFive": "Feu clic a Baixa la imatge.",
-  "showAll": "Mostra-ho tot"
+  "showAll": "Mostra-ho tot",
+  "expandInteractiveLegend": "Obre la llegenda interactiva",
+  "zoomTo": "Aplica el zoom a",
+  "totalFeatureCount": "Recompte total d'entitats",
+  "relationshipInstruction": "Feu clic als quadres de color per filtrar el mapa",
+  "relationshipLegendElement": "Element de llegenda de relació"
 });

@@ -50,7 +50,7 @@ define({
   "menu": "Nabídka",
   "more": "Více",
   "none": "Žádné",
-  "open": "Otevřeno",
+  "open": "Otevřít",
   "pagination": {
     "first": "První",
     "last": "Poslední",
