@@ -289,9 +289,14 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             if (!this._handles.has(handlesKey)) {
                 this._handles.add(watchUtils.whenFalse(this.view, "updating", function () {
                     var queryExpression = _this._generateQueryCountExpression(elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos, normalizationField, generateFeatureCountExpression);
-                    _this.featureCountQuery = featureLayerView.queryFeatureCount(new Query({
-                        where: queryExpression
-                    }));
+                    var geometry = _this.view && _this.view.get("extent");
+                    var outSpatialReference = _this.view && _this.view.get("spatialReference");
+                    var query = new Query({
+                        where: queryExpression,
+                        geometry: geometry,
+                        outSpatialReference: outSpatialReference
+                    });
+                    _this.featureCountQuery = featureLayerView.queryFeatureCount(query);
                     var featureCountValue = featureCount.getItemAt(operationalItemIndex);
                     _this.featureCountQuery.then(function (featureCountRes) {
                         if (featureCountValue) {

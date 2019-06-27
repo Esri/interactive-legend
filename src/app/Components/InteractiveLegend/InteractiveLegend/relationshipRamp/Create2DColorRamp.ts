@@ -677,8 +677,14 @@ class Create2DColorRamp extends declared(Accessor) {
       this.queryExpressions.join(" OR ") === ""
         ? this.queryCountExpressions.join(" OR ")
         : this.queryExpressions.join(" OR ");
+
+    const geometry = this.view && this.view.get("extent");
+    const outSpatialReference = this.view && this.view.get("spatialReference");
+
     this.layerView
       .queryFeatureCount({
+        geometry,
+        outSpatialReference,
         where
       })
       .then(totalFeatureCount => {

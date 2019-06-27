@@ -513,8 +513,12 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             var where = this.queryExpressions.join(" OR ") === ""
                 ? this.queryCountExpressions.join(" OR ")
                 : this.queryExpressions.join(" OR ");
+            var geometry = this.view && this.view.get("extent");
+            var outSpatialReference = this.view && this.view.get("spatialReference");
             this.layerView
                 .queryFeatureCount({
+                geometry: geometry,
+                outSpatialReference: outSpatialReference,
                 where: where
             })
                 .then(function (totalFeatureCount) {
