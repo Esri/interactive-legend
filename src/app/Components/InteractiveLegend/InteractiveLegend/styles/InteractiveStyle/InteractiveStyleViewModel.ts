@@ -477,11 +477,17 @@ class InteractiveStyleViewModel extends declared(Accessor) {
             generateFeatureCountExpression
           );
 
-          this.featureCountQuery = featureLayerView.queryFeatureCount(
-            new Query({
-              where: queryExpression
-            })
-          );
+          const geometry = this.view && this.view.get("extent");
+          const outSpatialReference =
+            this.view && this.view.get("spatialReference");
+
+          const query = new Query({
+            where: queryExpression,
+            geometry,
+            outSpatialReference
+          });
+
+          this.featureCountQuery = featureLayerView.queryFeatureCount(query);
 
           const featureCountValue = featureCount.getItemAt(
             operationalItemIndex
