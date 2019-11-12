@@ -486,6 +486,12 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/i18n!./Componen
                     }
                 }
                 var featureLayer = view.map.findLayerById(this.base.config.customUrlLayer.id);
+                var layerSearchSource = {
+                    layer: featureLayer,
+                    searchFields: this.base.config.customUrlLayer.fields[0].fields,
+                    outFields: ["*"],
+                    exactMatch: true
+                };
                 if (featureLayer && searchTerm) {
                     var search = new Search({
                         view: view,
@@ -494,14 +500,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/i18n!./Componen
                         includeDefaultSources: false,
                         suggestionsEnabled: false,
                         searchTerm: searchTerm,
-                        sources: [
-                            {
-                                layer: featureLayer,
-                                searchFields: this.base.config.customUrlLayer.fields[0].fields,
-                                outFields: ["*"],
-                                exactMatch: true
-                            }
-                        ]
+                        sources: [layerSearchSource]
                     });
                     search.search();
                 }
