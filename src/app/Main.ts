@@ -739,6 +739,12 @@ class InteractiveLegendApp {
       const featureLayer = view.map.findLayerById(
         this.base.config.customUrlLayer.id
       );
+      const layerSearchSource = {
+        layer: featureLayer,
+        searchFields: this.base.config.customUrlLayer.fields[0].fields,
+        outFields: ["*"],
+        exactMatch: true
+      };
       if (featureLayer && searchTerm) {
         const search = new Search({
           view,
@@ -747,14 +753,7 @@ class InteractiveLegendApp {
           includeDefaultSources: false,
           suggestionsEnabled: false,
           searchTerm,
-          sources: [
-            {
-              layer: featureLayer,
-              searchFields: this.base.config.customUrlLayer.fields[0].fields,
-              outFields: ["*"],
-              exactMatch: true
-            }
-          ]
+          sources: [layerSearchSource]
         });
         search.search();
       }

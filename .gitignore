@@ -2,6 +2,7 @@ node_modules
 .editorconfig
 .eslintrc
 .jsbeautifyrc
-Gruntfile.js
 tslint.json
 web.config
+.DS_Store
+src/app/.DS_Store
