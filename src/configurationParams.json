@@ -1,430 +1,522 @@
 {
-  "configurationSettings": [{
-    "category": "General",
-    "fields": [{
-      "type": "subcategory",
-      "label": "Interactive Legend"
-    }, {
-      "type": "paragraph",
-      "value": "Documentation on how to modify the legend drawing style can be found here: <a href='https://doc.arcgis.com/en/arcgis-online/create-maps/change-style.htm' target='_blank' rel='noopener'>https://doc.arcgis.com/en/arcgis-online/create-maps/change-style.htm</a>. The interactive legend tool does not support field attributes added to the map legend via custom expression."
-    }, {
-      "type": "itembrowser",
-      "fieldName": "webmap",
-      "label": "Select",
-      "itemTypes": ["Web Map"],
-      "conditions": ["renderer", "4x"],
-      "defaultContent": true,
-      "showOnLoad": true
-    }, {
-      "type": "appproxies"
-    }, {
-      "type": "string",
-      "fieldName": "title",
-      "tooltip": "Use this to title your app.",
-      "label": "Title of your application"
-    }, {
-      "type": "conditional",
-      "fieldName": "customHeaderEnabled",
-      "label": "Add a custom header",
-      "condition": false,
-      "items": [{
-        "type": "paragraph",
-        "value": "These are advanced settings that work best when used together.  Define the structure of the header via the html editor and then style it via the CSS input.  For more information on the HTML that can be used, see this topic <a href='https://doc.arcgis.com/en/arcgis-online/reference/supported-html.htm' target='_blank' rel='noopener'>format help</a> for more information."
-      }, {
-        "label": "Header HTML",
-        "tooltip": "use this to create a customized header for your app.",
-        "type": "string",
-        "fieldName": "headHTML",
-        "stringFieldOption": "richtext"
-      }]
-    }, {
-      "type": "conditional",
-      "fieldName": "splash",
-      "tooltip": "Add splash screen",
-      "label": "Splash screen",
-      "condition": false,
-      "items": [{
-        "type": "string",
-        "fieldName": "splashTitle",
-        "label": "Title",
-        "tooltip": "Splash screen title"
-      }, {
-        "type": "string",
-        "fieldName": "splashContent",
-        "label": "Content",
-        "tooltip": "Splash screen content",
-        "stringFieldOption": "richtext"
-      }, {
-        "type": "string",
-        "fieldName": "splashButtonText",
-        "label": "Button label",
-        "tooltip": "Define label for the accept button"
-      }, {
-        "type": "options",
-        "fieldName": "splashButtonPosition",
-        "tooltip": "Select location for splash button",
-        "label": "Splash button location",
-        "options": [{
-          "label": "Top right",
-          "value": "top-right"
-        }, {
-          "label": "Top left",
-          "value": "top-left"
-        }, {
-          "label": "Bottom right",
-          "value": "bottom-right"
-        }, {
-          "label": "Bottom left",
-          "value": "bottom-left"
-        }]
-      }, {
-        "type": "boolean",
-        "fieldName": "splashOnStart",
-        "label": "Always open at start",
-        "tooltip": "Always open at start"
-      }]
-    }, {
-      "label": "Custom CSS",
-      "tooltip": "use this to style different elements of the app",
-      "type": "string",
-      "fieldName": "customCSS"
-    }]
-  }, {
-    "category": "Options",
-    "fields": [{
-      "type": "options",
-      "fieldName": "interactiveLegendPosition",
-      "tooltip": "Select location for Interactive Legend",
-      "label": "Interactive Legend location",
-      "options": [{
-        "label": "Top right",
-        "value": "top-right"
-      }, {
-        "label": "Top left",
-        "value": "top-left"
-      }, {
-        "label": "Bottom right",
-        "value": "bottom-right"
-      }, {
-        "label": "Bottom left",
-        "value": "bottom-left"
-      }]
-    }, {
-      "type": "paragraph",
-      "value": "Interactive Legend options:"
-    }, {
-      "type": "boolean",
-      "fieldName": "featureCountEnabled",
-      "label": "Enable option to include feature count"
-    }, {
-      "type": "boolean",
-      "fieldName": "updateExtentEnabled",
-      "label": "Enable option to include zoom to button"
-    }, {
-      "type": "paragraph",
-      "value": "Select the widgets you would like to include in your app:"
-    }, {
-      "type": "conditional",
-      "fieldName": "homeEnabled",
-      "label": "Home Extent",
-      "condition": false,
-      "items": [{
-        "type": "options",
-        "fieldName": "homePosition",
-        "tooltip": "Select location for home control",
-        "label": "Home location",
-        "options": [{
-          "label": "Top right",
-          "value": "top-right"
-        }, {
-          "label": "Top left",
-          "value": "top-left"
-        }, {
-          "label": "Bottom right",
-          "value": "bottom-right"
-        }, {
-          "label": "Bottom left",
-          "value": "bottom-left"
-        }]
-      }]
-    }, {
-      "type": "conditional",
-      "fieldName": "zoomControlsEnabled",
-      "label": "Zoom Controls",
-      "condition": false,
-      "items": [{
-        "type": "options",
-        "fieldName": "zoomControlsPosition",
-        "tooltip": "Select location for zoom controls",
-        "label": "Zoom controls location",
-        "options": [{
-          "label": "Top right",
-          "value": "top-right"
-        }, {
-          "label": "Top left",
-          "value": "top-left"
-        }, {
-          "label": "Bottom right",
-          "value": "bottom-right"
-        }, {
-          "label": "Bottom left",
-          "value": "bottom-left"
-        }]
-      }]
-    }, {
-      "type": "conditional",
-      "fieldName": "layerListEnabled",
-      "label": "Layer List",
-      "condition": false,
-      "items": [{
-        "type": "options",
-        "fieldName": "layerListPosition",
-        "tooltip": "Select location for layer list",
-        "label": "Layer list location",
-        "options": [{
-          "label": "Top right",
-          "value": "top-right"
-        }, {
-          "label": "Top left",
-          "value": "top-left"
-        }, {
-          "label": "Bottom right",
-          "value": "bottom-right"
-        }, {
-          "label": "Bottom left",
-          "value": "bottom-left"
-        }]
-      }]
-    }, {
-      "type": "conditional",
-      "fieldName": "screenshotEnabled",
-      "label": "Screenshot",
-      "condition": false,
-      "items": [{
-        "type": "paragraph",
-        "value": "Please note: A third-party tool, Html2Canvas is used to capture the interactive map legend and pop-up in the screenshot, which may have unexpected behaviors across different browsers such as IE11."
-      }, {
-        "type": "boolean",
-        "fieldName": "enableLegendOption",
-        "label": "Enable option to include legend in screenshot"
-      }, {
-        "type": "boolean",
-        "fieldName": "enablePopupOption",
-        "label": "Enable option to include pop-up in screenshot"
-      }, {
-        "type": "options",
-        "fieldName": "screenshotPosition",
-        "tooltip": "Select location for the screenshot tool",
-        "label": "Screenshot location",
-        "options": [{
-          "label": "Top right",
-          "value": "top-right"
-        }, {
-          "label": "Top left",
-          "value": "top-left"
-        }, {
-          "label": "Bottom right",
-          "value": "bottom-right"
-        }, {
-          "label": "Bottom left",
-          "value": "bottom-left"
-        }]
-      }]
-    }, {
-      "type": "conditional",
-      "fieldName": "basemapToggleEnabled",
-      "label": "Basemap Toggle",
-      "condition": false,
-      "items": [{
-        "type": "options",
-        "fieldName": "nextBasemap",
-        "tooltip": "Select a basemap to toggle",
-        "label": "Select a basemap to toggle",
-        "options": [{
-          "label": "Topo",
-          "value": "topo"
-        }, {
-          "label": "Streets",
-          "value": "streets"
-        }, {
-          "label": "Satellite",
-          "value": "satellite"
-        }, {
-          "label": "Hybrid",
-          "value": "hybrid"
-        }, {
-          "label": "Dark Gray",
-          "value": "dark-gray"
-        }, {
-          "label": "Gray",
-          "value": "gray"
-        }, {
-          "label": "National Geographic",
-          "value": "national-geographic"
-        }, {
-          "label": "Oceans",
-          "value": "oceans"
-        }, {
-          "label": "OSM",
-          "value": "osm"
-        }, {
-          "label": "Terrain",
-          "value": "terrain"
-        }]
-      }, {
-        "type": "options",
-        "fieldName": "basemapTogglePosition",
-        "tooltip": "Select location for basemap toggle",
-        "label": "Basemap toggle location",
-        "options": [{
-          "label": "Top right",
-          "value": "top-right"
-        }, {
-          "label": "Top left",
-          "value": "top-left"
-        }, {
-          "label": "Bottom right",
-          "value": "bottom-right"
-        }, {
-          "label": "Bottom left",
-          "value": "bottom-left"
-        }]
-      }]
-    }, {
-      "type": "conditional",
-      "fieldName": "infoPanelEnabled",
-      "label": "Help Panel",
-      "condition": false,
-      "items": [{
-        "type": "options",
-        "fieldName": "infoPanelPosition",
-        "tooltip": "Select location for Info Panel",
-        "label": "Help panel location",
-        "options": [{
-          "label": "Top right",
-          "value": "top-right"
-        }, {
-          "label": "Top left",
-          "value": "top-left"
-        }, {
-          "label": "Bottom right",
-          "value": "bottom-right"
-        }, {
-          "label": "Bottom left",
-          "value": "bottom-left"
-        }]
-      }]
-    }]
-  }, {
-    "category": "Visualization Settings",
-    "fields": [{
-      "type": "subcategory",
-      "label": "Visualization Mode"
-    }, {
-      "type": "paragraph",
-      "value": "The Feature Filter mode shows the selected features on the map."
-    }, {
-      "type": "paragraph",
-      "value": "The Mute mode will apply opacity and grayscale to features of legend elements that are not selected."
-    }, {
-      "type": "options",
-      "fieldName": "filterMode",
-      "tooltip": "Select a mode",
-      "label": "Select a mode",
-      "options": [{
-        "label": "Feature Filter",
-        "value": "featureFilter"
-      }, {
-        "label": "Mute",
-        "value": "mute"
-      }]
-    }, {
-      "type": "subcategory",
-      "label": "Mute"
-    }, {
-      "type": "number",
-      "fieldName": "muteOpacity",
-      "label": "Enter opacity value (1 - 100)%. Default: 30%:",
-      "tooltip": "Enter opacity value (1 - 100)%. Default: 30%",
-      "constraints": {
-        "min": 1,
-        "max": 100,
-        "places": 1
-      }
-    }, {
-      "type": "number",
-      "fieldName": "muteGrayScale",
-      "label": "Enter gray scale value (1 - 100)%. Default: 100%:",
-      "tooltip": "Enter gray scale value (1 - 100)%. Default: 100%",
-      "constraints": {
-        "min": 1,
-        "max": 100,
-        "places": 1
-      }
-    }]
-  }, {
-    "category": "Search",
-    "fields": [{
-      "type": "conditional",
-      "fieldName": "searchEnabled",
-      "label": "Search",
-      "condition": false,
-      "items": [{
-        "type": "search",
-        "fieldName": "searchConfig",
-        "label": "Configure search options"
-      }, {
-        "type": "boolean",
-        "fieldName": "searchOpenAtStart",
-        "label": "Search open at start"
-      }, {
-        "type": "options",
-        "fieldName": "searchPosition",
-        "tooltip": "Select location for search",
-        "label": "Search location",
-        "options": [{
-          "label": "Top right",
-          "value": "top-right"
-        }, {
-          "label": "Top left",
-          "value": "top-left"
-        }, {
-          "label": "Bottom right",
-          "value": "bottom-right"
-        }, {
-          "label": "Bottom left",
-          "value": "bottom-left"
-        }]
-      }]
-    }, {
-      "type": "subcategory",
-      "label": "Custom URL Parameter"
-    }, {
-      "type": "paragraph",
-      "value": "Setup the app to support a custom url parameter. For example if your map contains a feature layer with parcel information and you'd like to be able to find parcels using a url parameter you can use this section to do so. Select a layer and search field then define the name of a custom param. Once you've defined these values you can append the custom search to your application url using the custom parameter name you define. For example, if I set the custom param value to parcels a custom url would look like this index.html?parcel=3045"
-    }, {
-      "placeHolder": "i.e. parcels",
-      "label": "URL param name",
-      "fieldName": "customUrlParam",
-      "type": "string",
-      "tooltip": "Custom URL param name"
-    }, {
-      "type": "layerAndFieldSelector",
-      "fieldName": "customUrlLayer",
-      "label": "Layer to search for custom url param value",
-      "tooltip": "Url param search layer",
-      "fields": [{
-        "multipleSelection": false,
-        "fieldName": "urlField",
-        "label": "URL param search field",
-        "tooltip": "URL param search field"
-      }],
-      "layerOptions": {
-        "supportedTypes": ["FeatureLayer"],
-        "geometryTypes": ["esriGeometryPoint", "esriGeometryLine", "esriGeometryPolyline", "esriGeometryPolygon"]
-      }
-    }]
-  }],
+  "configurationSettings": [
+    {
+      "category": "General",
+      "fields": [
+        {
+          "type": "subcategory",
+          "label": "Interactive Legend"
+        },
+        {
+          "type": "paragraph",
+          "value": "Documentation on how to modify the legend drawing style can be found here: <a href='https://doc.arcgis.com/en/arcgis-online/create-maps/change-style.htm' target='_blank' rel='noopener'>https://doc.arcgis.com/en/arcgis-online/create-maps/change-style.htm</a>. The interactive legend tool does not support field attributes added to the map legend via custom expression."
+        },
+        {
+          "type": "itembrowser",
+          "fieldName": "webmap",
+          "label": "Select",
+          "itemTypes": ["Web Map"],
+          "conditions": ["renderer", "4x"],
+          "defaultContent": true,
+          "showOnLoad": true
+        },
+        {
+          "type": "appproxies"
+        },
+        {
+          "type": "string",
+          "fieldName": "title",
+          "tooltip": "Use this to title your app.",
+          "label": "Title of your application"
+        },
+        {
+          "type": "conditional",
+          "fieldName": "customHeaderEnabled",
+          "label": "Add a custom header",
+          "condition": false,
+          "items": [
+            {
+              "type": "paragraph",
+              "value": "These are advanced settings that work best when used together.  Define the structure of the header via the html editor and then style it via the CSS input.  For more information on the HTML that can be used, see this topic <a href='https://doc.arcgis.com/en/arcgis-online/reference/supported-html.htm' target='_blank' rel='noopener'>format help</a> for more information."
+            },
+            {
+              "label": "Header HTML",
+              "tooltip": "use this to create a customized header for your app.",
+              "type": "string",
+              "fieldName": "headHTML",
+              "stringFieldOption": "richtext"
+            }
+          ]
+        },
+        {
+          "type": "conditional",
+          "fieldName": "splash",
+          "tooltip": "Add splash screen",
+          "label": "Splash screen",
+          "condition": false,
+          "items": [
+            {
+              "type": "string",
+              "fieldName": "splashTitle",
+              "label": "Title",
+              "tooltip": "Splash screen title"
+            },
+            {
+              "type": "string",
+              "fieldName": "splashContent",
+              "label": "Content",
+              "tooltip": "Splash screen content",
+              "stringFieldOption": "richtext"
+            },
+            {
+              "type": "string",
+              "fieldName": "splashButtonText",
+              "label": "Button label",
+              "tooltip": "Define label for the accept button"
+            },
+            {
+              "type": "options",
+              "fieldName": "splashButtonPosition",
+              "tooltip": "Select location for splash button",
+              "label": "Splash button location",
+              "options": [
+                {
+                  "label": "Top right",
+                  "value": "top-right"
+                },
+                {
+                  "label": "Top left",
+                  "value": "top-left"
+                },
+                {
+                  "label": "Bottom right",
+                  "value": "bottom-right"
+                },
+                {
+                  "label": "Bottom left",
+                  "value": "bottom-left"
+                }
+              ]
+            },
+            {
+              "type": "boolean",
+              "fieldName": "splashOnStart",
+              "label": "Always open at start",
+              "tooltip": "Always open at start"
+            }
+          ]
+        },
+        {
+          "label": "Custom CSS",
+          "tooltip": "use this to style different elements of the app",
+          "type": "string",
+          "fieldName": "customCSS"
+        }
+      ]
+    },
+    {
+      "category": "Options",
+      "fields": [
+        {
+          "type": "options",
+          "fieldName": "interactiveLegendPosition",
+          "tooltip": "Select location for Interactive Legend",
+          "label": "Interactive Legend location",
+          "options": [
+            {
+              "label": "Top right",
+              "value": "top-right"
+            },
+            {
+              "label": "Top left",
+              "value": "top-left"
+            },
+            {
+              "label": "Bottom right",
+              "value": "bottom-right"
+            },
+            {
+              "label": "Bottom left",
+              "value": "bottom-left"
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "value": "Interactive Legend options:"
+        },
+        {
+          "type": "boolean",
+          "fieldName": "featureCountEnabled",
+          "label": "Enable option to include feature count"
+        },
+        {
+          "type": "boolean",
+          "fieldName": "updateExtentEnabled",
+          "label": "Enable option to include zoom to button"
+        },
+        {
+          "type": "paragraph",
+          "value": "Select the widgets you would like to include in your app:"
+        },
+        {
+          "type": "conditional",
+          "fieldName": "homeEnabled",
+          "label": "Home Extent",
+          "condition": false,
+          "items": [
+            {
+              "type": "options",
+              "fieldName": "homePosition",
+              "tooltip": "Select location for home control",
+              "label": "Home location",
+              "options": [
+                {
+                  "label": "Top right",
+                  "value": "top-right"
+                },
+                {
+                  "label": "Top left",
+                  "value": "top-left"
+                },
+                {
+                  "label": "Bottom right",
+                  "value": "bottom-right"
+                },
+                {
+                  "label": "Bottom left",
+                  "value": "bottom-left"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "conditional",
+          "fieldName": "zoomControlsEnabled",
+          "label": "Zoom Controls",
+          "condition": false,
+          "items": [
+            {
+              "type": "options",
+              "fieldName": "zoomControlsPosition",
+              "tooltip": "Select location for zoom controls",
+              "label": "Zoom controls location",
+              "options": [
+                {
+                  "label": "Top right",
+                  "value": "top-right"
+                },
+                {
+                  "label": "Top left",
+                  "value": "top-left"
+                },
+                {
+                  "label": "Bottom right",
+                  "value": "bottom-right"
+                },
+                {
+                  "label": "Bottom left",
+                  "value": "bottom-left"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "conditional",
+          "fieldName": "layerListEnabled",
+          "label": "Layer List",
+          "condition": false,
+          "items": [
+            {
+              "type": "options",
+              "fieldName": "layerListPosition",
+              "tooltip": "Select location for layer list",
+              "label": "Layer list location",
+              "options": [
+                {
+                  "label": "Top right",
+                  "value": "top-right"
+                },
+                {
+                  "label": "Top left",
+                  "value": "top-left"
+                },
+                {
+                  "label": "Bottom right",
+                  "value": "bottom-right"
+                },
+                {
+                  "label": "Bottom left",
+                  "value": "bottom-left"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "conditional",
+          "fieldName": "screenshotEnabled",
+          "label": "Screenshot",
+          "condition": false,
+          "items": [
+            {
+              "type": "paragraph",
+              "value": "Please note: A third-party tool, Html2Canvas is used to capture the interactive map legend and pop-up in the screenshot, which may have unexpected behaviors across different browsers such as IE11."
+            },
+            {
+              "type": "boolean",
+              "fieldName": "enableLegendOption",
+              "label": "Enable option to include legend in screenshot"
+            },
+            {
+              "type": "boolean",
+              "fieldName": "enablePopupOption",
+              "label": "Enable option to include pop-up in screenshot"
+            },
+            {
+              "type": "options",
+              "fieldName": "screenshotPosition",
+              "tooltip": "Select location for the screenshot tool",
+              "label": "Screenshot location",
+              "options": [
+                {
+                  "label": "Top right",
+                  "value": "top-right"
+                },
+                {
+                  "label": "Top left",
+                  "value": "top-left"
+                },
+                {
+                  "label": "Bottom right",
+                  "value": "bottom-right"
+                },
+                {
+                  "label": "Bottom left",
+                  "value": "bottom-left"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "conditional",
+          "fieldName": "basemapToggleEnabled",
+          "label": "Basemap Toggle",
+          "condition": false,
+          "items": [
+            {
+              "type": "orgBasemaps",
+              "fieldName": "nextBasemap",
+              "label": "Alternate basemap for toggle"
+            },
+            {
+              "type": "options",
+              "fieldName": "basemapTogglePosition",
+              "tooltip": "Select location for basemap toggle",
+              "label": "Basemap toggle location",
+              "options": [
+                {
+                  "label": "Top right",
+                  "value": "top-right"
+                },
+                {
+                  "label": "Top left",
+                  "value": "top-left"
+                },
+                {
+                  "label": "Bottom right",
+                  "value": "bottom-right"
+                },
+                {
+                  "label": "Bottom left",
+                  "value": "bottom-left"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "conditional",
+          "fieldName": "infoPanelEnabled",
+          "label": "Help Panel",
+          "condition": false,
+          "items": [
+            {
+              "type": "options",
+              "fieldName": "infoPanelPosition",
+              "tooltip": "Select location for Info Panel",
+              "label": "Help panel location",
+              "options": [
+                {
+                  "label": "Top right",
+                  "value": "top-right"
+                },
+                {
+                  "label": "Top left",
+                  "value": "top-left"
+                },
+                {
+                  "label": "Bottom right",
+                  "value": "bottom-right"
+                },
+                {
+                  "label": "Bottom left",
+                  "value": "bottom-left"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "Visualization Settings",
+      "fields": [
+        {
+          "type": "subcategory",
+          "label": "Visualization Mode"
+        },
+        {
+          "type": "paragraph",
+          "value": "The Feature Filter mode shows the selected features on the map."
+        },
+        {
+          "type": "paragraph",
+          "value": "The Mute mode will apply opacity and grayscale to features of legend elements that are not selected."
+        },
+        {
+          "type": "options",
+          "fieldName": "filterMode",
+          "tooltip": "Select a mode",
+          "label": "Select a mode",
+          "options": [
+            {
+              "label": "Feature Filter",
+              "value": "featureFilter"
+            },
+            {
+              "label": "Mute",
+              "value": "mute"
+            }
+          ]
+        },
+        {
+          "type": "subcategory",
+          "label": "Mute"
+        },
+        {
+          "type": "number",
+          "fieldName": "muteOpacity",
+          "label": "Enter opacity value (1 - 100)%. Default: 30%:",
+          "tooltip": "Enter opacity value (1 - 100)%. Default: 30%",
+          "constraints": {
+            "min": 1,
+            "max": 100,
+            "places": 1
+          }
+        },
+        {
+          "type": "number",
+          "fieldName": "muteGrayScale",
+          "label": "Enter gray scale value (1 - 100)%. Default: 100%:",
+          "tooltip": "Enter gray scale value (1 - 100)%. Default: 100%",
+          "constraints": {
+            "min": 1,
+            "max": 100,
+            "places": 1
+          }
+        }
+      ]
+    },
+    {
+      "category": "Search",
+      "fields": [
+        {
+          "type": "conditional",
+          "fieldName": "searchEnabled",
+          "label": "Search",
+          "condition": false,
+          "items": [
+            {
+              "type": "search",
+              "fieldName": "searchConfig",
+              "label": "Configure search options"
+            },
+            {
+              "type": "boolean",
+              "fieldName": "searchOpenAtStart",
+              "label": "Search open at start"
+            },
+            {
+              "type": "options",
+              "fieldName": "searchPosition",
+              "tooltip": "Select location for search",
+              "label": "Search location",
+              "options": [
+                {
+                  "label": "Top right",
+                  "value": "top-right"
+                },
+                {
+                  "label": "Top left",
+                  "value": "top-left"
+                },
+                {
+                  "label": "Bottom right",
+                  "value": "bottom-right"
+                },
+                {
+                  "label": "Bottom left",
+                  "value": "bottom-left"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "subcategory",
+          "label": "Custom URL Parameter"
+        },
+        {
+          "type": "paragraph",
+          "value": "Setup the app to support a custom url parameter. For example if your map contains a feature layer with parcel information and you'd like to be able to find parcels using a url parameter you can use this section to do so. Select a layer and search field then define the name of a custom param. Once you've defined these values you can append the custom search to your application url using the custom parameter name you define. For example, if I set the custom param value to parcels a custom url would look like this index.html?parcel=3045"
+        },
+        {
+          "placeHolder": "i.e. parcels",
+          "label": "URL param name",
+          "fieldName": "customUrlParam",
+          "type": "string",
+          "tooltip": "Custom URL param name"
+        },
+        {
+          "type": "layerAndFieldSelector",
+          "fieldName": "customUrlLayer",
+          "label": "Layer to search for custom url param value",
+          "tooltip": "Url param search layer",
+          "fields": [
+            {
+              "multipleSelection": false,
+              "fieldName": "urlField",
+              "label": "URL param search field",
+              "tooltip": "URL param search field"
+            }
+          ],
+          "layerOptions": {
+            "supportedTypes": ["FeatureLayer"],
+            "geometryTypes": [
+              "esriGeometryPoint",
+              "esriGeometryLine",
+              "esriGeometryPolyline",
+              "esriGeometryPolygon"
+            ]
+          }
+        }
+      ]
+    }
+  ],
   "values": {
     "filterMode": "featureFilter",
     "zoomControlsEnabled": true,

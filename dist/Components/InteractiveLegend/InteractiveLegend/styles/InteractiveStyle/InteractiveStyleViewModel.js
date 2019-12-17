@@ -17,7 +17,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "esri/core/accessorSupport/decorators", "esri/core/Handles", "esri/core/watchUtils", "esri/core/Collection", "esri/widgets/LayerList/LayerListViewModel", "esri/views/layers/support/FeatureFilter", "esri/views/layers/support/FeatureEffect", "esri/tasks/support/Query", "./InteractiveStyleData", "./SelectedStyleData"], function (require, exports, __assign, __extends, __decorate, Accessor, decorators_1, Handles, watchUtils, Collection, LayerListViewModel, FeatureFilter, FeatureEffect, Query, InteractiveStyleData, SelectedStyleData) {
+define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "esri/core/accessorSupport/decorators", "esri/core/Handles", "esri/core/watchUtils", "esri/core/Collection", "esri/widgets/LayerList/LayerListViewModel", "esri/views/layers/support/FeatureFilter", "esri/views/layers/support/FeatureEffect", "esri/tasks/support/Query", "./InteractiveStyleData", "./SelectedStyleData", "esri/core/promiseUtils"], function (require, exports, __assign, __extends, __decorate, Accessor, decorators_1, Handles, watchUtils, Collection, LayerListViewModel, FeatureFilter, FeatureEffect, Query, InteractiveStyleData, SelectedStyleData, promiseUtils) {
     "use strict";
     var InteractiveStyleViewModel = /** @class */ (function (_super) {
         __extends(InteractiveStyleViewModel, _super);
@@ -82,6 +82,10 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         //----------------------------------
         InteractiveStyleViewModel.prototype.initialize = function () {
             var _this = this;
+            var disableClusteringKey = "disable-clustering";
+            this._handles.add(watchUtils.when(this, "view.map.allLayers", function () {
+                _this._disableClustering(disableClusteringKey);
+            }), disableClusteringKey);
             this._handles.add([
                 watchUtils.init(this, "view", function () {
                     if (!_this.view) {
@@ -98,15 +102,16 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 }),
                 watchUtils.on(this, "featureLayerViews", "change", function () {
                     _this.selectedStyleDataCollection.removeAll();
+                    var selectedStyleDataCollection = [];
                     _this.featureLayerViews.forEach(function (featureLayerView) {
                         if (!featureLayerView) {
-                            _this.selectedStyleDataCollection.add(null);
+                            selectedStyleDataCollection.push(null);
                         }
                         else {
                             var featureLayer = featureLayerView.get("layer"), renderer = featureLayer.get("renderer"), field = renderer && renderer.get("field"), field2 = renderer && renderer.get("field2"), field3 = renderer && renderer.get("field3"), fieldDelimiter = renderer && renderer.get("fieldDelimiter"), normalizationField = renderer && renderer.get("normalizationField"), normalizationType = renderer && renderer.get("normalizationType"), hasCustomArcade = (field2 || field3) && fieldDelimiter ? true : false, invalidNormalization = normalizationType === "percent-of-total" ||
                                 normalizationType === "log";
                             if (hasCustomArcade || invalidNormalization) {
-                                _this.selectedStyleDataCollection.add(null);
+                                selectedStyleDataCollection.push(null);
                             }
                             else {
                                 var selectedStyleData = new SelectedStyleData({
@@ -117,10 +122,11 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                                     featureLayerView: featureLayerView,
                                     normalizationField: normalizationField
                                 });
-                                _this.selectedStyleDataCollection.add(selectedStyleData);
+                                selectedStyleDataCollection.push(selectedStyleData);
                             }
                         }
                     });
+                    _this.selectedStyleDataCollection.addMany(selectedStyleDataCollection.slice());
                 })
             ]);
         };
@@ -287,24 +293,24 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 ? featureLayerView.layer.id + "-" + legendInfoIndex
                 : null;
             if (!this._handles.has(handlesKey)) {
-                this._handles.add(watchUtils.whenFalse(this.view, "updating", function () {
+                var queryFeatureCount_1 = promiseUtils.debounce(function () {
                     var queryExpression = _this._generateQueryCountExpression(elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos, normalizationField, generateFeatureCountExpression);
-                    var geometry = _this.view && _this.view.get("extent");
-                    var outSpatialReference = _this.view && _this.view.get("spatialReference");
-                    var query = new Query({
-                        where: queryExpression,
-                        geometry: geometry,
-                        outSpatialReference: outSpatialReference
-                    });
-                    _this.featureCountQuery = featureLayerView.queryFeatureCount(query);
+                    var query = _this._generateFeatureCountQuery(queryExpression);
+                    _this.featureCountQuery =
+                        featureLayerView &&
+                            featureLayerView.queryFeatureCount &&
+                            featureLayerView.queryFeatureCount(query);
+                    if (!_this.featureCountQuery) {
+                        return;
+                    }
                     var featureCountValue = featureCount.getItemAt(operationalItemIndex);
-                    _this.featureCountQuery.then(function (featureCountRes) {
+                    return _this.featureCountQuery.then(function (featureCountRes) {
                         if (featureCountValue) {
                             featureCountValue.removeAt(legendInfoIndex);
                         }
                         featureCountValue.add(featureCountRes, legendInfoIndex);
-                        if (_this.selectedStyleDataCollection.getItemAt(operationalItemIndex)
-                            .selectedInfoIndex.length === 0) {
+                        var selectedInfoLength = _this.selectedStyleDataCollection.getItemAt(operationalItemIndex).selectedInfoIndex.length;
+                        if (selectedInfoLength === 0) {
                             _this.queryTotalFeatureCount(operationalItemIndex);
                         }
                         else {
@@ -313,8 +319,36 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                         _this.featureCountQuery = null;
                         _this.notifyChange("state");
                     });
-                }), handlesKey);
+                });
+                this._handles.add([
+                    watchUtils.whenFalse(this.view, "stationary", function () {
+                        if (!_this.view.stationary) {
+                            watchUtils.whenTrueOnce(_this.view, "stationary", function () {
+                                queryFeatureCount_1();
+                            });
+                        }
+                        else {
+                            watchUtils.whenFalseOnce(_this.view, "interacting", function () {
+                                queryFeatureCount_1();
+                            });
+                        }
+                    }),
+                    watchUtils.whenFalse(featureLayerView, "updating", function () {
+                        watchUtils.whenFalseOnce(featureLayerView, "updating", function () {
+                            queryFeatureCount_1();
+                        });
+                    })
+                ], handlesKey);
             }
+        };
+        InteractiveStyleViewModel.prototype._generateFeatureCountQuery = function (queryExpression) {
+            var geometry = this.view && this.view.get("extent");
+            var outSpatialReference = this.view && this.view.get("spatialReference");
+            return new Query({
+                where: queryExpression,
+                geometry: geometry,
+                outSpatialReference: outSpatialReference
+            });
         };
         // queryTotalFeatureCount
         InteractiveStyleViewModel.prototype.queryTotalFeatureCount = function (operationalItemIndex) {
@@ -595,7 +629,8 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             var singleSymbol = legendElementInfos.length === 1;
             if (!singleSymbol) {
                 if (isPredominance) {
-                    return this._handlePredominanceExpression(elementInfo, operationalItemIndex);
+                    var predominanceExpression = this._handlePredominanceExpression(elementInfo, operationalItemIndex);
+                    return predominanceExpression;
                 }
                 else {
                     return this._generateQueryExpressions(elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, legendElementInfos, normalizationField, generateFeatureCountExpression);
@@ -634,6 +669,25 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                         }
                     }
                 });
+            });
+        };
+        // _disableClustering
+        InteractiveStyleViewModel.prototype._disableClustering = function (disableClusteringKey) {
+            var _this = this;
+            var allLayers = this.get("view.map.allLayers");
+            var layerPromises = [];
+            allLayers.forEach(function (layer) {
+                layerPromises.push(layer.load().then(function (loadedLayer) {
+                    return loadedLayer;
+                }));
+            });
+            Promise.all(layerPromises).then(function (layers) {
+                layers.forEach(function (layerItem) {
+                    if (layerItem && layerItem.get("featureReduction")) {
+                        layerItem.set("featureReduction", null);
+                    }
+                });
+                _this._handles.remove(disableClusteringKey);
             });
         };
         __decorate([

@@ -28,14 +28,14 @@ import ActiveLayerInfo = require("esri/widgets/Legend/support/ActiveLayerInfo");
 // esri.views.View
 import View = require("esri/views/View");
 
-export type LegendElement =
+type LegendElement =
   | SymbolTableElement
   | ColorRampElement
+  | StretchRampElement
   | OpacityRampElement
   | SizeRampElement
   | HeatmapRampElement
   | RelationshipRampElement;
-
 type SymbolTableElementType =
   | ImageSymbolTableElementInfo
   | SymbolTableElementInfo;
@@ -95,12 +95,11 @@ interface SizeRampStop {
 export interface ColorRampElement {
   type: "color-ramp";
   title: RampTitle | string;
-  borderColor: Color;
-  overlayColor: Color;
   infos: ColorRampStop[];
+  preview?: HTMLElement;
 }
 
-interface ColorRampStop {
+export interface ColorRampStop {
   value: number;
   color: Color;
   offset: number;
@@ -118,20 +117,19 @@ export interface HeatmapRampElement {
   type: "heatmap-ramp";
   title: RampTitle | string;
   infos: HeatmapRampStop[];
+  preview?: HTMLElement;
 }
 
 export interface OpacityRampElement {
   type: "opacity-ramp";
   title: RampTitle | string;
-  borderColor: Color;
-  overlayColor: Color;
   infos: OpacityRampStop[];
+  preview?: HTMLElement;
 }
 
 interface OpacityRampStop {
   value: number;
   color: Color;
-  offset: number;
   label: string;
 }
 
@@ -198,6 +196,13 @@ export interface CustomFill {
 export interface FocusIndexElement {
   label: string;
   fill: Fill;
+}
+
+export interface StretchRampElement {
+  type: "stretch-ramp";
+  title: RampTitle | string;
+  infos: ColorRampStop[];
+  preview?: HTMLElement;
 }
 
 interface SizeRampElement {

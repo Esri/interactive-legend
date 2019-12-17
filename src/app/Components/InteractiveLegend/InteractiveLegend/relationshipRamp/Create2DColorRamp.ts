@@ -47,6 +47,9 @@ import { twoClasses, threeClasses, fourClasses } from "./relationshipRampUtils";
 // esri.views.layers.support.FeatureFilter
 import FeatureFilter = require("esri/views/layers/support/FeatureFilter");
 
+// esri.core.promiseUtils
+import promiseUtils = require("esri/core/promiseUtils");
+
 @subclass("Create2DColorRamp")
 class Create2DColorRamp extends declared(Accessor) {
   //----------------------------------
@@ -129,11 +132,56 @@ class Create2DColorRamp extends declared(Accessor) {
         () => {
           this._handleCellBehavior();
           if (this.featureCountEnabled) {
-            this._handles.add([
-              watchUtils.whenFalse(this, "view.updating", () => {
-                this._queryFeatureCount();
-              })
-            ]);
+            const queryFeatureCount = promiseUtils.debounce(() => {
+              const where =
+                this.queryExpressions.join(" OR ") === ""
+                  ? this.queryCountExpressions.join(" OR ")
+                  : this.queryExpressions.join(" OR ");
+
+              const geometry = this.view && this.view.get("extent");
+              const outSpatialReference =
+                this.view && this.view.get("spatialReference");
+              const queryFeatureCount =
+                this.layerView &&
+                this.layerView.queryFeatureCount &&
+                this.layerView.queryFeatureCount({
+                  geometry,
+                  outSpatialReference,
+                  where
+                });
+              if (!queryFeatureCount) {
+                return;
+              }
+              return queryFeatureCount.then(totalFeatureCount => {
+                this.set("featureCount", totalFeatureCount);
+              });
+            });
+
+            const featureCountKey = "feature-count-key";
+
+            if (!this._handles.has(featureCountKey)) {
+              this._handles.add(
+                [
+                  watchUtils.whenFalse(this.view, "stationary", () => {
+                    if (!this.view.stationary) {
+                      watchUtils.whenTrueOnce(this.view, "stationary", () => {
+                        queryFeatureCount();
+                      });
+                    } else {
+                      watchUtils.whenFalseOnce(this.view, "interacting", () => {
+                        queryFeatureCount();
+                      });
+                    }
+                  }),
+                  watchUtils.whenFalse(this.layerView, "updating", () => {
+                    watchUtils.whenFalseOnce(this.layerView, "updating", () => {
+                      queryFeatureCount();
+                    });
+                  })
+                ],
+                featureCountKey
+              );
+            }
           }
         }
       ),
@@ -204,6 +252,7 @@ class Create2DColorRamp extends declared(Accessor) {
   }
 
   destroy() {
+    this._handles.removeAll();
     this._handles.destroy();
     this._handles = null;
   }

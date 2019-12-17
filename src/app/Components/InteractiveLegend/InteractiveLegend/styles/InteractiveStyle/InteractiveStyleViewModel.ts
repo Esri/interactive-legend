@@ -52,6 +52,8 @@ import {
 } from "../../../../../interfaces/interfaces";
 import SelectedStyleData = require("./SelectedStyleData");
 
+import promiseUtils = require("esri/core/promiseUtils");
+
 // State
 type State = "ready" | "loading" | "disabled" | "querying";
 
@@ -150,11 +152,20 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   //----------------------------------
 
   initialize() {
+    const disableClusteringKey = "disable-clustering";
+    this._handles.add(
+      watchUtils.when(this, "view.map.allLayers", () => {
+        this._disableClustering(disableClusteringKey);
+      }),
+      disableClusteringKey
+    );
+
     this._handles.add([
       watchUtils.init(this, "view", () => {
         if (!this.view) {
           return;
         }
+
         this._handles.add([
           watchUtils.whenFalseOnce(this, "view.updating", () => {
             this.layerListViewModel.operationalItems.forEach(() => {
@@ -166,10 +177,11 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       }),
       watchUtils.on(this, "featureLayerViews", "change", () => {
         this.selectedStyleDataCollection.removeAll();
+        const selectedStyleDataCollection = [];
         this.featureLayerViews.forEach(
           (featureLayerView: __esri.FeatureLayerView) => {
             if (!featureLayerView) {
-              this.selectedStyleDataCollection.add(null);
+              selectedStyleDataCollection.push(null);
             } else {
               const featureLayer = featureLayerView.get(
                   "layer"
@@ -190,7 +202,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
                   normalizationType === "log";
 
               if (hasCustomArcade || invalidNormalization) {
-                this.selectedStyleDataCollection.add(null);
+                selectedStyleDataCollection.push(null);
               } else {
                 const selectedStyleData = new SelectedStyleData({
                   layerItemId: featureLayer.id,
@@ -200,11 +212,14 @@ class InteractiveStyleViewModel extends declared(Accessor) {
                   featureLayerView,
                   normalizationField
                 });
-                this.selectedStyleDataCollection.add(selectedStyleData);
+                selectedStyleDataCollection.push(selectedStyleData);
               }
             }
           }
         );
+        this.selectedStyleDataCollection.addMany([
+          ...selectedStyleDataCollection
+        ]);
       })
     ]);
   }
@@ -462,60 +477,85 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     const handlesKey = featureLayerView
       ? `${featureLayerView.layer.id}-${legendInfoIndex}`
       : null;
+
     if (!this._handles.has(handlesKey)) {
-      this._handles.add(
-        watchUtils.whenFalse(this.view, "updating", () => {
-          const queryExpression = this._generateQueryCountExpression(
-            elementInfo,
-            field,
-            legendInfoIndex,
-            operationalItemIndex,
-            legendElement,
-            isPredominance,
-            legendElementInfos,
-            normalizationField,
-            generateFeatureCountExpression
-          );
+      const queryFeatureCount = promiseUtils.debounce(() => {
+        const queryExpression = this._generateQueryCountExpression(
+          elementInfo,
+          field,
+          legendInfoIndex,
+          operationalItemIndex,
+          legendElement,
+          isPredominance,
+          legendElementInfos,
+          normalizationField,
+          generateFeatureCountExpression
+        );
+        const query = this._generateFeatureCountQuery(queryExpression);
+        this.featureCountQuery =
+          featureLayerView &&
+          featureLayerView.queryFeatureCount &&
+          featureLayerView.queryFeatureCount(query);
 
-          const geometry = this.view && this.view.get("extent");
-          const outSpatialReference =
-            this.view && this.view.get("spatialReference");
-
-          const query = new Query({
-            where: queryExpression,
-            geometry,
-            outSpatialReference
-          });
-
-          this.featureCountQuery = featureLayerView.queryFeatureCount(query);
-
-          const featureCountValue = featureCount.getItemAt(
+        if (!this.featureCountQuery) {
+          return;
+        }
+        const featureCountValue = featureCount.getItemAt(operationalItemIndex);
+        return this.featureCountQuery.then(featureCountRes => {
+          if (featureCountValue) {
+            featureCountValue.removeAt(legendInfoIndex);
+          }
+          featureCountValue.add(featureCountRes, legendInfoIndex);
+          const selectedInfoLength = this.selectedStyleDataCollection.getItemAt(
             operationalItemIndex
-          );
+          ).selectedInfoIndex.length;
+          if (selectedInfoLength === 0) {
+            this.queryTotalFeatureCount(operationalItemIndex);
+          } else {
+            this.updateTotalFeatureCount(
+              operationalItemIndex,
+              legendElementIndex
+            );
+          }
+          this.featureCountQuery = null;
+          this.notifyChange("state");
+        });
+      });
 
-          this.featureCountQuery.then(featureCountRes => {
-            if (featureCountValue) {
-              featureCountValue.removeAt(legendInfoIndex);
-            }
-            featureCountValue.add(featureCountRes, legendInfoIndex);
-            if (
-              this.selectedStyleDataCollection.getItemAt(operationalItemIndex)
-                .selectedInfoIndex.length === 0
-            ) {
-              this.queryTotalFeatureCount(operationalItemIndex);
+      this._handles.add(
+        [
+          watchUtils.whenFalse(this.view, "stationary", () => {
+            if (!this.view.stationary) {
+              watchUtils.whenTrueOnce(this.view, "stationary", () => {
+                queryFeatureCount();
+              });
             } else {
-              this.updateTotalFeatureCount(
-                operationalItemIndex,
-                legendElementIndex
-              );
+              watchUtils.whenFalseOnce(this.view, "interacting", () => {
+                queryFeatureCount();
+              });
             }
-            this.featureCountQuery = null;
-            this.notifyChange("state");
-          });
-        }),
+          }),
+          watchUtils.whenFalse(featureLayerView, "updating", () => {
+            watchUtils.whenFalseOnce(featureLayerView, "updating", () => {
+              queryFeatureCount();
+            });
+          })
+        ],
         handlesKey
       );
     }
+  }
+
+  private _generateFeatureCountQuery(queryExpression: string): __esri.Query {
+    const geometry = this.view && this.view.get("extent");
+
+    const outSpatialReference = this.view && this.view.get("spatialReference");
+
+    return new Query({
+      where: queryExpression,
+      geometry,
+      outSpatialReference
+    });
   }
 
   // queryTotalFeatureCount
@@ -772,16 +812,8 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         const expression = isArray
           ? normalizationField
             ? isLastElement || (lastElementAndNoValue && secondToLastElement)
-              ? `(${field}/${normalizationField}) >= ${
-                  value[0]
-                } AND (${field}/${normalizationField}) <= ${
-                  elementInfo.value[1]
-                }`
-              : `(${field}/${normalizationField}) > ${
-                  value[0]
-                } AND (${field}/${normalizationField}) <= ${
-                  elementInfo.value[1]
-                }`
+              ? `(${field}/${normalizationField}) >= ${value[0]} AND (${field}/${normalizationField}) <= ${elementInfo.value[1]}`
+              : `(${field}/${normalizationField}) > ${value[0]} AND (${field}/${normalizationField}) <= ${elementInfo.value[1]}`
             : isLastElement || (lastElementAndNoValue && secondToLastElement)
             ? `${field} >= ${value[0]} AND ${field} <= ${value[1]}`
             : `${field} > ${value[0]} AND ${field} <= ${value[1]}`
@@ -821,11 +853,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         if (elementInfo.value === field) {
           return;
         }
-        const sqlQuery = `(${
-          elementInfo.value
-        } > ${field} OR (${field} IS NULL AND ${elementInfo.value} <> 0 AND ${
-          elementInfo.value
-        } IS NOT NULL))`;
+        const sqlQuery = `(${elementInfo.value} > ${field} OR (${field} IS NULL AND ${elementInfo.value} <> 0 AND ${elementInfo.value} IS NOT NULL))`;
 
         expressionArr.push(sqlQuery);
       });
@@ -911,10 +939,11 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     const singleSymbol = legendElementInfos.length === 1;
     if (!singleSymbol) {
       if (isPredominance) {
-        return this._handlePredominanceExpression(
+        const predominanceExpression = this._handlePredominanceExpression(
           elementInfo,
           operationalItemIndex
         );
+        return predominanceExpression;
       } else {
         return this._generateQueryExpressions(
           elementInfo,
@@ -971,6 +1000,32 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         });
       }
     );
+  }
+
+  // _disableClustering
+  private _disableClustering(disableClusteringKey: string): void {
+    const allLayers = this.get("view.map.allLayers") as __esri.Collection<
+      __esri.Layer
+    >;
+
+    const layerPromises = [];
+
+    allLayers.forEach(layer => {
+      layerPromises.push(
+        layer.load().then(loadedLayer => {
+          return loadedLayer;
+        })
+      );
+    });
+
+    Promise.all(layerPromises).then(layers => {
+      layers.forEach(layerItem => {
+        if (layerItem && layerItem.get("featureReduction")) {
+          layerItem.set("featureReduction", null);
+        }
+      });
+      this._handles.remove(disableClusteringKey);
+    });
   }
 }
 

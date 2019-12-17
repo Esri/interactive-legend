@@ -32,8 +32,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             _this._handles = new Handles();
             _this._screenshotPromise = null;
             _this._highlightedFeature = null;
-            _this._firstMapComponent = null;
-            _this._secondMapComponent = null;
             _this._screenshotConfig = null;
             _this._mapComponentSelectors = [
                 ".esri-screenshot__offscreen-legend-container",
@@ -260,8 +258,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 console.error("ERROR: ", err);
             })
                 .then(function (firstMapComponent) {
-                _this._firstMapComponent = firstMapComponent;
-                _this.notifyChange("state");
                 html2canvas(document.querySelector(_this._mapComponentSelectors[1]), {
                     height: document.querySelector(_this._mapComponentSelectors[1]).offsetHeight,
                     removeContainer: true,
@@ -271,36 +267,24 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     console.error("ERROR: ", err);
                 })
                     .then(function (secondMapComponent) {
-                    _this._secondMapComponent = secondMapComponent;
-                    _this._screenshotPromise = null;
-                    _this.notifyChange("state");
+                    _this._processMapComponents(viewCanvas, viewScreenshot, img, viewCanvasContext, combinedCanvasElements, screenshotImageElement, maskDiv, downloadBtnNode, firstMapComponent, secondMapComponent);
                 });
             });
-            this._handles.remove(screenshotKey);
-            this._handles.add(this._watchMapComponents(viewCanvas, viewScreenshot, img, viewCanvasContext, combinedCanvasElements, screenshotImageElement, maskDiv, screenshotKey, downloadBtnNode), screenshotKey);
         };
-        // _watchMapComponents
-        ScreenshotViewModel.prototype._watchMapComponents = function (viewCanvas, viewScreenshot, img, viewCanvasContext, combinedCanvasElements, screenshotImageElement, maskDiv, screenshotKey, downloadBtnNode) {
+        // _processMapComponents
+        ScreenshotViewModel.prototype._processMapComponents = function (viewCanvas, viewScreenshot, img, viewCanvasContext, combinedCanvasElements, screenshotImageElement, maskDiv, downloadBtnNode, firstMapComponent, secondMapComponent) {
             var _this = this;
-            return watchUtils.init(this, "state", function () {
-                if (_this.state === "complete" &&
-                    _this._firstMapComponent &&
-                    _this._secondMapComponent) {
-                    viewCanvas.height = viewScreenshot.data.height;
-                    viewCanvas.width = viewScreenshot.data.width;
-                    img.src = viewScreenshot.dataUrl;
-                    img.onload = function () {
-                        viewCanvasContext.drawImage(img, 0, 0);
-                        _this._generateImageForTwoComponents(viewCanvas, combinedCanvasElements, viewScreenshot, _this._firstMapComponent, _this._secondMapComponent);
-                        _this._canvasElement = combinedCanvasElements;
-                        _this._showPreview(combinedCanvasElements, screenshotImageElement, maskDiv, downloadBtnNode);
-                        _this._firstMapComponent = null;
-                        _this._secondMapComponent = null;
-                        _this._handles.remove(screenshotKey);
-                        _this.notifyChange("state");
-                    };
-                }
-            });
+            if (firstMapComponent && secondMapComponent) {
+                viewCanvas.height = viewScreenshot.data.height;
+                viewCanvas.width = viewScreenshot.data.width;
+                img.src = viewScreenshot.dataUrl;
+                img.onload = function () {
+                    viewCanvasContext.drawImage(img, 0, 0);
+                    _this._generateImageForTwoComponents(viewCanvas, combinedCanvasElements, viewScreenshot, firstMapComponent, secondMapComponent);
+                    _this._canvasElement = combinedCanvasElements;
+                    _this._showPreview(combinedCanvasElements, screenshotImageElement, maskDiv, downloadBtnNode);
+                };
+            }
         };
         // _generateImageForOneComponent
         ScreenshotViewModel.prototype._generateImageForOneComponent = function (viewCanvas, combinedCanvas, viewScreenshot, mapComponent) {
