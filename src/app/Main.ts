@@ -63,6 +63,9 @@ import FeatureLayer = require("esri/layers/FeatureLayer");
 // esri.widgets.BasemapToggle
 import BasemapToggle = require("esri/widgets/BasemapToggle");
 
+// esri.Basemap
+import Basemap = require("esri/Basemap");
+
 // esri.widgets.Expand
 import Expand = require("esri/widgets/Expand");
 
@@ -619,18 +622,34 @@ class InteractiveLegendApp {
   }
 
   // _handleBasemapToggleWidget
-  private _handleBasemapToggleWidget(
+  private async _handleBasemapToggleWidget(
     basemapToggleEnabled: boolean,
     view: MapView,
     nextBasemap: string,
     basemapTogglePosition: string
-  ): void {
-    const nextBaseMapVal = nextBasemap ? nextBasemap : "topo";
+  ): Promise<void> {
     if (basemapToggleEnabled) {
+      let basemap;
+
+      basemap = Basemap.fromId(nextBasemap);
+
+      if (!basemap) {
+        basemap = await new Basemap({
+          portalItem: {
+            id: nextBasemap
+          }
+        }).loadAll();
+      }
+
+      if (!basemap) {
+        basemap = "topo";
+      }
+
       const basemapToggle = new BasemapToggle({
         view,
-        nextBasemap: nextBaseMapVal
+        nextBasemap: basemap
       });
+
       watchUtils.whenOnce(basemapToggle, "container", () => {
         if (basemapToggle.container) {
           const container = basemapToggle.container as HTMLElement;
@@ -738,13 +757,13 @@ class InteractiveLegendApp {
 
       const featureLayer = view.map.findLayerById(
         this.base.config.customUrlLayer.id
-      );
+      ) as __esri.Layer;
       const layerSearchSource = {
         layer: featureLayer,
         searchFields: this.base.config.customUrlLayer.fields[0].fields,
         outFields: ["*"],
         exactMatch: true
-      };
+      } as __esri.LayerSearchSource;
       if (featureLayer && searchTerm) {
         const search = new Search({
           view,

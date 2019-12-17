@@ -5,9 +5,6 @@
 import * as i18n from "dojo/i18n!../nls/Legend";
 import * as i18nInteractiveLegend from "dojo/i18n!../../../../nls/resources";
 
-// dojox.gfx
-import { createSurface } from "dojox/gfx";
-
 // esri.widgets.Widget
 import Widget = require("esri/widgets/Widget");
 
@@ -75,16 +72,18 @@ import {
   SymbolTableElement,
   FilterMode,
   VNode,
-  LayerUID
+  LayerUID,
+  StretchRampElement,
+  ColorRampStop
 } from "../../../../interfaces/interfaces";
+
+import { formatNumber } from "esri/intl";
 
 // RelationshipRamp
 import RelationshipRamp = require("../relationshipRamp/RelationshipRamp");
 
 // SelectedStyleData
 import SelectedStyleData = require("./InteractiveStyle/SelectedStyleData");
-
-// import * as relationshipOnboardingImg from "../../relation";
 
 //----------------------------------
 //
@@ -368,7 +367,7 @@ class InteractiveClassic extends declared(Widget) {
           <div>
             {filteredLayers && filteredLayers.length ? (
               <div class={CSS.legendElements}>
-                {state === "loading" ? (
+                {!this.get("selectedStyleDataCollection.length") ? (
                   <div class={CSS.loader} />
                 ) : (
                   <div
@@ -558,7 +557,6 @@ class InteractiveClassic extends declared(Widget) {
           activeLayerInfo.get("layer.renderer.authoringInfo.type") ===
             "relationship"
       };
-
       return (
         <div key={key} class={service}>
           <div class={this.classes(interactiveStyles)}>
@@ -572,9 +570,7 @@ class InteractiveClassic extends declared(Widget) {
                     <span class={CSS.totalFeatureCount}>
                       {totalFeatureCountForLegend ||
                       totalFeatureCountForLegend === 0
-                        ? `${
-                            i18nInteractiveLegend.totalFeatureCount
-                          }: ${totalFeatureCountForLegend}`
+                        ? `${i18nInteractiveLegend.totalFeatureCount}: ${totalFeatureCountForLegend}`
                         : null}
                     </span>
                   </div>
@@ -583,9 +579,7 @@ class InteractiveClassic extends declared(Widget) {
                     <span class={CSS.totalFeatureCount}>
                       {relationshipFeatureCount ||
                       relationshipFeatureCount === 0
-                        ? `${
-                            i18nInteractiveLegend.totalFeatureCount
-                          }: ${relationshipFeatureCount}`
+                        ? `${i18nInteractiveLegend.totalFeatureCount}: ${relationshipFeatureCount}`
                         : null}
                     </span>
                   </div>
@@ -673,7 +667,12 @@ class InteractiveClassic extends declared(Widget) {
       legendElement.type === "opacity-ramp" ||
       legendElement.type === "heatmap-ramp"
     ) {
-      content = this._renderLegendForRamp(legendElement, activeLayerInfo);
+      content = this._renderLegendForRamp(
+        legendElement,
+        layer.opacity,
+        activeLayerInfo,
+        legendElementIndex
+      );
     } else if (legendElement.type === "relationship-ramp") {
       const layerView = this.viewModel.featureLayerViews.getItemAt(
         operationalItemIndex
@@ -816,7 +815,8 @@ class InteractiveClassic extends declared(Widget) {
       operationalItemIndex,
       featureLayerData,
       singleSymbol,
-      isTypePredominance
+      isTypePredominance,
+      field
     );
 
     const tableClass = isChild ? CSS.layerChildTable : layerTable,
@@ -916,90 +916,48 @@ class InteractiveClassic extends declared(Widget) {
 
   // _renderLegendForRamp
   private _renderLegendForRamp(
-    legendElement: ColorRampElement | OpacityRampElement | HeatmapRampElement,
-    activeLayerInfo: ActiveLayerInfo
+    legendElement:
+      | ColorRampElement
+      | StretchRampElement
+      | OpacityRampElement
+      | HeatmapRampElement,
+    opacity: number,
+    activeLayerInfo: ActiveLayerInfo,
+    legendElementIndex: number
   ): VNode {
     const rampStops: any[] = legendElement.infos;
     const isOpacityRamp = legendElement.type === "opacity-ramp";
     const isHeatmapRamp = legendElement.type === "heatmap-ramp";
-    const numGradients = rampStops.length - 1;
+    const isStretchRamp = legendElement.type === "stretch-ramp";
 
-    const rampWidth = "100%";
-    const rampHeight: number = 75;
-
-    const rampDiv = document.createElement("div");
+    const rampDiv = legendElement.preview;
     const opacityRampClass = isOpacityRamp ? CSS.opacityRamp : "";
     rampDiv.className = `${CSS.colorRamp} ${opacityRampClass}`;
-    rampDiv.style.height = `${rampHeight}px`;
 
-    const surface = createSurface(rampDiv, rampWidth, rampHeight);
-
-    try {
-      // TODO: When HeatmapRenderer is supported, stop offsets should not be adjusted.
-      // equalIntervalStops will be true for sizeInfo, false for heatmap.
-      // Heatmaps tend to have lots of colors, we don't want a giant color ramp.
-      // Hence equalIntervalStops = false.
-
-      if (!isHeatmapRamp) {
-        // Adjust the stop offsets so that we have stops at fixed/equal interval.
-        rampStops.forEach((stop, index) => {
-          stop.offset = index / numGradients;
-        });
-      }
-
-      surface
-        .createRect({ x: 0, y: 0, width: rampWidth as any, height: rampHeight })
-        .setFill({
-          type: "linear",
-          x1: 0,
-          y1: 0,
-          x2: 0,
-          y2: rampHeight,
-          colors: rampStops
-        })
-        .setStroke(null);
-
-      if (
-        legendElement.type === "color-ramp" ||
-        legendElement.type === "opacity-ramp"
-      ) {
-        const overlayColor = legendElement.overlayColor;
-
-        if (overlayColor && overlayColor.a > 0) {
-          surface
-            .createRect({
-              x: 0,
-              y: 0,
-              width: rampWidth as any,
-              height: rampHeight
-            })
-            .setFill(overlayColor)
-            .setStroke(null);
-        }
-      }
-    } catch (e) {
-      surface.clear();
-      surface.destroy();
+    if (opacity != null) {
+      rampDiv.style.opacity = opacity.toString();
     }
 
-    if (!surface) {
-      return null;
-    }
-
-    const labelsContent = rampStops
-      .filter(stop => !!stop.label)
-      .map(stop => (
-        <div class={CSS.rampLabel}>
-          {isHeatmapRamp ? i18n[stop.label] : stop.label}
-        </div>
-      ));
+    const labelsContent = rampStops.map(stop => (
+      <div class={stop.label ? CSS.rampLabel : null}>
+        {isHeatmapRamp
+          ? i18n[stop.label]
+          : isStretchRamp
+          ? this._getStretchStopLabel(stop)
+          : stop.label}
+      </div>
+    ));
 
     const symbolContainerStyles = { width: `${GRADIENT_WIDTH}px` },
-      rampLabelsContainerStyles = { height: `${rampHeight}px` };
+      rampLabelsContainerStyles = { height: rampDiv.style.height };
 
     return (
       <div class={CSS.layerRow}>
-        <div class={CSS.symbolContainer} styles={symbolContainerStyles}>
+        <div
+          key={`${activeLayerInfo.layer.id}-${legendElementIndex}`}
+          class={CSS.symbolContainer}
+          styles={symbolContainerStyles}
+        >
           <div
             class={CSS.rampContainer}
             bind={rampDiv}
@@ -1016,6 +974,17 @@ class InteractiveClassic extends declared(Widget) {
         </div>
       </div>
     );
+  }
+
+  // _getStretchStopLabel
+  private _getStretchStopLabel(stop: ColorRampStop): String {
+    return stop.label
+      ? i18n[stop.label] +
+          ": " +
+          formatNumber(stop.value, {
+            style: "decimal"
+          })
+      : "";
   }
 
   // _renderLegendForElementInfo
@@ -1120,7 +1089,8 @@ class InteractiveClassic extends declared(Widget) {
           selectedRow =
             (selectedInfoIndex && selectedInfoIndex.length === 0) ||
             (selectedInfoIndex === null &&
-              (queryExpressions && queryExpressions[0] !== "1=0"))
+              queryExpressions &&
+              queryExpressions[0] !== "1=0")
               ? selectedRowStyles
               : nonSelectedRowStyles;
         } else {
@@ -1167,30 +1137,33 @@ class InteractiveClassic extends declared(Widget) {
     const hasMoreThanOneClassBreak =
       featureLayerView && classBreakInfos && classBreakInfos.length > 1;
 
-    const allowSelectStyles = classBreakInfos
-      ? (!activeLayerInfo.layer.hasOwnProperty("sublayers") &&
-          activeLayerInfo.layer.type === "feature" &&
-          field &&
-          !isColorRamp &&
-          !isSizeRamp &&
-          hasMoreThanOneClassBreak &&
-          featureLayerData) ||
-        (isPredominance && !isSizeRamp) ||
-        classifyDataCheckedColorRamp ||
-        classifyDataCheckedSizeRamp ||
-        singleSymbol ||
-        isRelationship
-      : (!activeLayerInfo.layer.hasOwnProperty("sublayers") &&
-          activeLayerInfo.layer.type === "feature" &&
-          field &&
-          !isColorRamp &&
-          !isSizeRamp &&
-          featureLayerData) ||
-        (isPredominance && !isSizeRamp) ||
-        classifyDataCheckedColorRamp ||
-        classifyDataCheckedSizeRamp ||
-        singleSymbol ||
-        isRelationship;
+    const allowSelectStyles =
+      activeLayerInfo && activeLayerInfo.get("layer.type") === "feature"
+        ? classBreakInfos
+          ? (!activeLayerInfo.layer.hasOwnProperty("sublayers") &&
+              activeLayerInfo.layer.type === "feature" &&
+              field &&
+              !isColorRamp &&
+              !isSizeRamp &&
+              hasMoreThanOneClassBreak &&
+              featureLayerData) ||
+            (isPredominance && !isSizeRamp) ||
+            (classifyDataCheckedColorRamp && field) ||
+            (classifyDataCheckedSizeRamp && field) ||
+            (singleSymbol && !field && field !== null) ||
+            isRelationship
+          : (!activeLayerInfo.layer.hasOwnProperty("sublayers") &&
+              activeLayerInfo.layer.type === "feature" &&
+              field &&
+              !isColorRamp &&
+              !isSizeRamp &&
+              featureLayerData) ||
+            (isPredominance && !isSizeRamp) ||
+            (classifyDataCheckedColorRamp && field) ||
+            (classifyDataCheckedSizeRamp && field) ||
+            (singleSymbol && !field && field !== null) ||
+            isRelationship
+        : false;
 
     const applySelect = allowSelectStyles ? selectedRow : null;
     if (featureLayerData && featureLayerData.applyStyles === null) {
@@ -1255,11 +1228,12 @@ class InteractiveClassic extends declared(Widget) {
           <div
             bind={this}
             class={
-              (activeLayerInfo.layer.type === "feature" &&
-                (field && featureLayerData && !isSizeRamp)) ||
-              (isPredominance && !isSizeRamp) ||
-              singleSymbol
-                ? this.classes(applySelect, singleSymbolStyles, boxShadow)
+              activeLayerInfo && activeLayerInfo.get("layer.type") === "feature"
+                ? (field && featureLayerData && !isSizeRamp) ||
+                  (isPredominance && !isSizeRamp) ||
+                  singleSymbol
+                  ? this.classes(applySelect, singleSymbolStyles, boxShadow)
+                  : CSS.interactiveLegendRemoveOutline
                 : CSS.interactiveLegendRemoveOutline
             }
             onclick={(event: Event) => {
@@ -1313,7 +1287,10 @@ class InteractiveClassic extends declared(Widget) {
               ) : null}
             </div>
             <div class={CSS.interactiveLegendInfoContainer}>
-              <div class={this.classes(CSS.symbolContainer, symbolClasses)}>
+              <div
+                key={`${activeLayerInfo.layer.id}-${legendElementIndex}`}
+                class={this.classes(CSS.symbolContainer, symbolClasses)}
+              >
                 {content}
               </div>
               <div
@@ -1335,7 +1312,10 @@ class InteractiveClassic extends declared(Widget) {
     } else {
       return (
         <div class={CSS.layerRow}>
-          <div class={this.classes(CSS.symbolContainer, symbolClasses)}>
+          <div
+            key={`${activeLayerInfo.layer.id}-${legendElementIndex}`}
+            class={this.classes(CSS.symbolContainer, symbolClasses)}
+          >
             {content}
           </div>
           <div class={this.classes(CSS.layerInfo, labelClasses)}>
@@ -1753,8 +1733,12 @@ class InteractiveClassic extends declared(Widget) {
     operationalItemIndex: number,
     featureLayerData: any,
     singleSymbol: boolean,
-    isTypePredominance: boolean
+    isTypePredominance: boolean,
+    field: string
   ) {
+    if (activeLayerInfo && activeLayerInfo.get("layer.type") !== "feature") {
+      return false;
+    }
     const isRelationship = this._checkForRelationshipLegend(
       legendElement,
       operationalItemIndex
@@ -1786,6 +1770,7 @@ class InteractiveClassic extends declared(Widget) {
       featureLayerView && classBreakInfos && classBreakInfos.length > 1;
 
     const standardInteractivityCheck =
+      field &&
       !activeLayerInfo.get("layer.sublayers") &&
       activeLayerInfo.get("layer.type") === "feature" &&
       featureLayerData &&
@@ -1799,14 +1784,14 @@ class InteractiveClassic extends declared(Widget) {
           (isTypePredominance && !isSizeRamp && !isOpacityRamp) ||
           singleSymbol ||
           isRelationship ||
-          classifyDataCheckedColorRamp ||
-          classifyDataCheckedSizeRamp
+          (classifyDataCheckedColorRamp && field) ||
+          (classifyDataCheckedSizeRamp && field)
       : standardInteractivityCheck ||
           (isTypePredominance && !isSizeRamp && !isOpacityRamp) ||
           singleSymbol ||
           isRelationship ||
-          classifyDataCheckedColorRamp ||
-          classifyDataCheckedSizeRamp;
+          (classifyDataCheckedColorRamp && field) ||
+          (classifyDataCheckedSizeRamp && field);
   }
 
   // _checkForRelationshipLegend

@@ -17,7 +17,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "esri/core/accessorSupport/decorators", "esri/core/Handles", "esri/core/watchUtils", "esri/views/layers/support/FeatureEffect", "./relationshipRampUtils", "esri/views/layers/support/FeatureFilter"], function (require, exports, __assign, __extends, __decorate, Accessor, decorators_1, Handles, watchUtils, FeatureEffect, relationshipRampUtils_1, FeatureFilter) {
+define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "esri/core/accessorSupport/decorators", "esri/core/Handles", "esri/core/watchUtils", "esri/views/layers/support/FeatureEffect", "./relationshipRampUtils", "esri/views/layers/support/FeatureFilter", "esri/core/promiseUtils"], function (require, exports, __assign, __extends, __decorate, Accessor, decorators_1, Handles, watchUtils, FeatureEffect, relationshipRampUtils_1, FeatureFilter, promiseUtils) {
     "use strict";
     var Create2DColorRamp = /** @class */ (function (_super) {
         __extends(Create2DColorRamp, _super);
@@ -68,11 +68,48 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 watchUtils.when(this, ["layerView", "searchViewModel", "layerListViewModel"], function () {
                     _this._handleCellBehavior();
                     if (_this.featureCountEnabled) {
-                        _this._handles.add([
-                            watchUtils.whenFalse(_this, "view.updating", function () {
-                                _this._queryFeatureCount();
-                            })
-                        ]);
+                        var queryFeatureCount_1 = promiseUtils.debounce(function () {
+                            var where = _this.queryExpressions.join(" OR ") === ""
+                                ? _this.queryCountExpressions.join(" OR ")
+                                : _this.queryExpressions.join(" OR ");
+                            var geometry = _this.view && _this.view.get("extent");
+                            var outSpatialReference = _this.view && _this.view.get("spatialReference");
+                            var queryFeatureCount = _this.layerView &&
+                                _this.layerView.queryFeatureCount &&
+                                _this.layerView.queryFeatureCount({
+                                    geometry: geometry,
+                                    outSpatialReference: outSpatialReference,
+                                    where: where
+                                });
+                            if (!queryFeatureCount) {
+                                return;
+                            }
+                            return queryFeatureCount.then(function (totalFeatureCount) {
+                                _this.set("featureCount", totalFeatureCount);
+                            });
+                        });
+                        var featureCountKey = "feature-count-key";
+                        if (!_this._handles.has(featureCountKey)) {
+                            _this._handles.add([
+                                watchUtils.whenFalse(_this.view, "stationary", function () {
+                                    if (!_this.view.stationary) {
+                                        watchUtils.whenTrueOnce(_this.view, "stationary", function () {
+                                            queryFeatureCount_1();
+                                        });
+                                    }
+                                    else {
+                                        watchUtils.whenFalseOnce(_this.view, "interacting", function () {
+                                            queryFeatureCount_1();
+                                        });
+                                    }
+                                }),
+                                watchUtils.whenFalse(_this.layerView, "updating", function () {
+                                    watchUtils.whenFalseOnce(_this.layerView, "updating", function () {
+                                        queryFeatureCount_1();
+                                    });
+                                })
+                            ], featureCountKey);
+                        }
                     }
                 }),
                 watchUtils.init(this, "layerView", function () {
@@ -125,6 +162,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             ]);
         };
         Create2DColorRamp.prototype.destroy = function () {
+            this._handles.removeAll();
             this._handles.destroy();
             this._handles = null;
         };
