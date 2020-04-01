@@ -39,7 +39,7 @@
   "webmap": "default",
   "webscene": "",
   "portalUrl": "https://arcgis.com",
-  "oauthappid": "",
+  "oauthappid": "arcgisWebApps",
   "proxyUrl": "",
   "units": "",
   "telemetry": {

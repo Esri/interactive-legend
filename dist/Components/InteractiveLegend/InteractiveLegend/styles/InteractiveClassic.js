@@ -1,9 +1,12 @@
 /// <amd-dependency path="esri/core/tsSupport/declareExtendsHelper" name="__extends" />
 /// <amd-dependency path="esri/core/tsSupport/decorateHelper" name="__decorate" />
 var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -134,7 +137,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         //
         //-------------------------------------------------------------------
         function InteractiveClassic(params) {
-            var _this = _super.call(this) || this;
+            var _this = _super.call(this, params) || this;
             //----------------------------------
             //
             //  Variables
@@ -185,22 +188,25 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         InteractiveClassic.prototype.postInitialize = function () {
             var _this = this;
             this.own([
-                watchUtils.on(this, "viewModel.interactiveStyleData.featureCount", "change", function () {
-                    var featureCount = _this.get("viewModel.interactiveStyleData.featureCount");
-                    featureCount.forEach(function (featureCountCollection) {
-                        _this.own([
-                            featureCountCollection.on("change", function () {
-                                _this.scheduleRender();
-                            })
-                        ]);
-                    });
+                watchUtils.whenTrue(this, "featureCountEnabled", function () {
+                    _this.own([
+                        watchUtils.on(_this, "viewModel.interactiveStyleData.featureCount", "change", function () {
+                            var featureCount = _this.get("viewModel.interactiveStyleData.featureCount");
+                            featureCount.forEach(function (featureCountCollection) {
+                                _this.own([
+                                    featureCountCollection.on("change", function () {
+                                        _this.scheduleRender();
+                                    })
+                                ]);
+                            });
+                        })
+                    ]);
                 })
             ]);
         };
         InteractiveClassic.prototype.render = function () {
-            var _this = this;
             var _a;
-            var state = this.viewModel.state;
+            var _this = this;
             var activeLayerInfos = this.activeLayerInfos, baseClasses = this.classes(CSS.base, CSS.interactiveLegend, CSS.widget), filteredLayers = activeLayerInfos &&
                 activeLayerInfos
                     .toArray()
@@ -230,8 +236,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         //--------------------------------------------------------------------------
         // _renderLegendForLayer
         InteractiveClassic.prototype._renderLegendForLayer = function (activeLayerInfo, activeLayerInfoIndex) {
-            var _this = this;
             var _a, _b, _c, _d, _e, _f, _g, _h;
+            var _this = this;
             var title = activeLayerInfo.title;
             var titleIsString = typeof title === "string"
                 ? title.indexOf("Description") !== -1 ||
@@ -253,6 +259,14 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var totalFeatureCountArr = this.get("viewModel.interactiveStyleData.totalFeatureCount");
             var operationalItemIndex = this._getOperationalItemIndex(activeLayerInfo);
             var totalFeatureCountForLegend = totalFeatureCountArr[operationalItemIndex];
+            var queryExpressionCollection = this.get("viewModel.interactiveStyleData.queryExpressions");
+            var queryExpressions = queryExpressionCollection.getItemAt(operationalItemIndex);
+            var totalFeatureCountToDisplay = !isNaN(totalFeatureCountForLegend)
+                ? totalFeatureCountForLegend === false ||
+                    ((queryExpressions === null || queryExpressions === void 0 ? void 0 : queryExpressions.length) === 1 && queryExpressions[0] === "1=0")
+                    ? 0
+                    : totalFeatureCountForLegend
+                : 0;
             var relationshipRamp = this.relationshipRampElements[operationalItemIndex];
             var relationshipFeatureCount = this.featureCountEnabled &&
                 relationshipRamp &&
@@ -317,10 +331,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                             this.featureCountEnabled &&
                                 featureLayerData &&
                                 featureLayerData.applyStyles ? (isNaN(relationshipFeatureCount) ? (widget_1.tsx("div", { class: CSS.featureCountContainerStyles },
-                                widget_1.tsx("span", { class: CSS.totalFeatureCount }, totalFeatureCountForLegend ||
-                                    totalFeatureCountForLegend === 0
-                                    ? i18nInteractiveLegend.totalFeatureCount + ": " + totalFeatureCountForLegend
-                                    : null))) : (widget_1.tsx("div", { class: CSS.featureCountContainerStyles },
+                                widget_1.tsx("span", { class: CSS.totalFeatureCount }, i18nInteractiveLegend.totalFeatureCount + ": " + totalFeatureCountToDisplay))) : (widget_1.tsx("div", { class: CSS.featureCountContainerStyles },
                                 widget_1.tsx("span", { class: CSS.totalFeatureCount }, relationshipFeatureCount ||
                                     relationshipFeatureCount === 0
                                     ? i18nInteractiveLegend.totalFeatureCount + ": " + relationshipFeatureCount
@@ -330,8 +341,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         };
         // _renderLegendForElement
         InteractiveClassic.prototype._renderLegendForElement = function (legendElement, layer, legendElementIndex, activeLayerInfo, activeLayerInfoIndex, operationalItemIndex, legendElementInfos, isChild) {
-            var _this = this;
             var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+            var _this = this;
             var type = legendElement.type;
             var isColorRamp = type === "color-ramp", isOpacityRamp = type === "opacity-ramp", isSizeRamp = type === "size-ramp", isHeatRamp = type === "heatmap-ramp";
             var content = null;
@@ -339,6 +350,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var field = selectedStyleData && selectedStyleData.get("field");
             var normalizationField = selectedStyleData &&
                 selectedStyleData.get("normalizationField");
+            var layerView = this.viewModel.featureLayerViews.getItemAt(operationalItemIndex)
+                ? this.viewModel.featureLayerViews.getItemAt(operationalItemIndex)
+                : null;
             // build symbol table or size ramp
             if (legendElement.type === "symbol-table" || isSizeRamp) {
                 var rows = legendElement.infos
@@ -363,9 +377,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 content = this._renderLegendForRamp(legendElement, layer.opacity, activeLayerInfo, legendElementIndex);
             }
             else if (legendElement.type === "relationship-ramp") {
-                var layerView = this.viewModel.featureLayerViews.getItemAt(operationalItemIndex)
-                    ? this.viewModel.featureLayerViews.getItemAt(operationalItemIndex)
-                    : null;
                 if (!this.relationshipRampElements[operationalItemIndex] && layerView) {
                     this.relationshipRampElements[operationalItemIndex] = new RelationshipRamp({
                         legendElement: legendElement,
@@ -422,16 +433,16 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 _d);
             var layerTable = this.classes(CSS.layerTable, interactiveLegendLayerTable, singleSymbolMargin);
             var isRelationship = this._checkForRelationshipLegend(legendElement, operationalItemIndex);
-            var resetButton = this.offscreen
+            var isClusteringSizeRamp = this._checkForClusteringSizeRampLegend(activeLayerInfo, legendElementIndex);
+            var resetButton = this.offscreen || isClusteringSizeRamp
                 ? null
-                : this._renderResetButton(featureLayerData, operationalItemIndex, legendElementInfos, legendElement);
+                : this._renderResetButton(featureLayerData, operationalItemIndex, legendElementInfos, legendElement, legendElementIndex);
             var zoomToButton = this.offscreen || !this.updateExtentEnabled
                 ? null
                 : this._renderZoomToButton(operationalItemIndex);
             var featureLayer = activeLayerInfo.layer;
             var predominanceType = featureLayer.get("renderer.authoringInfo.type");
             var isTypePredominance = predominanceType === "predominance";
-            var singleSymbol = legendElementInfos && legendElementInfos.length === 1 && !field;
             var updateExtentStyles = (_e = {},
                 _e[CSS.updateExtentStyles] = zoomToButton && legendElementInfos && legendElementInfos.length > 1,
                 _e);
@@ -447,7 +458,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var removeMarginBottom = (_j = {},
                 _j[CSS.removeMarginBottom] = !field && !isTypePredominance,
                 _j);
-            var allowInteractivity = this._checkForInteractivity(activeLayerInfo, legendElement, operationalItemIndex, featureLayerData, singleSymbol, isTypePredominance, field);
+            var allowInteractivity = this.viewModel.validateInteractivity(activeLayerInfo, legendElement, field, layerView, legendElementIndex);
             var tableClass = isChild ? CSS.layerChildTable : layerTable, caption = title ||
                 (legendElementInfos && legendElementInfos.length === 1 && !field) ? (allowInteractivity ? (legendElementInfos &&
                 legendElementInfos.length === 1 &&
@@ -516,8 +527,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         };
         // _renderLegendForElementInfo
         InteractiveClassic.prototype._renderLegendForElementInfo = function (elementInfo, layer, isSizeRamp, legendType, legendInfoIndex, field, legendElementIndex, legendElement, activeLayerInfo, activeLayerInfoIndex, operationalItemIndex, legendElementInfos, normalizationField) {
-            var _this = this;
             var _a, _b, _c, _d;
+            var _this = this;
             // nested
             if (elementInfo.type) {
                 return this._renderLegendForElement(elementInfo, layer, legendElementIndex, activeLayerInfo, activeLayerInfoIndex, operationalItemIndex, legendElementInfos, true);
@@ -582,56 +593,19 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var isPredominance = featureLayer.get("renderer.authoringInfo.type") === "predominance";
             var featureLayerData = this._getFeatureLayerData(activeLayerInfo);
             var singleSymbol = legendElementInfos && legendElementInfos.length === 1 && !field;
-            var classifyDataCheckedColorRamp = this._colorRampCheck(activeLayerInfo);
-            var classifyDataCheckedSizeRamp = featureLayerView &&
-                featureLayerView.get("layer.renderer.authoringInfo.type") ===
-                    "class-breaks-size";
-            var isColorRamp = legendElement.type === "color-ramp";
-            var classBreakInfos = featureLayerView &&
-                featureLayerView.get("layer.renderer.classBreakInfos");
-            var hasMoreThanOneClassBreak = featureLayerView && classBreakInfos && classBreakInfos.length > 1;
-            var allowSelectStyles = activeLayerInfo && activeLayerInfo.get("layer.type") === "feature"
-                ? classBreakInfos
-                    ? (!activeLayerInfo.layer.hasOwnProperty("sublayers") &&
-                        activeLayerInfo.layer.type === "feature" &&
-                        field &&
-                        !isColorRamp &&
-                        !isSizeRamp &&
-                        hasMoreThanOneClassBreak &&
-                        featureLayerData) ||
-                        (isPredominance && !isSizeRamp) ||
-                        (classifyDataCheckedColorRamp && field) ||
-                        (classifyDataCheckedSizeRamp && field) ||
-                        (singleSymbol && !field && field !== null) ||
-                        isRelationship
-                    : (!activeLayerInfo.layer.hasOwnProperty("sublayers") &&
-                        activeLayerInfo.layer.type === "feature" &&
-                        field &&
-                        !isColorRamp &&
-                        !isSizeRamp &&
-                        featureLayerData) ||
-                        (isPredominance && !isSizeRamp) ||
-                        (classifyDataCheckedColorRamp && field) ||
-                        (classifyDataCheckedSizeRamp && field) ||
-                        (singleSymbol && !field && field !== null) ||
-                        isRelationship
-                : false;
+            var allowSelectStyles = this.viewModel.validateInteractivity(activeLayerInfo, legendElement, field, featureLayerView, legendElementIndex);
             var applySelect = allowSelectStyles ? selectedRow : null;
             if (featureLayerData && featureLayerData.applyStyles === null) {
                 featureLayerData.applyStyles = applySelect ? true : false;
                 this.scheduleRender();
             }
-            if (allowSelectStyles) {
-                if (this.featureCountEnabled) {
-                    this.viewModel.queryFeatureCount(elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementIndex, legendElementInfos, normalizationField, true);
-                }
-            }
             // FEATURE COUNT VARIABLES
-            var featureCountArrForLayer = this.get("viewModel.interactiveStyleData.featureCount");
-            var featureCountArrForLegend = featureCountArrForLayer.getItemAt(operationalItemIndex);
-            var featureCountArrForElementInfo = featureCountArrForLayer && featureCountArrForLegend
-                ? featureCountArrForLegend.getItemAt(legendInfoIndex)
-                : null;
+            var featureCount = this.get("viewModel.interactiveStyleData.featureCount");
+            var featureCountArrForLayer = featureCount.getItemAt(operationalItemIndex);
+            var featureCountForLegendElement = featureCountArrForLayer &&
+                featureCountArrForLayer.getItemAt(legendElementIndex);
+            var featureCountForLegendInfo = featureCountForLegendElement &&
+                featureCountForLegendElement[legendInfoIndex];
             var singleSymbolStyles = (_c = {},
                 _c[CSS.singleSymbol] = legendElementInfos && legendElementInfos.length === 1 && !field,
                 _c);
@@ -667,7 +641,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         widget_1.tsx("div", { class: CSS.interactiveLegendInfoContainer },
                             widget_1.tsx("div", { key: activeLayerInfo.layer.id + "-" + legendElementIndex, class: this.classes(CSS.symbolContainer, symbolClasses) }, content),
                             widget_1.tsx("div", { class: this.classes(CSS.layerInfo, labelClasses, CSS.interactiveLayerInfo) }, styleUtils_1.getTitle(elementInfo.label, false) || "")),
-                        widget_1.tsx("div", { class: CSS.featureCountContainer }, selected && !isSizeRamp ? featureCountArrForElementInfo : null))));
+                        widget_1.tsx("div", { class: CSS.featureCountContainer }, selected && !isSizeRamp ? featureCountForLegendInfo : null))));
             }
             else {
                 return (widget_1.tsx("div", { class: CSS.layerRow },
@@ -691,10 +665,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         // _renderOnboardingPanel
         InteractiveClassic.prototype._renderOnboardingPanel = function () {
             var close = i18nInteractiveLegend.close, newInteractiveLegend = i18nInteractiveLegend.newInteractiveLegend, onboardingConfirmation = i18nInteractiveLegend.onboardingConfirmation, firstOnboardingWelcomeMessage = i18nInteractiveLegend.firstOnboardingWelcomeMessage, secondOnboardingWelcomeMessage = i18nInteractiveLegend.secondOnboardingWelcomeMessage, thirdOnboardingWelcomeMessage = i18nInteractiveLegend.thirdOnboardingWelcomeMessage;
-            var relationshipTest = this.activeLayerInfos.filter(function (activeLayerInfo) {
-                return (activeLayerInfo.get("layer.renderer.authoringInfo.type") ===
-                    "relationship");
-            });
             return (widget_1.tsx("div", { class: CSS.onboarding.mainContainer },
                 widget_1.tsx("div", { key: "onboarding-panel", class: CSS.onboarding.contentContainer },
                     widget_1.tsx("div", { class: CSS.onboarding.closeContainer },
@@ -710,9 +680,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     widget_1.tsx("button", { bind: this, onclick: this._disableOnboarding, onkeydown: this._disableOnboarding, tabIndex: 0, class: CSS.calciteStyles.btn, title: onboardingConfirmation }, onboardingConfirmation))));
         };
         // _renderResetButton
-        InteractiveClassic.prototype._renderResetButton = function (featureLayerData, operationalItemIndex, legendElementInfos, legendElement) {
-            var _this = this;
+        InteractiveClassic.prototype._renderResetButton = function (featureLayerData, operationalItemIndex, legendElementInfos, legendElement, legendElementIndex) {
             var _a;
+            var _this = this;
             var isRelationship = this._checkForRelationshipLegend(legendElement, operationalItemIndex);
             var disabled = null;
             if (isRelationship) {
@@ -725,9 +695,9 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 _a[CSS.interactiveLegendGrayButtonStyles] = disabled,
                 _a);
             return (widget_1.tsx("button", { bind: this, class: this.classes(CSS.interactiveLegendResetButton, CSS.calciteStyles.btn, CSS.calciteStyles.btnClear, CSS.calciteStyles.btnSmall, grayStyles), tabIndex: this.offscreen ? -1 : 0, disabled: disabled ? true : false, onclick: function (event) {
-                    _this._resetLegendFilter(featureLayerData, operationalItemIndex);
+                    _this._resetLegendFilter(featureLayerData, operationalItemIndex, legendElementIndex);
                 }, onkeydown: function (event) {
-                    _this._resetLegendFilter(featureLayerData, operationalItemIndex);
+                    _this._resetLegendFilter(featureLayerData, operationalItemIndex, legendElementIndex);
                 } }, i18nInteractiveLegend.showAll));
         };
         // _renderZoomToButton
@@ -768,10 +738,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         };
         // End of filter methods
         // _resetLegendFilter
-        InteractiveClassic.prototype._resetLegendFilter = function (featureLayerData, operationalItemIndex) {
+        InteractiveClassic.prototype._resetLegendFilter = function (featureLayerData, operationalItemIndex, legendElementIndex) {
             this.viewModel.resetLegendFilter(featureLayerData, operationalItemIndex);
             if (this.featureCountEnabled) {
-                this.viewModel.queryTotalFeatureCount(operationalItemIndex);
+                this.viewModel.queryTotalFeatureCount(operationalItemIndex, legendElementIndex);
             }
         };
         // _disableOnboarding
@@ -863,43 +833,6 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 : false;
             return disabled;
         };
-        // _checkForInteractivity
-        InteractiveClassic.prototype._checkForInteractivity = function (activeLayerInfo, legendElement, operationalItemIndex, featureLayerData, singleSymbol, isTypePredominance, field) {
-            if (activeLayerInfo && activeLayerInfo.get("layer.type") !== "feature") {
-                return false;
-            }
-            var isRelationship = this._checkForRelationshipLegend(legendElement, operationalItemIndex);
-            var classifyDataCheckedColorRamp = this._colorRampCheck(activeLayerInfo);
-            var featureLayerView = this.viewModel.featureLayerViews.getItemAt(operationalItemIndex);
-            var type = legendElement.type;
-            var isOpacityRamp = type === "opacity-ramp", isSizeRamp = type === "size-ramp", isHeatRamp = type === "heatmap-ramp", isColorRamp = type === "color-ramp", classifyDataCheckedSizeRamp = featureLayerView &&
-                featureLayerView.get("layer.renderer.authoringInfo.type") ===
-                    "class-breaks-size";
-            var classBreakInfos = featureLayerView &&
-                featureLayerView.get("layer.renderer.classBreakInfos");
-            var hasMoreThanOneClassBreak = featureLayerView && classBreakInfos && classBreakInfos.length > 1;
-            var standardInteractivityCheck = field &&
-                !activeLayerInfo.get("layer.sublayers") &&
-                activeLayerInfo.get("layer.type") === "feature" &&
-                featureLayerData &&
-                !isOpacityRamp &&
-                !isHeatRamp &&
-                !isSizeRamp &&
-                !isColorRamp;
-            return classBreakInfos
-                ? (standardInteractivityCheck && hasMoreThanOneClassBreak) ||
-                    (isTypePredominance && !isSizeRamp && !isOpacityRamp) ||
-                    singleSymbol ||
-                    isRelationship ||
-                    (classifyDataCheckedColorRamp && field) ||
-                    (classifyDataCheckedSizeRamp && field)
-                : standardInteractivityCheck ||
-                    (isTypePredominance && !isSizeRamp && !isOpacityRamp) ||
-                    singleSymbol ||
-                    isRelationship ||
-                    (classifyDataCheckedColorRamp && field) ||
-                    (classifyDataCheckedSizeRamp && field);
-        };
         // _checkForRelationshipLegend
         InteractiveClassic.prototype._checkForRelationshipLegend = function (legendElement, operationalItemIndex) {
             var featureLayerView = this.viewModel.featureLayerViews.getItemAt(operationalItemIndex);
@@ -907,10 +840,12 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 featureLayerView.get("layer.renderer.authoringInfo.type");
             return (authoringInfoType === "relationship" && legendElement.type !== "size-ramp");
         };
-        // _colorRampCheck
-        InteractiveClassic.prototype._colorRampCheck = function (activeLayerInfo) {
-            return (activeLayerInfo.get("layer.renderer.authoringInfo.type") ===
-                "class-breaks-color");
+        // _checkForClusteringSizeRampLegend
+        InteractiveClassic.prototype._checkForClusteringSizeRampLegend = function (activeLayerInfo, legendElementIndex) {
+            var _a;
+            var hasClustering = activeLayerInfo === null || activeLayerInfo === void 0 ? void 0 : activeLayerInfo.get("layer.featureReduction");
+            var isSizeRamp = ((_a = activeLayerInfo === null || activeLayerInfo === void 0 ? void 0 : activeLayerInfo.legendElements[legendElementIndex]) === null || _a === void 0 ? void 0 : _a.type) === "size-ramp";
+            return hasClustering && isSizeRamp;
         };
         // _getFeatureLayerData
         InteractiveClassic.prototype._getFeatureLayerData = function (activeLayerInfo) {

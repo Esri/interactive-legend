@@ -41,6 +41,6 @@ define({
   "showNormField": "{field}을(를) {normField}(으)로 나눔",
   "showNormPct": "{field}을(를) 전체로 나눈 백분율",
   "showRatio": "{field} 대 {normField}의 비율",
-  "showRatioPercent": "{field}을(를) ${normField}(으)로 나눈 백분율",
+  "showRatioPercent": "{field}을(를) {normField}(으)로 나눈 백분율",
   "showRatioPercentTotal": "{field}을(를) {field}와(과) {normField}의 합으로 나눈 백분율"
 });

@@ -486,17 +486,6 @@ class InteractiveLegendApp {
     const headerContainer = header.container as HTMLElement;
 
     parentContainer.insertBefore(headerContainer, parentContainer.firstChild);
-
-    const parentContainerHeight = parentContainer.offsetHeight;
-    const headerContainerHeight = headerContainer.offsetHeight;
-    const hcProportion = headerContainerHeight * 100;
-    const hcHeightPercentage = parseFloat(
-      (hcProportion / parentContainerHeight).toFixed(4)
-    );
-    const viewParentContainerPercentage = 100 - hcHeightPercentage;
-    document.getElementById(
-      "view-parent-container"
-    ).style.height = `${viewParentContainerPercentage}%`;
   }
 
   // _handleSplash

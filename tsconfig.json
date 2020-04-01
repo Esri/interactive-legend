@@ -20,7 +20,7 @@
     "./src/app/Components/Screenshot",
     "./src/app/interfaces"
   ],
-  "exclude": ["./node_modules", "./tsrules"],
+  "exclude": ["./node_modules", "./tsrules", "./src/app/application-base-js"],
   "files": [
     "./src/app/application-base-js/index.d.ts",
     "./node_modules/@types/arcgis-js-api/index.d.ts",

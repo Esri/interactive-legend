@@ -2,9 +2,12 @@
 /// <amd-dependency path="esri/core/tsSupport/declareExtendsHelper" name="__extends" />
 /// <amd-dependency path="esri/core/tsSupport/decorateHelper" name="__decorate" />
 var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -17,7 +20,14 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "esri/core/accessorSupport/decorators", "esri/core/Handles", "esri/core/watchUtils", "esri/core/Collection", "esri/widgets/LayerList/LayerListViewModel", "esri/views/layers/support/FeatureFilter", "esri/views/layers/support/FeatureEffect", "esri/tasks/support/Query", "./InteractiveStyleData", "./SelectedStyleData", "esri/core/promiseUtils"], function (require, exports, __assign, __extends, __decorate, Accessor, decorators_1, Handles, watchUtils, Collection, LayerListViewModel, FeatureFilter, FeatureEffect, Query, InteractiveStyleData, SelectedStyleData, promiseUtils) {
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
+define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "esri/core/accessorSupport/decorators", "esri/core/Handles", "esri/core/watchUtils", "esri/core/Collection", "esri/widgets/LayerList/LayerListViewModel", "esri/views/layers/support/FeatureFilter", "esri/views/layers/support/FeatureEffect", "esri/tasks/support/Query", "./InteractiveStyleData", "./SelectedStyleData"], function (require, exports, __assign, __extends, __decorate, Accessor, decorators_1, Handles, watchUtils, Collection, LayerListViewModel, FeatureFilter, FeatureEffect, Query, InteractiveStyleData, SelectedStyleData) {
     "use strict";
     var InteractiveStyleViewModel = /** @class */ (function (_super) {
         __extends(InteractiveStyleViewModel, _super);
@@ -57,7 +67,9 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             _this.opacity = null;
             // grayScale
             _this.grayScale = null;
+            // featureCountEnabled
             _this.featureCountEnabled = null;
+            // updateExtentEnabled
             _this.updateExtentEnabled = null;
             return _this;
         }
@@ -126,9 +138,10 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                             }
                         }
                     });
-                    _this.selectedStyleDataCollection.addMany(selectedStyleDataCollection.slice());
+                    _this.selectedStyleDataCollection.addMany(__spreadArrays(selectedStyleDataCollection));
                 })
             ]);
+            this._initFeatureCount();
         };
         InteractiveStyleViewModel.prototype.destroy = function () {
             this._handles.removeAll();
@@ -278,69 +291,230 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             this._setSearchExpression(null);
             this.notifyChange("state");
         };
-        // FEATURE COUNT METHODS
-        InteractiveStyleViewModel.prototype.queryFeatureCount = function (elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementIndex, legendElementInfos, normalizationField, generateFeatureCountExpression) {
+        // validateInteractivity
+        InteractiveStyleViewModel.prototype.validateInteractivity = function (activeLayerInfo, legendElement, field, featureLayerView, legendElementIndex) {
+            var _a, _b, _c, _d;
+            var type = legendElement.type;
+            var classBreakInfos = featureLayerView === null || featureLayerView === void 0 ? void 0 : featureLayerView.get("layer.renderer.classBreakInfos");
+            var isSizeRamp = type === "size-ramp";
+            var isColorRamp = type === "color-ramp";
+            var opacityRamp = type === "opacity-ramp";
+            var heatmapRamp = type === "heatmap-ramp";
+            var hasMoreThanOneClassBreak = featureLayerView && classBreakInfos && classBreakInfos.length > 1;
+            var authoringInfoType = featureLayerView === null || featureLayerView === void 0 ? void 0 : featureLayerView.get("layer.renderer.authoringInfo.type");
+            var isPredominance = authoringInfoType === "predominance";
+            var classifyDataCheckedColorRamp = authoringInfoType === "class-breaks-color";
+            var classifyDataCheckedSizeRamp = authoringInfoType === "class-breaks-size";
+            var singleSymbol = ((_a = legendElement === null || legendElement === void 0 ? void 0 : legendElement.infos) === null || _a === void 0 ? void 0 : _a.length) === 1 && !field;
+            var isRelationship = authoringInfoType === "relationship" &&
+                legendElement.type !== "size-ramp";
+            var featureLayerData = (_b = this.selectedStyleDataCollection) === null || _b === void 0 ? void 0 : _b.find(function (data) { var _a; return data ? ((_a = activeLayerInfo === null || activeLayerInfo === void 0 ? void 0 : activeLayerInfo.layer) === null || _a === void 0 ? void 0 : _a.id) === (data === null || data === void 0 ? void 0 : data.layerItemId) : null; });
+            var hasSublayers = activeLayerInfo.get("parent.children.length") > 0;
+            var isFeatureLayer = (activeLayerInfo === null || activeLayerInfo === void 0 ? void 0 : activeLayerInfo.get("layer.type")) === "feature";
+            var moreThanOneClassBreak = !hasSublayers &&
+                isFeatureLayer &&
+                field &&
+                !isColorRamp &&
+                !isSizeRamp &&
+                featureLayerData &&
+                hasMoreThanOneClassBreak;
+            var oneClassBreak = !hasSublayers &&
+                isFeatureLayer &&
+                field &&
+                !isColorRamp &&
+                !isSizeRamp &&
+                featureLayerData &&
+                !hasMoreThanOneClassBreak
+                ? true
+                : false;
+            var validate = oneClassBreak ||
+                (isPredominance && !isSizeRamp) ||
+                (classifyDataCheckedColorRamp && field) ||
+                (classifyDataCheckedSizeRamp && field) ||
+                (singleSymbol && !field && field !== null) ||
+                isRelationship
+                ? true
+                : false;
+            var hasClustering = (activeLayerInfo === null || activeLayerInfo === void 0 ? void 0 : activeLayerInfo.get("layer.featureReduction")) &&
+                ((_c = activeLayerInfo === null || activeLayerInfo === void 0 ? void 0 : activeLayerInfo.legendElements[legendElementIndex]) === null || _c === void 0 ? void 0 : _c.type) === "size-ramp";
+            var isSingleSymbol = legendElement.type === "symbol-table" &&
+                ((_d = legendElement === null || legendElement === void 0 ? void 0 : legendElement.infos) === null || _d === void 0 ? void 0 : _d.length) === 1;
+            var hasColorRamp = !(activeLayerInfo === null || activeLayerInfo === void 0 ? void 0 : activeLayerInfo.legendElements.every(function (legendElement) { return legendElement.type !== "color-ramp"; }));
+            var hasSizeRamp = !(activeLayerInfo === null || activeLayerInfo === void 0 ? void 0 : activeLayerInfo.legendElements.every(function (legendElement) { return legendElement.type !== "size-ramp"; }));
+            var singleSymbolColor = isSingleSymbol && hasColorRamp;
+            var singleSymbolSize = isSingleSymbol && hasSizeRamp;
+            return isFeatureLayer &&
+                !hasClustering &&
+                !opacityRamp &&
+                !heatmapRamp &&
+                !hasSublayers &&
+                !singleSymbolColor &&
+                !singleSymbolSize
+                ? classBreakInfos
+                    ? moreThanOneClassBreak || validate
+                    : oneClassBreak || validate
+                : false;
+        };
+        // // FEATURE COUNT METHODS
+        // _initFeatureCount
+        InteractiveStyleViewModel.prototype._initFeatureCount = function () {
             var _this = this;
-            var _a = this.interactiveStyleData, featureCount = _a.featureCount, totalFeatureCount = _a.totalFeatureCount;
-            if (!featureCount.getItemAt(operationalItemIndex)) {
-                featureCount.add(new Collection(), operationalItemIndex);
-            }
-            if (totalFeatureCount[operationalItemIndex] === undefined) {
-                totalFeatureCount[operationalItemIndex] = null;
-            }
-            var featureLayerView = this.featureLayerViews.getItemAt(operationalItemIndex);
-            var handlesKey = featureLayerView
-                ? featureLayerView.layer.id + "-" + legendInfoIndex
-                : null;
-            if (!this._handles.has(handlesKey)) {
-                var queryFeatureCount_1 = promiseUtils.debounce(function () {
-                    var queryExpression = _this._generateQueryCountExpression(elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementInfos, normalizationField, generateFeatureCountExpression);
-                    var query = _this._generateFeatureCountQuery(queryExpression);
-                    _this.featureCountQuery =
-                        featureLayerView &&
-                            featureLayerView.queryFeatureCount &&
-                            featureLayerView.queryFeatureCount(query);
-                    if (!_this.featureCountQuery) {
-                        return;
+            var initFeatureCountKey = "init-feature-count";
+            this._handles.add(watchUtils.whenTrue(this, "featureCountEnabled", function () {
+                _this._handles.add([_this._watchDataForCount(initFeatureCountKey)], initFeatureCountKey);
+                _this._updateFeatureCountOnViewUpdate(initFeatureCountKey);
+            }));
+        };
+        // _watchDataForCount
+        InteractiveStyleViewModel.prototype._watchDataForCount = function (handlesKey) {
+            var _this = this;
+            return watchUtils.when(this, "layerListViewModel.operationalItems.length", function () {
+                if (_this._handles.has(handlesKey)) {
+                    _this._handles.remove(handlesKey);
+                }
+                var activeLayerInfosCountKey = "active-layer-infos-count-key";
+                _this._handles.add(watchUtils.when(_this, "activeLayerInfos.length", function () {
+                    if (_this._handles.has(activeLayerInfosCountKey)) {
+                        _this._handles.remove(activeLayerInfosCountKey);
                     }
-                    var featureCountValue = featureCount.getItemAt(operationalItemIndex);
-                    return _this.featureCountQuery.then(function (featureCountRes) {
-                        if (featureCountValue) {
-                            featureCountValue.removeAt(legendInfoIndex);
+                    var selectedStyleDataCollectionCountKey = "selected-style-data-collection-count-key";
+                    _this._handles.add(watchUtils.when(_this, "selectedStyleDataCollection.length", function () {
+                        if (_this._handles.has(selectedStyleDataCollectionCountKey)) {
+                            _this._handles.remove(selectedStyleDataCollectionCountKey);
                         }
-                        featureCountValue.add(featureCountRes, legendInfoIndex);
-                        var selectedInfoLength = _this.selectedStyleDataCollection.getItemAt(operationalItemIndex).selectedInfoIndex.length;
-                        if (selectedInfoLength === 0) {
-                            _this.queryTotalFeatureCount(operationalItemIndex);
-                        }
-                        else {
-                            _this.updateTotalFeatureCount(operationalItemIndex, legendElementIndex);
-                        }
-                        _this.featureCountQuery = null;
-                        _this.notifyChange("state");
-                    });
+                        _this._handleOperationalItemForCount();
+                    }), selectedStyleDataCollectionCountKey);
+                }), activeLayerInfosCountKey);
+            });
+        };
+        // _updateFeatureCountOnViewUpdate
+        InteractiveStyleViewModel.prototype._updateFeatureCountOnViewUpdate = function (initFeatureCountKey) {
+            var _this = this;
+            this._handles.add([
+                watchUtils.whenFalse(this, "view.stationary", function () {
+                    if (!_this.view.stationary) {
+                        var stationaryIsTrue_1 = "stationary-is-true";
+                        _this._handles.add(watchUtils.whenTrueOnce(_this, "view.stationary", function () {
+                            if (_this._handles.has(stationaryIsTrue_1)) {
+                                _this._handles.remove(stationaryIsTrue_1);
+                            }
+                            _this._handles.add([_this._watchDataForCount(initFeatureCountKey)], initFeatureCountKey);
+                        }), stationaryIsTrue_1);
+                    }
+                    else {
+                        var stationaryIsFalse_1 = "stationary-is-false";
+                        _this._handles.add(watchUtils.whenFalseOnce(_this, "view.interacting", function () {
+                            if (_this._handles.has(stationaryIsFalse_1)) {
+                                _this._handles.remove(stationaryIsFalse_1);
+                            }
+                            _this._handles.add([_this._watchDataForCount(initFeatureCountKey)], initFeatureCountKey);
+                        }), stationaryIsFalse_1);
+                    }
+                })
+            ]);
+        };
+        // _handleOperationalItemForCount
+        InteractiveStyleViewModel.prototype._handleOperationalItemForCount = function () {
+            var _this = this;
+            this.layerListViewModel.operationalItems.forEach(function (operationalItem, operationalItemIndex) {
+                var _a = _this.interactiveStyleData, featureCount = _a.featureCount, totalFeatureCount = _a.totalFeatureCount;
+                if (!featureCount.getItemAt(operationalItemIndex)) {
+                    featureCount.add(new Collection(), operationalItemIndex);
+                }
+                if (totalFeatureCount[operationalItemIndex] === undefined) {
+                    totalFeatureCount[operationalItemIndex] = null;
+                }
+                var featureLayerView = _this.featureLayerViews.getItemAt(operationalItemIndex);
+                _this.activeLayerInfos.forEach(function (activeLayerInfo) {
+                    if (operationalItem.layer.id === activeLayerInfo.layer.id) {
+                        _this._handleActiveLayerInfoForCount(activeLayerInfo, featureLayerView, operationalItemIndex);
+                    }
                 });
-                this._handles.add([
-                    watchUtils.whenFalse(this.view, "stationary", function () {
-                        if (!_this.view.stationary) {
-                            watchUtils.whenTrueOnce(_this.view, "stationary", function () {
-                                queryFeatureCount_1();
-                            });
-                        }
-                        else {
-                            watchUtils.whenFalseOnce(_this.view, "interacting", function () {
-                                queryFeatureCount_1();
-                            });
-                        }
-                    }),
-                    watchUtils.whenFalse(featureLayerView, "updating", function () {
-                        watchUtils.whenFalseOnce(featureLayerView, "updating", function () {
-                            queryFeatureCount_1();
-                        });
-                    })
-                ], handlesKey);
+            });
+        };
+        // _handleActiveLayerInfoForCount
+        InteractiveStyleViewModel.prototype._handleActiveLayerInfoForCount = function (activeLayerInfo, featureLayerView, operationalItemIndex) {
+            var _this = this;
+            var watchLegendElementsForCount = "watch-legend-elements-for-count";
+            this._handles.add(watchUtils.whenOnce(activeLayerInfo, "legendElements.length", function () {
+                if (_this._handles.has(watchLegendElementsForCount)) {
+                    _this._handles.remove(watchLegendElementsForCount);
+                }
+                activeLayerInfo.legendElements.forEach(function (legendElement, legendElementIndex) {
+                    _this._handleLegendElementForCount(legendElement, featureLayerView, legendElementIndex, operationalItemIndex, activeLayerInfo);
+                });
+            }), watchLegendElementsForCount);
+        };
+        // _handleLegendElementForCount
+        InteractiveStyleViewModel.prototype._handleLegendElementForCount = function (legendElement, featureLayerView, legendElementIndex, operationalItemIndex, activeLayerInfo) {
+            var isInteractive = this.validateInteractivity(activeLayerInfo, legendElement, activeLayerInfo.get("layer.renderer.field"), featureLayerView, legendElementIndex);
+            if (!(legendElement === null || legendElement === void 0 ? void 0 : legendElement.infos) || !isInteractive) {
+                return;
+            }
+            this._handleLayerViewWatcherForCount(featureLayerView, legendElementIndex, operationalItemIndex, legendElement, activeLayerInfo);
+            this._handleFeatureCount(featureLayerView, legendElementIndex, operationalItemIndex, legendElement, activeLayerInfo);
+        };
+        // _handleLayerViewWatcherForCount
+        InteractiveStyleViewModel.prototype._handleLayerViewWatcherForCount = function (featureLayerView, legendElementIndex, operationalItemIndex, legendElement, activeLayerInfo) {
+            var _this = this;
+            var key = "feature-count-" + activeLayerInfo.layer.id + "-" + operationalItemIndex + "-" + legendElementIndex;
+            if (!this._handles.has(key)) {
+                this._handles.add(watchUtils.whenFalse(featureLayerView, "updating", function () {
+                    _this._handleFeatureCount(featureLayerView, legendElementIndex, operationalItemIndex, legendElement, activeLayerInfo);
+                }), key);
             }
         };
+        // _handleFeatureCount
+        InteractiveStyleViewModel.prototype._handleFeatureCount = function (featureLayerView, legendElementIndex, operationalItemIndex, legendElement, activeLayerInfo) {
+            var _this = this;
+            var promises = [];
+            legendElement.infos.forEach(function (info, infoIndex) {
+                _this._handleLegendElementForFeatureCount(featureLayerView, legendElementIndex, infoIndex, operationalItemIndex, legendElement, info, promises, activeLayerInfo);
+            });
+            Promise.all(promises).then(function (featureCountResponses) {
+                _this._handleFeatureCountResponses(featureCountResponses, operationalItemIndex, legendElementIndex);
+            });
+        };
+        // _handleLegendElementForFeatureCount
+        InteractiveStyleViewModel.prototype._handleLegendElementForFeatureCount = function (featureLayerView, legendElementIndex, infoIndex, operationalItemIndex, legendElement, info, promises, activeLayerInfo) {
+            var _this = this;
+            var handlesKey = featureLayerView
+                ? featureLayerView.layer.id + "-" + legendElementIndex + "-" + infoIndex
+                : null;
+            var selectedStyleData = this.selectedStyleDataCollection.getItemAt(operationalItemIndex);
+            var field = selectedStyleData.field, normalizationField = selectedStyleData.normalizationField;
+            if (!this._handles.has(handlesKey)) {
+                var applyFeatureCount = this.validateInteractivity(activeLayerInfo, legendElement, field, featureLayerView, legendElementIndex);
+                var isPredominance = featureLayerView.get("layer.renderer.authoringInfo.type") ===
+                    "predominance";
+                if (!applyFeatureCount) {
+                    return;
+                }
+                var queryExpression_1 = this._generateQueryCountExpression(info, field, infoIndex, operationalItemIndex, legendElement, isPredominance, legendElement.infos, normalizationField, applyFeatureCount);
+                var query = this._generateFeatureCountQuery(queryExpression_1);
+                promises.push(featureLayerView
+                    .queryFeatureCount(query)
+                    .then(function (featureCountRes) {
+                    return {
+                        featureCountRes: featureCountRes,
+                        infoIndex: infoIndex
+                    };
+                })
+                    .catch(function (err) {
+                    console.warn("Invalid geometry - querying count without geometry: ", err);
+                    var queryNoGeometry = _this._generateFeatureCountQueryNoGeometry(queryExpression_1);
+                    return featureLayerView
+                        .queryFeatureCount(queryNoGeometry)
+                        .then(function (featureCountRes) {
+                        return {
+                            featureCountRes: featureCountRes,
+                            infoIndex: infoIndex
+                        };
+                    });
+                }));
+            }
+        };
+        // _generateFeatureCountQuery
         InteractiveStyleViewModel.prototype._generateFeatureCountQuery = function (queryExpression) {
             var geometry = this.view && this.view.get("extent");
             var outSpatialReference = this.view && this.view.get("spatialReference");
@@ -350,44 +524,54 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 outSpatialReference: outSpatialReference
             });
         };
+        // _generateFeatureCountQueryNoGeometry
+        InteractiveStyleViewModel.prototype._generateFeatureCountQueryNoGeometry = function (queryExpression) {
+            var outSpatialReference = this.view && this.view.get("spatialReference");
+            return new Query({
+                where: queryExpression,
+                outSpatialReference: outSpatialReference
+            });
+        };
+        // _handleFeatureCountResponses
+        InteractiveStyleViewModel.prototype._handleFeatureCountResponses = function (featureCountResObjects, operationalItemIndex, legendElementIndex) {
+            var featureCountsForLegendElement = featureCountResObjects
+                .slice()
+                .map(function (featureCountResObject) { return featureCountResObject.featureCountRes; });
+            var featureCountsForLayer = this.interactiveStyleData.featureCount.getItemAt(operationalItemIndex);
+            featureCountsForLayer.splice(legendElementIndex, 1, featureCountsForLegendElement);
+            var selectedInfoIndexes = this.selectedStyleDataCollection.getItemAt(operationalItemIndex).selectedInfoIndex[legendElementIndex];
+            if ((selectedInfoIndexes === null || selectedInfoIndexes === void 0 ? void 0 : selectedInfoIndexes.length) > 0) {
+                this.updateTotalFeatureCount(operationalItemIndex, legendElementIndex);
+            }
+            else {
+                this.queryTotalFeatureCount(operationalItemIndex, legendElementIndex);
+            }
+        };
         // queryTotalFeatureCount
-        InteractiveStyleViewModel.prototype.queryTotalFeatureCount = function (operationalItemIndex) {
+        InteractiveStyleViewModel.prototype.queryTotalFeatureCount = function (operationalItemIndex, legendElementIndex) {
             var totalFeatureCount = this.interactiveStyleData.totalFeatureCount;
             var featureCountCollection = this.interactiveStyleData.get("featureCount");
-            var featureCount = featureCountCollection.getItemAt(operationalItemIndex);
-            totalFeatureCount[operationalItemIndex] = null;
-            var queryExpressionsCollection = this.interactiveStyleData.get("queryExpressions");
-            var queryExpressions = queryExpressionsCollection.getItemAt(operationalItemIndex);
-            if (queryExpressions && queryExpressions[0] === "1=0") {
-                totalFeatureCount[operationalItemIndex] = 0;
-            }
-            else if (featureCount) {
-                featureCount.forEach(function (count) {
-                    totalFeatureCount[operationalItemIndex] += count;
-                });
-            }
-            this.notifyChange("state");
+            var featureCountsForLayer = featureCountCollection.getItemAt(operationalItemIndex);
+            var featureCountsForLegendElement = featureCountsForLayer.getItemAt(legendElementIndex);
+            var total = (featureCountsForLegendElement === null || featureCountsForLegendElement === void 0 ? void 0 : featureCountsForLegendElement.length) > 0 &&
+                featureCountsForLegendElement.reduce(function (num1, num2) { return num1 + num2; });
+            totalFeatureCount[operationalItemIndex] = total;
         };
         // updateTotalFeatureCount
         InteractiveStyleViewModel.prototype.updateTotalFeatureCount = function (operationalItemIndex, legendElementIndex) {
+            var totalFeatureCount = this.interactiveStyleData.totalFeatureCount;
+            var featureCountsForLegendElement = this.interactiveStyleData.featureCount
+                .getItemAt(operationalItemIndex)
+                .getItemAt(legendElementIndex);
             var selectedInfoIndexes = this.selectedStyleDataCollection.getItemAt(operationalItemIndex).selectedInfoIndex[legendElementIndex];
-            if (selectedInfoIndexes && selectedInfoIndexes.length === 0) {
-                this.queryTotalFeatureCount(operationalItemIndex);
-            }
-            else {
-                var totalFeatureCount_1 = this.interactiveStyleData.totalFeatureCount;
-                totalFeatureCount_1[operationalItemIndex] = null;
-                var featureCount = this.interactiveStyleData.featureCount.getItemAt(operationalItemIndex);
-                featureCount.forEach(function (count, countIndex) {
-                    selectedInfoIndexes.forEach(function (selectedIndex) {
-                        if (countIndex === selectedIndex) {
-                            totalFeatureCount_1[operationalItemIndex] += count;
-                        }
-                    });
+            var currentTotal = 0;
+            selectedInfoIndexes &&
+                selectedInfoIndexes.forEach(function (infoIndex) {
+                    currentTotal += featureCountsForLegendElement[infoIndex];
                 });
-            }
-            this.notifyChange("state");
+            totalFeatureCount[operationalItemIndex] = currentTotal;
         };
+        // End of feature count methods
         // updateExtentToAllFeatures
         // LIMITATION: When complex expressions (normalized fields) are queried against feature services that have Use Standardized Queries set to false - update extent cannot be applied.
         InteractiveStyleViewModel.prototype.updateExtentToAllFeatures = function (operationalItemIndex) {
@@ -520,7 +704,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                             }
                         });
                         var noExpression = expressionList_1.join(" AND ");
-                        return noExpression + " OR " + field + " IS NULL";
+                        return field ? noExpression + " OR " + field + " IS NULL" : "";
                     }
                 }
                 else {

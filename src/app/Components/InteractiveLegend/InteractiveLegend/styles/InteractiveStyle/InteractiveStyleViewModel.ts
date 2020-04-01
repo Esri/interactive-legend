@@ -52,8 +52,6 @@ import {
 } from "../../../../../interfaces/interfaces";
 import SelectedStyleData = require("./SelectedStyleData");
 
-import promiseUtils = require("esri/core/promiseUtils");
-
 // State
 type State = "ready" | "loading" | "disabled" | "querying";
 
@@ -139,9 +137,11 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   @property()
   grayScale: number = null;
 
+  // featureCountEnabled
   @property()
   featureCountEnabled: boolean = null;
 
+  // updateExtentEnabled
   @property()
   updateExtentEnabled: boolean = null;
 
@@ -200,7 +200,6 @@ class InteractiveStyleViewModel extends declared(Accessor) {
                 invalidNormalization =
                   normalizationType === "percent-of-total" ||
                   normalizationType === "log";
-
               if (hasCustomArcade || invalidNormalization) {
                 selectedStyleDataCollection.push(null);
               } else {
@@ -222,6 +221,8 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         ]);
       })
     ]);
+
+    this._initFeatureCount();
   }
 
   destroy() {
@@ -447,110 +448,431 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     this.notifyChange("state");
   }
 
-  // FEATURE COUNT METHODS
-
-  queryFeatureCount(
-    elementInfo: any,
-    field: string,
-    legendInfoIndex: number,
-    operationalItemIndex: number,
+  // validateInteractivity
+  validateInteractivity(
+    activeLayerInfo: __esri.ActiveLayerInfo,
     legendElement: LegendElement,
-    isPredominance: boolean,
-    legendElementIndex: number,
-    legendElementInfos?: any[],
-    normalizationField?: string,
-    generateFeatureCountExpression?: boolean
-  ) {
-    const { featureCount, totalFeatureCount } = this.interactiveStyleData;
+    field: string,
+    featureLayerView: __esri.FeatureLayerView,
+    legendElementIndex: number
+  ): boolean {
+    const { type } = legendElement;
+    const classBreakInfos = featureLayerView?.get(
+      "layer.renderer.classBreakInfos"
+    ) as __esri.ClassBreak[];
+    const isSizeRamp = type === "size-ramp";
+    const isColorRamp = type === "color-ramp";
+    const opacityRamp = type === "opacity-ramp";
+    const heatmapRamp = type === "heatmap-ramp";
 
-    if (!featureCount.getItemAt(operationalItemIndex)) {
-      featureCount.add(new Collection(), operationalItemIndex);
-    }
-    if (totalFeatureCount[operationalItemIndex] === undefined) {
-      totalFeatureCount[operationalItemIndex] = null;
-    }
+    const hasMoreThanOneClassBreak =
+      featureLayerView && classBreakInfos && classBreakInfos.length > 1;
 
-    const featureLayerView = this.featureLayerViews.getItemAt(
-      operationalItemIndex
+    const authoringInfoType = featureLayerView?.get(
+      "layer.renderer.authoringInfo.type"
+    );
+    const isPredominance = authoringInfoType === "predominance";
+    const classifyDataCheckedColorRamp =
+      authoringInfoType === "class-breaks-color";
+    const classifyDataCheckedSizeRamp =
+      authoringInfoType === "class-breaks-size";
+
+    const singleSymbol = legendElement?.infos?.length === 1 && !field;
+
+    const isRelationship =
+      authoringInfoType === "relationship" &&
+      legendElement.type !== "size-ramp";
+
+    const featureLayerData = this.selectedStyleDataCollection?.find(data =>
+      data ? activeLayerInfo?.layer?.id === data?.layerItemId : null
+    );
+    const hasSublayers = activeLayerInfo.get("parent.children.length") > 0;
+
+    const isFeatureLayer = activeLayerInfo?.get("layer.type") === "feature";
+
+    const moreThanOneClassBreak =
+      !hasSublayers &&
+      isFeatureLayer &&
+      field &&
+      !isColorRamp &&
+      !isSizeRamp &&
+      featureLayerData &&
+      hasMoreThanOneClassBreak;
+
+    const oneClassBreak =
+      !hasSublayers &&
+      isFeatureLayer &&
+      field &&
+      !isColorRamp &&
+      !isSizeRamp &&
+      featureLayerData &&
+      !hasMoreThanOneClassBreak
+        ? true
+        : false;
+
+    const validate =
+      oneClassBreak ||
+      (isPredominance && !isSizeRamp) ||
+      (classifyDataCheckedColorRamp && field) ||
+      (classifyDataCheckedSizeRamp && field) ||
+      (singleSymbol && !field && field !== null) ||
+      isRelationship
+        ? true
+        : false;
+
+    const hasClustering =
+      activeLayerInfo?.get("layer.featureReduction") &&
+      activeLayerInfo?.legendElements[legendElementIndex]?.type === "size-ramp";
+
+    const isSingleSymbol =
+      legendElement.type === "symbol-table" &&
+      legendElement?.infos?.length === 1;
+
+    const hasColorRamp = !activeLayerInfo?.legendElements.every(
+      legendElement => legendElement.type !== "color-ramp"
     );
 
-    const handlesKey = featureLayerView
-      ? `${featureLayerView.layer.id}-${legendInfoIndex}`
-      : null;
+    const hasSizeRamp = !activeLayerInfo?.legendElements.every(
+      legendElement => legendElement.type !== "size-ramp"
+    );
 
-    if (!this._handles.has(handlesKey)) {
-      const queryFeatureCount = promiseUtils.debounce(() => {
-        const queryExpression = this._generateQueryCountExpression(
-          elementInfo,
-          field,
-          legendInfoIndex,
-          operationalItemIndex,
-          legendElement,
-          isPredominance,
-          legendElementInfos,
-          normalizationField,
-          generateFeatureCountExpression
+    const singleSymbolColor = isSingleSymbol && hasColorRamp;
+
+    const singleSymbolSize = isSingleSymbol && hasSizeRamp;
+
+    return isFeatureLayer &&
+      !hasClustering &&
+      !opacityRamp &&
+      !heatmapRamp &&
+      !hasSublayers &&
+      !singleSymbolColor &&
+      !singleSymbolSize
+      ? classBreakInfos
+        ? moreThanOneClassBreak || validate
+        : oneClassBreak || validate
+      : false;
+  }
+
+  // // FEATURE COUNT METHODS
+  // _initFeatureCount
+  private _initFeatureCount(): void {
+    const initFeatureCountKey = "init-feature-count";
+    this._handles.add(
+      watchUtils.whenTrue(this, "featureCountEnabled", () => {
+        this._handles.add(
+          [this._watchDataForCount(initFeatureCountKey)],
+          initFeatureCountKey
         );
-        const query = this._generateFeatureCountQuery(queryExpression);
-        this.featureCountQuery =
-          featureLayerView &&
-          featureLayerView.queryFeatureCount &&
-          featureLayerView.queryFeatureCount(query);
 
-        if (!this.featureCountQuery) {
-          return;
+        this._updateFeatureCountOnViewUpdate(initFeatureCountKey);
+      })
+    );
+  }
+
+  // _watchDataForCount
+  private _watchDataForCount(handlesKey: string): __esri.WatchHandle {
+    return watchUtils.when(
+      this,
+      "layerListViewModel.operationalItems.length",
+      () => {
+        if (this._handles.has(handlesKey)) {
+          this._handles.remove(handlesKey);
         }
-        const featureCountValue = featureCount.getItemAt(operationalItemIndex);
-        return this.featureCountQuery.then(featureCountRes => {
-          if (featureCountValue) {
-            featureCountValue.removeAt(legendInfoIndex);
-          }
-          featureCountValue.add(featureCountRes, legendInfoIndex);
-          const selectedInfoLength = this.selectedStyleDataCollection.getItemAt(
-            operationalItemIndex
-          ).selectedInfoIndex.length;
-          if (selectedInfoLength === 0) {
-            this.queryTotalFeatureCount(operationalItemIndex);
-          } else {
-            this.updateTotalFeatureCount(
-              operationalItemIndex,
-              legendElementIndex
+        const activeLayerInfosCountKey = "active-layer-infos-count-key";
+        this._handles.add(
+          watchUtils.when(this, "activeLayerInfos.length", () => {
+            if (this._handles.has(activeLayerInfosCountKey)) {
+              this._handles.remove(activeLayerInfosCountKey);
+            }
+            const selectedStyleDataCollectionCountKey =
+              "selected-style-data-collection-count-key";
+            this._handles.add(
+              watchUtils.when(
+                this,
+                "selectedStyleDataCollection.length",
+                () => {
+                  if (this._handles.has(selectedStyleDataCollectionCountKey)) {
+                    this._handles.remove(selectedStyleDataCollectionCountKey);
+                  }
+                  this._handleOperationalItemForCount();
+                }
+              ),
+              selectedStyleDataCollectionCountKey
+            );
+          }),
+          activeLayerInfosCountKey
+        );
+      }
+    );
+  }
+
+  // _updateFeatureCountOnViewUpdate
+  private _updateFeatureCountOnViewUpdate(initFeatureCountKey: string): void {
+    this._handles.add([
+      watchUtils.whenFalse(this, "view.stationary", () => {
+        if (!this.view.stationary) {
+          const stationaryIsTrue = "stationary-is-true";
+          this._handles.add(
+            watchUtils.whenTrueOnce(this, "view.stationary", () => {
+              if (this._handles.has(stationaryIsTrue)) {
+                this._handles.remove(stationaryIsTrue);
+              }
+              this._handles.add(
+                [this._watchDataForCount(initFeatureCountKey)],
+                initFeatureCountKey
+              );
+            }),
+            stationaryIsTrue
+          );
+        } else {
+          const stationaryIsFalse = "stationary-is-false";
+          this._handles.add(
+            watchUtils.whenFalseOnce(this, "view.interacting", () => {
+              if (this._handles.has(stationaryIsFalse)) {
+                this._handles.remove(stationaryIsFalse);
+              }
+              this._handles.add(
+                [this._watchDataForCount(initFeatureCountKey)],
+                initFeatureCountKey
+              );
+            }),
+            stationaryIsFalse
+          );
+        }
+      })
+    ]);
+  }
+
+  // _handleOperationalItemForCount
+  private _handleOperationalItemForCount(): void {
+    this.layerListViewModel.operationalItems.forEach(
+      (operationalItem, operationalItemIndex) => {
+        const { featureCount, totalFeatureCount } = this.interactiveStyleData;
+        if (!featureCount.getItemAt(operationalItemIndex)) {
+          featureCount.add(new Collection(), operationalItemIndex);
+        }
+        if (totalFeatureCount[operationalItemIndex] === undefined) {
+          totalFeatureCount[operationalItemIndex] = null;
+        }
+
+        const featureLayerView = this.featureLayerViews.getItemAt(
+          operationalItemIndex
+        );
+
+        this.activeLayerInfos.forEach(activeLayerInfo => {
+          if (operationalItem.layer.id === activeLayerInfo.layer.id) {
+            this._handleActiveLayerInfoForCount(
+              activeLayerInfo,
+              featureLayerView,
+              operationalItemIndex
             );
           }
-          this.featureCountQuery = null;
-          this.notifyChange("state");
         });
-      });
+      }
+    );
+  }
 
+  // _handleActiveLayerInfoForCount
+  private _handleActiveLayerInfoForCount(
+    activeLayerInfo: __esri.ActiveLayerInfo,
+    featureLayerView: __esri.FeatureLayerView,
+    operationalItemIndex: number
+  ): void {
+    const watchLegendElementsForCount = "watch-legend-elements-for-count";
+    this._handles.add(
+      watchUtils.whenOnce(activeLayerInfo, "legendElements.length", () => {
+        if (this._handles.has(watchLegendElementsForCount)) {
+          this._handles.remove(watchLegendElementsForCount);
+        }
+        activeLayerInfo.legendElements.forEach(
+          (legendElement: any, legendElementIndex) => {
+            this._handleLegendElementForCount(
+              legendElement,
+              featureLayerView,
+              legendElementIndex,
+              operationalItemIndex,
+              activeLayerInfo
+            );
+          }
+        );
+      }),
+      watchLegendElementsForCount
+    );
+  }
+
+  // _handleLegendElementForCount
+  private _handleLegendElementForCount(
+    legendElement: LegendElement,
+    featureLayerView: __esri.FeatureLayerView,
+    legendElementIndex: number,
+    operationalItemIndex: number,
+    activeLayerInfo: __esri.ActiveLayerInfo
+  ): void {
+    const isInteractive = this.validateInteractivity(
+      activeLayerInfo,
+      legendElement,
+      activeLayerInfo.get("layer.renderer.field"),
+      featureLayerView,
+      legendElementIndex
+    );
+    if (!legendElement?.infos || !isInteractive) {
+      return;
+    }
+
+    this._handleLayerViewWatcherForCount(
+      featureLayerView,
+      legendElementIndex,
+      operationalItemIndex,
+      legendElement,
+      activeLayerInfo
+    );
+
+    this._handleFeatureCount(
+      featureLayerView,
+      legendElementIndex,
+      operationalItemIndex,
+      legendElement,
+      activeLayerInfo
+    );
+  }
+
+  // _handleLayerViewWatcherForCount
+  private _handleLayerViewWatcherForCount(
+    featureLayerView: __esri.FeatureLayerView,
+    legendElementIndex: number,
+    operationalItemIndex: number,
+    legendElement: LegendElement,
+    activeLayerInfo: __esri.ActiveLayerInfo
+  ): void {
+    const key = `feature-count-${activeLayerInfo.layer.id}-${operationalItemIndex}-${legendElementIndex}`;
+
+    if (!this._handles.has(key)) {
       this._handles.add(
-        [
-          watchUtils.whenFalse(this.view, "stationary", () => {
-            if (!this.view.stationary) {
-              watchUtils.whenTrueOnce(this.view, "stationary", () => {
-                queryFeatureCount();
-              });
-            } else {
-              watchUtils.whenFalseOnce(this.view, "interacting", () => {
-                queryFeatureCount();
-              });
-            }
-          }),
-          watchUtils.whenFalse(featureLayerView, "updating", () => {
-            watchUtils.whenFalseOnce(featureLayerView, "updating", () => {
-              queryFeatureCount();
-            });
-          })
-        ],
-        handlesKey
+        watchUtils.whenFalse(featureLayerView, "updating", () => {
+          this._handleFeatureCount(
+            featureLayerView,
+            legendElementIndex,
+            operationalItemIndex,
+            legendElement,
+            activeLayerInfo
+          );
+        }),
+        key
       );
     }
   }
 
+  // _handleFeatureCount
+  private _handleFeatureCount(
+    featureLayerView: __esri.FeatureLayerView,
+    legendElementIndex: number,
+    operationalItemIndex: number,
+    legendElement: LegendElement,
+    activeLayerInfo: __esri.ActiveLayerInfo
+  ): void {
+    const promises = [];
+    legendElement.infos.forEach((info, infoIndex) => {
+      this._handleLegendElementForFeatureCount(
+        featureLayerView,
+        legendElementIndex,
+        infoIndex,
+        operationalItemIndex,
+        legendElement,
+        info,
+        promises,
+        activeLayerInfo
+      );
+    });
+    Promise.all(promises).then(featureCountResponses => {
+      this._handleFeatureCountResponses(
+        featureCountResponses,
+        operationalItemIndex,
+        legendElementIndex
+      );
+    });
+  }
+
+  // _handleLegendElementForFeatureCount
+  private _handleLegendElementForFeatureCount(
+    featureLayerView: __esri.FeatureLayerView,
+    legendElementIndex: number,
+    infoIndex: number,
+    operationalItemIndex: number,
+    legendElement: any,
+    info: any,
+    promises: Promise<{ featureCountRes: number; infoIndex: number }>[],
+    activeLayerInfo: __esri.ActiveLayerInfo
+  ): void {
+    const handlesKey = featureLayerView
+      ? `${featureLayerView.layer.id}-${legendElementIndex}-${infoIndex}`
+      : null;
+    const selectedStyleData = this.selectedStyleDataCollection.getItemAt(
+      operationalItemIndex
+    );
+    const { field, normalizationField } = selectedStyleData;
+    if (!this._handles.has(handlesKey)) {
+      const applyFeatureCount = this.validateInteractivity(
+        activeLayerInfo,
+        legendElement,
+        field,
+        featureLayerView,
+        legendElementIndex
+      );
+      const isPredominance =
+        featureLayerView.get("layer.renderer.authoringInfo.type") ===
+        "predominance";
+
+      if (!applyFeatureCount) {
+        return;
+      }
+
+      const queryExpression = this._generateQueryCountExpression(
+        info,
+        field,
+        infoIndex,
+        operationalItemIndex,
+        legendElement,
+        isPredominance,
+        legendElement.infos,
+        normalizationField,
+        applyFeatureCount
+      );
+
+      const query = this._generateFeatureCountQuery(queryExpression);
+      promises.push(
+        featureLayerView
+          .queryFeatureCount(query)
+          .then(featureCountRes => {
+            return {
+              featureCountRes,
+              infoIndex
+            };
+          })
+          .catch(err => {
+            console.warn(
+              "Invalid geometry - querying count without geometry: ",
+              err
+            );
+            const queryNoGeometry = this._generateFeatureCountQueryNoGeometry(
+              queryExpression
+            );
+            return featureLayerView
+              .queryFeatureCount(queryNoGeometry)
+              .then(featureCountRes => {
+                return {
+                  featureCountRes,
+                  infoIndex
+                };
+              });
+          })
+      );
+    }
+  }
+
+  // _generateFeatureCountQuery
   private _generateFeatureCountQuery(queryExpression: string): __esri.Query {
     const geometry = this.view && this.view.get("extent");
-
     const outSpatialReference = this.view && this.view.get("spatialReference");
-
     return new Query({
       where: queryExpression,
       geometry,
@@ -558,33 +880,67 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     });
   }
 
+  // _generateFeatureCountQueryNoGeometry
+  private _generateFeatureCountQueryNoGeometry(
+    queryExpression: string
+  ): __esri.Query {
+    const outSpatialReference = this.view && this.view.get("spatialReference");
+    return new Query({
+      where: queryExpression,
+      outSpatialReference
+    });
+  }
+
+  // _handleFeatureCountResponses
+  private _handleFeatureCountResponses(
+    featureCountResObjects: { featureCountRes: number; infoIndex: number }[],
+    operationalItemIndex: number,
+    legendElementIndex: number
+  ): void {
+    const featureCountsForLegendElement = featureCountResObjects
+      .slice()
+      .map(featureCountResObject => featureCountResObject.featureCountRes);
+
+    const featureCountsForLayer = this.interactiveStyleData.featureCount.getItemAt(
+      operationalItemIndex
+    );
+
+    featureCountsForLayer.splice(
+      legendElementIndex,
+      1,
+      featureCountsForLegendElement
+    );
+    const selectedInfoIndexes = this.selectedStyleDataCollection.getItemAt(
+      operationalItemIndex
+    ).selectedInfoIndex[legendElementIndex];
+
+    if (selectedInfoIndexes?.length > 0) {
+      this.updateTotalFeatureCount(operationalItemIndex, legendElementIndex);
+    } else {
+      this.queryTotalFeatureCount(operationalItemIndex, legendElementIndex);
+    }
+  }
+
   // queryTotalFeatureCount
-  queryTotalFeatureCount(operationalItemIndex: number): void {
+  queryTotalFeatureCount(
+    operationalItemIndex: number,
+    legendElementIndex: number
+  ): void {
     const { totalFeatureCount } = this.interactiveStyleData;
     const featureCountCollection = this.interactiveStyleData.get(
       "featureCount"
     ) as __esri.Collection;
 
-    const featureCount = featureCountCollection.getItemAt(operationalItemIndex);
-    totalFeatureCount[operationalItemIndex] = null;
-
-    const queryExpressionsCollection = this.interactiveStyleData.get(
-      "queryExpressions"
-    ) as __esri.Collection;
-
-    const queryExpressions = queryExpressionsCollection.getItemAt(
+    const featureCountsForLayer = featureCountCollection.getItemAt(
       operationalItemIndex
     );
-
-    if (queryExpressions && queryExpressions[0] === "1=0") {
-      totalFeatureCount[operationalItemIndex] = 0;
-    } else if (featureCount) {
-      featureCount.forEach(count => {
-        totalFeatureCount[operationalItemIndex] += count;
-      });
-    }
-
-    this.notifyChange("state");
+    const featureCountsForLegendElement = featureCountsForLayer.getItemAt(
+      legendElementIndex
+    );
+    const total =
+      featureCountsForLegendElement?.length > 0 &&
+      featureCountsForLegendElement.reduce((num1, num2) => num1 + num2);
+    totalFeatureCount[operationalItemIndex] = total;
   }
 
   // updateTotalFeatureCount
@@ -592,31 +948,26 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     operationalItemIndex: number,
     legendElementIndex: number
   ): void {
+    const { totalFeatureCount } = this.interactiveStyleData;
+    const featureCountsForLegendElement = this.interactiveStyleData.featureCount
+      .getItemAt(operationalItemIndex)
+      .getItemAt(legendElementIndex);
+
     const selectedInfoIndexes = this.selectedStyleDataCollection.getItemAt(
       operationalItemIndex
     ).selectedInfoIndex[legendElementIndex];
-    if (selectedInfoIndexes && selectedInfoIndexes.length === 0) {
-      this.queryTotalFeatureCount(operationalItemIndex);
-    } else {
-      const { totalFeatureCount } = this.interactiveStyleData;
-      totalFeatureCount[operationalItemIndex] = null;
-      const featureCount = this.interactiveStyleData.featureCount.getItemAt(
-        operationalItemIndex
-      );
 
-      featureCount.forEach((count, countIndex) => {
-        selectedInfoIndexes.forEach(selectedIndex => {
-          if (countIndex === selectedIndex) {
-            totalFeatureCount[operationalItemIndex] += count;
-          }
-        });
+    let currentTotal = 0;
+    selectedInfoIndexes &&
+      selectedInfoIndexes.forEach(infoIndex => {
+        currentTotal += featureCountsForLegendElement[infoIndex];
       });
-    }
-    this.notifyChange("state");
+
+    totalFeatureCount[operationalItemIndex] = currentTotal;
   }
+  // End of feature count methods
 
   // updateExtentToAllFeatures
-
   // LIMITATION: When complex expressions (normalized fields) are queried against feature services that have Use Standardized Queries set to false - update extent cannot be applied.
   updateExtentToAllFeatures(operationalItemIndex: number): void {
     const layerView = this.featureLayerViews.getItemAt(operationalItemIndex);
@@ -797,7 +1148,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
             }
           });
           const noExpression = expressionList.join(" AND ");
-          return `${noExpression} OR ${field} IS NULL`;
+          return field ? `${noExpression} OR ${field} IS NULL` : "";
         }
       } else {
         const singleQuote =
