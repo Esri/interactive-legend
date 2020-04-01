@@ -82,10 +82,11 @@ const CSS = {
   fieldsetCheckbox: "fieldset-checkbox",
   button: "btn",
   buttonRed: "btn-red",
-  alert: "alert",
-  greenAlert: "alert-green",
-  alertClose: "alert-close",
-  popupAlert: "esri-screenshot__popup-alert",
+  featureWarning: "esri-screenshot__feature-warning",
+  featureWarningTextContainer:
+    "esri-screenshot__feature-warning-text-container",
+  warningSVG: "esri-screenshot__warning-svg",
+  selectFeatureText: "esri-screenshot__select-feature-text",
   screenshotfieldSetCheckbox: "esri-screenshot__field-set-checkbox",
   offScreenPopupContainer: "esri-screenshot__offscreen-pop-up-container",
   offScreenLegendContainer: "esri-screenshot__offscreen-legend-container",
@@ -298,49 +299,42 @@ class Screenshot extends declared(Widget) {
   private _renderScreenshotPanel(): any {
     const { screenshotTitle, screenshotSubtitle } = i18n;
     const fieldSet = this._renderFieldSet();
-    const featureAlert = this._renderFeatureAlert();
     const setMapAreaButton = this._renderSetMapAreaButton();
+    const featureWarning = this._renderFeatureWarning();
     return (
       // screenshotBtn
       <div key="screenshot-panel" class={this.classes(CSS.base, CSS.widget)}>
-        {this._selectFeatureAlertIsVisible ? featureAlert : null}
         <div class={CSS.mainContainer}>
           <h1 class={CSS.panelTitle}>{screenshotTitle}</h1>
           {this.enableLegendOption || this.enablePopupOption ? (
             <h3 class={CSS.panelSubTitle}>{screenshotSubtitle}</h3>
           ) : null}
           {this.enableLegendOption || this.enablePopupOption ? fieldSet : null}
+          {featureWarning}
           {setMapAreaButton}
         </div>
       </div>
     );
   }
 
-  // _renderFeatureAlert
-  private _renderFeatureAlert(): any {
-    const alertIsActive = {
-      ["is-active"]: this._selectFeatureAlertIsVisible
-    };
+  // _renderFeatureWarning
+  private _renderFeatureWarning(): any {
     return (
-      <div
-        key="feature-alert"
-        class={this.classes(
-          CSS.popupAlert,
-          CSS.alert,
-          CSS.greenAlert,
-          CSS.modifierClass,
-          alertIsActive
-        )}
-      >
-        {i18n.selectAFeature}
-        <button
-          bind={this}
-          onclick={this._removeSelectFeatureAlert}
-          onkeydown={this._removeSelectFeatureAlert}
-          class={CSS.alertClose}
-        >
-          <span class={CSS.closeIcon} />
-        </button>
+      <div class={CSS.featureWarning}>
+        {this._selectFeatureAlertIsVisible ? (
+          <div class={CSS.featureWarningTextContainer}>
+            <svg
+              class={CSS.warningSVG}
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 16 16"
+              width="16px"
+              height="16px"
+            >
+              <path d="M14.894 12.552l-6-11.998a1 1 0 0 0-1.787 0l-6 11.998A.998.998 0 0 0 2 13.999h12a.998.998 0 0 0 .894-1.447zM9 12H7v-2h2zm0-3H7V4h2z" />
+            </svg>
+            <span class={CSS.selectFeatureText}>{i18n.selectAFeature}</span>
+          </div>
+        ) : null}
       </div>
     );
   }

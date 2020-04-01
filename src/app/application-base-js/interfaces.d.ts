@@ -9,10 +9,10 @@ import WebScene = require("esri/WebScene");
 export type Direction = "ltr" | "rtl";
 
 export interface ApplicationBaseItemPromises {
-  webMap?: IPromise<any>;
-  webScene?: IPromise<any>;
-  groupInfo?: IPromise<any>;
-  groupItems?: IPromise<any>;
+  webMap?: Promise<any>;
+  webScene?: Promise<any>;
+  groupInfo?: Promise<any>;
+  groupItems?: Promise<any>;
 }
 
 export interface ApplicationConfigs {
@@ -72,23 +72,24 @@ export interface ApplicationBaseSettings {
     default?: string;
     fetch?: boolean;
     fetchMultiple?: boolean;
-  }
+  };
 }
 
 export interface ApplicationBaseResult {
   error?: Error;
   value: any;
-  promise: IPromise<any>;
+  promise: Promise<any>;
 }
 
 export interface ApplicationBasePortalItemResult extends ApplicationBaseResult {
   value: PortalItem;
-  promise: IPromise<PortalItem>;
+  promise: Promise<PortalItem>;
 }
 
-export interface ApplicationBasePortalQueryResult extends ApplicationBaseResult {
+export interface ApplicationBasePortalQueryResult
+  extends ApplicationBaseResult {
   value: PortalQueryResult;
-  promise: IPromise<PortalQueryResult>;
+  promise: Promise<PortalQueryResult>;
 }
 
 export interface ApplicationBaseResults {
@@ -118,4 +119,3 @@ export interface CreateMapFromItemOptions {
   item: PortalItem;
   appProxies?: ApplicationProxy[];
 }
-

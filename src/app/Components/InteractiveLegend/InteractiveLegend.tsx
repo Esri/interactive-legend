@@ -186,7 +186,6 @@ class InteractiveLegend extends declared(Widget) {
     if (value instanceof InteractiveClassic) {
       return value;
     }
-
     if (typeof value === "string") {
       return new InteractiveClassic({
         view: this.view,

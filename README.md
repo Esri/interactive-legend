@@ -1,6 +1,6 @@
 # Interactive Legend
 
-Interactive Legend is a configurable app template where the core functionality revolves around an interactive filter tool. This configurable app template provides end-users with an experience to filter features on a web map via selectable legend elements. 
+Interactive Legend is a configurable app template where the core functionality revolves around an interactive filter tool. This configurable app template provides end-users with an experience to filter features on a web map via selectable legend elements.
 
 ![Interactive Legend Preview](images/interactive-legend.png)
 
@@ -11,9 +11,10 @@ Select from two different filter modes:
 1. Feature Filter: Layer data features that fall within the criteria of the selected legend elements will display on the map view.
 2. Mute: Opacity and gray scale will be applied to layer data features that do not fall within the criteria of the selected legend elements.
 
-       a. Both opacity and gray scale values are configurable
+   a. Both opacity and gray scale values are configurable
 
-Select from a set of map tools: 
+Select from a set of map tools:
+
 - Home
 - Zoom
 - Layer List

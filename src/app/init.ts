@@ -44,9 +44,9 @@ new ApplicationBase({
       if (message === "identity-manager:not-authorized") {
         document.body.classList.remove("configurable-application--loading");
         document.body.classList.add("app-error");
-        document.getElementById("main-container").innerHTML = `<h1>${
-          i18n.licenseError.title
-        }</h1><p>${i18n.licenseError.message}</p>`;
+        document.getElementById(
+          "main-container"
+        ).innerHTML = `<h1>${i18n.licenseError.title}</h1><p>${i18n.licenseError.message}</p>`;
       } else {
         const errorMessage =
           message &&

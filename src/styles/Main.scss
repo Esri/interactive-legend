@@ -33,6 +33,11 @@ body {
   overflow-x: hidden;
 }
 
+.parent-container {
+  display: flex;
+  flex-direction: column;
+}
+
 .parent-container,
 #main-container {
   height: 100%;
@@ -76,7 +81,7 @@ body {
 
 .menu-button:hover {
   cursor: pointer;
-  color: #2a2a2a
+  color: #2a2a2a;
 }
 
 .configurable-application__view-container {
@@ -128,12 +133,11 @@ body {
   width: 20%;
 }
 
-.esri-interactive-legend .esri-interactive-legend__offscreen.esri-interactive-legend__offscreen {
+.esri-interactive-legend
+  .esri-interactive-legend__offscreen.esri-interactive-legend__offscreen {
   height: auto;
   max-height: none;
 }
-
-
 
 .expand-content-z-index {
   z-index: 0;
@@ -151,9 +155,8 @@ body {
 
 html[dir="rtl"] {
   .title-container {
-    padding-right: 15px
+    padding-right: 15px;
   }
-
 }
 
 .app-error {

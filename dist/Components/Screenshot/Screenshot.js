@@ -1,9 +1,12 @@
 /// <amd-dependency path="esri/core/tsSupport/declareExtendsHelper" name="__extends" />
 /// <amd-dependency path="esri/core/tsSupport/decorateHelper" name="__decorate" />
 var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -54,10 +57,10 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         fieldsetCheckbox: "fieldset-checkbox",
         button: "btn",
         buttonRed: "btn-red",
-        alert: "alert",
-        greenAlert: "alert-green",
-        alertClose: "alert-close",
-        popupAlert: "esri-screenshot__popup-alert",
+        featureWarning: "esri-screenshot__feature-warning",
+        featureWarningTextContainer: "esri-screenshot__feature-warning-text-container",
+        warningSVG: "esri-screenshot__warning-svg",
+        selectFeatureText: "esri-screenshot__select-feature-text",
         screenshotfieldSetCheckbox: "esri-screenshot__field-set-checkbox",
         offScreenPopupContainer: "esri-screenshot__offscreen-pop-up-container",
         offScreenLegendContainer: "esri-screenshot__offscreen-legend-container",
@@ -188,28 +191,24 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         Screenshot.prototype._renderScreenshotPanel = function () {
             var screenshotTitle = i18n.screenshotTitle, screenshotSubtitle = i18n.screenshotSubtitle;
             var fieldSet = this._renderFieldSet();
-            var featureAlert = this._renderFeatureAlert();
             var setMapAreaButton = this._renderSetMapAreaButton();
+            var featureWarning = this._renderFeatureWarning();
             return (
             // screenshotBtn
             widget_1.tsx("div", { key: "screenshot-panel", class: this.classes(CSS.base, CSS.widget) },
-                this._selectFeatureAlertIsVisible ? featureAlert : null,
                 widget_1.tsx("div", { class: CSS.mainContainer },
                     widget_1.tsx("h1", { class: CSS.panelTitle }, screenshotTitle),
                     this.enableLegendOption || this.enablePopupOption ? (widget_1.tsx("h3", { class: CSS.panelSubTitle }, screenshotSubtitle)) : null,
                     this.enableLegendOption || this.enablePopupOption ? fieldSet : null,
+                    featureWarning,
                     setMapAreaButton)));
         };
-        // _renderFeatureAlert
-        Screenshot.prototype._renderFeatureAlert = function () {
-            var _a;
-            var alertIsActive = (_a = {},
-                _a["is-active"] = this._selectFeatureAlertIsVisible,
-                _a);
-            return (widget_1.tsx("div", { key: "feature-alert", class: this.classes(CSS.popupAlert, CSS.alert, CSS.greenAlert, CSS.modifierClass, alertIsActive) },
-                i18n.selectAFeature,
-                widget_1.tsx("button", { bind: this, onclick: this._removeSelectFeatureAlert, onkeydown: this._removeSelectFeatureAlert, class: CSS.alertClose },
-                    widget_1.tsx("span", { class: CSS.closeIcon }))));
+        // _renderFeatureWarning
+        Screenshot.prototype._renderFeatureWarning = function () {
+            return (widget_1.tsx("div", { class: CSS.featureWarning }, this._selectFeatureAlertIsVisible ? (widget_1.tsx("div", { class: CSS.featureWarningTextContainer },
+                widget_1.tsx("svg", { class: CSS.warningSVG, xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 16 16", width: "16px", height: "16px" },
+                    widget_1.tsx("path", { d: "M14.894 12.552l-6-11.998a1 1 0 0 0-1.787 0l-6 11.998A.998.998 0 0 0 2 13.999h12a.998.998 0 0 0 .894-1.447zM9 12H7v-2h2zm0-3H7V4h2z" })),
+                widget_1.tsx("span", { class: CSS.selectFeatureText }, i18n.selectAFeature))) : null));
         };
         // _renderFieldSet
         Screenshot.prototype._renderFieldSet = function () {

@@ -15,7 +15,7 @@ class InteractiveStyleData extends declared(Accessor) {
   queryExpressions: Collection<string[]> = new Collection();
 
   @property()
-  featureCount: Collection<Collection<number>> = new Collection();
+  featureCount: Collection<Collection<number[]>> = new Collection();
 
   @property()
   totalFeatureCount: number[] = [];
