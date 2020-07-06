@@ -17,9 +17,11 @@
         "defaultValue": true
       },
       "splashTitle": {
+        "express": true,
         "defaultValue": "Splash title"
       },
       "splashContent": {
+        "express": true,
         "defaultValue": "Splash content"
       },
       "splashButtonText": {
@@ -40,6 +42,7 @@
         "defaultValue": true
       },
       "interactiveLegendPosition": {
+        "express": true,
         "defaultValue": "bottom-left"
       },
       "customCSS": {
@@ -89,6 +92,27 @@
         }
       }
     },
+    "interactiveLegend": {
+      "interactiveLegend": {
+        "filterMode": {
+          "defaultValue": "featureFilter"
+        },
+        "muteOpacity": {
+          "defaultValue": 30
+        },
+        "muteGrayScale": {
+          "defaultValue": 70
+        },
+        "featureCount": {
+          "express": true,
+          "defaultValue": false
+        },
+        "updateExtent": {
+          "express": true,
+          "defaultValue": false
+        }
+      }
+    },
     "share": {
       "screenshot": {
         "screenshot": {
@@ -120,30 +144,24 @@
           "searchConfiguration": {
             "express": true
           }
-        },
-        "customUrlParam": {
-          "defaultValue": ""
         }
       }
     },
-    "interactiveLegend": {
-      "interactiveLegend": {
-        "filterMode": {
-          "defaultValue": "featureFilter"
+    "customURLParams": {
+      "customURLParams": {
+        "customURLParamName": {
+          "express": false
         },
-        "muteOpacity": {
-          "defaultValue": 30
-        },
-        "muteGrayScale": {
-          "defaultValue": 70
-        },
-        "featureCount": {
-          "express": true,
-          "defaultValue": false
-        },
-        "updateExtent": {
-          "express": true,
-          "defaultValue": false
+        "customUrlParam": {
+          "express": false,
+          "config": {
+            "layerSelectionMode": "single",
+            "supportedLayerTypes": "*",
+            "supportedGeometryTypes": "*",
+            "supportsFieldSelection": true,
+            "fieldSelectionMode": "single",
+            "supportedFieldTypes": "*"
+          }
         }
       }
     }
