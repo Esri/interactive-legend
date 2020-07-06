@@ -4,6 +4,16 @@ Interactive Legend is a configurable app template where the core functionality r
 
 ![Interactive Legend Preview](images/interactive-legend.png)
 
+## 8.2 Release Updates
+
+1. Updated ArcGIS JSAPI to v4.16
+
+2. Removed usage of dojo declared and TS directives
+
+3. Supports 'Instant apps' new configuration experience.
+
+4. Property name udpates.
+
 ## Features
 
 Select from two different filter modes:
@@ -55,7 +65,7 @@ Esri welcomes contributions from anyone and everyone. Please see our [guidelines
 
 ## Licensing
 
-Copyright 2019 Esri
+Copyright 2020 Esri
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
