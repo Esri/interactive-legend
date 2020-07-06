@@ -1,41 +1,19 @@
-/// <amd-dependency path="esri/core/tsSupport/assignHelper" name="__assign" />
-/// <amd-dependency path="esri/core/tsSupport/declareExtendsHelper" name="__extends" />
-/// <amd-dependency path="esri/core/tsSupport/decorateHelper" name="__decorate" />
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "esri/core/accessorSupport/decorators", "esri/core/Handles", "esri/core/watchUtils", "esri/views/layers/support/FeatureEffect", "./relationshipRampUtils", "esri/views/layers/support/FeatureFilter", "esri/core/promiseUtils"], function (require, exports, __assign, __extends, __decorate, Accessor, decorators_1, Handles, watchUtils, FeatureEffect, relationshipRampUtils_1, FeatureFilter, promiseUtils) {
+define(["require", "exports", "tslib", "esri/core/Accessor", "esri/core/accessorSupport/decorators", "esri/core/Handles", "esri/core/watchUtils", "esri/views/layers/support/FeatureEffect", "./relationshipRampUtils", "esri/views/layers/support/FeatureFilter", "esri/core/promiseUtils"], function (require, exports, tslib_1, Accessor, decorators_1, Handles, watchUtils, FeatureEffect, relationshipRampUtils_1, FeatureFilter, promiseUtils) {
     "use strict";
     var Create2DColorRamp = /** @class */ (function (_super) {
-        __extends(Create2DColorRamp, _super);
-        //----------------------------------
+        tslib_1.__extends(Create2DColorRamp, _super);
+        // ----------------------------------
         //
         //  Lifecycle Methods
         //
-        //----------------------------------
+        // ----------------------------------
         function Create2DColorRamp(value) {
-            var _this = _super.call(this) || this;
-            //----------------------------------
+            var _this = _super.call(this, value) || this;
+            // ----------------------------------
             //
             //  Properties
             //
-            //----------------------------------
+            // ----------------------------------
             _this._handles = new Handles();
             _this._cellNodeCounter = 0;
             _this._cellNodes = null;
@@ -693,56 +671,56 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 });
             });
         };
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], Create2DColorRamp.prototype, "queryCountExpressions", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], Create2DColorRamp.prototype, "queryExpressions", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], Create2DColorRamp.prototype, "view", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], Create2DColorRamp.prototype, "legendElement", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], Create2DColorRamp.prototype, "id", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], Create2DColorRamp.prototype, "activeLayerInfos", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], Create2DColorRamp.prototype, "colorRampProperties", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], Create2DColorRamp.prototype, "layerView", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], Create2DColorRamp.prototype, "filterMode", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], Create2DColorRamp.prototype, "opacity", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], Create2DColorRamp.prototype, "grayScale", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], Create2DColorRamp.prototype, "featureCount", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], Create2DColorRamp.prototype, "searchViewModel", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], Create2DColorRamp.prototype, "layerListViewModel", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], Create2DColorRamp.prototype, "featureCountEnabled", void 0);
-        Create2DColorRamp = __decorate([
+        Create2DColorRamp = tslib_1.__decorate([
             decorators_1.subclass("Create2DColorRamp")
         ], Create2DColorRamp);
         return Create2DColorRamp;
-    }(decorators_1.declared(Accessor)));
+    }(Accessor));
     return Create2DColorRamp;
 });
 //# sourceMappingURL=Create2DColorRamp.js.map

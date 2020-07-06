@@ -1,17 +1,7 @@
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-define(["require", "exports", "dojox/gfx", "dojox/gfx/matrix", "esri/Color", "dojox/gfx/_base", "./Create2DColorRamp", "./Ramp"], function (require, exports, gfx_1, gfxMatrix, Color, gfxBase, Create2DColorRamp, Ramp) {
+define(["require", "exports", "tslib", "dojox/gfx", "dojox/gfx/matrix", "esri/Color", "dojox/gfx/_base", "./Create2DColorRamp", "./Ramp"], function (require, exports, tslib_1, gfx_1, gfxMatrix, Color, gfxBase, Create2DColorRamp, Ramp) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.fourClasses = exports.threeClasses = exports.twoClasses = exports.getRotationAngleForFocus = exports.getRelationshipRampElement = exports.getFill = exports.renderRamp = void 0;
     var svgNS = "http://www.w3.org/2000/svg";
     var arrowFill = "#555555";
     var focusToRotationAngleMap = {
@@ -286,11 +276,11 @@ define(["require", "exports", "dojox/gfx", "dojox/gfx/matrix", "esri/Color", "do
                         fill = symbol.color;
                     }
                     else if (style !== "none") {
-                        fill = __assign(__assign({}, gfxBase.defaultPattern), { src: FILL_PATTERN_URL_PREFIX + style + ".png", width: 8, height: 8 });
+                        fill = tslib_1.__assign(tslib_1.__assign({}, gfxBase.defaultPattern), { src: FILL_PATTERN_URL_PREFIX + style + ".png", width: 8, height: 8 });
                     }
                     break;
                 case PICTURE_FILL_SYMBOL:
-                    fill = __assign(__assign({}, gfxBase.defaultPattern), { src: symbol.url, width: pt2px(symbol.width) * symbol.xscale, height: pt2px(symbol.height) * symbol.yscale, x: pt2px(symbol.xoffset), y: pt2px(symbol.yoffset) });
+                    fill = tslib_1.__assign(tslib_1.__assign({}, gfxBase.defaultPattern), { src: symbol.url, width: pt2px(symbol.width) * symbol.xscale, height: pt2px(symbol.height) * symbol.yscale, x: pt2px(symbol.xoffset), y: pt2px(symbol.yoffset) });
                     break;
                 case TEXT_SYMBOL:
                     fill = symbol.color;

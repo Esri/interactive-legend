@@ -48,7 +48,8 @@
     "infoPanelEnabled",
     "muteOpacity",
     "muteGrayScale",
-    "filterMode"
+    "filterMode",
+    "locale"
   ],
   "webMap": {
     "default": "ddf28dc057b8400dbfa148ef403f7c57",

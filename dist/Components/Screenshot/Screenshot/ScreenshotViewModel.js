@@ -1,28 +1,7 @@
-/// <amd-dependency path="esri/core/tsSupport/declareExtendsHelper" name="__extends" />
-/// <amd-dependency path="esri/core/tsSupport/decorateHelper" name="__decorate" />
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "./html2canvas/html2canvas", "esri/core/Handles", "esri/core/watchUtils", "../../InteractiveLegend/InteractiveLegend", "esri/core/accessorSupport/decorators"], function (require, exports, __extends, __decorate, Accessor, html2canvas, Handles, watchUtils, InteractiveLegend, decorators_1) {
+define(["require", "exports", "tslib", "esri/core/Accessor", "./html2canvas/html2canvas", "esri/core/Handles", "esri/core/watchUtils", "../../InteractiveLegend/InteractiveLegend", "esri/core/accessorSupport/decorators"], function (require, exports, tslib_1, Accessor, html2canvas, Handles, watchUtils, InteractiveLegend, decorators_1) {
     "use strict";
     var ScreenshotViewModel = /** @class */ (function (_super) {
-        __extends(ScreenshotViewModel, _super);
+        tslib_1.__extends(ScreenshotViewModel, _super);
         function ScreenshotViewModel() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             //----------------------------------
@@ -85,7 +64,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                             : "complete"
                     : "disabled";
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         //----------------------------------
@@ -365,10 +344,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             }
             else {
                 var byteString = atob(dataUrl.split(",")[1]);
-                var mimeString = dataUrl
-                    .split(",")[0]
-                    .split(":")[1]
-                    .split(";")[0];
+                var mimeString = dataUrl.split(",")[0].split(":")[1].split(";")[0];
                 var ab = new ArrayBuffer(byteString.length);
                 var ia = new Uint8Array(ab);
                 for (var i = 0; i < byteString.length; i++) {
@@ -433,7 +409,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                     }
                     else if (!firstComponent.offsetWidth ||
                         !firstComponent.offsetHeight ||
-                        (!secondMapComponent.offsetWidth || !secondMapComponent.offsetHeight)) {
+                        !secondMapComponent.offsetWidth ||
+                        !secondMapComponent.offsetHeight) {
                         this._includeOneMapComponent(viewScreenshot, viewCanvas, img, screenshotImageElement, maskDiv, downloadBtnNode);
                     }
                     else {
@@ -553,60 +530,60 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 _this.notifyChange("state");
             });
         };
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property({
                 dependsOn: ["view.ready"],
                 readOnly: true
             })
         ], ScreenshotViewModel.prototype, "state", null);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], ScreenshotViewModel.prototype, "view", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], ScreenshotViewModel.prototype, "previewIsVisible", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], ScreenshotViewModel.prototype, "screenshotModeIsActive", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], ScreenshotViewModel.prototype, "includeLegendInScreenshot", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], ScreenshotViewModel.prototype, "includePopupInScreenshot", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], ScreenshotViewModel.prototype, "enableLegendOption", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], ScreenshotViewModel.prototype, "enablePopupOption", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], ScreenshotViewModel.prototype, "legendFeatureCountEnabled", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], ScreenshotViewModel.prototype, "dragHandler", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property({
                 readOnly: true
             })
         ], ScreenshotViewModel.prototype, "featureWidget", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property({
                 readOnly: true
             })
         ], ScreenshotViewModel.prototype, "legendWidget", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], ScreenshotViewModel.prototype, "selectedStyleData", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], ScreenshotViewModel.prototype, "layerListViewModel", void 0);
-        ScreenshotViewModel = __decorate([
+        ScreenshotViewModel = tslib_1.__decorate([
             decorators_1.subclass("ScreenshotViewModel")
         ], ScreenshotViewModel);
         return ScreenshotViewModel;
-    }(decorators_1.declared(Accessor)));
+    }(Accessor));
     return ScreenshotViewModel;
 });
 //# sourceMappingURL=ScreenshotViewModel.js.map

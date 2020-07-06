@@ -1,6 +1,3 @@
-/// <amd-dependency path="esri/core/tsSupport/declareExtendsHelper" name="__extends" />
-/// <amd-dependency path="esri/core/tsSupport/decorateHelper" name="__decorate" />
-
 // esri.widgets.Widget
 import Widget = require("esri/widgets/Widget");
 
@@ -40,13 +37,13 @@ import { attachToNode } from "../support/styleUtils";
 // interfaces
 import { RelationshipRampElement } from "../../../../interfaces/interfaces";
 
-import * as i18nInteractiveLegend from "dojo/i18n!../../../../nls/resources";
+import i18nInteractiveLegend from "dojo/i18n!../../../../nls/resources";
 
-//----------------------------------
+// ----------------------------------
 //
 //  CSS classes
 //
-//----------------------------------
+// ----------------------------------
 const CSS = {
   // relationship diamond
   diamondContainer: "esri-relationship-ramp--diamond__container",
@@ -73,22 +70,22 @@ const CSS = {
 };
 
 @subclass("RelationshipRamp")
-class RelationshipRamp extends declared(Widget) {
-  //----------------------------------
+class RelationshipRamp extends Widget {
+  // ----------------------------------
   //
   //  Variables
   //
-  //----------------------------------
+  // ----------------------------------
   private _rampDiv: HTMLElement = null;
 
   @property()
   twoDimensionRamp: Ramp = null;
 
-  //----------------------------------
+  // ----------------------------------
   //
   //  Properties
   //
-  //----------------------------------
+  // ----------------------------------
 
   // view
   @property()
@@ -135,14 +132,14 @@ class RelationshipRamp extends declared(Widget) {
   @property()
   featureCountEnabled: boolean = null;
 
-  //----------------------------------
+  // ----------------------------------
   //
   //  Lifecycle methods
   //
-  //----------------------------------
+  // ----------------------------------
 
   constructor(value?: any) {
-    super();
+    super(value);
   }
 
   postInitialize() {
@@ -180,7 +177,7 @@ class RelationshipRamp extends declared(Widget) {
     const isDiamond = !!focus;
     if (isDiamond) {
       return (
-        <div>
+        <div key={`${this.layerView.layer.id}-relationship`}>
           <div class={CSS.relationshipInstructions}>
             {i18nInteractiveLegend.relationshipInstruction}
           </div>

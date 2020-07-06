@@ -19,16 +19,28 @@
 
   limitations under the License.​
 */
-define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/text!../config/applicationBase.json", "dojo/text!../config/application.json", "ApplicationBase/ApplicationBase", "dojo/i18n!./userTypesError/nls/resources", "./Main"], function (require, exports, i18nInteractiveLegend, applicationBaseConfig, applicationConfig, ApplicationBase, i18n, Application) {
+define(["require", "exports", "tslib", "dojo/i18n!./nls/resources", "dojo/text!../config/applicationBase.json", "dojo/text!../config/application.json", "ApplicationBase/ApplicationBase", "dojo/i18n!./userTypesError/nls/resources", "./Components/Unsupported/UnsupportedBrowser", "./Main"], function (require, exports, tslib_1, resources_1, applicationBaseConfig, applicationConfig, ApplicationBase, i18n, UnsupportedBrowser, Application) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    resources_1 = tslib_1.__importDefault(resources_1);
     var Main = new Application();
     new ApplicationBase({
         config: applicationConfig,
         settings: applicationBaseConfig
     })
         .load()
-        .then(function (base) { return Main.init(base); }, function (message) {
+        .then(function (base) {
+        if (base["isIE"]) {
+            document.body.classList.remove("configurable-application--loading");
+            document.body.innerHTML = "";
+            new UnsupportedBrowser({
+                container: document.body,
+                isIE11: true
+            });
+            return;
+        }
+        return Main.init(base);
+    }, function (message) {
         if (message === "identity-manager:not-authorized") {
             document.body.classList.remove("configurable-application--loading");
             document.body.classList.add("app-error");
@@ -41,7 +53,7 @@ define(["require", "exports", "dojo/i18n!./nls/resources", "dojo/text!../config/
                 typeof message.message === "string" &&
                 message.message
                 ? message.message
-                : i18nInteractiveLegend.error;
+                : resources_1.default.error;
             document.body.classList.remove("configurable-application--loading");
             document.body.classList.add("app-error");
             document.getElementById("main-container").innerHTML = "<h1>" + errorMessage + "</h1>";

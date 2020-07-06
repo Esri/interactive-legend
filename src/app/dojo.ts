@@ -76,6 +76,6 @@
       }
     ]
   };
-
+  window["esriConfig"] = { locale: dojoLocale };
   window["dojoConfig"] = config;
 })();

@@ -1,16 +1,8 @@
-/// <amd-dependency path="esri/core/tsSupport/assignHelper" name="__assign" />
-/// <amd-dependency path="esri/core/tsSupport/declareExtendsHelper" name="__extends" />
-/// <amd-dependency path="esri/core/tsSupport/decorateHelper" name="__decorate" />
-
 // esri.core.Accessor
 import Accessor = require("esri/core/Accessor");
 
 // esri.core.accessorSupport
-import {
-  declared,
-  property,
-  subclass
-} from "esri/core/accessorSupport/decorators";
+import { property, subclass } from "esri/core/accessorSupport/decorators";
 
 // esri.views.MapView
 import MapView = require("esri/views/MapView");
@@ -51,12 +43,12 @@ import FeatureFilter = require("esri/views/layers/support/FeatureFilter");
 import promiseUtils = require("esri/core/promiseUtils");
 
 @subclass("Create2DColorRamp")
-class Create2DColorRamp extends declared(Accessor) {
-  //----------------------------------
+class Create2DColorRamp extends Accessor {
+  // ----------------------------------
   //
   //  Properties
   //
-  //----------------------------------
+  // ----------------------------------
   private _handles = new Handles();
   private _cellNodeCounter: number = 0;
   private _cellNodes: any[] = null;
@@ -115,13 +107,13 @@ class Create2DColorRamp extends declared(Accessor) {
   @property()
   featureCountEnabled: boolean = null;
 
-  //----------------------------------
+  // ----------------------------------
   //
   //  Lifecycle Methods
   //
-  //----------------------------------
+  // ----------------------------------
   constructor(value?: any) {
-    super();
+    super(value);
   }
 
   initialize() {
@@ -867,28 +859,12 @@ class Create2DColorRamp extends declared(Accessor) {
   ): string {
     const { focus, field1, field2, data, i, j } = expressionParams;
     return focus === "LL"
-      ? `${field1} >= ${data[i][j][0].minValue} AND ${field1} <= ${
-          data[i][j][0].maxValue
-        } AND ${field2} >= ${data[i][j][1].minValue} AND ${field2} <= ${
-          data[i][j][1].maxValue
-        }`
+      ? `${field1} >= ${data[i][j][0].minValue} AND ${field1} <= ${data[i][j][0].maxValue} AND ${field2} >= ${data[i][j][1].minValue} AND ${field2} <= ${data[i][j][1].maxValue}`
       : focus === "LM" || focus === "LM1" || focus === "LM2" || focus === "LH"
-      ? `${field1} >= ${data[i][j][0].minValue} AND ${field1} <= ${
-          data[i][j][0].maxValue
-        } AND ${field2} > ${data[i][j][1].minValue} AND ${field2} <= ${
-          data[i][j][1].maxValue
-        }`
+      ? `${field1} >= ${data[i][j][0].minValue} AND ${field1} <= ${data[i][j][0].maxValue} AND ${field2} > ${data[i][j][1].minValue} AND ${field2} <= ${data[i][j][1].maxValue}`
       : focus === "ML" || focus === "M1L" || focus === "M2L" || focus === "HL"
-      ? `${field1} > ${data[i][j][0].minValue} AND ${field1} <= ${
-          data[i][j][0].maxValue
-        } AND ${field2} >= ${data[i][j][1].minValue} AND ${field2} <= ${
-          data[i][j][1].maxValue
-        }`
-      : `${field1} > ${data[i][j][0].minValue} AND ${field1} <= ${
-          data[i][j][0].maxValue
-        } AND ${field2} > ${data[i][j][1].minValue} AND ${field2} <= ${
-          data[i][j][1].maxValue
-        }`;
+      ? `${field1} > ${data[i][j][0].minValue} AND ${field1} <= ${data[i][j][0].maxValue} AND ${field2} >= ${data[i][j][1].minValue} AND ${field2} <= ${data[i][j][1].maxValue}`
+      : `${field1} > ${data[i][j][0].minValue} AND ${field1} <= ${data[i][j][0].maxValue} AND ${field2} > ${data[i][j][1].minValue} AND ${field2} <= ${data[i][j][1].maxValue}`;
   }
 
   // _setSearchExpression
