@@ -1,28 +1,5 @@
-/// <amd-dependency path="esri/core/tsSupport/assignHelper" name="__assign" />
-/// <amd-dependency path="esri/core/tsSupport/declareExtendsHelper" name="__extends" />
-/// <amd-dependency path="esri/core/tsSupport/decorateHelper" name="__decorate" />
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/accessorSupport/decorators", "esri/widgets/Widget", "esri/widgets/support/widget"], function (require, exports, __assign, __extends, __decorate, decorators_1, Widget, widget_1) {
+define(["require", "exports", "tslib", "esri/core/accessorSupport/decorators", "esri/widgets/Widget", "esri/widgets/support/widget", "../InteractiveLegend/InteractiveLegend/support/styleUtils", "esri/core/watchUtils"], function (require, exports, tslib_1, decorators_1, Widget, widget_1, styleUtils_1, watchUtils_1) {
     "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
     var CSS = {
         jsModal: "js-modal",
         modalOverlay: "modal-overlay",
@@ -44,32 +21,55 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         splashButtonStyles: "splash-button"
     };
     var Splash = /** @class */ (function (_super) {
-        __extends(Splash, _super);
+        tslib_1.__extends(Splash, _super);
         function Splash(params) {
             var _this = _super.call(this, params) || this;
             _this._calcite = null;
+            _this._splashContentNode = null;
             _this.view = null;
+            _this.splashButtonText = null;
+            _this.splashContent = null;
+            _this.splashOnStart = null;
+            _this.splashTitle = null;
             _this.modalId = "splash";
-            _this.config = params.config;
             return _this;
         }
+        Splash.prototype.postInitialize = function () {
+            var _this = this;
+            this.own([
+                watchUtils_1.when(this, "splashContent", function () {
+                    _this._handleSplashContent();
+                    _this.scheduleRender();
+                }),
+                watchUtils_1.watch(this, "splashContent", function () {
+                    _this._handleSplashContent();
+                    _this.scheduleRender();
+                })
+            ]);
+        };
         Splash.prototype.render = function () {
-            var description = this.config.splashContent ? (widget_1.tsx("span", { innerHTML: this.config.splashContent })) : null;
+            var _this = this;
             if (!this._calcite) {
                 this._calcite = calcite.init();
             }
-            var splashContent = (widget_1.tsx("div", { class: this.classes(CSS.jsModal, CSS.modalOverlay, CSS.modifierClass), "data-modal": this.modalId },
+            var _a = this, splashTitle = _a.splashTitle, splashButtonText = _a.splashButtonText;
+            return (widget_1.tsx("div", { class: this.classes(CSS.jsModal, CSS.modalOverlay, CSS.modifierClass), "data-modal": this.modalId, afterCreate: function () {
+                    if (_this.splashOnStart && !sessionStorage.getItem("disableSplash")) {
+                        calcite.bus.emit("modal:open", { id: _this.modalId });
+                        sessionStorage.setItem("disableSplash", "true");
+                    }
+                } },
                 widget_1.tsx("div", { class: this.classes(CSS.modalContent, CSS.column12, CSS.appBody), role: "dialog", "aria-labelledby": "modal" },
-                    widget_1.tsx("h3", { class: CSS.trailerHalf }, this.config.splashTitle),
-                    widget_1.tsx("p", null, description),
+                    widget_1.tsx("h3", { class: CSS.trailerHalf }, splashTitle),
+                    this._splashContentNode ? (widget_1.tsx("p", { bind: this._splashContentNode, afterCreate: styleUtils_1.attachToNode })) : null,
                     widget_1.tsx("div", { class: CSS.textRight },
-                        widget_1.tsx("button", { class: this.classes(CSS.btn, CSS.btnClear, CSS.jsModalToggle, CSS.appButton) }, this.config.splashButtonText)))));
-            return widget_1.tsx("div", null, splashContent);
+                        widget_1.tsx("button", { class: this.classes(CSS.btn, CSS.btnClear, CSS.jsModalToggle, CSS.appButton) }, splashButtonText)))));
         };
         Splash.prototype.createToolbarButton = function () {
             // add a button to the app that toggles the splash and setup to add to the view
             var splashButton = document.createElement("button");
             splashButton.setAttribute("data-modal", this.modalId);
+            splashButton.id = this.modalId;
             var jsModalToggle = CSS.jsModalToggle, esriWidget = CSS.esriWidget, esriWidgetButton = CSS.esriWidgetButton, flushIcon = CSS.flushIcon, descriptionIcon = CSS.descriptionIcon, splashButtonStyles = CSS.splashButtonStyles;
             var headerButtonClasses = [
                 jsModalToggle,
@@ -88,39 +88,42 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
             splashButton.appendChild(spanElement);
             return splashButton;
         };
-        Splash.prototype.showSplash = function () {
-            if (this.config.splash) {
-                // enable splash screen when app loads then
-                // set info in session storage when its closed
-                // so we don't open again this session.
-                if (this.config.splashOnStart) {
-                    calcite.bus.emit("modal:open", { id: this.modalId });
-                }
-                else {
-                    if (!sessionStorage.getItem("disableSplash")) {
-                        calcite.bus.emit("modal:open", { id: this.modalId });
-                    }
-                    sessionStorage.setItem("disableSplash", "true");
-                }
-            }
+        Splash.prototype._handleSplashContent = function () {
+            var content = document.createElement("div");
+            content.innerHTML = this.splashContent;
+            this._splashContentNode = content;
+            this.scheduleRender();
         };
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property(),
             widget_1.renderable()
         ], Splash.prototype, "view", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property(),
             widget_1.renderable()
-        ], Splash.prototype, "config", void 0);
-        __decorate([
+        ], Splash.prototype, "splashButtonText", void 0);
+        tslib_1.__decorate([
             decorators_1.property(),
             widget_1.renderable()
+        ], Splash.prototype, "splashContent", void 0);
+        tslib_1.__decorate([
+            decorators_1.property(),
+            widget_1.renderable()
+        ], Splash.prototype, "splashOnStart", void 0);
+        tslib_1.__decorate([
+            decorators_1.property(),
+            widget_1.renderable()
+        ], Splash.prototype, "splashTitle", void 0);
+        tslib_1.__decorate([
+            decorators_1.property({
+                readOnly: true
+            })
         ], Splash.prototype, "modalId", void 0);
-        Splash = __decorate([
+        Splash = tslib_1.__decorate([
             decorators_1.subclass("Splash")
         ], Splash);
         return Splash;
-    }(decorators_1.declared(Widget)));
-    exports.default = Splash;
+    }(Widget));
+    return Splash;
 });
 //# sourceMappingURL=Splash.js.map

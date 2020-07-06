@@ -1,13 +1,9 @@
-/// <amd-dependency path="esri/core/tsSupport/declareExtendsHelper" name="__extends" />
-/// <amd-dependency path="esri/core/tsSupport/decorateHelper" name="__decorate" />
-
 // dojo
 import i18n = require("dojo/i18n!./Info/nls/resources");
 
 // esri.core.accessorSupport
 import {
   subclass,
-  declared,
   property,
   aliasOf
 } from "esri/core/accessorSupport/decorators";
@@ -18,7 +14,7 @@ import Widget = require("esri/widgets/Widget");
 // esri.widgets.Expand
 import Expand = require("esri/widgets/Expand");
 
-//esri.widgets.support
+// esri.widgets.support
 import {
   accessibleHandler,
   tsx,
@@ -40,11 +36,11 @@ import InfoItem = require("./Info/InfoItem");
 // InfoViewModel
 import InfoViewModel = require("./Info/InfoViewModel");
 
-//----------------------------------
+// ----------------------------------
 //
 //  CSS Classes
 //
-//----------------------------------
+// ----------------------------------
 
 const CSS = {
   base: "esri-info",
@@ -79,21 +75,21 @@ const CSS = {
 };
 
 @subclass("Info")
-class Info extends declared(Widget) {
+class Info extends Widget {
   constructor(value: any) {
-    super();
+    super(value);
   }
-  //----------------------------------
+  // ----------------------------------
   //
   //  Private Variables
   //
-  //----------------------------------
+  // ----------------------------------
   private _paginationNodes: any[] = [];
-  //----------------------------------
+  // ----------------------------------
   //
   //  Properties
   //
-  //----------------------------------
+  // ----------------------------------
 
   // view
   @aliasOf("viewModel.view")
@@ -118,11 +114,11 @@ class Info extends declared(Widget) {
   @renderable()
   selectedItemIndex: number = null;
 
-  //----------------------------------------------
+  // ----------------------------------------------
   //
   //  iconClass and label - Expand Widget Support
   //
-  //----------------------------------------------
+  // ----------------------------------------------
 
   // iconClass
   @property()
@@ -139,11 +135,11 @@ class Info extends declared(Widget) {
   })
   viewModel: InfoViewModel = new InfoViewModel();
 
-  //----------------------------------
+  // ----------------------------------
   //
   //  Lifecycle
   //
-  //----------------------------------
+  // ----------------------------------
 
   render() {
     const paginationNodes =
@@ -158,13 +154,17 @@ class Info extends declared(Widget) {
         {paginationNodes ? (
           <div class={CSS.paginationContainer}>{paginationNodes}</div>
         ) : null}
-        <div class={CSS.contentContainer}>
-          <div class={CSS.titleContainer}>
-            <h1>{infoContentItem.title}</h1>
+        <div key="content-container" class={CSS.contentContainer}>
+          <div key="title-container" class={CSS.titleContainer}>
+            <h1>{infoContentItem?.title}</h1>
           </div>
-          <div class={CSS.infoContent}>{content}</div>
+          <div key="info-content" class={CSS.infoContent}>
+            {content}
+          </div>
         </div>
-        <div class={CSS.buttonContainer}>{pageNavButtons}</div>
+        <div key="button-container" class={CSS.buttonContainer}>
+          {pageNavButtons}
+        </div>
       </div>
     );
   }
@@ -177,10 +177,9 @@ class Info extends declared(Widget) {
   // _generateContentNodes
   private _generateContentNodes(selectedItemIndex: number): any[] {
     const contentItem = this.infoContent.getItemAt(selectedItemIndex);
-    const { type } = contentItem;
-    if (type === "explanation") {
+    if (contentItem?.type === "explanation") {
       return this._generateExplanationNode(contentItem);
-    } else if (type === "list") {
+    } else if (contentItem?.type === "list") {
       return this._generateListNode(contentItem);
     }
   }
@@ -315,8 +314,7 @@ class Info extends declared(Widget) {
 
     return (
       <div class={CSS.lastPageButtons}>
-        {" "}
-        <div class={CSS.backButtonContainer}>
+        <div key="info-back-button-container" class={CSS.backButtonContainer}>
           <button
             bind={this}
             onclick={this._previousPage}

@@ -61,7 +61,6 @@ export interface ApplicationBaseSettings {
   portal?: {
     fetch?: boolean;
   };
-  rightToLeftLocales?: string[];
   urlParams?: string[];
   webMap?: {
     default?: string;
@@ -72,7 +71,7 @@ export interface ApplicationBaseSettings {
     default?: string;
     fetch?: boolean;
     fetchMultiple?: boolean;
-  };
+  }
 }
 
 export interface ApplicationBaseResult {
@@ -86,8 +85,7 @@ export interface ApplicationBasePortalItemResult extends ApplicationBaseResult {
   promise: Promise<PortalItem>;
 }
 
-export interface ApplicationBasePortalQueryResult
-  extends ApplicationBaseResult {
+export interface ApplicationBasePortalQueryResult extends ApplicationBaseResult {
   value: PortalQueryResult;
   promise: Promise<PortalQueryResult>;
 }
@@ -119,3 +117,4 @@ export interface CreateMapFromItemOptions {
   item: PortalItem;
   appProxies?: ApplicationProxy[];
 }
+

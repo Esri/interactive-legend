@@ -28,6 +28,8 @@ import ActiveLayerInfo = require("esri/widgets/Legend/support/ActiveLayerInfo");
 // esri.views.View
 import View = require("esri/views/View");
 
+import { ApplicationConfig } from "../application-base-js/interfaces";
+
 type LegendElement =
   | SymbolTableElement
   | ColorRampElement
@@ -262,4 +264,11 @@ interface RelationshipExpressionParams {
 declare module "*.png" {
   const value: any;
   export = value;
+}
+
+export interface esriWidgetProps extends __esri.WidgetProperties {
+  config: ApplicationConfig;
+  view?: __esri.MapView;
+  portal?: __esri.Portal;
+  propertyName?: string;
 }

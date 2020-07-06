@@ -20,7 +20,7 @@
   limitations under the License.​
 */
 
-import * as i18nInteractiveLegend from "dojo/i18n!./nls/resources";
+import i18nInteractiveLegend from "dojo/i18n!./nls/resources";
 
 import applicationBaseConfig = require("dojo/text!../config/applicationBase.json");
 import applicationConfig = require("dojo/text!../config/application.json");
@@ -28,6 +28,8 @@ import applicationConfig = require("dojo/text!../config/application.json");
 import ApplicationBase = require("ApplicationBase/ApplicationBase");
 
 import i18n = require("dojo/i18n!./userTypesError/nls/resources");
+
+import UnsupportedBrowser = require("./Components/Unsupported/UnsupportedBrowser");
 
 import Application = require("./Main");
 
@@ -39,7 +41,18 @@ new ApplicationBase({
 })
   .load()
   .then(
-    base => Main.init(base),
+    base => {
+      if (base["isIE"]) {
+        document.body.classList.remove("configurable-application--loading");
+        document.body.innerHTML = "";
+        new UnsupportedBrowser({
+          container: document.body,
+          isIE11: true
+        });
+        return;
+      }
+      return Main.init(base);
+    },
     message => {
       if (message === "identity-manager:not-authorized") {
         document.body.classList.remove("configurable-application--loading");

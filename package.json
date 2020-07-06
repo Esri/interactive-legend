@@ -28,7 +28,7 @@
     "postcss-normalize-charset": "^1.1.0",
     "tar": ">=4.4.2",
     "tslint": "^5.11.0",
-    "typescript": "^3.7.5"
+    "typescript": "^3.9.5"
   },
   "scripts": {
     "start": "npm-run-all --parallel watch:grunt watch:ts",
@@ -37,6 +37,7 @@
     "lint": "grunt lint"
   },
   "dependencies": {
-    "lodash": ">=4.17.13"
+    "lodash": ">=4.17.13",
+    "tslib": "^2.0.0"
   }
 }

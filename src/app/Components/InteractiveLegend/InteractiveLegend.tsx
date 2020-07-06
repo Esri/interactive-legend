@@ -1,9 +1,5 @@
-/// <amd-dependency path="esri/core/tsSupport/assignHelper" name="__assign" />
-/// <amd-dependency path="esri/core/tsSupport/declareExtendsHelper" name="__extends" />
-/// <amd-dependency path="esri/core/tsSupport/decorateHelper" name="__decorate" />
-
 // dojo
-import * as i18n from "dojo/i18n!./InteractiveLegend/nls/Legend";
+import i18n from "dojo/i18n!./InteractiveLegend/nls/Legend";
 
 // esri.widgets.Widget
 import Widget = require("esri/widgets/Widget");
@@ -11,13 +7,12 @@ import Widget = require("esri/widgets/Widget");
 // esri.core.accessorSupport.decorators
 import {
   aliasOf,
-  declared,
   property,
   subclass,
   cast
 } from "esri/core/accessorSupport/decorators";
 
-//esri.widgets.support.widget
+// esri.widgets.support.widget
 import { renderable, tsx } from "esri/widgets/support/widget";
 
 // esri.views.MapView
@@ -47,11 +42,11 @@ import LegendViewModel = require("esri/widgets/Legend/LegendViewModel");
 // esri.widgets.LayerList.LayerListViewModel
 import LayerListViewModel = require("esri/widgets/LayerList/LayerListViewModel");
 
-//----------------------------------
+// ----------------------------------
 //
 //  CSS classes
 //
-//----------------------------------
+// ----------------------------------
 const CSS = {
   widgetIcon: "esri-icon-layer-list"
 };
@@ -63,21 +58,21 @@ type StyleType = InteractiveClassic["type"];
 type LegendStyle = InteractiveClassic;
 
 @subclass("InteractiveLegend")
-class InteractiveLegend extends declared(Widget) {
-  //--------------------------------------------------------------------------
+class InteractiveLegend extends Widget {
+  // --------------------------------------------------------------------------
   //
   //  Variables
   //
-  //--------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
   // _handles
   private _handles = new Handles();
 
-  //--------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
   //
   //  Properties
   //
-  //--------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
   // activeLayerInfos
   @aliasOf("viewModel.activeLayerInfos")
@@ -96,7 +91,6 @@ class InteractiveLegend extends declared(Widget) {
 
   // filterMode
   @aliasOf("style.filterMode")
-  @renderable()
   filterMode: FilterMode = null;
 
   // basemapLegendVisible
@@ -226,23 +220,17 @@ class InteractiveLegend extends declared(Widget) {
     });
   }
 
-  //-------------------------------------------------------------------
+  // -------------------------------------------------------------------
   //
   //  Lifecycle methods
   //
-  //-------------------------------------------------------------------
+  // -------------------------------------------------------------------
   constructor(params?: any) {
-    super();
+    super(params);
   }
 
   postInitialize(): void {
-    const {
-      style,
-      activeLayerInfos,
-      filterMode,
-      view,
-      layerListViewModel
-    } = this;
+    const { style, activeLayerInfos, view, layerListViewModel } = this;
     this.own([
       watchUtils.on(this, "activeLayerInfos", "change", () => {
         style.activeLayerInfos = activeLayerInfos;
@@ -250,10 +238,20 @@ class InteractiveLegend extends declared(Widget) {
       }),
       watchUtils.init(
         this,
-        ["view", "filterMode", "layerListViewModel"],
+        [
+          "view",
+          "filterMode",
+          "layerListViewModel",
+          "featureCountEnabled",
+          "updateExtentEnabled"
+        ],
         () => {
           style.view = view;
-          style.filterMode = filterMode;
+          style.filterMode = this.filterMode;
+          style.featureCountEnabled = this.featureCountEnabled;
+          style.updateExtentEnabled = this.updateExtentEnabled;
+          style.opacity = this.opacity;
+          style.grayScale = this.grayScale;
           style.layerListViewModel = layerListViewModel;
         }
       ),
@@ -282,11 +280,11 @@ class InteractiveLegend extends declared(Widget) {
     return this.style.render();
   }
 
-  //--------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
   //
   //  Private methods
   //
-  //-------------------------------------------------------------------
+  // -------------------------------------------------------------------
 
   // _refreshActiveLayerInfos
   private _refreshActiveLayerInfos(

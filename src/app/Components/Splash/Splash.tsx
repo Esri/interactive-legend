@@ -1,26 +1,20 @@
-/// <amd-dependency path="esri/core/tsSupport/assignHelper" name="__assign" />
-/// <amd-dependency path="esri/core/tsSupport/declareExtendsHelper" name="__extends" />
-/// <amd-dependency path="esri/core/tsSupport/decorateHelper" name="__decorate" />
-
 import i18n = require("dojo/i18n!./../nls/resources");
 import {
   subclass,
-  declared,
   property
 } from "esri/core/accessorSupport/decorators";
 import Widget = require("esri/widgets/Widget");
 
-import { ApplicationConfig } from "ApplicationBase/interfaces";
 import { renderable, tsx } from "esri/widgets/support/widget";
-
-// esri.core.watchUtils
-import watchUtils = require("esri/core/watchUtils");
 
 // esri.views.MapView
 import MapView = require("esri/views/MapView");
 
 // esri.views.SceneView
 import SceneView = require("esri/views/SceneView");
+import { attachToNode } from "../InteractiveLegend/InteractiveLegend/support/styleUtils";
+
+import { when, watch } from "esri/core/watchUtils";
 
 const CSS = {
   jsModal: "js-modal",
@@ -45,13 +39,13 @@ const CSS = {
 
 declare var calcite: any;
 @subclass("Splash")
-class Splash extends declared(Widget) {
+class Splash extends Widget {
+  private _calcite: any = null;
+  private _splashContentNode = null;
+
   constructor(params: any) {
     super(params);
-    this.config = params.config;
   }
-
-  private _calcite: any = null;
 
   @property()
   @renderable()
@@ -59,32 +53,63 @@ class Splash extends declared(Widget) {
 
   @property()
   @renderable()
-  config: ApplicationConfig;
+  splashButtonText: string = null;
 
   @property()
   @renderable()
-  modalId: string = "splash";
+  splashContent: string = null;
+
+  @property()
+  @renderable()
+  splashOnStart: boolean = null;
+
+  @property()
+  @renderable()
+  splashTitle: string = null;
+
+  @property({
+    readOnly: true
+  })
+  readonly modalId: string = "splash";
+
+  postInitialize() {
+    this.own([
+      when(this, "splashContent", () => {
+        this._handleSplashContent();
+        this.scheduleRender();
+      }),
+      watch(this, "splashContent", () => {
+        this._handleSplashContent();
+        this.scheduleRender();
+      })
+    ]);
+  }
 
   render() {
-    const description = this.config.splashContent ? (
-      <span innerHTML={this.config.splashContent} />
-    ) : null;
     if (!this._calcite) {
       this._calcite = calcite.init();
     }
-
-    const splashContent = (
+    const { splashTitle, splashButtonText } = this;
+    return (
       <div
         class={this.classes(CSS.jsModal, CSS.modalOverlay, CSS.modifierClass)}
         data-modal={this.modalId}
+        afterCreate={() => {
+          if (this.splashOnStart && !sessionStorage.getItem("disableSplash")) {
+            calcite.bus.emit("modal:open", { id: this.modalId });
+            sessionStorage.setItem("disableSplash", "true");
+          }
+        }}
       >
         <div
           class={this.classes(CSS.modalContent, CSS.column12, CSS.appBody)}
           role="dialog"
           aria-labelledby="modal"
         >
-          <h3 class={CSS.trailerHalf}>{this.config.splashTitle}</h3>
-          <p>{description}</p>
+          <h3 class={CSS.trailerHalf}>{splashTitle}</h3>
+          {this._splashContentNode ? (
+            <p bind={this._splashContentNode} afterCreate={attachToNode} />
+          ) : null}
           <div class={CSS.textRight}>
             <button
               class={this.classes(
@@ -94,20 +119,19 @@ class Splash extends declared(Widget) {
                 CSS.appButton
               )}
             >
-              {this.config.splashButtonText}
+              {splashButtonText}
             </button>
           </div>
         </div>
       </div>
     );
-
-    return <div>{splashContent}</div>;
   }
 
-  public createToolbarButton(): HTMLButtonElement {
+  createToolbarButton(): HTMLButtonElement {
     // add a button to the app that toggles the splash and setup to add to the view
     const splashButton = document.createElement("button");
     splashButton.setAttribute("data-modal", this.modalId);
+    splashButton.id = this.modalId;
     const {
       jsModalToggle,
       esriWidget,
@@ -136,21 +160,12 @@ class Splash extends declared(Widget) {
     return splashButton;
   }
 
-  public showSplash() {
-    if (this.config.splash) {
-      // enable splash screen when app loads then
-      // set info in session storage when its closed
-      // so we don't open again this session.
-      if (this.config.splashOnStart) {
-        calcite.bus.emit("modal:open", { id: this.modalId });
-      } else {
-        if (!sessionStorage.getItem("disableSplash")) {
-          calcite.bus.emit("modal:open", { id: this.modalId });
-        }
-        sessionStorage.setItem("disableSplash", "true");
-      }
-    }
+  private _handleSplashContent(): void {
+    const content = document.createElement("div");
+    content.innerHTML = this.splashContent;
+    this._splashContentNode = content;
+    this.scheduleRender();
   }
 }
 
-export default Splash;
+export = Splash;

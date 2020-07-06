@@ -1,6 +1,3 @@
-/// <amd-dependency path="esri/core/tsSupport/declareExtendsHelper" name="__extends" />
-/// <amd-dependency path="esri/core/tsSupport/decorateHelper" name="__decorate" />
-
 // esri.core.Accessor
 import Accessor = require("esri/core/Accessor");
 
@@ -34,7 +31,6 @@ import InteractiveLegend = require("../../InteractiveLegend/InteractiveLegend");
 // esri.core.accessorSupport
 import {
   subclass,
-  declared,
   property
 } from "esri/core/accessorSupport/decorators";
 
@@ -46,7 +42,7 @@ import { Area, Screenshot, ScreenshotConfig } from "./interfaces/interfaces";
 import SelectedStyleData = require("../../InteractiveLegend/InteractiveLegend/styles/InteractiveStyle/SelectedStyleData");
 
 @subclass("ScreenshotViewModel")
-class ScreenshotViewModel extends declared(Accessor) {
+class ScreenshotViewModel extends Accessor {
   //----------------------------------
   //
   //  Variables
@@ -58,7 +54,7 @@ class ScreenshotViewModel extends declared(Accessor) {
   private _screenshotPromise: IPromise<any> = null;
   private _highlightedFeature: any = null;
 
-  private _screenshotConfig: ScreenshotConfig = null;
+  private _screenshotConfig: __esri.MapViewTakeScreenshotOptions = null;
   private _mapComponentSelectors = [
     ".esri-screenshot__offscreen-legend-container",
     ".esri-screenshot__offscreen-pop-up-container"
@@ -575,10 +571,7 @@ class ScreenshotViewModel extends declared(Accessor) {
       document.body.removeChild(imgURL);
     } else {
       const byteString = atob(dataUrl.split(",")[1]);
-      const mimeString = dataUrl
-        .split(",")[0]
-        .split(":")[1]
-        .split(";")[0];
+      const mimeString = dataUrl.split(",")[0].split(":")[1].split(";")[0];
       const ab = new ArrayBuffer(byteString.length);
       const ia = new Uint8Array(ab);
       for (let i = 0; i < byteString.length; i++) {
@@ -714,7 +707,8 @@ class ScreenshotViewModel extends declared(Accessor) {
         } else if (
           !firstComponent.offsetWidth ||
           !firstComponent.offsetHeight ||
-          (!secondMapComponent.offsetWidth || !secondMapComponent.offsetHeight)
+          !secondMapComponent.offsetWidth ||
+          !secondMapComponent.offsetHeight
         ) {
           this._includeOneMapComponent(
             viewScreenshot,
@@ -774,7 +768,7 @@ class ScreenshotViewModel extends declared(Accessor) {
         this.view.popup.selectedFeature
       ) {
         const layerView = this.view.layerViews.find(
-          layerView =>
+          (layerView) =>
             layerView.layer.id === this.view.popup.selectedFeature.layer.id
         ) as __esri.FeatureLayerView;
         this._highlightedFeature = layerView.highlight(

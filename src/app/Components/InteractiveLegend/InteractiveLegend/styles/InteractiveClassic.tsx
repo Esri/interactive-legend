@@ -1,9 +1,6 @@
-/// <amd-dependency path="esri/core/tsSupport/declareExtendsHelper" name="__extends" />
-/// <amd-dependency path="esri/core/tsSupport/decorateHelper" name="__decorate" />
-
 // dojo
-import * as i18n from "dojo/i18n!../nls/Legend";
-import * as i18nInteractiveLegend from "dojo/i18n!../../../../nls/resources";
+import i18n from "dojo/i18n!../nls/Legend";
+import i18nInteractiveLegend from "dojo/i18n!../../../../nls/resources";
 
 // esri.widgets.Widget
 import Widget = require("esri/widgets/Widget");
@@ -16,7 +13,7 @@ import {
   aliasOf
 } from "esri/core/accessorSupport/decorators";
 
-//esri.widgets.support.widget
+// esri.widgets.support.widget
 import {
   renderable,
   tsx,
@@ -85,11 +82,11 @@ import RelationshipRamp = require("../relationshipRamp/RelationshipRamp");
 // SelectedStyleData
 import SelectedStyleData = require("./InteractiveStyle/SelectedStyleData");
 
-//----------------------------------
+// ----------------------------------
 //
 //  CSS classes
 //
-//----------------------------------
+// ----------------------------------
 const CSS = {
   widget: "esri-widget",
   base: "esri-legend esri-widget--panel",
@@ -209,22 +206,22 @@ const KEY = "esri-legend__",
   GRADIENT_WIDTH = 24;
 
 @subclass("InteractiveClassic")
-class InteractiveClassic extends declared(Widget) {
-  //----------------------------------
+class InteractiveClassic extends Widget {
+  // ----------------------------------
   //
   //  Variables
   //
-  //----------------------------------
+  // ----------------------------------
 
   private _handles = new Handles();
   private _interactiveLegendBase: any = null;
   private _filterLayerRowContainerStyles: number = null;
 
-  //--------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
   //
   //  Properties
   //
-  //--------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
   // activeLayerInfos
   @aliasOf("viewModel.activeLayerInfos")
@@ -304,11 +301,11 @@ class InteractiveClassic extends declared(Widget) {
   @property({ readOnly: true })
   readonly type: "classic" = "classic";
 
-  //-------------------------------------------------------------------
+  // -------------------------------------------------------------------
   //
   //  Lifecycle methods
   //
-  //-------------------------------------------------------------------
+  // -------------------------------------------------------------------
 
   constructor(params?: any) {
     super(params);
@@ -358,6 +355,7 @@ class InteractiveClassic extends declared(Widget) {
 
     return (
       <div
+        key="interactive-classic"
         bind={this}
         afterCreate={storeNode}
         data-node-ref="_interactiveLegendBase"
@@ -373,6 +371,7 @@ class InteractiveClassic extends declared(Widget) {
                   <div class={CSS.loader} />
                 ) : (
                   <div
+                    key="interactive-legned-main-container"
                     class={this.classes(
                       CSS.interactiveLegendMainContainer,
                       offScreenScreenshot
@@ -397,17 +396,17 @@ class InteractiveClassic extends declared(Widget) {
     this._handles = null;
   }
 
-  //--------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
   //
   //  Private methods
   //
-  //--------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
-  //--------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
   //
   //  Render methods
   //
-  //--------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
   // _renderLegendForLayer
   private _renderLegendForLayer(
@@ -584,13 +583,19 @@ class InteractiveClassic extends declared(Widget) {
               featureLayerData &&
               featureLayerData.applyStyles ? (
                 isNaN(relationshipFeatureCount) ? (
-                  <div class={CSS.featureCountContainerStyles}>
+                  <div
+                    key="total-feature-count-container"
+                    class={CSS.featureCountContainerStyles}
+                  >
                     <span class={CSS.totalFeatureCount}>
                       {`${i18nInteractiveLegend.totalFeatureCount}: ${totalFeatureCountToDisplay}`}
                     </span>
                   </div>
                 ) : (
-                  <div class={CSS.featureCountContainerStyles}>
+                  <div
+                    key="total-feature-count-container-relationship"
+                    class={CSS.featureCountContainerStyles}
+                  >
                     <span class={CSS.totalFeatureCount}>
                       {relationshipFeatureCount ||
                       relationshipFeatureCount === 0
@@ -908,24 +913,29 @@ class InteractiveClassic extends declared(Widget) {
       [CSS.relationshipElements]: isRelationship
     };
     return (
-      <div class={this.classes(tableClass, tableClasses, relationshipStyles)}>
+      <div
+        key={`${activeLayerInfo.layer.id}-legend-element`}
+        class={this.classes(tableClass, tableClasses, relationshipStyles)}
+      >
         {caption}
         {(field && allowInteractivity && !caption) ||
         (isTypePredominance && !isSizeRamp && !isOpacityRamp && !caption) ? (
-          <div>
-            <div
-              class={this.classes(
-                CSS.interactiveLegendNoCaption,
-                noCaptionUpdateExtent
-              )}
-            >
-              {zoomToButton}
-              {resetButton}
-            </div>
+          <div
+            key={`${activeLayerInfo.layer.id}-buttons`}
+            class={this.classes(
+              CSS.interactiveLegendNoCaption,
+              noCaptionUpdateExtent
+            )}
+          >
+            {zoomToButton}
+            {resetButton}
           </div>
         ) : null}
 
-        <div key={operationalItemIndex} class={CSS.contentContainer}>
+        <div
+          key={`${activeLayerInfo.layer.id}-content-container`}
+          class={CSS.contentContainer}
+        >
           {content}
         </div>
       </div>
@@ -1271,9 +1281,14 @@ class InteractiveClassic extends declared(Widget) {
                 {getTitle(elementInfo.label, false) || ""}
               </div>
             </div>
-            <div class={CSS.featureCountContainer}>
-              {selected && !isSizeRamp ? featureCountForLegendInfo : null}
-            </div>
+            {this.featureCountEnabled ? (
+              <div
+                key={`feature-count-${activeLayerInfo.layer.id}-${legendElementIndex}`}
+                class={CSS.featureCountContainer}
+              >
+                {selected && !isSizeRamp ? featureCountForLegendInfo : null}
+              </div>
+            ) : null}
           </div>
         </div>
       );
@@ -1402,6 +1417,7 @@ class InteractiveClassic extends declared(Widget) {
     return (
       <button
         bind={this}
+        key="reset-button"
         class={this.classes(
           CSS.interactiveLegendResetButton,
           CSS.calciteStyles.btn,
@@ -1436,6 +1452,7 @@ class InteractiveClassic extends declared(Widget) {
     return (
       <button
         bind={this}
+        key="zoom-to-button"
         class={this.classes(
           CSS.calciteStyles.btn,
           CSS.calciteStyles.btnClear,
@@ -1455,11 +1472,11 @@ class InteractiveClassic extends declared(Widget) {
     );
   }
 
-  //-------------------------------------------------------------------
+  // -------------------------------------------------------------------
   //
   //  Filter methods
   //
-  //-------------------------------------------------------------------
+  // -------------------------------------------------------------------
 
   @accessibleHandler()
   private _handleFilterOption(
@@ -1509,7 +1526,7 @@ class InteractiveClassic extends declared(Widget) {
     }
   }
 
-  //_filterFeatures
+  // _filterFeatures
   private _featureFilter(
     event: Event,
     elementInfo: any,
@@ -1623,7 +1640,7 @@ class InteractiveClassic extends declared(Widget) {
     const layerRowContainer = document.querySelector(
       `.${CSS.interactiveLegendLayerRowContainer}`
     );
-    const { clientHeight } = intLegend;
+    const clientHeight = intLegend?.clientHeight;
     const maxHeight = intLegend
       ? parseFloat(getComputedStyle(intLegend).maxHeight)
       : null;

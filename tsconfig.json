@@ -12,7 +12,9 @@
     "preserveConstEnums": true,
     "declaration": false,
     "suppressImplicitAnyIndexErrors": true,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "importHelpers": true,
+    "esModuleInterop": true
   },
   "include": [
     "./**/*",

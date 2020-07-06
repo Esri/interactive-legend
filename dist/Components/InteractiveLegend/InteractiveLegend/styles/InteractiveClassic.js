@@ -1,31 +1,12 @@
-/// <amd-dependency path="esri/core/tsSupport/declareExtendsHelper" name="__extends" />
-/// <amd-dependency path="esri/core/tsSupport/decorateHelper" name="__decorate" />
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "dojo/i18n!../nls/Legend", "dojo/i18n!../../../../nls/resources", "esri/widgets/Widget", "esri/core/accessorSupport/decorators", "esri/widgets/support/widget", "esri/core/watchUtils", "./InteractiveStyle/InteractiveStyleViewModel", "esri/core/Handles", "../support/styleUtils", "esri/intl", "../relationshipRamp/RelationshipRamp"], function (require, exports, __extends, __decorate, i18n, i18nInteractiveLegend, Widget, decorators_1, widget_1, watchUtils, InteractiveStyleViewModel, Handles, styleUtils_1, intl_1, RelationshipRamp) {
+define(["require", "exports", "tslib", "dojo/i18n!../nls/Legend", "dojo/i18n!../../../../nls/resources", "esri/widgets/Widget", "esri/core/accessorSupport/decorators", "esri/widgets/support/widget", "esri/core/watchUtils", "./InteractiveStyle/InteractiveStyleViewModel", "esri/core/Handles", "../support/styleUtils", "esri/intl", "../relationshipRamp/RelationshipRamp"], function (require, exports, tslib_1, Legend_1, resources_1, Widget, decorators_1, widget_1, watchUtils, InteractiveStyleViewModel, Handles, styleUtils_1, intl_1, RelationshipRamp) {
     "use strict";
-    //----------------------------------
+    Legend_1 = tslib_1.__importDefault(Legend_1);
+    resources_1 = tslib_1.__importDefault(resources_1);
+    // ----------------------------------
     //
     //  CSS classes
     //
-    //----------------------------------
+    // ----------------------------------
     var CSS = {
         widget: "esri-widget",
         base: "esri-legend esri-widget--panel",
@@ -130,27 +111,27 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
     };
     var KEY = "esri-legend__", GRADIENT_WIDTH = 24;
     var InteractiveClassic = /** @class */ (function (_super) {
-        __extends(InteractiveClassic, _super);
-        //-------------------------------------------------------------------
+        tslib_1.__extends(InteractiveClassic, _super);
+        // -------------------------------------------------------------------
         //
         //  Lifecycle methods
         //
-        //-------------------------------------------------------------------
+        // -------------------------------------------------------------------
         function InteractiveClassic(params) {
             var _this = _super.call(this, params) || this;
-            //----------------------------------
+            // ----------------------------------
             //
             //  Variables
             //
-            //----------------------------------
+            // ----------------------------------
             _this._handles = new Handles();
             _this._interactiveLegendBase = null;
             _this._filterLayerRowContainerStyles = null;
-            //--------------------------------------------------------------------------
+            // --------------------------------------------------------------------------
             //
             //  Properties
             //
-            //--------------------------------------------------------------------------
+            // --------------------------------------------------------------------------
             // activeLayerInfos
             _this.activeLayerInfos = null;
             // view
@@ -217,23 +198,23 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var offScreenScreenshot = (_a = {},
                 _a[CSS.offScreenScreenshot] = this.offscreen,
                 _a);
-            return (widget_1.tsx("div", { bind: this, afterCreate: widget_1.storeNode, "data-node-ref": "_interactiveLegendBase", class: baseClasses }, this.onboardingPanelEnabled ? (this._renderOnboardingPanel()) : (widget_1.tsx("div", null, filteredLayers && filteredLayers.length ? (widget_1.tsx("div", { class: CSS.legendElements }, !this.get("selectedStyleDataCollection.length") ? (widget_1.tsx("div", { class: CSS.loader })) : (widget_1.tsx("div", { class: this.classes(CSS.interactiveLegendMainContainer, offScreenScreenshot) }, filteredLayers)))) : (widget_1.tsx("div", { class: CSS.message }, i18n.noLegend))))));
+            return (widget_1.tsx("div", { key: "interactive-classic", bind: this, afterCreate: widget_1.storeNode, "data-node-ref": "_interactiveLegendBase", class: baseClasses }, this.onboardingPanelEnabled ? (this._renderOnboardingPanel()) : (widget_1.tsx("div", null, filteredLayers && filteredLayers.length ? (widget_1.tsx("div", { class: CSS.legendElements }, !this.get("selectedStyleDataCollection.length") ? (widget_1.tsx("div", { class: CSS.loader })) : (widget_1.tsx("div", { key: "interactive-legned-main-container", class: this.classes(CSS.interactiveLegendMainContainer, offScreenScreenshot) }, filteredLayers)))) : (widget_1.tsx("div", { class: CSS.message }, Legend_1.default.noLegend))))));
         };
         InteractiveClassic.prototype.destroy = function () {
             this._handles.removeAll();
             this._handles.destroy();
             this._handles = null;
         };
-        //--------------------------------------------------------------------------
+        // --------------------------------------------------------------------------
         //
         //  Private methods
         //
-        //--------------------------------------------------------------------------
-        //--------------------------------------------------------------------------
+        // --------------------------------------------------------------------------
+        // --------------------------------------------------------------------------
         //
         //  Render methods
         //
-        //--------------------------------------------------------------------------
+        // --------------------------------------------------------------------------
         // _renderLegendForLayer
         InteractiveClassic.prototype._renderLegendForLayer = function (activeLayerInfo, activeLayerInfoIndex) {
             var _a, _b, _c, _d, _e, _f, _g, _h;
@@ -330,11 +311,11 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                             labelNode,
                             this.featureCountEnabled &&
                                 featureLayerData &&
-                                featureLayerData.applyStyles ? (isNaN(relationshipFeatureCount) ? (widget_1.tsx("div", { class: CSS.featureCountContainerStyles },
-                                widget_1.tsx("span", { class: CSS.totalFeatureCount }, i18nInteractiveLegend.totalFeatureCount + ": " + totalFeatureCountToDisplay))) : (widget_1.tsx("div", { class: CSS.featureCountContainerStyles },
+                                featureLayerData.applyStyles ? (isNaN(relationshipFeatureCount) ? (widget_1.tsx("div", { key: "total-feature-count-container", class: CSS.featureCountContainerStyles },
+                                widget_1.tsx("span", { class: CSS.totalFeatureCount }, resources_1.default.totalFeatureCount + ": " + totalFeatureCountToDisplay))) : (widget_1.tsx("div", { key: "total-feature-count-container-relationship", class: CSS.featureCountContainerStyles },
                                 widget_1.tsx("span", { class: CSS.totalFeatureCount }, relationshipFeatureCount ||
                                     relationshipFeatureCount === 0
-                                    ? i18nInteractiveLegend.totalFeatureCount + ": " + relationshipFeatureCount
+                                    ? resources_1.default.totalFeatureCount + ": " + relationshipFeatureCount
                                     : null)))) : null),
                         widget_1.tsx("div", { class: layer }, filteredElements))));
             }
@@ -481,14 +462,13 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var relationshipStyles = (_m = {},
                 _m[CSS.relationshipElements] = isRelationship,
                 _m);
-            return (widget_1.tsx("div", { class: this.classes(tableClass, tableClasses, relationshipStyles) },
+            return (widget_1.tsx("div", { key: activeLayerInfo.layer.id + "-legend-element", class: this.classes(tableClass, tableClasses, relationshipStyles) },
                 caption,
                 (field && allowInteractivity && !caption) ||
-                    (isTypePredominance && !isSizeRamp && !isOpacityRamp && !caption) ? (widget_1.tsx("div", null,
-                    widget_1.tsx("div", { class: this.classes(CSS.interactiveLegendNoCaption, noCaptionUpdateExtent) },
-                        zoomToButton,
-                        resetButton))) : null,
-                widget_1.tsx("div", { key: operationalItemIndex, class: CSS.contentContainer }, content)));
+                    (isTypePredominance && !isSizeRamp && !isOpacityRamp && !caption) ? (widget_1.tsx("div", { key: activeLayerInfo.layer.id + "-buttons", class: this.classes(CSS.interactiveLegendNoCaption, noCaptionUpdateExtent) },
+                    zoomToButton,
+                    resetButton)) : null,
+                widget_1.tsx("div", { key: activeLayerInfo.layer.id + "-content-container", class: CSS.contentContainer }, content)));
         };
         // _renderLegendForRamp
         InteractiveClassic.prototype._renderLegendForRamp = function (legendElement, opacity, activeLayerInfo, legendElementIndex) {
@@ -504,7 +484,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 rampDiv.style.opacity = opacity.toString();
             }
             var labelsContent = rampStops.map(function (stop) { return (widget_1.tsx("div", { class: stop.label ? CSS.rampLabel : null }, isHeatmapRamp
-                ? i18n[stop.label]
+                ? Legend_1.default[stop.label]
                 : isStretchRamp
                     ? _this._getStretchStopLabel(stop)
                     : stop.label)); });
@@ -518,7 +498,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         // _getStretchStopLabel
         InteractiveClassic.prototype._getStretchStopLabel = function (stop) {
             return stop.label
-                ? i18n[stop.label] +
+                ? Legend_1.default[stop.label] +
                     ": " +
                     intl_1.formatNumber(stop.value, {
                         style: "decimal"
@@ -641,7 +621,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         widget_1.tsx("div", { class: CSS.interactiveLegendInfoContainer },
                             widget_1.tsx("div", { key: activeLayerInfo.layer.id + "-" + legendElementIndex, class: this.classes(CSS.symbolContainer, symbolClasses) }, content),
                             widget_1.tsx("div", { class: this.classes(CSS.layerInfo, labelClasses, CSS.interactiveLayerInfo) }, styleUtils_1.getTitle(elementInfo.label, false) || "")),
-                        widget_1.tsx("div", { class: CSS.featureCountContainer }, selected && !isSizeRamp ? featureCountForLegendInfo : null))));
+                        this.featureCountEnabled ? (widget_1.tsx("div", { key: "feature-count-" + activeLayerInfo.layer.id + "-" + legendElementIndex, class: CSS.featureCountContainer }, selected && !isSizeRamp ? featureCountForLegendInfo : null)) : null)));
             }
             else {
                 return (widget_1.tsx("div", { class: CSS.layerRow },
@@ -664,7 +644,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         };
         // _renderOnboardingPanel
         InteractiveClassic.prototype._renderOnboardingPanel = function () {
-            var close = i18nInteractiveLegend.close, newInteractiveLegend = i18nInteractiveLegend.newInteractiveLegend, onboardingConfirmation = i18nInteractiveLegend.onboardingConfirmation, firstOnboardingWelcomeMessage = i18nInteractiveLegend.firstOnboardingWelcomeMessage, secondOnboardingWelcomeMessage = i18nInteractiveLegend.secondOnboardingWelcomeMessage, thirdOnboardingWelcomeMessage = i18nInteractiveLegend.thirdOnboardingWelcomeMessage;
+            var close = resources_1.default.close, newInteractiveLegend = resources_1.default.newInteractiveLegend, onboardingConfirmation = resources_1.default.onboardingConfirmation, firstOnboardingWelcomeMessage = resources_1.default.firstOnboardingWelcomeMessage, secondOnboardingWelcomeMessage = resources_1.default.secondOnboardingWelcomeMessage, thirdOnboardingWelcomeMessage = resources_1.default.thirdOnboardingWelcomeMessage;
             return (widget_1.tsx("div", { class: CSS.onboarding.mainContainer },
                 widget_1.tsx("div", { key: "onboarding-panel", class: CSS.onboarding.contentContainer },
                     widget_1.tsx("div", { class: CSS.onboarding.closeContainer },
@@ -694,26 +674,26 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var grayStyles = (_a = {},
                 _a[CSS.interactiveLegendGrayButtonStyles] = disabled,
                 _a);
-            return (widget_1.tsx("button", { bind: this, class: this.classes(CSS.interactiveLegendResetButton, CSS.calciteStyles.btn, CSS.calciteStyles.btnClear, CSS.calciteStyles.btnSmall, grayStyles), tabIndex: this.offscreen ? -1 : 0, disabled: disabled ? true : false, onclick: function (event) {
+            return (widget_1.tsx("button", { bind: this, key: "reset-button", class: this.classes(CSS.interactiveLegendResetButton, CSS.calciteStyles.btn, CSS.calciteStyles.btnClear, CSS.calciteStyles.btnSmall, grayStyles), tabIndex: this.offscreen ? -1 : 0, disabled: disabled ? true : false, onclick: function (event) {
                     _this._resetLegendFilter(featureLayerData, operationalItemIndex, legendElementIndex);
                 }, onkeydown: function (event) {
                     _this._resetLegendFilter(featureLayerData, operationalItemIndex, legendElementIndex);
-                } }, i18nInteractiveLegend.showAll));
+                } }, resources_1.default.showAll));
         };
         // _renderZoomToButton
         InteractiveClassic.prototype._renderZoomToButton = function (operationalItemIndex) {
             var _this = this;
-            return (widget_1.tsx("button", { bind: this, class: this.classes(CSS.calciteStyles.btn, CSS.calciteStyles.btnClear, CSS.calciteStyles.btnSmall, CSS.extentButton), tabIndex: this.offscreen ? -1 : 0, onclick: function (event) {
+            return (widget_1.tsx("button", { bind: this, key: "zoom-to-button", class: this.classes(CSS.calciteStyles.btn, CSS.calciteStyles.btnClear, CSS.calciteStyles.btnSmall, CSS.extentButton), tabIndex: this.offscreen ? -1 : 0, onclick: function (event) {
                     _this.viewModel.updateExtentToAllFeatures(operationalItemIndex);
                 }, onkeydown: function (event) {
                     _this.viewModel.updateExtentToAllFeatures(operationalItemIndex);
-                } }, i18nInteractiveLegend.zoomTo));
+                } }, resources_1.default.zoomTo));
         };
-        //-------------------------------------------------------------------
+        // -------------------------------------------------------------------
         //
         //  Filter methods
         //
-        //-------------------------------------------------------------------
+        // -------------------------------------------------------------------
         InteractiveClassic.prototype._handleFilterOption = function (event, elementInfo, field, legendInfoIndex, operationalItemIndex, legendElement, isPredominance, legendElementIndex, legendElementInfos, normalizationField) {
             if (this.filterMode === "featureFilter") {
                 this._featureFilter(event, elementInfo, field, operationalItemIndex, legendInfoIndex, legendElement, isPredominance, legendElementInfos, normalizationField);
@@ -726,7 +706,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 this.scheduleRender();
             }
         };
-        //_filterFeatures
+        // _filterFeatures
         InteractiveClassic.prototype._featureFilter = function (event, elementInfo, field, operationalItemIndex, legendInfoIndex, legendElement, isPredominance, legendElementInfos, normalizationField) {
             this._handleSelectedStyles(event, legendElementInfos);
             this.viewModel.applyFeatureFilter(elementInfo, field, operationalItemIndex, legendElement, legendInfoIndex, isPredominance, legendElementInfos, normalizationField);
@@ -775,7 +755,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         InteractiveClassic.prototype._removeScrollbarFlicker = function () {
             var intLegend = this._interactiveLegendBase;
             var layerRowContainer = document.querySelector("." + CSS.interactiveLegendLayerRowContainer);
-            var clientHeight = intLegend.clientHeight;
+            var clientHeight = intLegend === null || intLegend === void 0 ? void 0 : intLegend.clientHeight;
             var maxHeight = intLegend
                 ? parseFloat(getComputedStyle(intLegend).maxHeight)
                 : null;
@@ -895,82 +875,82 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                 return true;
             }
         };
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.aliasOf("viewModel.activeLayerInfos"),
             decorators_1.property()
         ], InteractiveClassic.prototype, "activeLayerInfos", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.aliasOf("viewModel.view"),
             decorators_1.property()
         ], InteractiveClassic.prototype, "view", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.aliasOf("viewModel.filterMode"),
             decorators_1.property()
         ], InteractiveClassic.prototype, "filterMode", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.aliasOf("viewModel.layerListViewModel"),
             decorators_1.property()
         ], InteractiveClassic.prototype, "layerListViewModel", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.aliasOf("viewModel.searchExpressions"),
             decorators_1.property()
         ], InteractiveClassic.prototype, "searchExpressions", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.aliasOf("viewModel.searchViewModel"),
             decorators_1.property()
         ], InteractiveClassic.prototype, "searchViewModel", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.aliasOf("viewModel.selectedStyleDataCollection"),
             widget_1.renderable()
         ], InteractiveClassic.prototype, "selectedStyleDataCollection", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.aliasOf("viewModel.opacity"),
             widget_1.renderable()
         ], InteractiveClassic.prototype, "opacity", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.aliasOf("viewModel.grayScale"),
             widget_1.renderable()
         ], InteractiveClassic.prototype, "grayScale", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.aliasOf("viewModel.featureCountEnabled"),
             widget_1.renderable()
         ], InteractiveClassic.prototype, "featureCountEnabled", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.aliasOf("viewModel.updateExtentEnabled"),
             widget_1.renderable()
         ], InteractiveClassic.prototype, "updateExtentEnabled", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], InteractiveClassic.prototype, "relationshipRampElements", void 0);
-        __decorate([
+        tslib_1.__decorate([
             widget_1.renderable(["viewModel.state"]),
             decorators_1.property({
                 type: InteractiveStyleViewModel
             })
         ], InteractiveClassic.prototype, "viewModel", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], InteractiveClassic.prototype, "onboardingPanelEnabled", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], InteractiveClassic.prototype, "offscreen", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property({ readOnly: true })
         ], InteractiveClassic.prototype, "type", void 0);
-        __decorate([
+        tslib_1.__decorate([
             widget_1.accessibleHandler()
         ], InteractiveClassic.prototype, "_handleFilterOption", null);
-        __decorate([
+        tslib_1.__decorate([
             widget_1.accessibleHandler()
         ], InteractiveClassic.prototype, "_resetLegendFilter", null);
-        __decorate([
+        tslib_1.__decorate([
             widget_1.accessibleHandler()
         ], InteractiveClassic.prototype, "_disableOnboarding", null);
-        InteractiveClassic = __decorate([
+        InteractiveClassic = tslib_1.__decorate([
             decorators_1.subclass("InteractiveClassic")
         ], InteractiveClassic);
         return InteractiveClassic;
-    }(decorators_1.declared(Widget)));
+    }(Widget));
     return InteractiveClassic;
 });
 //# sourceMappingURL=InteractiveClassic.js.map

@@ -1,5 +1,5 @@
 // dojo
-import * as i18n from "dojo/i18n!../nls/Legend";
+import i18n from "dojo/i18n!../nls/Legend";
 
 // import Lang = require("esri/core/lang");
 

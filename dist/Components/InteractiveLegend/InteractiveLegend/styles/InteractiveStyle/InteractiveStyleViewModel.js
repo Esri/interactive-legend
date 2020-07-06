@@ -1,36 +1,7 @@
-/// <amd-dependency path="esri/core/tsSupport/assignHelper" name="__assign" />
-/// <amd-dependency path="esri/core/tsSupport/declareExtendsHelper" name="__extends" />
-/// <amd-dependency path="esri/core/tsSupport/decorateHelper" name="__decorate" />
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __spreadArrays = (this && this.__spreadArrays) || function () {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
-};
-define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/core/Accessor", "esri/core/accessorSupport/decorators", "esri/core/Handles", "esri/core/watchUtils", "esri/core/Collection", "esri/widgets/LayerList/LayerListViewModel", "esri/views/layers/support/FeatureFilter", "esri/views/layers/support/FeatureEffect", "esri/tasks/support/Query", "./InteractiveStyleData", "./SelectedStyleData"], function (require, exports, __assign, __extends, __decorate, Accessor, decorators_1, Handles, watchUtils, Collection, LayerListViewModel, FeatureFilter, FeatureEffect, Query, InteractiveStyleData, SelectedStyleData) {
+define(["require", "exports", "tslib", "esri/core/Accessor", "esri/core/accessorSupport/decorators", "esri/core/Handles", "esri/core/watchUtils", "esri/core/Collection", "esri/widgets/LayerList/LayerListViewModel", "esri/views/layers/support/FeatureFilter", "esri/views/layers/support/FeatureEffect", "esri/tasks/support/Query", "./InteractiveStyleData", "./SelectedStyleData"], function (require, exports, tslib_1, Accessor, decorators_1, Handles, watchUtils, Collection, LayerListViewModel, FeatureFilter, FeatureEffect, Query, InteractiveStyleData, SelectedStyleData) {
     "use strict";
     var InteractiveStyleViewModel = /** @class */ (function (_super) {
-        __extends(InteractiveStyleViewModel, _super);
+        tslib_1.__extends(InteractiveStyleViewModel, _super);
         function InteractiveStyleViewModel() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             //----------------------------------
@@ -84,7 +55,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                         : "loading"
                     : "disabled";
             },
-            enumerable: true,
+            enumerable: false,
             configurable: true
         });
         //----------------------------------
@@ -138,7 +109,48 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                             }
                         }
                     });
-                    _this.selectedStyleDataCollection.addMany(__spreadArrays(selectedStyleDataCollection));
+                    _this.selectedStyleDataCollection.addMany(tslib_1.__spreadArrays(selectedStyleDataCollection));
+                }),
+                watchUtils.watch(this, "filterMode", function () {
+                    _this.selectedStyleDataCollection.forEach(function (selectedStyleData) {
+                        var _a, _b, _c;
+                        if (_this.filterMode === "featureFilter") {
+                            var filter = (_b = (_a = selectedStyleData === null || selectedStyleData === void 0 ? void 0 : selectedStyleData.featureLayerView) === null || _a === void 0 ? void 0 : _a.effect) === null || _b === void 0 ? void 0 : _b.filter;
+                            if (filter) {
+                                selectedStyleData.featureLayerView.effect = null;
+                                selectedStyleData.featureLayerView.filter = filter;
+                            }
+                        }
+                        else if (_this.filterMode === "mute") {
+                            var filter = (_c = selectedStyleData === null || selectedStyleData === void 0 ? void 0 : selectedStyleData.featureLayerView) === null || _c === void 0 ? void 0 : _c.filter;
+                            if (filter) {
+                                selectedStyleData.featureLayerView.filter = null;
+                                var _d = _this, opacity = _d.opacity, grayScale = _d.grayScale;
+                                var opacityValue = opacity === null ? 30 : opacity;
+                                var grayScaleValue = grayScale === null ? 100 : grayScale;
+                                selectedStyleData.featureLayerView.effect = new FeatureEffect({
+                                    excludedEffect: "opacity(" + opacityValue + "%) grayscale(" + grayScaleValue + "%)",
+                                    filter: filter
+                                });
+                            }
+                        }
+                    });
+                }),
+                watchUtils.watch(this, "opacity, grayScale", function () {
+                    _this.selectedStyleDataCollection.forEach(function (selectedStyleData) {
+                        var _a, _b, _c;
+                        if (_this.filterMode === "mute") {
+                            var filter = ((_a = selectedStyleData === null || selectedStyleData === void 0 ? void 0 : selectedStyleData.featureLayerView) === null || _a === void 0 ? void 0 : _a.filter) || ((_c = (_b = selectedStyleData === null || selectedStyleData === void 0 ? void 0 : selectedStyleData.featureLayerView) === null || _b === void 0 ? void 0 : _b.effect) === null || _c === void 0 ? void 0 : _c.filter);
+                            selectedStyleData.featureLayerView.filter = null;
+                            var _d = _this, opacity = _d.opacity, grayScale = _d.grayScale;
+                            var opacityValue = opacity === null ? 30 : opacity;
+                            var grayScaleValue = grayScale === null ? 100 : grayScale;
+                            selectedStyleData.featureLayerView.effect = new FeatureEffect({
+                                excludedEffect: "opacity(" + opacityValue + "%) grayscale(" + grayScaleValue + "%)",
+                                filter: filter
+                            });
+                        }
+                    });
                 })
             ]);
             this._initFeatureCount();
@@ -360,7 +372,8 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         InteractiveStyleViewModel.prototype._initFeatureCount = function () {
             var _this = this;
             var initFeatureCountKey = "init-feature-count";
-            this._handles.add(watchUtils.whenTrue(this, "featureCountEnabled", function () {
+            this._handles.add(watchUtils.watch(this, "featureCountEnabled", function () {
+                _this._handles.remove(initFeatureCountKey);
                 _this._handles.add([_this._watchDataForCount(initFeatureCountKey)], initFeatureCountKey);
                 _this._updateFeatureCountOnViewUpdate(initFeatureCountKey);
             }));
@@ -390,6 +403,8 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         // _updateFeatureCountOnViewUpdate
         InteractiveStyleViewModel.prototype._updateFeatureCountOnViewUpdate = function (initFeatureCountKey) {
             var _this = this;
+            var featureCountViewUpdateKey = "feature-count-view-update-key";
+            this._handles.remove(featureCountViewUpdateKey);
             this._handles.add([
                 watchUtils.whenFalse(this, "view.stationary", function () {
                     if (!_this.view.stationary) {
@@ -411,7 +426,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                         }), stationaryIsFalse_1);
                     }
                 })
-            ]);
+            ], featureCountViewUpdateKey);
         };
         // _handleOperationalItemForCount
         InteractiveStyleViewModel.prototype._handleOperationalItemForCount = function () {
@@ -458,7 +473,7 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
         InteractiveStyleViewModel.prototype._handleLayerViewWatcherForCount = function (featureLayerView, legendElementIndex, operationalItemIndex, legendElement, activeLayerInfo) {
             var _this = this;
             var key = "feature-count-" + activeLayerInfo.layer.id + "-" + operationalItemIndex + "-" + legendElementIndex;
-            if (!this._handles.has(key)) {
+            if (!this._handles.has(key) && featureLayerView) {
                 this._handles.add(watchUtils.whenFalse(featureLayerView, "updating", function () {
                     _this._handleFeatureCount(featureLayerView, legendElementIndex, operationalItemIndex, legendElement, activeLayerInfo);
                 }), key);
@@ -874,22 +889,22 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 _this._handles.remove(disableClusteringKey);
             });
         };
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], InteractiveStyleViewModel.prototype, "view", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], InteractiveStyleViewModel.prototype, "activeLayerInfos", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], InteractiveStyleViewModel.prototype, "interactiveStyleData", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], InteractiveStyleViewModel.prototype, "featureLayerViews", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], InteractiveStyleViewModel.prototype, "featureCountQuery", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property({
                 dependsOn: [
                     "view.updating",
@@ -900,38 +915,38 @@ define(["require", "exports", "esri/core/tsSupport/assignHelper", "esri/core/tsS
                 readOnly: true
             })
         ], InteractiveStyleViewModel.prototype, "state", null);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], InteractiveStyleViewModel.prototype, "selectedStyleDataCollection", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], InteractiveStyleViewModel.prototype, "filterMode", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], InteractiveStyleViewModel.prototype, "layerListViewModel", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], InteractiveStyleViewModel.prototype, "searchExpressions", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], InteractiveStyleViewModel.prototype, "searchViewModel", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], InteractiveStyleViewModel.prototype, "opacity", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], InteractiveStyleViewModel.prototype, "grayScale", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], InteractiveStyleViewModel.prototype, "featureCountEnabled", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], InteractiveStyleViewModel.prototype, "updateExtentEnabled", void 0);
-        InteractiveStyleViewModel = __decorate([
+        InteractiveStyleViewModel = tslib_1.__decorate([
             decorators_1.subclass("InteractiveStyleViewModel")
         ], InteractiveStyleViewModel);
         return InteractiveStyleViewModel;
-    }(decorators_1.declared(Accessor)));
+    }(Accessor));
     return InteractiveStyleViewModel;
 });
 //# sourceMappingURL=InteractiveStyleViewModel.js.map

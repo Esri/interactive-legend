@@ -74,6 +74,7 @@
             }
         ]
     };
+    window["esriConfig"] = { locale: dojoLocale };
     window["dojoConfig"] = config;
 })();
 //# sourceMappingURL=dojo.js.map

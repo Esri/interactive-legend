@@ -1,31 +1,11 @@
-/// <amd-dependency path="esri/core/tsSupport/declareExtendsHelper" name="__extends" />
-/// <amd-dependency path="esri/core/tsSupport/decorateHelper" name="__decorate" />
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/core/tsSupport/decorateHelper", "esri/widgets/Widget", "esri/core/accessorSupport/decorators", "esri/widgets/support/widget", "../relationshipRamp/relationshipRampUtils", "esri/core/watchUtils", "../support/styleUtils", "dojo/i18n!../../../../nls/resources"], function (require, exports, __extends, __decorate, Widget, decorators_1, widget_1, relationshipRampUtils_1, watchUtils, styleUtils_1, i18nInteractiveLegend) {
+define(["require", "exports", "tslib", "esri/widgets/Widget", "esri/core/accessorSupport/decorators", "esri/widgets/support/widget", "../relationshipRamp/relationshipRampUtils", "esri/core/watchUtils", "../support/styleUtils", "dojo/i18n!../../../../nls/resources"], function (require, exports, tslib_1, Widget, decorators_1, widget_1, relationshipRampUtils_1, watchUtils, styleUtils_1, resources_1) {
     "use strict";
-    //----------------------------------
+    resources_1 = tslib_1.__importDefault(resources_1);
+    // ----------------------------------
     //
     //  CSS classes
     //
-    //----------------------------------
+    // ----------------------------------
     var CSS = {
         // relationship diamond
         diamondContainer: "esri-relationship-ramp--diamond__container",
@@ -47,26 +27,26 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
         relationshipInstructions: "esri-interactive-legend__relationship-instructions"
     };
     var RelationshipRamp = /** @class */ (function (_super) {
-        __extends(RelationshipRamp, _super);
-        //----------------------------------
+        tslib_1.__extends(RelationshipRamp, _super);
+        // ----------------------------------
         //
         //  Lifecycle methods
         //
-        //----------------------------------
+        // ----------------------------------
         function RelationshipRamp(value) {
-            var _this = _super.call(this) || this;
-            //----------------------------------
+            var _this = _super.call(this, value) || this;
+            // ----------------------------------
             //
             //  Variables
             //
-            //----------------------------------
+            // ----------------------------------
             _this._rampDiv = null;
             _this.twoDimensionRamp = null;
-            //----------------------------------
+            // ----------------------------------
             //
             //  Properties
             //
-            //----------------------------------
+            // ----------------------------------
             // view
             _this.view = null;
             // legendElement
@@ -113,8 +93,8 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
             var _a = this.legendElement, focus = _a.focus, labels = _a.labels;
             var isDiamond = !!focus;
             if (isDiamond) {
-                return (widget_1.tsx("div", null,
-                    widget_1.tsx("div", { class: CSS.relationshipInstructions }, i18nInteractiveLegend.relationshipInstruction),
+                return (widget_1.tsx("div", { key: this.layerView.layer.id + "-relationship" },
+                    widget_1.tsx("div", { class: CSS.relationshipInstructions }, resources_1.default.relationshipInstruction),
                     widget_1.tsx("div", { key: "" + this.id, class: CSS.diamondContainer },
                         widget_1.tsx("div", { class: CSS.diamondLeftCol }, labels.left),
                         widget_1.tsx("div", { class: CSS.diamondMidCol },
@@ -124,7 +104,7 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         widget_1.tsx("div", { class: CSS.diamondRightCol }, labels.right))));
             }
             return (widget_1.tsx("div", null,
-                widget_1.tsx("div", { class: CSS.relationshipInstructions }, i18nInteractiveLegend.relationshipInstruction),
+                widget_1.tsx("div", { class: CSS.relationshipInstructions }, resources_1.default.relationshipInstruction),
                 widget_1.tsx("div", { class: CSS.squareTable },
                     widget_1.tsx("div", { class: CSS.squareTableRow },
                         widget_1.tsx("div", { class: this.classes(CSS.squareTableCell, CSS.squareTableLabel, CSS.squareTableLabelRightBottom) }, labels.left),
@@ -139,50 +119,50 @@ define(["require", "exports", "esri/core/tsSupport/declareExtendsHelper", "esri/
                         widget_1.tsx("div", { class: CSS.squareTableCell }),
                         widget_1.tsx("div", { class: this.classes(CSS.squareTableCell, CSS.squareTableLabel, CSS.squareTableLabelLeftTop) }, labels.right)))));
         };
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], RelationshipRamp.prototype, "twoDimensionRamp", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], RelationshipRamp.prototype, "view", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], RelationshipRamp.prototype, "legendElement", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], RelationshipRamp.prototype, "id", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], RelationshipRamp.prototype, "activeLayerInfos", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], RelationshipRamp.prototype, "layerView", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], RelationshipRamp.prototype, "featureCount", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], RelationshipRamp.prototype, "filterMode", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], RelationshipRamp.prototype, "opacity", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], RelationshipRamp.prototype, "grayScale", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], RelationshipRamp.prototype, "searchViewModel", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], RelationshipRamp.prototype, "layerListViewModel", void 0);
-        __decorate([
+        tslib_1.__decorate([
             decorators_1.property()
         ], RelationshipRamp.prototype, "featureCountEnabled", void 0);
-        RelationshipRamp = __decorate([
+        RelationshipRamp = tslib_1.__decorate([
             decorators_1.subclass("RelationshipRamp")
         ], RelationshipRamp);
         return RelationshipRamp;
-    }(decorators_1.declared(Widget)));
+    }(Widget));
     return RelationshipRamp;
 });
 //# sourceMappingURL=RelationshipRamp.js.map

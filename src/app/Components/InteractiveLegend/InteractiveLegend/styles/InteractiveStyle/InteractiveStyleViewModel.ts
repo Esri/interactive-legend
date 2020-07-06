@@ -1,15 +1,10 @@
-/// <amd-dependency path="esri/core/tsSupport/assignHelper" name="__assign" />
-/// <amd-dependency path="esri/core/tsSupport/declareExtendsHelper" name="__extends" />
-/// <amd-dependency path="esri/core/tsSupport/decorateHelper" name="__decorate" />
-
 // esri.core.Accessor
 import Accessor = require("esri/core/Accessor");
 
 // esri.core.accessorSupport
 import {
   property,
-  subclass,
-  declared
+  subclass
 } from "esri/core/accessorSupport/decorators";
 
 // esri.core.Handles
@@ -56,7 +51,7 @@ import SelectedStyleData = require("./SelectedStyleData");
 type State = "ready" | "loading" | "disabled" | "querying";
 
 @subclass("InteractiveStyleViewModel")
-class InteractiveStyleViewModel extends declared(Accessor) {
+class InteractiveStyleViewModel extends Accessor {
   //----------------------------------
   //
   //  Variables
@@ -219,6 +214,46 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         this.selectedStyleDataCollection.addMany([
           ...selectedStyleDataCollection
         ]);
+      }),
+      watchUtils.watch(this, "filterMode", () => {
+        this.selectedStyleDataCollection.forEach((selectedStyleData) => {
+          if (this.filterMode === "featureFilter") {
+            const filter = selectedStyleData?.featureLayerView?.effect?.filter;
+            if (filter) {
+              selectedStyleData.featureLayerView.effect = null;
+              selectedStyleData.featureLayerView.filter = filter;
+            }
+          } else if (this.filterMode === "mute") {
+            const filter = selectedStyleData?.featureLayerView?.filter;
+            if (filter) {
+              selectedStyleData.featureLayerView.filter = null;
+              const { opacity, grayScale } = this;
+              const opacityValue = opacity === null ? 30 : opacity;
+              const grayScaleValue = grayScale === null ? 100 : grayScale;
+              selectedStyleData.featureLayerView.effect = new FeatureEffect({
+                excludedEffect: `opacity(${opacityValue}%) grayscale(${grayScaleValue}%)`,
+                filter
+              });
+            }
+          }
+        });
+      }),
+      watchUtils.watch(this, "opacity, grayScale", () => {
+        this.selectedStyleDataCollection.forEach((selectedStyleData) => {
+          if (this.filterMode === "mute") {
+            const filter =
+              selectedStyleData?.featureLayerView?.filter ||
+              selectedStyleData?.featureLayerView?.effect?.filter;
+            selectedStyleData.featureLayerView.filter = null;
+            const { opacity, grayScale } = this;
+            const opacityValue = opacity === null ? 30 : opacity;
+            const grayScaleValue = grayScale === null ? 100 : grayScale;
+            selectedStyleData.featureLayerView.effect = new FeatureEffect({
+              excludedEffect: `opacity(${opacityValue}%) grayscale(${grayScaleValue}%)`,
+              filter
+            });
+          }
+        });
       })
     ]);
 
@@ -483,7 +518,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       authoringInfoType === "relationship" &&
       legendElement.type !== "size-ramp";
 
-    const featureLayerData = this.selectedStyleDataCollection?.find(data =>
+    const featureLayerData = this.selectedStyleDataCollection?.find((data) =>
       data ? activeLayerInfo?.layer?.id === data?.layerItemId : null
     );
     const hasSublayers = activeLayerInfo.get("parent.children.length") > 0;
@@ -529,11 +564,11 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       legendElement?.infos?.length === 1;
 
     const hasColorRamp = !activeLayerInfo?.legendElements.every(
-      legendElement => legendElement.type !== "color-ramp"
+      (legendElement) => legendElement.type !== "color-ramp"
     );
 
     const hasSizeRamp = !activeLayerInfo?.legendElements.every(
-      legendElement => legendElement.type !== "size-ramp"
+      (legendElement) => legendElement.type !== "size-ramp"
     );
 
     const singleSymbolColor = isSingleSymbol && hasColorRamp;
@@ -558,7 +593,8 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   private _initFeatureCount(): void {
     const initFeatureCountKey = "init-feature-count";
     this._handles.add(
-      watchUtils.whenTrue(this, "featureCountEnabled", () => {
+      watchUtils.watch(this, "featureCountEnabled", () => {
+        this._handles.remove(initFeatureCountKey);
         this._handles.add(
           [this._watchDataForCount(initFeatureCountKey)],
           initFeatureCountKey
@@ -608,39 +644,44 @@ class InteractiveStyleViewModel extends declared(Accessor) {
 
   // _updateFeatureCountOnViewUpdate
   private _updateFeatureCountOnViewUpdate(initFeatureCountKey: string): void {
-    this._handles.add([
-      watchUtils.whenFalse(this, "view.stationary", () => {
-        if (!this.view.stationary) {
-          const stationaryIsTrue = "stationary-is-true";
-          this._handles.add(
-            watchUtils.whenTrueOnce(this, "view.stationary", () => {
-              if (this._handles.has(stationaryIsTrue)) {
-                this._handles.remove(stationaryIsTrue);
-              }
-              this._handles.add(
-                [this._watchDataForCount(initFeatureCountKey)],
-                initFeatureCountKey
-              );
-            }),
-            stationaryIsTrue
-          );
-        } else {
-          const stationaryIsFalse = "stationary-is-false";
-          this._handles.add(
-            watchUtils.whenFalseOnce(this, "view.interacting", () => {
-              if (this._handles.has(stationaryIsFalse)) {
-                this._handles.remove(stationaryIsFalse);
-              }
-              this._handles.add(
-                [this._watchDataForCount(initFeatureCountKey)],
-                initFeatureCountKey
-              );
-            }),
-            stationaryIsFalse
-          );
-        }
-      })
-    ]);
+    const featureCountViewUpdateKey = "feature-count-view-update-key";
+    this._handles.remove(featureCountViewUpdateKey);
+    this._handles.add(
+      [
+        watchUtils.whenFalse(this, "view.stationary", () => {
+          if (!this.view.stationary) {
+            const stationaryIsTrue = "stationary-is-true";
+            this._handles.add(
+              watchUtils.whenTrueOnce(this, "view.stationary", () => {
+                if (this._handles.has(stationaryIsTrue)) {
+                  this._handles.remove(stationaryIsTrue);
+                }
+                this._handles.add(
+                  [this._watchDataForCount(initFeatureCountKey)],
+                  initFeatureCountKey
+                );
+              }),
+              stationaryIsTrue
+            );
+          } else {
+            const stationaryIsFalse = "stationary-is-false";
+            this._handles.add(
+              watchUtils.whenFalseOnce(this, "view.interacting", () => {
+                if (this._handles.has(stationaryIsFalse)) {
+                  this._handles.remove(stationaryIsFalse);
+                }
+                this._handles.add(
+                  [this._watchDataForCount(initFeatureCountKey)],
+                  initFeatureCountKey
+                );
+              }),
+              stationaryIsFalse
+            );
+          }
+        })
+      ],
+      featureCountViewUpdateKey
+    );
   }
 
   // _handleOperationalItemForCount
@@ -659,7 +700,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
           operationalItemIndex
         );
 
-        this.activeLayerInfos.forEach(activeLayerInfo => {
+        this.activeLayerInfos.forEach((activeLayerInfo) => {
           if (operationalItem.layer.id === activeLayerInfo.layer.id) {
             this._handleActiveLayerInfoForCount(
               activeLayerInfo,
@@ -746,7 +787,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   ): void {
     const key = `feature-count-${activeLayerInfo.layer.id}-${operationalItemIndex}-${legendElementIndex}`;
 
-    if (!this._handles.has(key)) {
+    if (!this._handles.has(key) && featureLayerView) {
       this._handles.add(
         watchUtils.whenFalse(featureLayerView, "updating", () => {
           this._handleFeatureCount(
@@ -783,7 +824,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         activeLayerInfo
       );
     });
-    Promise.all(promises).then(featureCountResponses => {
+    Promise.all(promises).then((featureCountResponses) => {
       this._handleFeatureCountResponses(
         featureCountResponses,
         operationalItemIndex,
@@ -842,13 +883,13 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       promises.push(
         featureLayerView
           .queryFeatureCount(query)
-          .then(featureCountRes => {
+          .then((featureCountRes) => {
             return {
               featureCountRes,
               infoIndex
             };
           })
-          .catch(err => {
+          .catch((err) => {
             console.warn(
               "Invalid geometry - querying count without geometry: ",
               err
@@ -858,7 +899,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
             );
             return featureLayerView
               .queryFeatureCount(queryNoGeometry)
-              .then(featureCountRes => {
+              .then((featureCountRes) => {
                 return {
                   featureCountRes,
                   infoIndex
@@ -899,7 +940,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
   ): void {
     const featureCountsForLegendElement = featureCountResObjects
       .slice()
-      .map(featureCountResObject => featureCountResObject.featureCountRes);
+      .map((featureCountResObject) => featureCountResObject.featureCountRes);
 
     const featureCountsForLayer = this.interactiveStyleData.featureCount.getItemAt(
       operationalItemIndex
@@ -959,7 +1000,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
 
     let currentTotal = 0;
     selectedInfoIndexes &&
-      selectedInfoIndexes.forEach(infoIndex => {
+      selectedInfoIndexes.forEach((infoIndex) => {
         currentTotal += featureCountsForLegendElement[infoIndex];
       });
 
@@ -983,10 +1024,10 @@ class InteractiveStyleViewModel extends declared(Accessor) {
     query.outSpatialReference = this.view.spatialReference;
     featureLayer
       .queryExtent(query)
-      .catch(err => {
+      .catch((err) => {
         console.error("ERROR: ", err);
       })
-      .then(extent => {
+      .then((extent) => {
         this.view.goTo(extent);
       });
   }
@@ -999,7 +1040,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
 
   // _storeFeatureData
   private _storeFeatureData(): void {
-    this.layerListViewModel.operationalItems.forEach(operationalItem => {
+    this.layerListViewModel.operationalItems.forEach((operationalItem) => {
       this._setUpDataContainers();
       const featureLayerView = operationalItem.layerView as FeatureLayerView;
       this.featureLayerViews.push(featureLayerView);
@@ -1134,7 +1175,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         } else {
           // Types unique symbols - 'Other' category
           const expressionList = [];
-          legendElementInfos.forEach(legendElementInfo => {
+          legendElementInfos.forEach((legendElementInfo) => {
             if (legendElementInfo.value) {
               const { value } = legendElementInfo;
               const singleQuote =
@@ -1200,7 +1241,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       return;
     }
     if (elementInfo.hasOwnProperty("value")) {
-      fields.forEach(field => {
+      fields.forEach((field) => {
         if (elementInfo.value === field) {
           return;
         }
@@ -1211,19 +1252,19 @@ class InteractiveStyleViewModel extends declared(Accessor) {
       return expressionArr.join(" AND ");
     } else {
       const queryForZeroes = [];
-      fields.forEach(field => {
+      fields.forEach((field) => {
         queryForZeroes.push(`${field} = 0`);
       });
 
       const otherExpression = [];
       if (fields.length > 2) {
-        fields.forEach(field1 => {
-          fields.forEach(field2 => {
+        fields.forEach((field1) => {
+          fields.forEach((field2) => {
             if (field1 === field2) {
               return;
             }
             const queryForMultiplePredominance = [];
-            fields.forEach(field3 => {
+            fields.forEach((field3) => {
               if (field1 === field3 || field2 === field3) {
                 return;
               }
@@ -1239,7 +1280,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
 
         const isNull = [];
 
-        fields.forEach(field => {
+        fields.forEach((field) => {
           isNull.push(`${field} IS NULL`);
         });
         const generatedOtherExpression = `(${queryForZeroes.join(
@@ -1248,8 +1289,8 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         return generatedOtherExpression;
       } else {
         const expressions = [];
-        fields.forEach(field1 => {
-          fields.forEach(field2 => {
+        fields.forEach((field1) => {
+          fields.forEach((field2) => {
             if (field1 === field2) {
               return;
             }
@@ -1259,8 +1300,8 @@ class InteractiveStyleViewModel extends declared(Accessor) {
         });
 
         const zeroAndNull = [];
-        fields.forEach(field1 => {
-          fields.forEach(field2 => {
+        fields.forEach((field1) => {
+          fields.forEach((field2) => {
             if (field1 === field2) {
               return;
             }
@@ -1335,7 +1376,7 @@ class InteractiveStyleViewModel extends declared(Accessor) {
 
     this.searchViewModel.sources.forEach(
       (searchSource: __esri.LayerSearchSource) => {
-        this.layerListViewModel.operationalItems.forEach(operationalItem => {
+        this.layerListViewModel.operationalItems.forEach((operationalItem) => {
           if (
             searchSource.layer &&
             searchSource.layer.id === operationalItem.layer.id
@@ -1361,16 +1402,16 @@ class InteractiveStyleViewModel extends declared(Accessor) {
 
     const layerPromises = [];
 
-    allLayers.forEach(layer => {
+    allLayers.forEach((layer) => {
       layerPromises.push(
-        layer.load().then(loadedLayer => {
+        layer.load().then((loadedLayer) => {
           return loadedLayer;
         })
       );
     });
 
-    Promise.all(layerPromises).then(layers => {
-      layers.forEach(layerItem => {
+    Promise.all(layerPromises).then((layers) => {
+      layers.forEach((layerItem) => {
         if (layerItem && layerItem.get("featureReduction")) {
           layerItem.set("featureReduction", null);
         }

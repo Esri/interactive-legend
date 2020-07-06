@@ -1,6 +1,8 @@
-define(["require", "exports", "dojo/i18n!../nls/Legend", "./replace"], function (require, exports, i18n, replace_1) {
+define(["require", "exports", "tslib", "dojo/i18n!../nls/Legend", "./replace"], function (require, exports, tslib_1, Legend_1, replace_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.isImageryStretchedLegend = exports.isRendererTitle = exports.getTitle = exports.attachToNode = void 0;
+    Legend_1 = tslib_1.__importDefault(Legend_1);
     function isRampTitle(titleInfo, isRamp) {
         return isRamp;
     }
@@ -40,7 +42,7 @@ define(["require", "exports", "dojo/i18n!../nls/Legend", "./replace"], function 
                         : null;
         }
         return bundleKey
-            ? replace_1.replace(bundleKey === "showField" ? "{field}" : i18n[bundleKey], {
+            ? replace_1.replace(bundleKey === "showField" ? "{field}" : Legend_1.default[bundleKey], {
                 field: titleInfo.field,
                 normField: titleInfo.normField
             })

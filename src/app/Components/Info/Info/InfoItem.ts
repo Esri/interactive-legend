@@ -1,8 +1,4 @@
-/// <amd-dependency path="esri/core/tsSupport/declareExtendsHelper" name="__extends" />
-/// <amd-dependency path="esri/core/tsSupport/decorateHelper" name="__decorate" />
-
 import {
-  declared,
   property,
   subclass
 } from "esri/core/accessorSupport/decorators";
@@ -14,7 +10,7 @@ import Accessor = require("esri/core/Accessor");
 type InfoItemType = "list" | "explanation";
 
 @subclass("InfoItem")
-class InfoItem extends declared(Accessor) {
+class InfoItem extends Accessor {
   // type
   @property()
   type: InfoItemType = null;

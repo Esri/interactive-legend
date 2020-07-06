@@ -1,13 +1,9 @@
-/// <amd-dependency path="esri/core/tsSupport/declareExtendsHelper" name="__extends" />
-/// <amd-dependency path="esri/core/tsSupport/decorateHelper" name="__decorate" />
-
 // esri.core
 import Accessor = require("esri/core/Accessor");
 
 // esri.core.accessorSupport
 import {
   subclass,
-  declared,
   property
 } from "esri/core/accessorSupport/decorators";
 
@@ -37,7 +33,7 @@ const InfoItemCollection = Collection.ofType<InfoItem>(InfoItem);
 type State = "ready" | "loading" | "disabled";
 
 @subclass("InfoViewModel")
-class InfoViewModel extends declared(Accessor) {
+class InfoViewModel extends Accessor {
   // state
   @property({
     dependsOn: ["view.ready"],

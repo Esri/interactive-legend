@@ -13,6 +13,22 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <script src="promisePolyfill.min.js"></script>
     <!-- End Responsive -->
+
+    <script
+      type="module"
+      src="https://unpkg.com/@esri/calcite-components@1.0.0-beta.27/dist/calcite/calcite.esm.js"
+    ></script>
+    <script
+      nomodule=""
+      src="https://unpkg.com/@esri/calcite-components@1.0.0-beta.27/dist/calcite/calcite.js"
+    ></script>
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://unpkg.com/@esri/calcite-components@1.0.0-beta.27/dist/calcite/calcite.css"
+    />
+
     <script src="./calcite-web-1.2.5/dist/js/calcite-web.min.js"></script>
     <link
       rel="icon"
@@ -26,11 +42,11 @@
     />
     <link
       rel="stylesheet"
-      href="https://js.arcgis.com/4.15/esri/themes/light/main.css"
+      href="https://js.arcgis.com/4.16/esri/themes/light/main.css"
     />
     <link rel="stylesheet" href="styles/Main.css" />
     <script src="./dojo.js"></script>
-    <script src="https://js.arcgis.com/4.15/"></script>
+    <script src="https://js.arcgis.com/4.16/"></script>
     <link rel="stylesheet" href="Components/Info/css/Info.css" />
     <link rel="stylesheet" href="Components/Screenshot/css/Screenshot.css" />
     <link
@@ -38,6 +54,10 @@
       href="Components/InteractiveLegend/css/InteractiveLegend.css"
     />
     <link rel="stylesheet" href="Components/Header/css/Header.css" />
+    <link
+      rel="stylesheet"
+      href="Components/Unsupported/css/UnsupportedBrowser.css"
+    />
     <script>
       require(["Application/init"]);
     </script>

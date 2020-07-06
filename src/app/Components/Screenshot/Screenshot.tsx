@@ -1,8 +1,5 @@
-/// <amd-dependency path="esri/core/tsSupport/declareExtendsHelper" name="__extends" />
-/// <amd-dependency path="esri/core/tsSupport/decorateHelper" name="__decorate" />
-
 // dojo
-import * as i18n from "dojo/i18n!./Screenshot/nls/resources";
+import i18n from "dojo/i18n!./Screenshot/nls/resources";
 
 // esri.widgets.Widget
 import Widget = require("esri/widgets/Widget");
@@ -10,7 +7,6 @@ import Widget = require("esri/widgets/Widget");
 // esri.core.accessorSupport
 import {
   subclass,
-  declared,
   property,
   aliasOf
 } from "esri/core/accessorSupport/decorators";
@@ -27,7 +23,7 @@ import watchUtils = require("esri/core/watchUtils");
 // esri.core.Handles
 import Handles = require("esri/core/Handles");
 
-//esri.widgets.support
+// esri.widgets.support
 import {
   accessibleHandler,
   renderable,
@@ -46,11 +42,11 @@ import FeatureWidget = require("esri/widgets/Feature");
 
 import SelectedStyleData = require("../InteractiveLegend/InteractiveLegend/styles/InteractiveStyle/SelectedStyleData");
 
-//----------------------------------
+// ----------------------------------
 //
 //  CSS Classes
 //
-//----------------------------------
+// ----------------------------------
 const CSS = {
   base: "esri-screenshot",
   widget: "esri-widget esri-widget--panel",
@@ -96,15 +92,15 @@ const CSS = {
 };
 
 @subclass("Screenshot")
-class Screenshot extends declared(Widget) {
+class Screenshot extends Widget {
   constructor(value?: any) {
-    super();
+    super(value);
   }
-  //----------------------------------
+  // ----------------------------------
   //
   //  Variables
   //
-  //----------------------------------
+  // ----------------------------------
 
   // Stored Nodes
   private _maskNode: HTMLElement = null;
@@ -118,11 +114,11 @@ class Screenshot extends declared(Widget) {
   // _handles
   private _handles: Handles = new Handles();
 
-  //----------------------------------
+  // ----------------------------------
   //
   //  Properties
   //
-  //----------------------------------
+  // ----------------------------------
 
   // view
   @aliasOf("viewModel.view")
@@ -141,12 +137,12 @@ class Screenshot extends declared(Widget) {
 
   // enableLegendOption
   @aliasOf("viewModel.enableLegendOption")
-  @property()
+  @renderable()
   enableLegendOption: boolean = null;
 
   // enablePopupOption
   @aliasOf("viewModel.enablePopupOption")
-  @property()
+  @renderable()
   enablePopupOption: boolean = null;
 
   @aliasOf("viewModel.featureWidget")
@@ -202,11 +198,11 @@ class Screenshot extends declared(Widget) {
   ])
   viewModel: ScreenshotViewModel = new ScreenshotViewModel();
 
-  //----------------------------------
+  // ----------------------------------
   //
   //  Lifecycle Methods
   //
-  //----------------------------------
+  // ----------------------------------
 
   postInitialize() {
     this.own([
@@ -251,11 +247,11 @@ class Screenshot extends declared(Widget) {
     this._screenshotImgNode = null;
   }
 
-  //----------------------------------
+  // ----------------------------------
   //
   //  Public Methods
   //
-  //----------------------------------
+  // ----------------------------------
 
   // activateScreenshot
   @accessibleHandler()
@@ -283,17 +279,17 @@ class Screenshot extends declared(Widget) {
     this.viewModel.downloadImage();
   }
 
-  //----------------------------------
+  // ----------------------------------
   //
   //  Private Methods
   //
-  //----------------------------------
+  // ----------------------------------
 
-  //----------------------------------
+  // ----------------------------------
   //
   //  Render Node Methods
   //
-  //----------------------------------
+  // ----------------------------------
 
   // _renderScreenshotPanel
   private _renderScreenshotPanel(): any {
@@ -350,8 +346,10 @@ class Screenshot extends declared(Widget) {
         )}
       >
         {this.enableLegendOption ? (
-          <label class={CSS.screenshotOption}>
-            {" "}
+          <label
+            key="esri-screenshot-legend-option"
+            class={CSS.screenshotOption}
+          >
             <input
               bind={this}
               onclick={this._toggleLegend}
@@ -363,7 +361,10 @@ class Screenshot extends declared(Widget) {
           </label>
         ) : null}
         {this.enablePopupOption ? (
-          <label class={CSS.screenshotOption}>
+          <label
+            key="esri-screenshot-popup-option"
+            class={CSS.screenshotOption}
+          >
             <input
               bind={this}
               onclick={this._togglePopup}

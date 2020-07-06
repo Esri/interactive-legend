@@ -71,10 +71,9 @@ body {
   position: relative;
   display: flex;
   align-items: center;
-  height: 5vh;
   background-color: #fff;
   color: #949494;
-  padding-left: 1vw;
+  padding: 0.5%;
   z-index: 2000;
   font-size: 1.3em;
 }
@@ -156,7 +155,19 @@ body {
 html[dir="rtl"] {
   .title-container {
     padding-right: 15px;
+
+    .esri-header__shared-theme-logo {
+      margin-right: 0px;
+      margin-left: 4px;
+    }
   }
+
+  // @media only screen and (max-width: 813px) {
+  //   .esri-header__shared-theme-logo {
+  //     margin-right: 0;
+  //     margin-left: 4px;
+  //   }
+  // }
 }
 
 .app-error {
@@ -183,8 +194,12 @@ html[dir="rtl"] {
   }
 
   .title-container {
-    height: 5%;
-    box-sizing: border-box;
+    padding: 1.5%;
+
+    .esri-header__shared-theme-logo {
+      width: 9%;
+      margin-right: 4px;
+    }
   }
 }
 
