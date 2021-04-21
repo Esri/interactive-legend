@@ -9,17 +9,6 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <script>
-    if (navigator && navigator.userAgent) {
-      var match = /\b(MSIE |Trident.*?rv:|Edge\/)(\d+)/.exec(navigator.userAgent);
-      if (match && match.length && match.length === 3) {
-        const version = parseInt(match[2]);
-        if (version <= 19) {
-          document.location = "../../shared/unsupported/index.html";
-        }
-      }
-    }
-  </script>
   <!-- End Responsive -->
   <link rel="shorcut icon" type="image/png" href="./assets/favicon.png">
   <link id="esri-stylesheet" rel="stylesheet" href="https://js.arcgis.com/4.19/esri/themes/light/main.css" />
