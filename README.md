@@ -43,13 +43,12 @@ Select from a set of map tools:
 
 ## Instructions
 
-1. Fork and then clone the repo.
-2. Run `npm install`
-3. Run `npm start`
+1. Clone the repo.
+2. `cd` into project.
+2. Run `npm install`.
+3. Run `npm start`.
 4. Host on local web server.
-5. Open web browser.
-6. Click on dist directory within browser tab.
-7. Test with different web maps.
+5. Visit `[LOCAL_HOST_URL]/dist/index.html` in web browser.
 
 ## Requirements
 
