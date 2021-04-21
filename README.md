@@ -4,6 +4,12 @@ Interactive Legend is a configurable app template where the core functionality r
 
 ![Interactive Legend Preview](images/interactive-legend.png)
 
+## 9.1 Release Updates
+
+1. Added Time Filter experience.
+
+2. Updated JSAPI to v4.19
+
 ## 8.2 Release Updates
 
 1. Updated ArcGIS JSAPI to v4.16
@@ -12,7 +18,7 @@ Interactive Legend is a configurable app template where the core functionality r
 
 3. Supports 'Instant apps' new configuration experience.
 
-4. Property name udpates.
+4. Property name updates.
 
 ## Features
 
