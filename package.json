@@ -14,30 +14,30 @@
     "TypeScript"
   ],
   "devDependencies": {
-    "@types/arcgis-js-api": "^4.14.0",
+    "@esri/application-base-js": "0.0.31",
+    "@esri/configurable-app-components": "^1.3.5",
+    "templates-common-library": "0.0.4",
+    "@types/arcgis-js-api": "^4.18.0",
     "autoprefixer": "^6.3.6",
-    "dojo-typings": "^1.11.9",
-    "grunt": "^1.0.3",
-    "grunt-contrib-jshint": "^1.1.0",
-    "grunt-contrib-watch": "^1.1.0",
-    "grunt-postcss": "^0.8.0",
-    "grunt-sass": "^2.1.0",
-    "grunt-tslint": "^5.0.2",
+    "copy-dir": "^1.3.0",
+    "dojo-typings": "^1.11.11",
+    "fs-extra": "^9.0.1",
     "node-sass": "^4.13.1",
     "npm-run-all": "^4.1.2",
     "postcss-normalize-charset": "^1.1.0",
     "tar": ">=4.4.2",
     "tslint": "^5.11.0",
-    "typescript": "^3.9.5"
+    "typescript": "^3.9.5",
+    "lodash": ">=4.17.13",
+    "tslib": "^2.0.0"
   },
   "scripts": {
-    "start": "npm-run-all --parallel watch:grunt watch:ts",
-    "watch:grunt": "grunt watch",
-    "watch:ts": "tsc --watch",
-    "lint": "grunt lint"
-  },
-  "dependencies": {
-    "lodash": ">=4.17.19",
-    "tslib": "^2.0.0"
+    "start": "node build/buildOutput.js && npm run build:ts && npm run build:sass && npm-run-all --parallel watch:ts watch:sass",
+    "build": "node build/buildOutput.js && npm run build:sass && npm run build:ts",
+    "build:ts": "tsc -p tsconfig.prod.json",
+    "build:sass": "node-sass styles/Main.scss dist/styles/Main.css",
+    "watch:ts": "tsc -p tsconfig.prod.json --watch",
+    "watch:sass": "node-sass styles/Main.scss dist/styles/Main.css --watch",
+    "deploy": "npm run build"
   }
 }

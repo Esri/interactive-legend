@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=11, IE=edge" />
+  <meta charset="utf-8" />
+  <!-- Responsive -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <!-- End Responsive -->
+  <link rel="shorcut icon" type="image/png" href="./assets/favicon.png">
+  <link id="esri-stylesheet" rel="stylesheet" href="https://js.arcgis.com/4.19/esri/themes/light/main.css" />
+  <link rel="stylesheet" type="text/css" href="https://unpkg.com/@esri/calcite-components/dist/calcite/calcite.css" />
+  <script type="module" src="https://unpkg.com/@esri/calcite-components/dist/calcite/calcite.esm.js"></script>
+  <script nomodule="" src="https://unpkg.com/@esri/calcite-components/dist/calcite/calcite.js"></script>
+  <link rel="stylesheet" href="../node_modules/@esri/configurable-app-components/Share/Share/css/Share.css">
+  <link rel="stylesheet" href="styles/Main.css" />
+  <script src="dojo.js"></script>
+  <script src="https://js.arcgis.com/4.19/"></script>
+  <script>
+    require(["Application/init"]);
+  </script>
+</head>
+
+<body class="configurable-application--loading">
+  <div class="parent-container">
+    <div id="view-parent-container">
+      <div id="main-container">
+        <div id="viewContainer" class="configurable-application__view-container"></div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

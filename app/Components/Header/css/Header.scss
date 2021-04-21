@@ -1,0 +1,42 @@
+.esri-header__shared-theme-logo {
+  max-width: 50px;
+}
+
+.esri-interactive-legend__header-app-container {
+  position: relative;
+  z-index: 0;
+}
+
+.title-container {
+  font-weight: normal;
+  margin: 0;
+}
+
+.title-container header {
+  width: 100%;
+}
+
+@media only screen and (max-width: 813px) {
+  .title-container {
+    font-size: 20px;
+  }
+}
+
+.esri-header__shared-theme-logo {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+
+  img {
+    width: 100%;
+  }
+
+  a {
+    line-height: 0;
+  }
+}
+
+html[dir="rtl"] {
+  margin-right: 0;
+  margin-left: 10px;
+}

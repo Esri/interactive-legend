@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["./app"],
+  "compilerOptions": {
+    "sourceMap": false,
+    "outDir": "./dist"
+  },
+  "exclude": ["node_modules"]
+}
