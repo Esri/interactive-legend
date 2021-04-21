@@ -45,10 +45,11 @@ Select from a set of map tools:
 
 1. Fork and then clone the repo.
 2. Run `npm install`
-3. Host on local web server.
-4. Open web browser.
-5. Click on dist directory within browser tab.
-6. Test with different web maps.
+3. Run `npm start`
+4. Host on local web server.
+5. Open web browser.
+6. Click on dist directory within browser tab.
+7. Test with different web maps.
 
 ## Requirements
 
@@ -71,7 +72,7 @@ Esri welcomes contributions from anyone and everyone. Please see our [guidelines
 
 ## Licensing
 
-Copyright 2020 Esri
+Copyright 2021 Esri
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
