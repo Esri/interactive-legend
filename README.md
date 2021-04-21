@@ -12,7 +12,7 @@ Interactive Legend is a configurable app template where the core functionality r
 
 3. Supports 'Instant apps' new configuration experience.
 
-4. Property name updates.
+4. Property name udpates.
 
 ## Features
 

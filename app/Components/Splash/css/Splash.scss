@@ -1,0 +1,14 @@
+.esri-splash__content {
+  max-height: 45vh;
+  overflow-y: auto;
+}
+
+@media only screen and (max-width: 813px) {
+  .esri-splash__content {
+    max-height: unset;
+  }
+
+  .esri-interactive-legend__splash-modal {
+    z-index: 502;
+  }
+}
